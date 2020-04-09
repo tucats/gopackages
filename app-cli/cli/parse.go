@@ -54,6 +54,19 @@ func Parse(grammar []Option, description string) error {
 	// Prepend the default supplied options
 	grammar = append([]Option{
 		Option{
+			LongName:    "profile",
+			OptionType:  Subcommand,
+			Description: "Manage the default profile",
+			Value:       ProfileGrammar,
+		},
+		Option{
+			ShortName:   "p",
+			LongName:    "use-profile",
+			Description: "Name of profile to use",
+			OptionType:  StringType,
+			Action:      SetDefaultProfile,
+		},
+		Option{
 			ShortName:   "d",
 			LongName:    "debug",
 			Description: "Are we debugging?",
@@ -156,7 +169,12 @@ func ParseGrammar(args []string, grammar Options) error {
 			// Is it a subcommand?
 			for _, entry := range grammar {
 				if entry.LongName == option && entry.OptionType == Subcommand {
-					subGrammar := entry.Value.(Options)
+
+					subGrammar := Options{}
+					if entry.Value == nil {
+						subGrammar = entry.Value.(Options)
+					}
+
 					CommandRoot = CommandRoot + entry.LongName + " "
 					CurrentVerbDescription = entry.Description
 					entry.Found = true
