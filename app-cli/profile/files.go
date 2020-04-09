@@ -130,11 +130,14 @@ func UseProfile(name string) {
 		Configurations[name] = c
 		profileDirty = true
 	}
+	ProfileName = name
 	CurrentConfiguration = &c
 }
 
 // Set puts a profile entry in the current Configuration structure
 func Set(key string, value string) {
+
+	explicitValues.Items[key] = value
 
 	c := *CurrentConfiguration
 	c.Items[key] = value

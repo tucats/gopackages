@@ -12,6 +12,12 @@ import (
 // Grammar describes profile subcommands
 var Grammar = cli.Options{
 	cli.Option{
+		LongName:    "list",
+		Description: "List all profiles",
+		Action:      ListAction,
+		OptionType:  cli.Subcommand,
+	},
+	cli.Option{
 		LongName:    "show",
 		Description: "Show the current profile",
 		Action:      ShowAction,
@@ -23,6 +29,14 @@ var Grammar = cli.Options{
 		Description:          "Set the default output type (text or json)",
 		ParameterDescription: "type",
 		Action:               SetOutputFormat,
+		Parameters:           1,
+	},
+	cli.Option{
+		LongName:             "set-description",
+		OptionType:           cli.Subcommand,
+		Description:          "Set the profile description",
+		ParameterDescription: "text",
+		Action:               SetDescriptionAction,
 		Parameters:           1,
 	},
 	cli.Option{
@@ -63,6 +77,22 @@ func ShowAction(c *cli.Options) error {
 		t.AddRowItems(k, v)
 	}
 	t.SetOrderBy("key")
+	t.Underlines(false)
+	t.Print(ui.TextTableFormat)
+
+	return nil
+}
+
+// ListAction Displays the current contents of the active profile
+func ListAction(c *cli.Options) error {
+
+	t := tables.New([]string{"Name", "Description"})
+
+	for k, v := range Configurations {
+
+		t.AddRowItems(k, v.Description)
+	}
+	t.SetOrderBy("name")
 	t.Underlines(false)
 	t.Print(ui.TextTableFormat)
 
@@ -115,6 +145,17 @@ func DeleteAction(c *cli.Options) error {
 	key := cli.Parameters[0]
 	Delete(key)
 	ui.Say("Profile key %s deleted", key)
+
+	return nil
+}
+
+// SetDescriptionAction sets the profile description string
+func SetDescriptionAction(c *cli.Options) error {
+
+	config := Configurations[ProfileName]
+	config.Description = cli.Parameters[0]
+	Configurations[ProfileName] = config
+	profileDirty = true
 
 	return nil
 }

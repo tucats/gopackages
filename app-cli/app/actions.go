@@ -43,7 +43,8 @@ func SetQuietMode(c *cli.Options) error {
 // SetDefaultProfile is the action routine when --profile is specified as a global
 // option. It's string value is used as the name of the active profile.
 func SetDefaultProfile(c *cli.Options) error {
-	name, _ := cli.GetString(*c, "profile")
+	name, _ := cli.GetString(*c, "use-profile")
+	ui.Debug("Using profile %s", name)
 	profile.UseProfile(name)
 	return nil
 }
