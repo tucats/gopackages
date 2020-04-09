@@ -1,3 +1,3 @@
-module gitlab.com/tomcole/gopackages/cli
+module gitlab.com/tucats/gopackages/cli
 
 go 1.14

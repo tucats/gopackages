@@ -1,10 +1,11 @@
 package cli
 
 import (
-	"app-cli/tables"
-	"app-cli/ui"
 	"fmt"
 	"os"
+
+	"github.com/tucats/gopackages/app-cli/ui"
+	"gitlab.com/tucats/gopackages/cli/tables"
 )
 
 // Copyright contains the copyright string (if any) used in help output

@@ -1,10 +1,11 @@
 package main
 
 import (
-	"app-cli/cli"
-	"app-cli/commands"
 	"fmt"
 	"os"
+
+	"gitlab.com/tucats/gopackages/cli/cli"
+	"gitlab.com/tucats/gopackages/cli/commands"
 )
 
 func main() {

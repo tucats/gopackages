@@ -1,13 +1,14 @@
 package cli
 
 import (
-	"app-cli/ui"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"gitlab.com/tucats/gopackages/cli/ui"
 )
 
 // MainProgram is the name of the main program extracted from arguments.
