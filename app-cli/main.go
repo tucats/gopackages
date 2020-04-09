@@ -5,13 +5,12 @@ package main
 
 import (
 	"github.com/tucats/gopackages/cli/app"
-	"github.com/tucats/gopackages/cli/cli"
 	"github.com/tucats/gopackages/cli/commands"
 )
 
 func main() {
 
-	cli.SetCopyright("(c) 2020 Tom Cole, fernwood.org")
+	app.SetCopyright("(c) 2020 Tom Cole, fernwood.org")
 	app.Run(commands.Grammar, "app-cli", "test driver for CLI development")
 
 }

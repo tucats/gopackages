@@ -73,3 +73,8 @@ func Run(grammar cli.Options, appName string, appDescription string) error {
 	}
 	return err
 }
+
+// SetCopyright sets the copyright string used in the help output.
+func SetCopyright(copyright string) {
+	cli.SetCopyright("(c) 2020 Tom Cole, fernwood.org")
+}
