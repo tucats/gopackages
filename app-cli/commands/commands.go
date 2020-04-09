@@ -1,3 +1,5 @@
+// Package commands contains the grammar definitioin for all commands, and can
+// also contain the implementations of those commands.
 package commands
 
 import "github.com/tucats/gopackages/cli/cli"

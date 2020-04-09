@@ -1,3 +1,6 @@
+// Package ui contains basic tools for interacting with a user. This includes generating
+// informational and debugging messages. It also includes functions for controlling
+// whether those messages are displayed or not.
 package ui
 
 import (
@@ -7,6 +10,9 @@ import (
 	"time"
 )
 
+// Formatted output types for data more complex than individual messages, such
+// as the format for tabular data output. Choices are "text", "json", or default
+// which means whatever was set by the command line or profile.
 const (
 
 	// DefaultTableFormat means use whatever the default is that may have been set
