@@ -1,11 +1,12 @@
 package tables
 
 import (
-	"app-cli/ui"
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/tucats/gopackages/cli/ui"
 )
 
 // Print will output a table using current rows and format specifications.

@@ -1,9 +1,10 @@
 package cli
 
 import (
-	"app-cli/ui"
 	"errors"
 	"strings"
+
+	"github.com/tucats/gopackages/cli/ui"
 )
 
 // ValidKeyword does a case-insensitive compare of a string containing

@@ -1,6 +1,6 @@
 package commands
 
-import "app-cli/cli"
+import "github.com/tucats/gopackages/cli/cli"
 
 // Grammar is the primary grammar of the command line, which defines all global options
 // and any subcommands.

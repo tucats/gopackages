@@ -1,9 +1,9 @@
 package commands
 
 import (
-	"app-cli/cli"
-	"app-cli/tables"
-	"app-cli/ui"
+	"github.com/tucats/gopackages/cli/cli"
+	"github.com/tucats/gopackages/cli/tables"
+	"github.com/tucats/gopackages/cli/ui"
 )
 
 // ListGrammar is the grammar definition for the list command
