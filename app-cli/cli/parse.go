@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gitlab.com/tucats/gopackages/cli/ui"
+	"github.com/tucats/gopackages/cli/ui"
 )
 
 // MainProgram is the name of the main program extracted from arguments.
