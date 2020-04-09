@@ -17,7 +17,11 @@ func SetCopyright(s string) {
 	Copyright = s
 }
 
-// ShowHelp displays help text for the grammar
+// ShowHelp displays help text for the grammar, using a standardized format.
+// The help shows subcommands as well as options, including value type cues.
+// The output is automatically directed to the stdout console output.
+//
+// This function uses the tables package to create uniform columns of output.
 func ShowHelp(grammar Options) {
 
 	if Copyright != "" {

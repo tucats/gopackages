@@ -14,13 +14,16 @@ import (
 // MainProgram is the name of the main program extracted from arguments.
 var MainProgram string
 
-// CurrentVerbDescription is a descriptive string used in help output.
+// CurrentVerbDescription is a descriptive string used in help output. It
+// is the description of the main program, or the current active verb.
 var CurrentVerbDescription string
 
 // MainProgramDescription is the description of the main program
 var MainProgramDescription string
 
-// CommandRoot builds out the command components as we parse, for use in help.
+// CommandRoot builds out the command components as we parse, for use in
+// help output. So the command verb and the chain of subcommands are stored
+// here, separated by blanks.
 var CommandRoot string
 
 // Parameters stores those command line items not parsed as part of the
@@ -35,7 +38,10 @@ var Action func(grammar *Options) error
 var Globals *[]Option
 
 // Parse accepts a grammar definition and parses the current argument
-// list against that grammar.
+// list against that grammar. Unrecognized options or subcommands, as
+// well as invalid values are reported as an error. If there is an
+// action routine associated with an option or a subcommand, that
+// action is executed.
 func Parse(grammar []Option, description string) error {
 
 	args := os.Args
@@ -246,7 +252,6 @@ func ParseGrammar(args []string, grammar Options) error {
 	}
 
 	// Did we ever find an action routine? If so, let's run it.
-
 	if err == nil && Action != nil {
 		err = Action(&grammar)
 	}
