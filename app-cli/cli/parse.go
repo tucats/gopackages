@@ -109,7 +109,7 @@ func ParseGrammar(args []string, grammar Options) error {
 	for currentArg := 0; currentArg < lastArg; currentArg++ {
 
 		option := args[currentArg]
-		ui.Debug("Processing argument text: %s", option)
+		ui.Debug("Processing token: %s", option)
 
 		var location *Option
 		var name string
@@ -151,11 +151,13 @@ func ParseGrammar(args []string, grammar Options) error {
 		}
 
 		location = nil
-		for n, entry := range grammar {
+		if name > "" {
+			for n, entry := range grammar {
 
-			if (isShort && entry.ShortName == name) || (!isShort && entry.LongName == name) {
-				location = &grammar[n]
-				break
+				if (isShort && entry.ShortName == name) || (!isShort && entry.LongName == name) {
+					location = &grammar[n]
+					break
+				}
 			}
 		}
 
@@ -171,7 +173,7 @@ func ParseGrammar(args []string, grammar Options) error {
 				if entry.LongName == option && entry.OptionType == Subcommand {
 
 					subGrammar := Options{}
-					if entry.Value == nil {
+					if entry.Value != nil {
 						subGrammar = entry.Value.(Options)
 					}
 
@@ -182,6 +184,7 @@ func ParseGrammar(args []string, grammar Options) error {
 						Action = entry.Action
 						ui.Debug("Adding action routine")
 					}
+					ui.Debug("Transferring control to subgrammar for %s", entry.LongName)
 					return ParseGrammar(args[currentArg+1:], subGrammar)
 				}
 			}
@@ -189,10 +192,10 @@ func ParseGrammar(args []string, grammar Options) error {
 			// Not a subcommand, just save it as an unclaimed parameter
 			Parameters = append(Parameters, option)
 			count := len(Parameters)
-			ui.Debug(fmt.Sprintf("added parameter %d", count))
+			ui.Debug(fmt.Sprintf("Unclaimed token added parameter %d", count))
 
 		} else {
-			ui.Debug("processing grammar option")
+			ui.Debug("processing option")
 
 			location.Found = true
 
@@ -269,9 +272,22 @@ func ParseGrammar(args []string, grammar Options) error {
 		}
 	}
 
+	// Whew! Everything parsed and in it's place. Before we wind up, let's verify that
+	// all required options were in fact found.
+
+	for _, entry := range grammar {
+
+		if entry.Required && !entry.Found {
+			err = errors.New("Required option " + entry.LongName + " not found")
+			break
+		}
+	}
+
 	// Did we ever find an action routine? If so, let's run it.
 	if err == nil && Action != nil {
 		err = Action(&grammar)
+	} else {
+		ShowHelp(grammar)
 	}
 	return err
 }

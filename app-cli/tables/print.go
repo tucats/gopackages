@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/tucats/gopackages/cli/profile"
 	"github.com/tucats/gopackages/cli/ui"
 )
 
@@ -17,6 +18,14 @@ func (t *Table) Print(format int) error {
 		t.SortRows(t.orderBy, t.ascending)
 	}
 
+	if format == ui.DefaultTableFormat {
+		switch profile.Get("output-format") {
+		case "text":
+			format = ui.TextTableFormat
+		case "json":
+			format = ui.JSONTableFormat
+		}
+	}
 	// Based on the selected format, generate the output
 	switch format {
 	case ui.TextTableFormat:

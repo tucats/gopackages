@@ -28,6 +28,7 @@ type Option struct {
 	Description string
 	OptionType  int
 	Found       bool
+	Required    bool
 	Private     bool
 	SubGrammar  Options
 	Value       interface{}

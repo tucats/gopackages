@@ -75,6 +75,6 @@ func ListActions(c *cli.Options) error {
 	}
 
 	// Print the table in the user-requested format.
-	return t.Print(ui.OutputFormat)
+	return t.Print(ui.DefaultTableFormat)
 
 }
