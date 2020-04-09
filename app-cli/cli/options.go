@@ -25,6 +25,7 @@ const (
 type Option struct {
 	ShortName            string
 	LongName             string
+	Aliases              []string
 	Description          string
 	OptionType           int
 	Parameters           int

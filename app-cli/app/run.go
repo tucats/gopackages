@@ -17,6 +17,7 @@ func Run(grammar cli.Options, appName string, appDescription string) error {
 	grammar = append([]cli.Option{
 		cli.Option{
 			LongName:    "profile",
+			Aliases:     []string{"prof"},
 			OptionType:  cli.Subcommand,
 			Description: "Manage the default profile",
 			Value:       profile.Grammar,

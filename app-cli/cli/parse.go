@@ -144,7 +144,16 @@ func ParseGrammar(args []string, grammar Options) error {
 
 			// Is it a subcommand?
 			for _, entry := range grammar {
-				if entry.LongName == option && entry.OptionType == Subcommand {
+
+				// Is it one of the aliases permitted?
+				isAlias := false
+				for _, n := range entry.Aliases {
+					if option == n {
+						isAlias = true
+						break
+					}
+				}
+				if (isAlias || entry.LongName == option) && entry.OptionType == Subcommand {
 
 					subGrammar := Options{}
 					if entry.Value != nil {
