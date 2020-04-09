@@ -23,16 +23,18 @@ const (
 
 // Option defines the structure of each option that can be parsed.
 type Option struct {
-	ShortName   string
-	LongName    string
-	Description string
-	OptionType  int
-	Found       bool
-	Required    bool
-	Private     bool
-	SubGrammar  Options
-	Value       interface{}
-	Action      func(grammar *Options) error
+	ShortName            string
+	LongName             string
+	Description          string
+	OptionType           int
+	Parameters           int
+	ParameterDescription string
+	Found                bool
+	Required             bool
+	Private              bool
+	SubGrammar           Options
+	Value                interface{}
+	Action               func(grammar *Options) error
 }
 
 // Options is a simple array of Option types, and is used to express

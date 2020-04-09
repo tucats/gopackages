@@ -51,6 +51,14 @@ func ShowHelp(grammar Options) {
 		composedCommand = composedCommand + "[command] "
 	}
 
+	if parameterDescription > "" {
+		composedCommand = composedCommand + " [" + parameterDescription + "]"
+	} else if expectedParameters == 1 {
+		composedCommand = composedCommand + " [parameter]"
+	} else if expectedParameters > 1 {
+		composedCommand = composedCommand + " [parameters]"
+	}
+
 	minimumFirstColumnWidth := len(composedCommand)
 	if minimumFirstColumnWidth < 20 {
 		minimumFirstColumnWidth = 20
@@ -87,10 +95,9 @@ func ShowHelp(grammar Options) {
 	t.SetSpacing(3)
 	t.SetMinimumWidth(0, minimumFirstColumnWidth)
 
-	for n, option := range grammar {
-		if n == 0 {
-			fmt.Printf("Options:\n")
-		}
+	fmt.Printf("Options:\n")
+
+	for _, option := range grammar {
 		if option.Private {
 			continue
 		}

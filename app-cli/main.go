@@ -4,26 +4,14 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/tucats/gopackages/cli/app"
 	"github.com/tucats/gopackages/cli/cli"
 	"github.com/tucats/gopackages/cli/commands"
-	"github.com/tucats/gopackages/cli/profile"
 )
 
 func main() {
 
-	profile.Load("default")
-
 	cli.SetCopyright("(c) 2020 Tom Cole, fernwood.org")
-	status := cli.Parse(commands.Grammar, "test driver for CLI package")
-
-	if status != nil {
-		fmt.Printf("Error, %s\n", status.Error())
-		os.Exit(1)
-	}
-
-	profile.Save()
+	app.Run(commands.Grammar, "app-cli", "test driver for CLI development")
 
 }

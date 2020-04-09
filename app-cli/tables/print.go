@@ -6,26 +6,17 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tucats/gopackages/cli/profile"
 	"github.com/tucats/gopackages/cli/ui"
 )
 
 // Print will output a table using current rows and format specifications.
-func (t *Table) Print(format int) error {
+func (t *Table) Print(format string) error {
 
 	// If there is an orderBy set for the table, do the sort now
 	if t.orderBy >= 0 {
 		t.SortRows(t.orderBy, t.ascending)
 	}
 
-	if format == ui.DefaultTableFormat {
-		switch profile.Get("output-format") {
-		case "text":
-			format = ui.TextTableFormat
-		case "json":
-			format = ui.JSONTableFormat
-		}
-	}
 	// Based on the selected format, generate the output
 	switch format {
 	case ui.TextTableFormat:

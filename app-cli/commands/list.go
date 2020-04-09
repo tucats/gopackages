@@ -2,8 +2,8 @@ package commands
 
 import (
 	"github.com/tucats/gopackages/cli/cli"
+	"github.com/tucats/gopackages/cli/profile"
 	"github.com/tucats/gopackages/cli/tables"
-	"github.com/tucats/gopackages/cli/ui"
 )
 
 // ListGrammar is the grammar definition for the list command
@@ -75,6 +75,6 @@ func ListActions(c *cli.Options) error {
 	}
 
 	// Print the table in the user-requested format.
-	return t.Print(ui.DefaultTableFormat)
+	return t.Print(profile.Get("output-format"))
 
 }

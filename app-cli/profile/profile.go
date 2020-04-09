@@ -1,169 +1,120 @@
-// Package profile manages the persistent user profile used by the command
-// application infrastructure. This includes automatically reading any
-// profile in as part of startup, and of updating the profile as needed.
 package profile
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"os"
+	"errors"
 	"strings"
+
+	"github.com/tucats/gopackages/cli/cli"
+	"github.com/tucats/gopackages/cli/tables"
+	"github.com/tucats/gopackages/cli/ui"
 )
 
-// ProfileDirectory is the name of the invisible directory that is created
-// in the user's home directory to host configuration data
-var ProfileDirectory = ".org.fernwood"
-
-// ProfileFile is the name of the configuration file that contains the
-// profiles.
-var ProfileFile = "config.json"
-
-// ProfileName is the name of the configuration being used. The default
-// configuration is always named "default"
-var ProfileName = "default"
-
-// Configuration describes what is known about a configuration
-type Configuration struct {
-	Description string            `json:"description,omit"`
-	Items       map[string]string `json:"items"`
+// Grammar describes profile subcommands
+var Grammar = cli.Options{
+	cli.Option{
+		LongName:    "show",
+		Description: "Show the current profile",
+		Action:      ShowAction,
+		OptionType:  cli.Subcommand,
+	},
+	cli.Option{
+		LongName:             "set-output",
+		OptionType:           cli.Subcommand,
+		Description:          "Set the default output type (text or json)",
+		ParameterDescription: "type",
+		Action:               SetOutputFormat,
+		Parameters:           1,
+	},
+	cli.Option{
+		LongName:             "delete",
+		OptionType:           cli.Subcommand,
+		Description:          "Delete a key from the profile",
+		Action:               DeleteAction,
+		Parameters:           1,
+		ParameterDescription: "key",
+	},
+	cli.Option{
+		LongName:    "set",
+		Description: "Set a profile value",
+		Action:      SetAction,
+		OptionType:  cli.Subcommand,
+		Value: cli.Options{
+			cli.Option{
+				LongName:    "key",
+				Description: "The key that will be set in the profile. Can be of the form key=value.",
+				OptionType:  cli.StringType,
+				Required:    true,
+			},
+			cli.Option{
+				LongName:    "value",
+				Description: "The value to set for the key. If missing, the key is deleted",
+				OptionType:  cli.StringType,
+			},
+		},
+	},
 }
 
-// CurrentConfiguration describes the current configuration that is active.
-var CurrentConfiguration *Configuration
+// ShowAction Displays the current contents of the active profile
+func ShowAction(c *cli.Options) error {
 
-// profileDirty is set to true when a key value is written or deleted, which
-// tells us to rewrite the profile. If false, then no update is required.
-var profileDirty = false
+	t := tables.New([]string{"Key", "Value"})
 
-// Configurations is a map keyed by the configuration name for each
-// configuration in the config file
-var Configurations map[string]Configuration
-
-// Load reads in the named profile, if it exists.
-func Load(name string) error {
-
-	var c Configuration = Configuration{Description: "Default configuration", Items: map[string]string{}}
-	CurrentConfiguration = &c
-	Configurations = map[string]Configuration{"default": c}
-
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return err
+	for k, v := range CurrentConfiguration.Items {
+		t.AddRowItems(k, v)
 	}
+	t.SetOrderBy("key")
+	t.Underlines(false)
+	t.Print(ui.TextTableFormat)
 
-	var path strings.Builder
-	path.WriteString(home)
-	path.WriteRune(os.PathSeparator)
-	path.WriteString(ProfileDirectory)
-	path.WriteRune(os.PathSeparator)
-	path.WriteString(ProfileFile)
+	return nil
+}
 
-	configFile, err := os.Open(path.String())
-	if err != nil {
-		return err
-	}
+// SetOutputFormat is the action handler for the set-output subcommand.
+func SetOutputFormat(c *cli.Options) error {
 
-	defer configFile.Close()
-	// read our opened jsonFile as a byte array.
-	byteValue, _ := ioutil.ReadAll(configFile)
-
-	// we unmarshal our byteArray which contains our
-	// jsonFile's content into the config map which we defined above
-	err = json.Unmarshal(byteValue, &Configurations)
-	if err == nil {
-		if name == "" {
-			name = ProfileName
+	if len(cli.Parameters) == 1 {
+		outputType := cli.Parameters[0]
+		if outputType == "text" || outputType == "json" {
+			Set("output-format", outputType)
+			return nil
 		}
-		c, found := Configurations[name]
-		if !found {
-			c = Configuration{Description: "Default configuration", Items: map[string]string{}}
-			Configurations[name] = c
+		return errors.New("Invalid output type: " + outputType)
+	}
+	return errors.New("Missing output type")
+}
+
+// SetAction uses the first two parameters as a key and value
+func SetAction(c *cli.Options) error {
+
+	// Generic --key and --value specification
+	key, _ := cli.GetString(*c, "key")
+	value, valueFound := cli.GetString(*c, "value")
+
+	if !valueFound {
+		if equals := strings.Index(key, "="); equals >= 0 {
+			value = key[equals+1:]
+			key = key[:equals]
+			valueFound = true
 		}
-		ProfileName = name
-		CurrentConfiguration = &c
 	}
 
-	return err
-}
-
-// Save the current configuration.
-func Save() error {
-
-	// So we even need to do anything?
-	if !profileDirty {
-		return nil
+	if valueFound {
+		Set(key, value)
+		ui.Say("Profile key %s written", key)
+	} else {
+		Delete(key)
+		ui.Say("Profile key %s deleted", key)
 	}
 
-	// Does the directory exist?
-	var path strings.Builder
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-	path.WriteString(home)
-	path.WriteRune(os.PathSeparator)
-	path.WriteString(ProfileDirectory)
-
-	if _, err := os.Stat(path.String()); os.IsNotExist(err) {
-		os.MkdirAll(path.String(), os.ModePerm)
-	}
-
-	path.WriteRune(os.PathSeparator)
-	path.WriteString(ProfileFile)
-
-	byteBuffer, err := json.MarshalIndent(&Configurations, "", "  ")
-
-	err = ioutil.WriteFile(path.String(), byteBuffer, os.ModePerm)
-	return err
+	return nil
 }
 
-// UseProfile specifies the name of the profile to use, if other
-// than the default.
-func UseProfile(name string) {
+// DeleteAction deletes a named key value
+func DeleteAction(c *cli.Options) error {
 
-	c, found := Configurations[name]
-	if !found {
-		c = Configuration{Description: name + " configuration", Items: map[string]string{}}
-		Configurations[name] = c
-		profileDirty = true
-	}
-	CurrentConfiguration = &c
-}
+	key := cli.Parameters[0]
+	Delete(key)
+	ui.Say("Profile key %s deleted", key)
 
-// Set puts a profile entry in the current Configuration structure
-func Set(key string, value string) {
-
-	c := *CurrentConfiguration
-	c.Items[key] = value
-	profileDirty = true
-
-}
-
-// SetDefault puts a profile entry in the current Configuration structure. It is
-// different than Set() in that it doesn't mark the value as dirty, so no need
-// to update on account of this setting.
-func SetDefault(key string, value string) {
-	c := *CurrentConfiguration
-	c.Items[key] = value
-}
-
-// Get gets a profile entry in the current configuration structure.
-// If the key does not exist, an empty string is returned.
-func Get(key string) string {
-	c := *CurrentConfiguration
-	return c.Items[key]
-}
-
-// Delete removes a key from the map entirely.
-func Delete(key string) {
-	c := *CurrentConfiguration
-	delete(c.Items, key)
-	profileDirty = true
-}
-
-// Exists test to see if a key value exists or not
-func Exists(key string) bool {
-	c := *CurrentConfiguration
-	_, exists := c.Items[key]
-	return exists
+	return nil
 }

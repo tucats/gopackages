@@ -30,6 +30,16 @@ var CommandRoot string
 // grammar.
 var Parameters []string
 
+// expectedParameters describes how many parameters are expected, which
+// comes from any parameter value processed in an subcommand. A negative
+// number means any number up to the absolute value.
+var expectedParameters = 0
+
+// parameterDescription is a string that can be specified in a subcommand
+// option to describe parameters. For example, the set-output builtin
+// command uses a description of "type"
+var parameterDescription = ""
+
 // Action is the function to invoke on the last subcommand found in parsing.
 var Action func(grammar *Options) error
 
@@ -50,42 +60,6 @@ func Parse(grammar []Option, description string) error {
 	MainProgramDescription = description
 	CommandRoot = ""
 	Action = nil
-
-	// Prepend the default supplied options
-	grammar = append([]Option{
-		Option{
-			LongName:    "profile",
-			OptionType:  Subcommand,
-			Description: "Manage the default profile",
-			Value:       ProfileGrammar,
-		},
-		Option{
-			ShortName:   "p",
-			LongName:    "use-profile",
-			Description: "Name of profile to use",
-			OptionType:  StringType,
-			Action:      SetDefaultProfile,
-		},
-		Option{
-			ShortName:   "d",
-			LongName:    "debug",
-			Description: "Are we debugging?",
-			OptionType:  BooleanType,
-			Action:      SetDebugMessaging,
-		},
-		Option{
-			LongName:    "output-format",
-			Description: "Specify text or json output format",
-			OptionType:  StringType,
-			Action:      SetOutputFormat,
-		},
-		Option{
-			ShortName:   "q",
-			LongName:    "quiet",
-			Description: "If specified, suppress extra messaging",
-			OptionType:  BooleanType,
-			Action:      SetQuietMode,
-		}}, grammar...)
 
 	Globals = &grammar
 
@@ -180,6 +154,9 @@ func ParseGrammar(args []string, grammar Options) error {
 					CommandRoot = CommandRoot + entry.LongName + " "
 					CurrentVerbDescription = entry.Description
 					entry.Found = true
+					expectedParameters = entry.Parameters
+					parameterDescription = entry.ParameterDescription
+
 					if entry.Action != nil {
 						Action = entry.Action
 						ui.Debug("Adding action routine")
@@ -283,11 +260,30 @@ func ParseGrammar(args []string, grammar Options) error {
 		}
 	}
 
-	// Did we ever find an action routine? If so, let's run it.
-	if err == nil && Action != nil {
-		err = Action(&grammar)
-	} else {
-		ShowHelp(grammar)
+	// If the parse went okay, let's check to make sure we don't have dangling
+	// parameters, and then call the action if there is one.
+
+	if err == nil {
+
+		if expectedParameters == 0 && len(Parameters) > 0 {
+			return errors.New("unexpected parameters on command line")
+		}
+		if expectedParameters < 0 {
+			if len(Parameters) > -expectedParameters {
+				return errors.New("too many parameters on command line")
+			}
+		} else {
+			if len(Parameters) != expectedParameters {
+				return errors.New("incorrect number of parameters on command line")
+			}
+		}
+		// Did we ever find an action routine? If so, let's run it. Otherwise,
+		// there wasn't enough command to determine what to do, so show the help.
+		if Action != nil {
+			err = Action(&grammar)
+		} else {
+			ShowHelp(grammar)
+		}
 	}
 	return err
 }

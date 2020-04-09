@@ -17,18 +17,18 @@ const (
 
 	// DefaultTableFormat means use whatever the default is that may have been set
 	// by the global option --output-type, etc.
-	DefaultTableFormat = 0
+	DefaultTableFormat = "default"
 
 	// TextTableFormat indicates the output format should be human-readable text
-	TextTableFormat = 1
+	TextTableFormat = "text"
 
 	// JSONTableFormat indicates the output format should be machine-readable JSON
-	JSONTableFormat = 2
+	JSONTableFormat = "json"
 )
 
 // OutputFormat is the default output format if not overridden by a global option
 // or explicit call from the user.
-var OutputFormat int = TextTableFormat
+var OutputFormat = TextTableFormat
 
 // DebugMode determines if "debug" style messages are output.
 var DebugMode = false
