@@ -43,7 +43,7 @@ func QuietAction(c *cli.Context) error {
 // UseProfileAction is the action routine when --profile is specified as a global
 // option. It's string value is used as the name of the active profile.
 func UseProfileAction(c *cli.Context) error {
-	name, _ := c.GetString("use-profile")
+	name, _ := c.GetString("profile")
 	ui.Debug("Using profile %s", name)
 	profile.UseProfile(name)
 	return nil

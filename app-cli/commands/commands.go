@@ -9,7 +9,7 @@ import "github.com/tucats/gopackages/cli/cli"
 var Grammar = []cli.Option{
 	cli.Option{
 		LongName:    "list",
-		Description: "List stuff",
+		Description: "Demonstration command to list a table",
 		OptionType:  cli.Subcommand,
 		Value:       ListGrammar,
 		Action:      ListAction,

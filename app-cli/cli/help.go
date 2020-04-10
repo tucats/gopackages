@@ -11,6 +11,9 @@ import (
 // Copyright contains the copyright string (if any) used in help output
 var Copyright string
 
+// Version is a string representation of the current program.
+var Version string = "v.0.0-1"
+
 // SetCopyright sets the copyright string. If not set, then no copyright
 // message is displayed as part of help.
 func SetCopyright(s string) {
@@ -25,11 +28,7 @@ func SetCopyright(s string) {
 func ShowHelp(c *Context) {
 
 	if Copyright != "" {
-		name := c.MainProgram
-		if MainProgramDescription > "" {
-			name = name + " - " + MainProgramDescription
-		}
-		fmt.Printf("%s - %s\n\n", name, Copyright)
+		fmt.Printf("%s\n", Copyright)
 	}
 
 	composedCommand := c.MainProgram + " " + c.Command
@@ -62,42 +61,42 @@ func ShowHelp(c *Context) {
 	}
 
 	minimumFirstColumnWidth := len(composedCommand)
-	if minimumFirstColumnWidth < 20 {
-		minimumFirstColumnWidth = 20
+	if minimumFirstColumnWidth < 26 {
+		minimumFirstColumnWidth = 26
 	}
-
-	fmt.Printf("Usage:\n   %-20s   %s\n\n", composedCommand, c.Description)
+	if c.Parent == nil {
+		c.Description = MainProgramDescription + ", " + Version
+	}
+	fmt.Printf("\nUsage:\n   %-26s   %s\n\n", composedCommand, c.Description)
 	headerShown := false
 
-	t := tables.New([]string{"subcommand", "description"})
-	t.ShowHeadings(false)
-	t.SetIndent(3)
-	t.SetSpacing(3)
-	t.SetMinimumWidth(0, minimumFirstColumnWidth)
+	tc := tables.New([]string{"subcommand", "description"})
+	tc.ShowHeadings(false)
+	tc.SetIndent(3)
+	tc.SetSpacing(3)
+	tc.SetMinimumWidth(0, minimumFirstColumnWidth)
 
 	for _, option := range c.Grammar {
 		if option.OptionType == Subcommand && !option.Private {
 			if !headerShown {
 				headerShown = true
 				fmt.Printf("Commands:\n")
-				t.AddRow([]string{"help", "Display help text"})
+				tc.AddRow([]string{"help", "Display help text"})
 			}
-			t.AddRow([]string{option.LongName, option.Description})
+			tc.AddRow([]string{option.LongName, option.Description})
 		}
 	}
 	if headerShown {
-		t.SortRows(0, true)
-		t.Print(ui.TextTableFormat)
+		tc.SortRows(0, true)
+		tc.Print(ui.TextTableFormat)
 		fmt.Printf("\n")
 	}
 
-	t = tables.New([]string{"option", "description"})
-	t.ShowHeadings(false)
-	t.SetIndent(3)
-	t.SetSpacing(3)
-	t.SetMinimumWidth(0, minimumFirstColumnWidth)
-
-	fmt.Printf("Options:\n")
+	to := tables.New([]string{"option", "description"})
+	to.ShowHeadings(false)
+	to.SetIndent(3)
+	to.SetSpacing(3)
+	to.SetMinimumWidth(0, minimumFirstColumnWidth)
 
 	for _, option := range c.Grammar {
 		if option.Private {
@@ -133,13 +132,13 @@ func ShowHelp(c *Context) {
 			if option.EnvironmentVariable != "" {
 				fullDescription = fullDescription + " [" + option.EnvironmentVariable + "]"
 			}
-			t.AddRow([]string{name, fullDescription})
+			to.AddRow([]string{name, fullDescription})
 		}
 	}
 
-	t.AddRow([]string{"--help, -h", "Show this help text"})
-	t.SortRows(0, true)
-	t.Print(ui.TextTableFormat)
-
+	fmt.Printf("Options:\n")
+	to.AddRow([]string{"--help, -h", "Show this help text"})
+	to.SortRows(0, true)
+	to.Print(ui.TextTableFormat)
 	os.Exit(0)
 }

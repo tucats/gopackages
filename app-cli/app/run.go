@@ -6,6 +6,8 @@ package app
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/tucats/gopackages/cli/cli"
 	"github.com/tucats/gopackages/cli/profile"
@@ -42,7 +44,7 @@ func Run(grammar []cli.Option, appName string, appDescription string) error {
 		},
 		cli.Option{
 			ShortName:           "p",
-			LongName:            "use-profile",
+			LongName:            "profile",
 			Description:         "Name of profile to use",
 			OptionType:          cli.StringType,
 			Action:              UseProfileAction,
@@ -106,5 +108,25 @@ func Run(grammar []cli.Option, appName string, appDescription string) error {
 
 // SetCopyright sets the copyright string used in the help output.
 func SetCopyright(copyright string) {
-	cli.SetCopyright("(c) 2020 Tom Cole, fernwood.org")
+	cli.SetCopyright(copyright)
+}
+
+// SetVersion sets the version string for the application
+func SetVersion(version []int) {
+	var v strings.Builder
+
+	v.WriteString("v")
+	for i, n := range version {
+
+		if i > 1 && n == 0 {
+			break
+		}
+		if i > 1 {
+			v.WriteRune('-')
+		} else if i > 0 {
+			v.WriteRune('.')
+		}
+		v.WriteString(strconv.Itoa(n))
+	}
+	cli.Version = v.String()
 }

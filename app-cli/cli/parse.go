@@ -76,6 +76,7 @@ func (c *Context) ParseGrammar(args []string) error {
 		// Handle the special cases automatically.
 		if (helpVerb && option == "help") || option == "-h" || option == "--help" {
 			ShowHelp(c)
+			break
 		}
 		if option == "--" {
 			parametersOnly = true

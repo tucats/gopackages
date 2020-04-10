@@ -10,7 +10,8 @@ import (
 
 func main() {
 
-	app.SetCopyright("(c) 2020 Tom Cole, fernwood.org")
+	app.SetCopyright("(c) 2020 Tom Cole. All rights reserved.")
+	app.SetVersion([]int{1, 1, 35})
 	app.Run(commands.Grammar, "app-cli", "test driver for CLI development")
 
 }
