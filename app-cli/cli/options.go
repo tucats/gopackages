@@ -33,11 +33,17 @@ type Option struct {
 	Found                bool
 	Required             bool
 	Private              bool
-	SubGrammar           Options
+	SubGrammar           []Option
 	Value                interface{}
-	Action               func(grammar *Options) error
+	Action               func(c *Context) error
 }
 
-// Options is a simple array of Option types, and is used to express
+// Context is a simple array of Option types, and is used to express
 // a grammar.
-type Options []Option
+type Context struct {
+	AppName     string
+	MainProgram string
+	Description string
+	Command     string
+	Grammar     []Option
+}

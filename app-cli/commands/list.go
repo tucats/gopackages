@@ -7,7 +7,7 @@ import (
 )
 
 // ListGrammar is the grammar definition for the list command
-var ListGrammar cli.Options = []cli.Option{
+var ListGrammar = []cli.Option{
 	cli.Option{
 		LongName:    "no-headings",
 		Description: "If specified, do not print headings",
@@ -43,13 +43,13 @@ var ListGrammar cli.Options = []cli.Option{
 }
 
 // ListActions is the command handler to list objects.
-func ListActions(c *cli.Options) error {
+func ListActions(c *cli.Context) error {
 
 	t := tables.New([]string{"Name", "Age"})
 	_ = t.SetAlignment(1, tables.AlignmentRight)
 
 	// If an order-by is given, tell the table to sort the data
-	if name, present := cli.GetString(*c, "order-by"); present {
+	if name, present := c.GetString("order-by"); present {
 		if err := t.SetOrderBy(name); err != nil {
 			return err
 		}
@@ -63,12 +63,12 @@ func ListActions(c *cli.Options) error {
 	t.AddRowItems("Anna", 25)
 
 	// Add formatting and other control settings the user might specify.
-	t.SuppressHeadings(cli.GetBool(*c, "no-headings"))
-	t.RowNumbers(cli.GetBool(*c, "row-numbers"))
-	if limit, present := cli.GetInteger(*c, "limit"); present {
+	t.SuppressHeadings(c.GetBool("no-headings"))
+	t.RowNumbers(c.GetBool("row-numbers"))
+	if limit, present := c.GetInteger("limit"); present {
 		t.RowLimit(limit)
 	}
-	if startingRow, present := cli.GetInteger(*c, "start"); present {
+	if startingRow, present := c.GetInteger("start"); present {
 		if err := t.SetStartingRow(startingRow); err != nil {
 			return err
 		}

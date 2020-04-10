@@ -11,7 +11,7 @@
             "mode": "auto",
             "program": "${fileDirname}",
             "env": {},
-            "args": ["-d", "-p", "admin", "profile", "set-description", "Used for stuff"]
+            "args": ["list"]
         }
     ]
 }

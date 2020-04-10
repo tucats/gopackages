@@ -11,20 +11,8 @@ import (
 	"github.com/tucats/gopackages/cli/ui"
 )
 
-// MainProgram is the name of the main program extracted from arguments.
-var MainProgram string
-
-// CurrentVerbDescription is a descriptive string used in help output. It
-// is the description of the main program, or the current active verb.
-var CurrentVerbDescription string
-
 // MainProgramDescription is the description of the main program
 var MainProgramDescription string
-
-// CommandRoot builds out the command components as we parse, for use in
-// help output. So the command verb and the chain of subcommands are stored
-// here, separated by blanks.
-var CommandRoot string
 
 // Parameters stores those command line items not parsed as part of the
 // grammar.
@@ -41,7 +29,7 @@ var expectedParameters = 0
 var parameterDescription = ""
 
 // Action is the function to invoke on the last subcommand found in parsing.
-var Action func(grammar *Options) error
+var Action func(c *Context) error
 
 // Globals is a copy of the outermost grammar definition, and is used to find
 // global values later.
@@ -52,28 +40,28 @@ var Globals *[]Option
 // well as invalid values are reported as an error. If there is an
 // action routine associated with an option or a subcommand, that
 // action is executed.
-func Parse(grammar []Option, description string) error {
+func (c *Context) Parse(description string) error {
 
 	args := os.Args
-	MainProgram = filepath.Base(args[0])
-	CurrentVerbDescription = ""
+	c.MainProgram = filepath.Base(args[0])
+	c.Description = ""
 	MainProgramDescription = description
-	CommandRoot = ""
+	c.Command = ""
 	Action = nil
 
-	Globals = &grammar
+	Globals = &c.Grammar
 
 	// If there are no arguments other than the main program name, dump out the help by default.
 	if len(args) == 1 {
-		ShowHelp(grammar)
+		ShowHelp(c)
 	}
 
 	// Start parsing using the top-level grammar.
-	return ParseGrammar(args[1:], grammar)
+	return c.ParseGrammar(args[1:])
 }
 
 // ParseGrammar accepts an argument list and a grammar definition, and parses
-func ParseGrammar(args []string, grammar Options) error {
+func (c *Context) ParseGrammar(args []string) error {
 
 	lastArg := len(args)
 	var err error
@@ -100,7 +88,7 @@ func ParseGrammar(args []string, grammar Options) error {
 
 		// Handle the special cases automatically.
 		if (helpVerb && option == "help") || option == "-h" || option == "--help" {
-			ShowHelp(grammar)
+			ShowHelp(c)
 		}
 		if option == "--" {
 			parametersOnly = true
@@ -126,10 +114,10 @@ func ParseGrammar(args []string, grammar Options) error {
 
 		location = nil
 		if name > "" {
-			for n, entry := range grammar {
+			for n, entry := range c.Grammar {
 
 				if (isShort && entry.ShortName == name) || (!isShort && entry.LongName == name) {
-					location = &grammar[n]
+					location = &(c.Grammar[n])
 					break
 				}
 			}
@@ -143,7 +131,7 @@ func ParseGrammar(args []string, grammar Options) error {
 		if location == nil {
 
 			// Is it a subcommand?
-			for _, entry := range grammar {
+			for _, entry := range c.Grammar {
 
 				// Is it one of the aliases permitted?
 				isAlias := false
@@ -155,13 +143,19 @@ func ParseGrammar(args []string, grammar Options) error {
 				}
 				if (isAlias || entry.LongName == option) && entry.OptionType == Subcommand {
 
-					subGrammar := Options{}
+					// We're doing a subcommand! Create a new context that defines the
+					// next level down. It should include the current context information,
+					// and an updated grammar tree, command text, and description adapted
+					// for this subcommand.
+					subContext := *c
 					if entry.Value != nil {
-						subGrammar = entry.Value.(Options)
+						subContext.Grammar = entry.Value.([]Option)
+					} else {
+						subContext.Grammar = []Option{}
 					}
+					subContext.Command = c.Command + entry.LongName + " "
+					subContext.Description = entry.Description
 
-					CommandRoot = CommandRoot + entry.LongName + " "
-					CurrentVerbDescription = entry.Description
 					entry.Found = true
 					expectedParameters = entry.Parameters
 					parameterDescription = entry.ParameterDescription
@@ -171,7 +165,7 @@ func ParseGrammar(args []string, grammar Options) error {
 						ui.Debug("Adding action routine")
 					}
 					ui.Debug("Transferring control to subgrammar for %s", entry.LongName)
-					return ParseGrammar(args[currentArg+1:], subGrammar)
+					return subContext.ParseGrammar(args[currentArg+1:])
 				}
 			}
 
@@ -250,7 +244,7 @@ func ParseGrammar(args []string, grammar Options) error {
 
 			// After parsing the option value, if there is an action routine, call it
 			if location.Action != nil {
-				err = location.Action(&grammar)
+				err = location.Action(c)
 				if err != nil {
 					break
 				}
@@ -261,7 +255,7 @@ func ParseGrammar(args []string, grammar Options) error {
 	// Whew! Everything parsed and in it's place. Before we wind up, let's verify that
 	// all required options were in fact found.
 
-	for _, entry := range grammar {
+	for _, entry := range c.Grammar {
 
 		if entry.Required && !entry.Found {
 			err = errors.New("Required option " + entry.LongName + " not found")
@@ -289,9 +283,9 @@ func ParseGrammar(args []string, grammar Options) error {
 		// Did we ever find an action routine? If so, let's run it. Otherwise,
 		// there wasn't enough command to determine what to do, so show the help.
 		if Action != nil {
-			err = Action(&grammar)
+			err = Action(c)
 		} else {
-			ShowHelp(grammar)
+			ShowHelp(c)
 		}
 	}
 	return err

@@ -1,3 +1,6 @@
+// Package app provides the top-level framework for CLI execution. This includes
+// the Run() method to run the program, plus a number of action routines that can
+// be invoked from the grammar or by a user action routine.
 package app
 
 import (
@@ -8,10 +11,24 @@ import (
 	"github.com/tucats/gopackages/cli/profile"
 )
 
-// Run sets up required data structures and executes the parse. The caller's
-// grammar is extended with pre-defined global verbs and options (such as
-// profile or --output-format) common to all CLI applications.
-func Run(grammar cli.Options, appName string, appDescription string) error {
+// Run sets up required data structures and executes the parse.
+// When completed, the command line functionality will have been
+// run. It is up to the caller (typically the main() fucntion)
+// to handle any post-processing cleanup, etc.
+//
+// * The grammar is cli.Options array of cli.Option structures.
+//   Each element describes a parsable token in the command line grammar.
+//   This grammar is extended to include the automatic built-in
+//   commands for profile management, etc.
+//
+// * The appName is the name of the CLI application.
+//   This is used in --help output and in determining the name of
+//   the configuration file used.
+//
+// * The appDescription is used as the text description of the application.
+//   This is displayed in --help output
+//
+func Run(grammar []cli.Option, appName string, appDescription string) error {
 
 	// Prepend the default supplied options
 	grammar = append([]cli.Option{
@@ -56,7 +73,8 @@ func Run(grammar cli.Options, appName string, appDescription string) error {
 
 	// Parse the grammar and call the actions (essentially, execute
 	// the function of the CLI)
-	err := cli.Parse(grammar, appDescription)
+	context := cli.Context{Grammar: grammar}
+	err := context.Parse(appDescription)
 
 	// If no errors, then write out an updated profile as needed.
 	if err == nil {

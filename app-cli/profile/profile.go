@@ -10,7 +10,7 @@ import (
 )
 
 // Grammar describes profile subcommands
-var Grammar = cli.Options{
+var Grammar = []cli.Option{
 	cli.Option{
 		LongName:    "list",
 		Description: "List all profiles",
@@ -52,7 +52,7 @@ var Grammar = cli.Options{
 		Description: "Set a profile value",
 		Action:      SetAction,
 		OptionType:  cli.Subcommand,
-		Value: cli.Options{
+		Value: []cli.Option{
 			cli.Option{
 				LongName:    "key",
 				Description: "The key that will be set in the profile. Can be of the form key=value.",
@@ -69,7 +69,7 @@ var Grammar = cli.Options{
 }
 
 // ShowAction Displays the current contents of the active profile
-func ShowAction(c *cli.Options) error {
+func ShowAction(c *cli.Context) error {
 
 	t := tables.New([]string{"Key", "Value"})
 
@@ -84,7 +84,7 @@ func ShowAction(c *cli.Options) error {
 }
 
 // ListAction Displays the current contents of the active profile
-func ListAction(c *cli.Options) error {
+func ListAction(c *cli.Context) error {
 
 	t := tables.New([]string{"Name", "Description"})
 
@@ -100,7 +100,7 @@ func ListAction(c *cli.Options) error {
 }
 
 // SetOutputFormat is the action handler for the set-output subcommand.
-func SetOutputFormat(c *cli.Options) error {
+func SetOutputFormat(c *cli.Context) error {
 
 	if len(cli.Parameters) == 1 {
 		outputType := cli.Parameters[0]
@@ -114,11 +114,11 @@ func SetOutputFormat(c *cli.Options) error {
 }
 
 // SetAction uses the first two parameters as a key and value
-func SetAction(c *cli.Options) error {
+func SetAction(c *cli.Context) error {
 
 	// Generic --key and --value specification
-	key, _ := cli.GetString(*c, "key")
-	value, valueFound := cli.GetString(*c, "value")
+	key, _ := c.GetString("key")
+	value, valueFound := c.GetString("value")
 
 	if !valueFound {
 		if equals := strings.Index(key, "="); equals >= 0 {
@@ -140,7 +140,7 @@ func SetAction(c *cli.Options) error {
 }
 
 // DeleteAction deletes a named key value
-func DeleteAction(c *cli.Options) error {
+func DeleteAction(c *cli.Context) error {
 
 	key := cli.Parameters[0]
 	Delete(key)
@@ -150,7 +150,7 @@ func DeleteAction(c *cli.Options) error {
 }
 
 // SetDescriptionAction sets the profile description string
-func SetDescriptionAction(c *cli.Options) error {
+func SetDescriptionAction(c *cli.Context) error {
 
 	config := Configurations[ProfileName]
 	config.Description = cli.Parameters[0]

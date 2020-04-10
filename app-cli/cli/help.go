@@ -22,22 +22,22 @@ func SetCopyright(s string) {
 // The output is automatically directed to the stdout console output.
 //
 // This function uses the tables package to create uniform columns of output.
-func ShowHelp(grammar Options) {
+func ShowHelp(c *Context) {
 
 	if Copyright != "" {
-		name := MainProgram
+		name := c.MainProgram
 		if MainProgramDescription > "" {
 			name = name + " - " + MainProgramDescription
 		}
 		fmt.Printf("%s - %s\n\n", name, Copyright)
 	}
 
-	composedCommand := MainProgram + " " + CommandRoot
+	composedCommand := c.MainProgram + " " + c.Command
 
 	hasSubcommand := false
 	hasOptions := false
 
-	for _, option := range grammar {
+	for _, option := range c.Grammar {
 		if option.OptionType == Subcommand {
 			hasSubcommand = true
 		} else {
@@ -64,7 +64,7 @@ func ShowHelp(grammar Options) {
 		minimumFirstColumnWidth = 20
 	}
 
-	fmt.Printf("Usage:\n   %-20s   %s\n\n", composedCommand, CurrentVerbDescription)
+	fmt.Printf("Usage:\n   %-20s   %s\n\n", composedCommand, c.Description)
 	headerShown := false
 
 	t := tables.New([]string{"subcommand", "description"})
@@ -73,7 +73,7 @@ func ShowHelp(grammar Options) {
 	t.SetSpacing(3)
 	t.SetMinimumWidth(0, minimumFirstColumnWidth)
 
-	for _, option := range grammar {
+	for _, option := range c.Grammar {
 		if option.OptionType == Subcommand && !option.Private {
 			if !headerShown {
 				headerShown = true
@@ -97,7 +97,7 @@ func ShowHelp(grammar Options) {
 
 	fmt.Printf("Options:\n")
 
-	for _, option := range grammar {
+	for _, option := range c.Grammar {
 		if option.Private {
 			continue
 		}
