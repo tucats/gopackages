@@ -8,6 +8,9 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/google/uuid"
+	"github.com/tucats/gopackages/cli/ui"
 )
 
 // ProfileDirectory is the name of the invisible directory that is created
@@ -25,6 +28,7 @@ var ProfileName = "default"
 // Configuration describes what is known about a configuration
 type Configuration struct {
 	Description string            `json:"description,omit"`
+	ID          string            `json:"id,omit"`
 	Items       map[string]string `json:"items"`
 }
 
@@ -46,6 +50,7 @@ var Configurations map[string]Configuration
 func Load(application string, name string) error {
 
 	var c Configuration = Configuration{Description: "Default configuration", Items: map[string]string{}}
+
 	CurrentConfiguration = &c
 	Configurations = map[string]Configuration{"default": c}
 	ProfileFile = application + ".json"
@@ -82,6 +87,7 @@ func Load(application string, name string) error {
 		if !found {
 			c = Configuration{Description: "Default configuration", Items: map[string]string{}}
 			Configurations[name] = c
+			profileDirty = true
 		}
 		ProfileName = name
 		CurrentConfiguration = &c
@@ -115,6 +121,15 @@ func Save() error {
 	path.WriteRune(os.PathSeparator)
 	path.WriteString(ProfileFile)
 
+	// Make sure every configuration has an id
+	for n := range Configurations {
+		c := Configurations[n]
+		if c.ID == "" {
+			c.ID = uuid.New().String()
+			ui.Debug("Creating configuration \"%s\" with id %s", n, c.ID)
+			Configurations[n] = c
+		}
+	}
 	byteBuffer, err := json.MarshalIndent(&Configurations, "", "  ")
 
 	err = ioutil.WriteFile(path.String(), byteBuffer, os.ModePerm)
