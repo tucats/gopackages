@@ -68,8 +68,7 @@ func Run(grammar []cli.Option, appName string, appDescription string) error {
 		}}, grammar...)
 
 	// Load the active profile, if any
-	profile.ProfileFile = appName + ".json"
-	profile.Load("default")
+	profile.Load(appName, "default")
 
 	// Parse the grammar and call the actions (essentially, execute
 	// the function of the CLI)

@@ -43,11 +43,12 @@ var profileDirty = false
 var Configurations map[string]Configuration
 
 // Load reads in the named profile, if it exists.
-func Load(name string) error {
+func Load(application string, name string) error {
 
 	var c Configuration = Configuration{Description: "Default configuration", Items: map[string]string{}}
 	CurrentConfiguration = &c
 	Configurations = map[string]Configuration{"default": c}
+	ProfileFile = application + ".json"
 
 	home, err := os.UserHomeDir()
 	if err != nil {
