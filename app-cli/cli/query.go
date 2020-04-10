@@ -2,16 +2,17 @@ package cli
 
 // GetParameter returns the ith parameter string parsed, or an
 // empty string if not found.
-func GetParameter(i int) string {
-	if i < GetParameterCount() {
-		return Parameters[i]
+func (c *Context) GetParameter(i int) string {
+	g := c.FindGlobal()
+	if i < g.GetParameterCount() {
+		return g.Parameters[i]
 	}
 	return ""
 }
 
 // GetParameterCount returns the number of parameters processed.
-func GetParameterCount() int {
-	return len(Parameters)
+func (c *Context) GetParameterCount() int {
+	return len(c.FindGlobal().Parameters)
 }
 
 // WasFound reports if an entry in the grammar was found on

@@ -12,7 +12,7 @@ import (
 
 // ProfileDirectory is the name of the invisible directory that is created
 // in the user's home directory to host configuration data
-var ProfileDirectory = ".org.fernwood"
+const ProfileDirectory = ".org.fernwood"
 
 // ProfileFile is the name of the configuration file that contains the
 // profiles.

@@ -28,7 +28,7 @@ var Grammar = []cli.Option{
 		OptionType:           cli.Subcommand,
 		Description:          "Set the default output type (text or json)",
 		ParameterDescription: "type",
-		Action:               SetOutputFormat,
+		Action:               SetOutputAction,
 		Parameters:           1,
 	},
 	cli.Option{
@@ -36,8 +36,8 @@ var Grammar = []cli.Option{
 		OptionType:           cli.Subcommand,
 		Description:          "Set the profile description",
 		ParameterDescription: "text",
-		Action:               SetDescriptionAction,
 		Parameters:           1,
+		Action:               SetDescriptionAction,
 	},
 	cli.Option{
 		LongName:             "delete",
@@ -89,7 +89,6 @@ func ListAction(c *cli.Context) error {
 	t := tables.New([]string{"Name", "Description"})
 
 	for k, v := range Configurations {
-
 		t.AddRowItems(k, v.Description)
 	}
 	t.SetOrderBy("name")
@@ -99,11 +98,11 @@ func ListAction(c *cli.Context) error {
 	return nil
 }
 
-// SetOutputFormat is the action handler for the set-output subcommand.
-func SetOutputFormat(c *cli.Context) error {
+// SetOutputAction is the action handler for the set-output subcommand.
+func SetOutputAction(c *cli.Context) error {
 
-	if len(cli.Parameters) == 1 {
-		outputType := cli.Parameters[0]
+	if c.GetParameterCount() == 1 {
+		outputType := c.GetParameter(0)
 		if outputType == "text" || outputType == "json" {
 			Set("output-format", outputType)
 			return nil
@@ -142,7 +141,7 @@ func SetAction(c *cli.Context) error {
 // DeleteAction deletes a named key value
 func DeleteAction(c *cli.Context) error {
 
-	key := cli.Parameters[0]
+	key := c.GetParameter(0)
 	Delete(key)
 	ui.Say("Profile key %s deleted", key)
 
@@ -153,7 +152,7 @@ func DeleteAction(c *cli.Context) error {
 func SetDescriptionAction(c *cli.Context) error {
 
 	config := Configurations[ProfileName]
-	config.Description = cli.Parameters[0]
+	config.Description = c.GetParameter(0)
 	Configurations[ProfileName] = config
 	profileDirty = true
 

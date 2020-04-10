@@ -44,27 +44,27 @@ func Run(grammar []cli.Option, appName string, appDescription string) error {
 			LongName:    "use-profile",
 			Description: "Name of profile to use",
 			OptionType:  cli.StringType,
-			Action:      SetDefaultProfile,
+			Action:      UseProfileAction,
 		},
 		cli.Option{
 			ShortName:   "d",
 			LongName:    "debug",
 			Description: "Are we debugging?",
 			OptionType:  cli.BooleanType,
-			Action:      SetDebugMessaging,
+			Action:      DebugAction,
 		},
 		cli.Option{
 			LongName:    "output-format",
 			Description: "Specify text or json output format",
 			OptionType:  cli.StringType,
-			Action:      SetOutputFormat,
+			Action:      OutputFormatAction,
 		},
 		cli.Option{
 			ShortName:   "q",
 			LongName:    "quiet",
 			Description: "If specified, suppress extra messaging",
 			OptionType:  cli.BooleanType,
-			Action:      SetQuietMode,
+			Action:      QuietAction,
 		}}, grammar...)
 
 	// Load the active profile, if any

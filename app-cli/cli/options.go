@@ -41,9 +41,23 @@ type Option struct {
 // Context is a simple array of Option types, and is used to express
 // a grammar.
 type Context struct {
-	AppName     string
-	MainProgram string
-	Description string
-	Command     string
-	Grammar     []Option
+	AppName                string
+	MainProgram            string
+	Description            string
+	Command                string
+	Grammar                []Option
+	Parent                 *Context
+	Parameters             []string
+	ParameterCount         int
+	ExpectedParameterCount int
+	ParameterDescription   string
+}
+
+// FindGlobal locates the top-most context structure in the chain
+// of nested contexts.
+func (c *Context) FindGlobal() *Context {
+	if c.Parent != nil {
+		return c.Parent.FindGlobal()
+	}
+	return c
 }

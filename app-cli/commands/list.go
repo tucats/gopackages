@@ -42,8 +42,8 @@ var ListGrammar = []cli.Option{
 	},
 }
 
-// ListActions is the command handler to list objects.
-func ListActions(c *cli.Context) error {
+// ListAction is the command handler to list objects.
+func ListAction(c *cli.Context) error {
 
 	t := tables.New([]string{"Name", "Age"})
 	_ = t.SetAlignment(1, tables.AlignmentRight)

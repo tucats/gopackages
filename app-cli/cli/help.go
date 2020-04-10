@@ -51,11 +51,13 @@ func ShowHelp(c *Context) {
 		composedCommand = composedCommand + "[command] "
 	}
 
-	if parameterDescription > "" {
-		composedCommand = composedCommand + " [" + parameterDescription + "]"
-	} else if expectedParameters == 1 {
+	g := c.FindGlobal()
+	e := g.ExpectedParameterCount
+	if g.ParameterDescription > "" {
+		composedCommand = composedCommand + " [" + g.ParameterDescription + "]"
+	} else if e == 1 {
 		composedCommand = composedCommand + " [parameter]"
-	} else if expectedParameters > 1 {
+	} else if e > 1 {
 		composedCommand = composedCommand + " [parameters]"
 	}
 

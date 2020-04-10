@@ -14,20 +14,6 @@ import (
 // MainProgramDescription is the description of the main program
 var MainProgramDescription string
 
-// Parameters stores those command line items not parsed as part of the
-// grammar.
-var Parameters []string
-
-// expectedParameters describes how many parameters are expected, which
-// comes from any parameter value processed in an subcommand. A negative
-// number means any number up to the absolute value.
-var expectedParameters = 0
-
-// parameterDescription is a string that can be specified in a subcommand
-// option to describe parameters. For example, the set-output builtin
-// command uses a description of "type"
-var parameterDescription = ""
-
 // Action is the function to invoke on the last subcommand found in parsing.
 var Action func(c *Context) error
 
@@ -80,8 +66,9 @@ func (c *Context) ParseGrammar(args []string) error {
 
 		// Are we now only eating parameter values?
 		if parametersOnly {
-			Parameters = append(Parameters, option)
-			count := len(Parameters)
+			globalContext := c.FindGlobal()
+			globalContext.Parameters = append(globalContext.Parameters, option)
+			count := len(globalContext.Parameters)
 			ui.Debug(fmt.Sprintf("added parameter %d", count))
 			continue
 		}
@@ -148,6 +135,7 @@ func (c *Context) ParseGrammar(args []string) error {
 					// and an updated grammar tree, command text, and description adapted
 					// for this subcommand.
 					subContext := *c
+					subContext.Parent = c
 					if entry.Value != nil {
 						subContext.Grammar = entry.Value.([]Option)
 					} else {
@@ -157,8 +145,8 @@ func (c *Context) ParseGrammar(args []string) error {
 					subContext.Description = entry.Description
 
 					entry.Found = true
-					expectedParameters = entry.Parameters
-					parameterDescription = entry.ParameterDescription
+					c.FindGlobal().ExpectedParameterCount = entry.Parameters
+					c.FindGlobal().ParameterDescription = entry.ParameterDescription
 
 					if entry.Action != nil {
 						Action = entry.Action
@@ -170,8 +158,9 @@ func (c *Context) ParseGrammar(args []string) error {
 			}
 
 			// Not a subcommand, just save it as an unclaimed parameter
-			Parameters = append(Parameters, option)
-			count := len(Parameters)
+			g := c.FindGlobal()
+			g.Parameters = append(g.Parameters, option)
+			count := len(g.Parameters)
 			ui.Debug(fmt.Sprintf("Unclaimed token added parameter %d", count))
 
 		} else {
@@ -268,15 +257,17 @@ func (c *Context) ParseGrammar(args []string) error {
 
 	if err == nil {
 
-		if expectedParameters == 0 && len(Parameters) > 0 {
+		g := c.FindGlobal()
+		ui.Debug("Parameters expected: %d  found %d", g.ExpectedParameterCount, g.GetParameterCount())
+		if g.ExpectedParameterCount == 0 && len(g.Parameters) > 0 {
 			return errors.New("unexpected parameters on command line")
 		}
-		if expectedParameters < 0 {
-			if len(Parameters) > -expectedParameters {
+		if g.ExpectedParameterCount < 0 {
+			if len(g.Parameters) > -g.ExpectedParameterCount {
 				return errors.New("too many parameters on command line")
 			}
 		} else {
-			if len(Parameters) != expectedParameters {
+			if len(g.Parameters) != g.ExpectedParameterCount {
 				return errors.New("incorrect number of parameters on command line")
 			}
 		}

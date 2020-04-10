@@ -12,6 +12,6 @@ var Grammar = []cli.Option{
 		Description: "List stuff",
 		OptionType:  cli.Subcommand,
 		Value:       ListGrammar,
-		Action:      ListActions,
+		Action:      ListAction,
 	},
 }
