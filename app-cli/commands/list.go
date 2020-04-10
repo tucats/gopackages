@@ -63,8 +63,8 @@ func ListAction(c *cli.Context) error {
 	t.AddRowItems("Anna", 25)
 
 	// Add formatting and other control settings the user might specify.
-	t.SuppressHeadings(c.GetBool("no-headings"))
-	t.RowNumbers(c.GetBool("row-numbers"))
+	t.ShowHeadings(!c.GetBool("no-headings"))
+	t.ShowRowNumbers(c.GetBool("row-numbers"))
 	if limit, present := c.GetInteger("limit"); present {
 		t.RowLimit(limit)
 	}

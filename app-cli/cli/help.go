@@ -70,7 +70,7 @@ func ShowHelp(c *Context) {
 	headerShown := false
 
 	t := tables.New([]string{"subcommand", "description"})
-	t.SuppressHeadings(true)
+	t.ShowHeadings(false)
 	t.SetIndent(3)
 	t.SetSpacing(3)
 	t.SetMinimumWidth(0, minimumFirstColumnWidth)
@@ -92,7 +92,7 @@ func ShowHelp(c *Context) {
 	}
 
 	t = tables.New([]string{"option", "description"})
-	t.SuppressHeadings(true)
+	t.ShowHeadings(false)
 	t.SetIndent(3)
 	t.SetSpacing(3)
 	t.SetMinimumWidth(0, minimumFirstColumnWidth)

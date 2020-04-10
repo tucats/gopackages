@@ -14,21 +14,21 @@ const (
 
 // Table is the wrapper object around a table to be printed
 type Table struct {
-	hasUnderlines    bool
-	suppressHeadings bool
-	rowNumbers       bool
-	spacing          string
-	indent           string
-	orderBy          int
-	ascending        bool
-	rowCount         int
-	rowLimit         int
-	startingRow      int
-	rows             [][]string
-	columnCount      int
-	columns          []string
-	alignment        []int
-	maxWidth         []int
+	showUnderlines bool
+	showHeadings   bool
+	showRowNumbers bool
+	rowLimit       int
+	startingRow    int
+	columnCount    int
+	rowCount       int
+	orderBy        int
+	ascending      bool
+	rows           [][]string
+	columns        []string
+	alignment      []int
+	maxWidth       []int
+	spacing        string
+	indent         string
 }
 
 // New creates a new table object, given a list of headings
@@ -45,7 +45,8 @@ func New(headings []string) Table {
 	t.rows = make([][]string, 0)
 	t.orderBy = -1
 	t.ascending = true
-	t.hasUnderlines = true
+	t.showUnderlines = true
+	t.showHeadings = true
 
 	for n, h := range headings {
 		t.maxWidth[n] = len(h)

@@ -77,7 +77,7 @@ func ShowAction(c *cli.Context) error {
 		t.AddRowItems(k, v)
 	}
 	t.SetOrderBy("key")
-	t.Underlines(false)
+	t.ShowUnderlines(false)
 	t.Print(ui.TextTableFormat)
 
 	return nil
@@ -92,7 +92,7 @@ func ListAction(c *cli.Context) error {
 		t.AddRowItems(k, v.Description)
 	}
 	t.SetOrderBy("name")
-	t.Underlines(false)
+	t.ShowUnderlines(false)
 	t.Print(ui.TextTableFormat)
 
 	return nil

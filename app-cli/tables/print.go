@@ -79,9 +79,9 @@ func (t *Table) FormatText() []string {
 		rowLimit = len(t.rows)
 	}
 
-	if !t.suppressHeadings {
+	if t.showHeadings {
 		buffer.WriteString(t.indent)
-		if t.rowNumbers {
+		if t.showRowNumbers {
 			buffer.WriteString("Row")
 			buffer.WriteString(t.spacing)
 		}
@@ -103,10 +103,10 @@ func (t *Table) FormatText() []string {
 		}
 		output = append(output, buffer.String())
 
-		if t.hasUnderlines {
+		if t.showUnderlines {
 			buffer.Reset()
 			buffer.WriteString(t.indent)
-			if t.rowNumbers {
+			if t.showRowNumbers {
 				buffer.WriteString("===")
 				buffer.WriteString(t.spacing)
 			}
@@ -119,6 +119,7 @@ func (t *Table) FormatText() []string {
 			output = append(output, buffer.String())
 		}
 	}
+
 	for i, r := range t.rows {
 
 		if i < t.startingRow {
@@ -129,27 +130,24 @@ func (t *Table) FormatText() []string {
 		}
 		buffer.Reset()
 		buffer.WriteString(t.indent)
-		if t.rowNumbers {
+		if t.showRowNumbers {
 			buffer.WriteString(fmt.Sprintf("%3d", i+1))
 			buffer.WriteString(t.spacing)
 		}
+
+		// Loop over the elements of the row. Generate pre- or post-spacing as
+		// appropriate for the requested alignment, and any intra-column spacing.
 		for n, c := range r {
-
-			switch t.alignment[n] {
-
-			case AlignmentLeft:
-				buffer.WriteString(c)
+			if t.alignment[n] == AlignmentRight {
 				for pad := len(c); pad < t.maxWidth[n]; pad++ {
 					buffer.WriteRune(' ')
 				}
-			case AlignmentRight:
+			}
+			buffer.WriteString(c)
+			if t.alignment[n] == AlignmentLeft {
 				for pad := len(c); pad < t.maxWidth[n]; pad++ {
 					buffer.WriteRune(' ')
 				}
-				buffer.WriteString(c)
-
-			default:
-				buffer.WriteString("unsupported alignment")
 			}
 			buffer.WriteString(t.spacing)
 		}

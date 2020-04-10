@@ -14,19 +14,19 @@ func (t *Table) RowLimit(limit int) {
 	}
 }
 
-// Underlines enables underlining of column headings when the parameter is true
-func (t *Table) Underlines(flag bool) {
-	t.hasUnderlines = flag
+// ShowUnderlines enables underlining of column headings when the parameter is true
+func (t *Table) ShowUnderlines(flag bool) {
+	t.showUnderlines = flag
 }
 
-// SuppressHeadings disables printing of column headings when the parameter is true
-func (t *Table) SuppressHeadings(flag bool) {
-	t.suppressHeadings = flag
+// ShowHeadings disables printing of column headings when the parameter is true
+func (t *Table) ShowHeadings(flag bool) {
+	t.showHeadings = flag
 }
 
-// RowNumbers enables printing of column headings when the parameter is true
-func (t *Table) RowNumbers(flag bool) {
-	t.rowNumbers = flag
+// ShowRowNumbers enables printing of column headings when the parameter is true
+func (t *Table) ShowRowNumbers(flag bool) {
+	t.showRowNumbers = flag
 }
 
 // SetMinimumWidth specifies the minimum width of a column. The column number is
