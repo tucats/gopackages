@@ -6,6 +6,7 @@ package ui
 import (
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -56,7 +57,7 @@ func Log(class string, format string, args ...interface{}) {
 	sequenceMux.Lock()
 	sequence = sequence + 1
 	sequenceString := fmt.Sprintf("%d, %d", pid, sequence)
-	fmt.Printf("[%s] %-10s %-7s: %s\n", class, time.Now().Format(time.RFC3339), sequenceString, s)
+	fmt.Printf("[%s] %-10s %-7s: %s\n", time.Now().Format(time.RFC3339), sequenceString, strings.ToUpper(class), s)
 	sequenceMux.Unlock()
 
 }

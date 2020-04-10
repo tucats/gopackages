@@ -12,7 +12,7 @@ import (
 // OutputFormatAction sets the default output format to use.
 func OutputFormatAction(c *cli.Context) error {
 
-	if formatString, present := c.GetString("output-format"); present {
+	if formatString, present := c.FindGlobal().GetString("output-format"); present {
 		switch strings.ToLower(formatString) {
 		case "text":
 			ui.OutputFormat = ui.TextTableFormat
@@ -30,13 +30,13 @@ func OutputFormatAction(c *cli.Context) error {
 
 // DebugAction is an action routine to set the global debug status if specified
 func DebugAction(c *cli.Context) error {
-	ui.DebugMode = c.GetBool("debug")
+	ui.DebugMode = c.FindGlobal().GetBool("debug")
 	return nil
 }
 
 // QuietAction is an action routine to set the global debug status if specified
 func QuietAction(c *cli.Context) error {
-	ui.QuietMode = c.GetBool("quiet")
+	ui.QuietMode = c.FindGlobal().GetBool("quiet")
 	return nil
 }
 

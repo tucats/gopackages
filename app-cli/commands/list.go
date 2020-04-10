@@ -4,6 +4,7 @@ import (
 	"github.com/tucats/gopackages/cli/cli"
 	"github.com/tucats/gopackages/cli/profile"
 	"github.com/tucats/gopackages/cli/tables"
+	"github.com/tucats/gopackages/cli/ui"
 )
 
 // ListGrammar is the grammar definition for the list command
@@ -44,6 +45,8 @@ var ListGrammar = []cli.Option{
 
 // ListAction is the command handler to list objects.
 func ListAction(c *cli.Context) error {
+
+	ui.Debug("In the LIST action")
 
 	t := tables.New([]string{"Name", "Age"})
 	_ = t.SetAlignment(1, tables.AlignmentRight)

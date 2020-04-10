@@ -9,6 +9,7 @@ import (
 
 	"github.com/tucats/gopackages/cli/cli"
 	"github.com/tucats/gopackages/cli/profile"
+	"github.com/tucats/gopackages/cli/ui"
 )
 
 // Run sets up required data structures and executes the parse.
@@ -40,35 +41,47 @@ func Run(grammar []cli.Option, appName string, appDescription string) error {
 			Value:       profile.Grammar,
 		},
 		cli.Option{
-			ShortName:   "p",
-			LongName:    "use-profile",
-			Description: "Name of profile to use",
-			OptionType:  cli.StringType,
-			Action:      UseProfileAction,
+			ShortName:           "p",
+			LongName:            "use-profile",
+			Description:         "Name of profile to use",
+			OptionType:          cli.StringType,
+			Action:              UseProfileAction,
+			EnvironmentVariable: "CLI_PROFILE",
 		},
 		cli.Option{
-			ShortName:   "d",
-			LongName:    "debug",
-			Description: "Are we debugging?",
-			OptionType:  cli.BooleanType,
-			Action:      DebugAction,
+			ShortName:           "d",
+			LongName:            "debug",
+			Description:         "Are we debugging?",
+			OptionType:          cli.BooleanType,
+			Action:              DebugAction,
+			EnvironmentVariable: "CLI_DEBUG",
 		},
 		cli.Option{
-			LongName:    "output-format",
-			Description: "Specify text or json output format",
-			OptionType:  cli.StringType,
-			Action:      OutputFormatAction,
+			LongName:            "output-format",
+			Description:         "Specify text or json output format",
+			OptionType:          cli.StringType,
+			Action:              OutputFormatAction,
+			EnvironmentVariable: "CLI_OUTPUT_FORMAT",
 		},
 		cli.Option{
-			ShortName:   "q",
-			LongName:    "quiet",
-			Description: "If specified, suppress extra messaging",
-			OptionType:  cli.BooleanType,
-			Action:      QuietAction,
+			ShortName:           "q",
+			LongName:            "quiet",
+			Description:         "If specified, suppress extra messaging",
+			OptionType:          cli.BooleanType,
+			Action:              QuietAction,
+			EnvironmentVariable: "CLI_QUIET",
 		}}, grammar...)
 
 	// Load the active profile, if any
 	profile.Load(appName, "default")
+
+	// If the CLI_DEBUG environment variable is set, then turn on
+	// debugging now, so messages will come out before that particular
+	// option is processed.
+
+	if os.Getenv("CLI_DEBUG") != "" {
+		ui.DebugMode = true
+	}
 
 	// Parse the grammar and call the actions (essentially, execute
 	// the function of the CLI)

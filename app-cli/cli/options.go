@@ -28,8 +28,9 @@ type Option struct {
 	Aliases              []string
 	Description          string
 	OptionType           int
-	Parameters           int
+	ParametersExpected   int
 	ParameterDescription string
+	EnvironmentVariable  string
 	Found                bool
 	Required             bool
 	Private              bool
@@ -54,10 +55,12 @@ type Context struct {
 }
 
 // FindGlobal locates the top-most context structure in the chain
-// of nested contexts.
+// of nested contexts. If our tree has no parent, we are the
+// global grammar. Otherwise, ask our parent...
 func (c *Context) FindGlobal() *Context {
-	if c.Parent != nil {
-		return c.Parent.FindGlobal()
+	if c.Parent == nil {
+		return c
 	}
-	return c
+	return c.Parent.FindGlobal()
+
 }

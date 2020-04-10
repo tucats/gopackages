@@ -145,12 +145,11 @@ func (c *Context) ParseGrammar(args []string) error {
 					subContext.Description = entry.Description
 
 					entry.Found = true
-					c.FindGlobal().ExpectedParameterCount = entry.Parameters
+					c.FindGlobal().ExpectedParameterCount = entry.ParametersExpected
 					c.FindGlobal().ParameterDescription = entry.ParameterDescription
 
 					if entry.Action != nil {
 						Action = entry.Action
-						ui.Debug("Adding action routine")
 					}
 					ui.Debug("Transferring control to subgrammar for %s", entry.LongName)
 					return subContext.ParseGrammar(args[currentArg+1:])
@@ -164,7 +163,6 @@ func (c *Context) ParseGrammar(args []string) error {
 			ui.Debug(fmt.Sprintf("Unclaimed token added parameter %d", count))
 
 		} else {
-			ui.Debug("processing option")
 
 			location.Found = true
 
@@ -188,41 +186,17 @@ func (c *Context) ParseGrammar(args []string) error {
 				location.Value = true
 
 			case BooleanValueType:
-				valid := false
-				for _, x := range []string{"1", "true", "t", "yes", "y"} {
-					if strings.ToLower(value) == x {
-						location.Value = true
-						valid = true
-						break
-					}
-				}
-
-				if !valid {
-					for _, x := range []string{"0", "false", "f", "no", "n"} {
-						if strings.ToLower(value) == x {
-							location.Value = false
-							valid = true
-							break
-						}
-					}
-				}
-
+				b, valid := ValidateBoolean(value)
 				if !valid {
 					return errors.New("option --" + location.LongName + ": invalid boolean value \"" + value + "\"")
 				}
+				location.Value = b
 
 			case StringType:
 				location.Value = value
 
 			case StringListType:
-				// The value is a comma-separated list of items. Parse each individual item
-				// and make a string array of the list as the value.
-
-				list := strings.Split(value, ",")
-				for n := 0; n < len(list); n++ {
-					list[n] = strings.TrimSpace(list[n])
-				}
-				location.Value = list
+				location.Value = MakeList(value)
 			case IntType:
 				i, err := strconv.Atoi(value)
 				if err != nil {
@@ -230,6 +204,8 @@ func (c *Context) ParseGrammar(args []string) error {
 				}
 				location.Value = i
 			}
+
+			ui.Debug("Option value set to %#v", location.Value)
 
 			// After parsing the option value, if there is an action routine, call it
 			if location.Action != nil {
@@ -271,6 +247,11 @@ func (c *Context) ParseGrammar(args []string) error {
 				return errors.New("incorrect number of parameters on command line")
 			}
 		}
+
+		// Search the tree to see if we have any environment variable settings that
+		// should be pulled into the grammar.
+		c.ResolveEnvironmentVariables()
+
 		// Did we ever find an action routine? If so, let's run it. Otherwise,
 		// there wasn't enough command to determine what to do, so show the help.
 		if Action != nil {

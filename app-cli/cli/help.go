@@ -129,7 +129,11 @@ func ShowHelp(c *Context) {
 				name = name + " <list>"
 			}
 
-			t.AddRow([]string{name, option.Description})
+			fullDescription := option.Description
+			if option.EnvironmentVariable != "" {
+				fullDescription = fullDescription + " [" + option.EnvironmentVariable + "]"
+			}
+			t.AddRow([]string{name, fullDescription})
 		}
 	}
 

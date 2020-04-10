@@ -29,3 +29,34 @@ func FindKeyword(test string, valid []string) int {
 	}
 	return -1
 }
+
+// ValidateBoolean tests to see if a string value contains a
+// legitimate boolean value. The first return is the boolean
+// value, and the second indicates if it was valid.
+func ValidateBoolean(value string) (bool, bool) {
+	valid := false
+	for _, x := range []string{"1", "true", "t", "yes", "y"} {
+		if strings.ToLower(value) == x {
+			return true, true
+		}
+	}
+
+	if !valid {
+		for _, x := range []string{"0", "false", "f", "no", "n"} {
+			if strings.ToLower(value) == x {
+				return false, true
+			}
+		}
+	}
+	return false, false
+}
+
+// MakeList takes a string containing a comma-separated list of
+// string values and converts it to an array of trimmed strings.
+func MakeList(value string) []string {
+	list := strings.Split(value, ",")
+	for n := 0; n < len(list); n++ {
+		list[n] = strings.TrimSpace(list[n])
+	}
+	return list
+}

@@ -29,14 +29,14 @@ var Grammar = []cli.Option{
 		Description:          "Set the default output type (text or json)",
 		ParameterDescription: "type",
 		Action:               SetOutputAction,
-		Parameters:           1,
+		ParametersExpected:   1,
 	},
 	cli.Option{
 		LongName:             "set-description",
 		OptionType:           cli.Subcommand,
 		Description:          "Set the profile description",
 		ParameterDescription: "text",
-		Parameters:           1,
+		ParametersExpected:   1,
 		Action:               SetDescriptionAction,
 	},
 	cli.Option{
@@ -44,7 +44,7 @@ var Grammar = []cli.Option{
 		OptionType:           cli.Subcommand,
 		Description:          "Delete a key from the profile",
 		Action:               DeleteAction,
-		Parameters:           1,
+		ParametersExpected:   1,
 		ParameterDescription: "key",
 	},
 	cli.Option{
