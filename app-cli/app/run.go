@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tucats/gopackages/cli/cli"
-	"github.com/tucats/gopackages/cli/profile"
-	"github.com/tucats/gopackages/cli/ui"
+	"github.com/tucats/gopackages/app-cli/cli"
+	"github.com/tucats/gopackages/app-cli/profile"
+	"github.com/tucats/gopackages/app-cli/ui"
 )
 
 // Run sets up required data structures and executes the parse.

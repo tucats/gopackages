@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/tucats/gopackages/cli/ui"
+	"github.com/tucats/gopackages/app-cli/ui"
 )
 
 // ProfileDirectory is the name of the invisible directory that is created

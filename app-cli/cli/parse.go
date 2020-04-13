@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tucats/gopackages/cli/ui"
+	"github.com/tucats/gopackages/app-cli/ui"
 )
 
 // MainProgramDescription is the description of the main program

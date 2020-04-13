@@ -1,4 +1,4 @@
-module github.com/tucats/gopackages/cli
+module github.com/tucats/gopackages/app-cli
 
 go 1.14
 

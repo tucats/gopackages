@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/tucats/gopackages/cli/ui"
+	"github.com/tucats/gopackages/app-cli/ui"
 )
 
 // ResolveEnvironmentVariables searches the grammar tree backwards

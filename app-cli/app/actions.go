@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/tucats/gopackages/cli/cli"
-	"github.com/tucats/gopackages/cli/profile"
-	"github.com/tucats/gopackages/cli/ui"
+	"github.com/tucats/gopackages/app-cli/cli"
+	"github.com/tucats/gopackages/app-cli/profile"
+	"github.com/tucats/gopackages/app-cli/ui"
 )
 
 // OutputFormatAction sets the default output format to use.

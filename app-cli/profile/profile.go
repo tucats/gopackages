@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/tucats/gopackages/cli/cli"
-	"github.com/tucats/gopackages/cli/tables"
-	"github.com/tucats/gopackages/cli/ui"
+	"github.com/tucats/gopackages/app-cli/cli"
+	"github.com/tucats/gopackages/app-cli/tables"
+	"github.com/tucats/gopackages/app-cli/ui"
 )
 
 // Grammar describes profile subcommands

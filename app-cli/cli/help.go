@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/tucats/gopackages/cli/tables"
-	"github.com/tucats/gopackages/cli/ui"
+	"github.com/tucats/gopackages/app-cli/tables"
+	"github.com/tucats/gopackages/app-cli/ui"
 )
 
 // Copyright contains the copyright string (if any) used in help output

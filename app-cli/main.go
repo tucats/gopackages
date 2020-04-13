@@ -4,8 +4,8 @@
 package main
 
 import (
-	"github.com/tucats/gopackages/cli/app"
-	"github.com/tucats/gopackages/cli/commands"
+	"github.com/tucats/gopackages/app-cli/app"
+	"github.com/tucats/gopackages/app-cli/commands"
 )
 
 func main() {
