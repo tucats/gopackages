@@ -54,6 +54,9 @@ func ValidateBoolean(value string) (bool, bool) {
 // MakeList takes a string containing a comma-separated list of
 // string values and converts it to an array of trimmed strings.
 func MakeList(value string) []string {
+	if len(strings.TrimSpace(value)) == 0 {
+		return []string{}
+	}
 	list := strings.Split(value, ",")
 	for n := 0; n < len(list); n++ {
 		list[n] = strings.TrimSpace(list[n])
