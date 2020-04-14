@@ -54,11 +54,13 @@ func Debug(format string, args ...interface{}) {
 func Log(class string, format string, args ...interface{}) {
 	pid := os.Getpid()
 	s := fmt.Sprintf(format, args...)
+
 	sequenceMux.Lock()
+	defer sequenceMux.Unlock()
+
 	sequence = sequence + 1
 	sequenceString := fmt.Sprintf("%d, %d", pid, sequence)
 	fmt.Printf("[%s] %-10s %-7s: %s\n", time.Now().Format(time.RFC3339), sequenceString, strings.ToUpper(class), s)
-	sequenceMux.Unlock()
 
 }
 
