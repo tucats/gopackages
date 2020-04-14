@@ -9,9 +9,16 @@ import "github.com/tucats/gopackages/app-cli/cli"
 var Grammar = []cli.Option{
 	cli.Option{
 		LongName:    "list",
-		Description: "Demonstration command to list a table",
+		Description: "List contents of a table",
 		OptionType:  cli.Subcommand,
 		Value:       ListGrammar,
 		Action:      ListAction,
+	},
+	cli.Option{
+		LongName:    "weather",
+		Description: "Get the current weather",
+		OptionType:  cli.Subcommand,
+		Value:       WeatherGrammar,
+		Action:      WeatherAction,
 	},
 }

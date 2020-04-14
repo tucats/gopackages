@@ -1,6 +1,6 @@
 // Package main contains the main program, which is used as a test driver to validate features
-// as they are added to the app-cli package. This is not intended to be run as a standalone
-// program, as it has uninterestly-limited features.
+// as they are added to the app-cli package. This is not intended to be run as a useful CLI
+// program, as it has uninteresting and limited features.
 package main
 
 import (
