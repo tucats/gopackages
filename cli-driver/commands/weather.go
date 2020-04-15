@@ -26,40 +26,43 @@ var stateNames = map[string]string{
 	"dc": "district of columbia",
 }
 
-// LatLong defines the coordinates of a report.
-type LatLong struct {
-	Longitude float32 `json:"lon"`
-	Lattitude float32 `json:"lat"`
-}
+// Weather types
+type (
+	// LatLong defines the location of a weather station
+	LatLong struct {
+		Longitude float32 `json:"lon"`
+		Lattitude float32 `json:"lat"`
+	}
 
-// WeatherText contains human-readable descriptions of the conditions.
-type WeatherText struct {
-	Description string `json:"description"`
-}
+	// WeatherText defines a human-readable description of conditions.
+	WeatherText struct {
+		Description string `json:"description"`
+	}
 
-// WeatherWind summarizes wind conditions
-type WeatherWind struct {
-	Speed     float64 `json:"speed"`
-	Direction float64 `json:"deg"`
-}
+	// WeatherWind defines the speed and direction of the wind
+	WeatherWind struct {
+		Speed     float64 `json:"speed"`
+		Direction float64 `json:"deg"`
+	}
 
-// WeatherOverview summarizes temperature.
-type WeatherOverview struct {
-	Temp      float64 `json:"temp"`
-	FeelsLike float64 `json:"feels_like"`
-	Minimum   float64 `json:"temp_min"`
-	Maximum   float64 `json:"temp_max"`
-	Pressure  int     `json:"pressure"`
-	Humidity  int     `json:"humidity"`
-}
+	// WeatherOverview provides an overfiew of temperature and humidity
+	WeatherOverview struct {
+		Temp      float64 `json:"temp"`
+		FeelsLike float64 `json:"feels_like"`
+		Minimum   float64 `json:"temp_min"`
+		Maximum   float64 `json:"temp_max"`
+		Pressure  int     `json:"pressure"`
+		Humidity  int     `json:"humidity"`
+	}
 
-// Weather contains a weather report.
-type Weather struct {
-	Coord LatLong         `json:"coord"`
-	Text  []WeatherText   `json:"weather"`
-	Main  WeatherOverview `json:"main"`
-	Wind  WeatherWind     `json:"wind"`
-}
+	// Weather is the overall structure of a weather report
+	Weather struct {
+		Coord LatLong         `json:"coord"`
+		Text  []WeatherText   `json:"weather"`
+		Main  WeatherOverview `json:"main"`
+		Wind  WeatherWind     `json:"wind"`
+	}
+)
 
 // WeatherGrammar defines the subgrammar of the weather command.
 var WeatherGrammar = []cli.Option{
