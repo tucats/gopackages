@@ -11,7 +11,7 @@ import (
 func main() {
 
 	app.SetCopyright("(c) 2020 Tom Cole. All rights reserved.")
-	app.SetVersion([]int{1, 1, 36})
+	app.SetVersion([]int{1, 1, 1})
 	app.Run(commands.Grammar, "cli-driver", "test driver for CLI development")
 
 }
