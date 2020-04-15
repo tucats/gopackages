@@ -3,6 +3,7 @@ package app
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/cli"
@@ -55,5 +56,6 @@ func UseProfileAction(c *cli.Context) error {
 func ShowVersionAction(c *cli.Context) error {
 
 	fmt.Printf("%s %s\n", c.MainProgram, cli.Version)
+	os.Exit(0)
 	return nil
 }
