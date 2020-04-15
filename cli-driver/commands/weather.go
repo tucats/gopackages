@@ -127,7 +127,9 @@ func WeatherAction(c *cli.Context) error {
 	t := tables.New([]string{"Item", "Value"})
 	t.AddRowItems("Summary", weather.Text[0].Description)
 	t.AddRowItems("Temperature", weather.Main.Temp)
-	t.AddRowItems("Feels Like", weather.Main.FeelsLike)
+	t.AddRowItems("  Feels Like", weather.Main.FeelsLike)
+	t.AddRowItems("  Minimum", weather.Main.Minimum)
+	t.AddRowItems("  Maximum", weather.Main.Maximum)
 	t.AddRowItems("Wind Speed", weather.Wind.Speed)
 
 	if weather.Wind.Direction > 0.0 {
