@@ -66,6 +66,13 @@ func Run(grammar []cli.Option, appName string, appDescription string) error {
 			EnvironmentVariable: "CLI_OUTPUT_FORMAT",
 		},
 		cli.Option{
+			ShortName:   "v",
+			LongName:    "version",
+			Description: "Show version number of command line tool",
+			OptionType:  cli.BooleanType,
+			Action:      ShowVersionAction,
+		},
+		cli.Option{
 			ShortName:           "q",
 			LongName:            "quiet",
 			Description:         "If specified, suppress extra messaging",

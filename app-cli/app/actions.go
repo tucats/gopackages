@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/cli"
@@ -46,5 +47,13 @@ func UseProfileAction(c *cli.Context) error {
 	name, _ := c.GetString("profile")
 	ui.Debug("Using profile %s", name)
 	profile.UseProfile(name)
+	return nil
+}
+
+// ShowVersionAction is the action routine called when --version is specified.
+// It prints the version number information and then exits the application.
+func ShowVersionAction(c *cli.Context) error {
+
+	fmt.Printf("%s %s\n", c.MainProgram, cli.Version)
 	return nil
 }
