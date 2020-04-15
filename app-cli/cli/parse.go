@@ -174,7 +174,7 @@ func (c *Context) ParseGrammar(args []string) error {
 				if !hasValue {
 					currentArg = currentArg + 1
 					if currentArg >= lastArg {
-						return errors.New("Error, missing option value for " + name)
+						return NewExitError("missing option value for "+name, ExitUsageError)
 					}
 					value = args[currentArg]
 					hasValue = true
