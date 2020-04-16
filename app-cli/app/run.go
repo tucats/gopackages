@@ -107,7 +107,7 @@ func Run(grammar []cli.Option, appName string, appDescription string) error {
 	// code to carry along the desired exit code to support multiple types
 	// of errors.
 	if err != nil {
-		fmt.Printf("Error. %s\n", err.Error())
+		fmt.Printf("Error: %v\n", err.Error())
 		if e2, ok := err.(cli.ExitError); ok {
 			os.Exit(e2.ExitStatus)
 		}

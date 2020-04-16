@@ -6,7 +6,6 @@ package commands
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -86,7 +85,7 @@ func WeatherAction(c *cli.Context) error {
 		state = profile.Get("weather-state")
 	} else {
 		if len(location) != 2 {
-			return errors.New("Missing location value")
+			return cli.NewExitError("incomplete location name", cli.ExitUsageError)
 		}
 
 		city = strings.ToLower(location[0])
@@ -98,6 +97,10 @@ func WeatherAction(c *cli.Context) error {
 
 		profile.Set("weather-city", city)
 		profile.Set("weather-state", state)
+	}
+
+	if city == "" || state == "" {
+		return cli.NewExitError("incomplete location name", cli.ExitUsageError)
 	}
 
 	keyValue := profile.Get("weather-api-key")
