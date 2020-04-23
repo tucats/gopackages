@@ -3,7 +3,6 @@ package cli
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -28,7 +27,7 @@ var Globals *[]Option
 // action is executed.
 func (c *Context) Parse(description string) error {
 
-	args := os.Args
+	args := c.Args
 	c.MainProgram = filepath.Base(args[0])
 	c.Description = ""
 	MainProgramDescription = description

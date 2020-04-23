@@ -17,6 +17,10 @@ func (t *Table) Print(format string) error {
 		t.SortRows(t.orderBy, t.ascending)
 	}
 
+	if format == "" {
+		format = ui.TextTableFormat
+	}
+
 	// Based on the selected format, generate the output
 	switch format {
 	case ui.TextTableFormat:

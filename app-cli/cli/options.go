@@ -47,6 +47,7 @@ type Context struct {
 	Description            string
 	Command                string
 	Grammar                []Option
+	Args                   []string
 	Parent                 *Context
 	Parameters             []string
 	ParameterCount         int

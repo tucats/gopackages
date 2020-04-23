@@ -31,7 +31,7 @@ import (
 // * The appDescription is used as the text description of the application.
 //   This is displayed in --help output
 //
-func Run(grammar []cli.Option, appName string, appDescription string) error {
+func Run(grammar []cli.Option, args []string, appName string) error {
 
 	// Prepend the default supplied options
 	grammar = append([]cli.Option{
@@ -81,6 +81,13 @@ func Run(grammar []cli.Option, appName string, appDescription string) error {
 			EnvironmentVariable: "CLI_QUIET",
 		}}, grammar...)
 
+	// Extract the description of the app if it was given
+
+	var appDescription = ""
+	if i := strings.Index(appName, ":"); i > 0 {
+		appDescription = strings.Trim(appName[i+1:])
+		appName := strings.Trim(appName[:i])
+	}
 	// Load the active profile, if any
 	profile.Load(appName, "default")
 
@@ -94,7 +101,7 @@ func Run(grammar []cli.Option, appName string, appDescription string) error {
 
 	// Parse the grammar and call the actions (essentially, execute
 	// the function of the CLI)
-	context := cli.Context{Grammar: grammar}
+	context := cli.Context{Grammar: grammar, Args: args}
 	err := context.Parse(appDescription)
 
 	// If no errors, then write out an updated profile as needed.
