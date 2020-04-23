@@ -85,8 +85,8 @@ func Run(grammar []cli.Option, args []string, appName string) error {
 
 	var appDescription = ""
 	if i := strings.Index(appName, ":"); i > 0 {
-		appDescription = strings.Trim(appName[i+1:])
-		appName := strings.Trim(appName[:i])
+		appDescription = strings.TrimSpace(appName[i+1:])
+		appName := strings.TrimSpace(appName[:i])
 	}
 	// Load the active profile, if any
 	profile.Load(appName, "default")
