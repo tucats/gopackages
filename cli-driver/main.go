@@ -4,6 +4,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/tucats/gopackages/app-cli/app"
 	"github.com/tucats/gopackages/cli-driver/commands"
 )
@@ -12,6 +14,6 @@ func main() {
 
 	app.SetCopyright("(c) 2020 Tom Cole. All rights reserved.")
 	app.SetVersion([]int{1, 1, 1})
-	app.Run(commands.Grammar, "cli-driver", "test driver for CLI development")
+	app.Run(commands.Grammar, os.Args, "cli-driver: test driver for CLI development")
 
 }
