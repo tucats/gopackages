@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/tucats/gopackages/app-cli/tables"
 	"github.com/tucats/gopackages/app-cli/ui"
@@ -140,5 +139,4 @@ func ShowHelp(c *Context) {
 	to.AddRow([]string{"--help, -h", "Show this help text"})
 	to.SortRows(0, true)
 	to.Print(ui.TextTableFormat)
-	os.Exit(0)
 }

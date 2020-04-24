@@ -101,7 +101,7 @@ func Run(grammar []cli.Option, args []string, appName string) error {
 
 	// Parse the grammar and call the actions (essentially, execute
 	// the function of the CLI)
-	context := cli.Context{Grammar: grammar, Args: args}
+	context := cli.Context{Description: appDescription, Grammar: grammar, Args: args}
 	err := context.Parse(appDescription)
 
 	// If no errors, then write out an updated profile as needed.
