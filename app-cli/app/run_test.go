@@ -6,6 +6,7 @@ package app
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/tucats/gopackages/app-cli/cli"
@@ -21,11 +22,13 @@ var testGrammar1 = []cli.Option{
 		LongName:    "sub1",
 		OptionType:  cli.Subcommand,
 		Description: "sub1 subcommand",
+		Action:      testAction0,
 	},
 	cli.Option{
 		LongName:    "sub2",
 		OptionType:  cli.Subcommand,
 		Description: "sub2 subcommand has options",
+		Action:      testAction0,
 		Value: []cli.Option{
 			cli.Option{
 				ShortName:   "x",
@@ -34,8 +37,18 @@ var testGrammar1 = []cli.Option{
 				OptionType:  cli.StringType,
 				Action:      testAction1,
 			},
+			cli.Option{
+				LongName:    "count",
+				Description: "Count of things to blow up",
+				OptionType:  cli.IntType,
+				Action:      testAction2,
+			},
 		},
 	},
+}
+
+func testAction0(c *cli.Context) error {
+	return nil
 }
 
 func testAction1(c *cli.Context) error {
@@ -43,6 +56,15 @@ func testAction1(c *cli.Context) error {
 	fmt.Printf("Found the option value %s\n", v)
 	if v != "bob" {
 		return errors.New("Invalid explode name: " + v)
+	}
+	return nil
+}
+
+func testAction2(c *cli.Context) error {
+	v, _ := c.GetInteger("count")
+	fmt.Printf("Found the option value %v\n", v)
+	if v != 42 {
+		return errors.New("Invalid count: " + strconv.Itoa(v))
 	}
 	return nil
 }
@@ -126,6 +148,33 @@ func TestRun(t *testing.T) {
 			args: args{
 				testGrammar1,
 				[]string{"test-driver", "-d", "sub2", "-x"},
+				"testing: the test app",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Valid subcommand with invalid int valid option ",
+			args: args{
+				testGrammar1,
+				[]string{"test-driver", "-d", "sub2", "--count", "42F"},
+				"testing: the test app",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Valid subcommand with valid option ",
+			args: args{
+				testGrammar1,
+				[]string{"test-driver", "-d", "sub2", "--count", "42"},
+				"testing: the test app",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Valid subcommand with valid option with wrong value",
+			args: args{
+				testGrammar1,
+				[]string{"test-driver", "-d", "sub2", "--count", "43"},
 				"testing: the test app",
 			},
 			wantErr: true,
