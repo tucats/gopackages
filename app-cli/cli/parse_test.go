@@ -67,6 +67,43 @@ func TestContext_ParseGrammar(t *testing.T) {
 
 	var grammar1 = []Option{
 		Option{
+			LongName:   "sub1",
+			OptionType: Subcommand,
+			Action:     dummyAction,
+			Value: []Option{
+				Option{
+					LongName:   "subopt1",
+					OptionType: BooleanType,
+				},
+			},
+		},
+		Option{
+			LongName:           "sub2",
+			Aliases:            []string{"s2"},
+			OptionType:         Subcommand,
+			Action:             dummyAction,
+			ParametersExpected: -3,
+			Value: []Option{
+				Option{
+					LongName:   "subopt2",
+					OptionType: BooleanType,
+				},
+			},
+		},
+		Option{
+			LongName:           "sub3",
+			Aliases:            []string{"s3"},
+			OptionType:         Subcommand,
+			Action:             dummyAction,
+			ParametersExpected: 1,
+			Value: []Option{
+				Option{
+					LongName:   "subopt2",
+					OptionType: BooleanType,
+				},
+			},
+		},
+		Option{
 			ShortName:   "a",
 			LongName:    "alpha",
 			OptionType:  BooleanType,
@@ -138,6 +175,14 @@ func TestContext_ParseGrammar(t *testing.T) {
 				args: []string{"-x"},
 			},
 			wantErr: true,
+		},
+		{
+			name:   "Option with = value test",
+			fields: fields1,
+			args: args{
+				args: []string{"-i=42"},
+			},
+			wantErr: false,
 		},
 
 		// Integer options
@@ -236,6 +281,73 @@ func TestContext_ParseGrammar(t *testing.T) {
 			},
 			wantErr: true,
 		},
+
+		// Subcommands
+		{
+			name:   "Subcommand not found test",
+			fields: fields1,
+			args: args{
+				args: []string{"sub99"},
+			},
+			wantErr: true,
+		},
+		{
+			name:   "Subcommand found test",
+			fields: fields1,
+			args: args{
+				args: []string{"sub1"},
+			},
+			wantErr: false,
+		},
+		{
+			name:   "Subcommand with valid option test",
+			fields: fields1,
+			args: args{
+				args: []string{"sub1", "--subopt1"},
+			},
+			wantErr: false,
+		},
+		{
+			name:   "Subcommand with invalid option test",
+			fields: fields1,
+			args: args{
+				args: []string{"sub1", "--subopt199"},
+			},
+			wantErr: true,
+		},
+		{
+			name:   "Subcommand with alias name  test",
+			fields: fields1,
+			args: args{
+				args: []string{"s2"},
+			},
+			wantErr: false,
+		},
+		{
+			name:   "Subcommand with parameters test",
+			fields: fields1,
+			args: args{
+				args: []string{"sub2", "parm1", "parm2"},
+			},
+			wantErr: false,
+		},
+		{
+			name:   "Subcommand with too many parameters test",
+			fields: fields1,
+			args: args{
+				args: []string{"sub2", "parm1", "parm2", "parm3", "parm4"},
+			},
+			wantErr: true,
+		},
+		{
+			name:   "Subcommand with break before parameters test",
+			fields: fields1,
+			args: args{
+				args: []string{"sub2", "--", "--parm1", "parm2", "parm3"},
+			},
+			wantErr: false,
+		},
+
 		// TODO: Add test cases.
 	}
 
