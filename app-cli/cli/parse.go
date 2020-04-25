@@ -39,6 +39,7 @@ func (c *Context) Parse(description string) error {
 	// If there are no arguments other than the main program name, dump out the help by default.
 	if len(args) == 1 {
 		ShowHelp(c)
+		return nil
 	}
 
 	// Start parsing using the top-level grammar.
@@ -75,7 +76,7 @@ func (c *Context) ParseGrammar(args []string) error {
 		// Handle the special cases automatically.
 		if (helpVerb && option == "help") || option == "-h" || option == "--help" {
 			ShowHelp(c)
-			break
+			return nil
 		}
 		if option == "--" {
 			parametersOnly = true
