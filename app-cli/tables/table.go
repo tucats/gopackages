@@ -1,5 +1,7 @@
 package tables
 
+import "errors"
+
 const (
 
 	// AlignmentLeft aligns the column to the left
@@ -32,9 +34,13 @@ type Table struct {
 }
 
 // New creates a new table object, given a list of headings
-func New(headings []string) Table {
+func New(headings []string) (Table, error) {
 
 	var t Table
+
+	if len(headings) == 0 {
+		return t, errors.New("cannot create table with zero columns")
+	}
 	t.rowLimit = -1
 	t.columnCount = len(headings)
 	t.columns = headings
@@ -53,7 +59,7 @@ func New(headings []string) Table {
 		t.columns[n] = h
 		t.alignment[n] = AlignmentLeft
 	}
-	return t
+	return t, nil
 }
 
 // GetHeadings returns an array of the headings already stored
