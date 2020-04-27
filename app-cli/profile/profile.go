@@ -71,7 +71,7 @@ var Grammar = []cli.Option{
 // ShowAction Displays the current contents of the active profile
 func ShowAction(c *cli.Context) error {
 
-	t := tables.New([]string{"Key", "Value"})
+	t, _ := tables.New([]string{"Key", "Value"})
 
 	for k, v := range CurrentConfiguration.Items {
 		t.AddRowItems(k, v)
@@ -86,7 +86,7 @@ func ShowAction(c *cli.Context) error {
 // ListAction Displays the current contents of the active profile
 func ListAction(c *cli.Context) error {
 
-	t := tables.New([]string{"Name", "Description"})
+	t, _ := tables.New([]string{"Name", "Description"})
 
 	for k, v := range Configurations {
 		t.AddRowItems(k, v.Description)

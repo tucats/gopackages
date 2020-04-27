@@ -69,7 +69,7 @@ func ShowHelp(c *Context) {
 	fmt.Printf("\nUsage:\n   %-26s   %s\n\n", composedCommand, c.Description)
 	headerShown := false
 
-	tc := tables.New([]string{"subcommand", "description"})
+	tc, _ := tables.New([]string{"subcommand", "description"})
 	tc.ShowHeadings(false)
 	tc.SetIndent(3)
 	tc.SetSpacing(3)
@@ -91,7 +91,7 @@ func ShowHelp(c *Context) {
 		fmt.Printf("\n")
 	}
 
-	to := tables.New([]string{"option", "description"})
+	to, _ := tables.New([]string{"option", "description"})
 	to.ShowHeadings(false)
 	to.SetIndent(3)
 	to.SetSpacing(3)
