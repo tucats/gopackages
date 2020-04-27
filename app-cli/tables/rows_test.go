@@ -8,11 +8,13 @@ import (
 func TestTable_SortRows(t *testing.T) {
 
 	tests := []struct {
-		name       string
-		headers    []string
-		rows       [][]string
-		sortColumn string
-		result     []string
+		name        string
+		headers     []string
+		rows        [][]string
+		sortColumn  string
+		result      []string
+		hideLines   bool
+		hideHeaders bool
 	}{
 		{
 			name:       "Simple table with one column, two rows",
@@ -35,6 +37,22 @@ func TestTable_SortRows(t *testing.T) {
 			sortColumn: "second",
 			result:     []string{"first    second    ", "=====    ======    ", "v2       d1        ", "v1       d2        "},
 		},
+		{
+			name:       "Format table without underlines",
+			headers:    []string{"first", "second"},
+			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			sortColumn: "second",
+			result:     []string{"first    second    ", "v2       d1        ", "v1       d2        "},
+			hideLines:  true,
+		},
+		{
+			name:        "Format table without headings",
+			headers:     []string{"first", "second"},
+			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			sortColumn:  "second",
+			result:      []string{"v2       d1        ", "v1       d2        "},
+			hideHeaders: true,
+		},
 		// TODO add tests
 	}
 
@@ -46,6 +64,12 @@ func TestTable_SortRows(t *testing.T) {
 			}
 			table.SetOrderBy(tt.sortColumn)
 			table.SortRows(table.orderBy, table.ascending)
+			if tt.hideLines {
+				table.ShowUnderlines(false)
+			}
+			if tt.hideHeaders {
+				table.ShowHeadings(false)
+			}
 			x := table.FormatText()
 
 			if !reflect.DeepEqual(x, tt.result) {
