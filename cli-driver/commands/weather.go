@@ -130,7 +130,7 @@ func WeatherAction(c *cli.Context) error {
 		return err
 	}
 
-	t := tables.New([]string{"Item", "Value"})
+	t, _ := tables.New([]string{"Item", "Value"})
 	t.AddRowItems("Summary", weather.Text[0].Description)
 	t.AddRowItems("Temperature", weather.Main.Temp)
 	t.AddRowItems("  Feels Like", weather.Main.FeelsLike)

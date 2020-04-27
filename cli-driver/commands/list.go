@@ -48,7 +48,7 @@ func ListAction(c *cli.Context) error {
 
 	ui.Debug("In the LIST action")
 
-	t := tables.New([]string{"Name", "Age"})
+	t, _ := tables.New([]string{"Name", "Age"})
 	_ = t.SetAlignment(1, tables.AlignmentRight)
 
 	// If an order-by is given, tell the table to sort the data
