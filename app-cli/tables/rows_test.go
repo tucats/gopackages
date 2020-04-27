@@ -15,6 +15,9 @@ func TestTable_SortRows(t *testing.T) {
 		result      []string
 		hideLines   bool
 		hideHeaders bool
+		startingRow int
+		width       int
+		wantErr     bool
 	}{
 		{
 			name:       "Simple table with one column, two rows",
@@ -29,6 +32,7 @@ func TestTable_SortRows(t *testing.T) {
 			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
 			sortColumn: "first",
 			result:     []string{"first    second    ", "=====    ======    ", "v1       d2        ", "v2       d1        "},
+			wantErr:    false,
 		},
 		{
 			name:       "Simple table with two columns, two rows, alternate sort",
@@ -36,6 +40,32 @@ func TestTable_SortRows(t *testing.T) {
 			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
 			sortColumn: "second",
 			result:     []string{"first    second    ", "=====    ======    ", "v2       d1        ", "v1       d2        "},
+			wantErr:    false,
+		},
+		{
+			name:       "Simple table with two columns, two rows, invalid sort",
+			headers:    []string{"first", "second"},
+			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			sortColumn: "foobar",
+			result:     []string{"first    second    ", "=====    ======    ", "v2       d1        ", "v1       d2        "},
+			wantErr:    true,
+		},
+		{
+			name:        "Starting row",
+			headers:     []string{"first", "second"},
+			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			sortColumn:  "second",
+			result:      []string{"first    second    ", "=====    ======    ", "v1       d2        "},
+			startingRow: 2,
+		},
+		{
+			name:        "Invalid starting row",
+			headers:     []string{"first", "second"},
+			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			sortColumn:  "second",
+			result:      []string{"first    second    ", "=====    ======    ", "v2       d1        ", "v1       d2        "},
+			startingRow: -5,
+			wantErr:     true,
 		},
 		{
 			name:       "Format table without underlines",
@@ -53,6 +83,34 @@ func TestTable_SortRows(t *testing.T) {
 			result:      []string{"v2       d1        ", "v1       d2        "},
 			hideHeaders: true,
 		},
+		{
+			name:        "Valid minimum width",
+			headers:     []string{"first", "second"},
+			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			sortColumn:  "second",
+			result:      []string{"v2       d1            ", "v1       d2            "},
+			hideHeaders: true,
+			width:       10,
+		},
+		{
+			name:        "Valid but ineffective width",
+			headers:     []string{"first", "second"},
+			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			sortColumn:  "second",
+			result:      []string{"v2       d1        ", "v1       d2        "},
+			width:       2,
+			hideHeaders: true,
+		},
+		{
+			name:        "Invalid minimum width",
+			headers:     []string{"first", "second"},
+			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			sortColumn:  "second",
+			result:      []string{"v2       d1        ", "v1       d2        "},
+			hideHeaders: true,
+			wantErr:     true,
+			width:       -3,
+		},
 		// TODO add tests
 	}
 
@@ -62,13 +120,36 @@ func TestTable_SortRows(t *testing.T) {
 			for _, r := range tt.rows {
 				table.AddRow(r)
 			}
-			table.SetOrderBy(tt.sortColumn)
-			table.SortRows(table.orderBy, table.ascending)
+
+			if tt.sortColumn != "" {
+				err := table.SetOrderBy(tt.sortColumn)
+				if (err != nil) && !tt.wantErr {
+					t.Errorf("Unexpected SetOrderBy error result: %v", err)
+				}
+				err = table.SortRows(table.orderBy, table.ascending)
+				if (err != nil) && !tt.wantErr {
+					t.Errorf("Unexpected SortRows error result: %v", err)
+				}
+			}
+
 			if tt.hideLines {
 				table.ShowUnderlines(false)
 			}
 			if tt.hideHeaders {
 				table.ShowHeadings(false)
+			}
+
+			if tt.startingRow != 0 {
+				err := table.SetStartingRow(tt.startingRow)
+				if (err != nil) && !tt.wantErr {
+					t.Errorf("Unexpected SetStartingRow error result: %v", err)
+				}
+			}
+			if tt.width != 0 {
+				err := table.SetMinimumWidth(1, tt.width)
+				if (err != nil) && !tt.wantErr {
+					t.Errorf("Unexpected SetMinimumWidth error result: %v", err)
+				}
 			}
 			x := table.FormatText()
 
