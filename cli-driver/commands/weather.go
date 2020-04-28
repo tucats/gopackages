@@ -6,6 +6,7 @@ package commands
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -130,12 +131,14 @@ func WeatherAction(c *cli.Context) error {
 		city = profile.Get("weather-city")
 		state = profile.Get("weather-state")
 	} else {
-		if len(location) != 2 {
+		if len(location) < 1 || len(location) > 2 {
 			return cli.NewExitError("incomplete location name", cli.ExitUsageError)
 		}
 
 		city = strings.ToLower(location[0])
-		state = strings.ToLower(location[1])
+		if len(location) >= 2 {
+			state = strings.ToLower(location[1])
+		}
 
 		if longName, found := stateNames[state]; found {
 			state = longName
@@ -145,7 +148,7 @@ func WeatherAction(c *cli.Context) error {
 		profile.Set("weather-state", state)
 	}
 
-	if city == "" || state == "" {
+	if city == "" {
 		return cli.NewExitError("incomplete location name", cli.ExitUsageError)
 	}
 
@@ -166,10 +169,13 @@ func WeatherAction(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	if response.StatusCode != 200 {
+		return errors.New("invalid request, " + response.Status)
+	}
 
 	weather := Weather{}
 	data, _ := ioutil.ReadAll(response.Body)
-	ui.Debug("Reply: %s", string(data))
+	ui.Debug("Reply: %s, %s", response.Status, string(data))
 
 	err = json.Unmarshal(data, &weather)
 	if err != nil {
@@ -177,7 +183,9 @@ func WeatherAction(c *cli.Context) error {
 	}
 
 	t, _ := tables.New([]string{"Item", "Value"})
-	t.AddRowItems("Summary", weather.Text[0].Description)
+	if len(weather.Text) > 0 {
+		t.AddRowItems("Summary", weather.Text[0].Description)
+	}
 	t.AddRowItems("Temperature", weather.Main.Temp)
 	t.AddRowItems("  Feels Like", weather.Main.FeelsLike)
 	t.AddRowItems("  Minimum", weather.Main.Minimum)
