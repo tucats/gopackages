@@ -158,6 +158,7 @@ func Set(key string, value string) {
 	c := *CurrentConfiguration
 	c.Items[key] = value
 	profileDirty = true
+	ui.Debug("Setting profile key \"%s\" = \"%s\"", key, value)
 
 }
 
@@ -166,6 +167,7 @@ func Set(key string, value string) {
 // to update on account of this setting.
 func SetDefault(key string, value string) {
 	explicitValues.Items[key] = value
+	ui.Debug("Setting default key \"%s\" = \"%s\"", key, value)
 }
 
 // Get gets a profile entry in the current configuration structure.
@@ -179,6 +181,7 @@ func Get(key string) string {
 		c := *CurrentConfiguration
 		v = c.Items[key]
 	}
+	ui.Debug("Reading profile key \"%s\" : \"%s\"", key, v)
 	return v
 }
 
@@ -189,6 +192,7 @@ func Delete(key string) {
 	delete(c.Items, key)
 	delete(explicitValues.Items, key)
 	profileDirty = true
+	ui.Debug("Deleting profile key \"%s\"", key)
 }
 
 // Exists test to see if a key value exists or not
