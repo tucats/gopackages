@@ -55,7 +55,7 @@ func (t *Table) FormatJSON() string {
 			}
 			buffer.WriteRune('"')
 			buffer.WriteString(header)
-			buffer.WriteString("\" : ")
+			buffer.WriteString("\":")
 
 			if _, valid := strconv.Atoi(row[i]); valid == nil {
 				buffer.WriteString(row[i])

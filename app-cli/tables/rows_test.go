@@ -43,6 +43,14 @@ func TestTable_SortRows(t *testing.T) {
 			wantErr:    false,
 		},
 		{
+			name:       "Simple table with two columns, two rows, alternate descending sort",
+			headers:    []string{"first", "second"},
+			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			sortColumn: "~second",
+			result:     []string{"first    second    ", "=====    ======    ", "v1       d2        ", "v2       d1        "},
+			wantErr:    false,
+		},
+		{
 			name:       "Simple table with two columns, two rows, invalid sort",
 			headers:    []string{"first", "second"},
 			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
@@ -293,4 +301,28 @@ func TestTable_AddRow(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTable_AddRowItems(t *testing.T) {
+
+	t.Run("Add row items", func(t *testing.T) {
+		tb, _ := New([]string{"Age", "Name", "Active", "Ratio"})
+
+		tb.AddRowItems(60, "Tom", true, 28.5)
+		tb.AddRowItems(59, "Mary", true, 23.5)
+		tb.AddRowItems(62, "Tony", false, 35.9)
+		tb.SortRows(3, false)
+
+		expected := [][]string{
+			[]string{"62", "Tony", "false", "35.9"},
+			[]string{"60", "Tom", "true", "28.5"},
+			[]string{"59", "Mary", "true", "23.5"},
+		}
+
+		if !reflect.DeepEqual(tb.rows, expected) {
+			t.Errorf("Table.AddRowItems() got %v, want %v", tb.rows, expected)
+		}
+
+	})
+
 }
