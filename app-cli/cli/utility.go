@@ -63,3 +63,14 @@ func MakeList(value string) []string {
 	}
 	return list
 }
+
+// FindGlobal locates the top-most context structure in the chain
+// of nested contexts. If our tree has no parent, we are the
+// global grammar. Otherwise, ask our parent...
+func (c *Context) FindGlobal() *Context {
+	if c.Parent == nil {
+		return c
+	}
+	return c.Parent.FindGlobal()
+
+}
