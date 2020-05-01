@@ -15,20 +15,21 @@ import (
 
 // Run sets up required data structures and executes the parse.
 // When completed, the command line functionality will have been
-// run. It is up to the caller (typically the main() fucntion)
+// run. It is up to the caller (typically the main() function)
 // to handle any post-processing cleanup, etc.
 //
-// * The grammar is cli.Options array of cli.Option structures.
-//   Each element describes a parsable token in the command line grammar.
-//   This grammar is extended to include the automatic built-in
-//   commands for profile management, etc.
+// The grammar is cli.Options array of cli.Option structures.
+// Each element describes a parsable token in the command line grammar.
+// This grammar is extended to include the automatic built-in
+// commands for profile management, etc.
 //
-// * The appName is the name of the CLI application.
-//   This is used in --help output and in determining the name of
-//   the configuration file used.
+// The args array is the array of command line arguments to be parsed.
+// This could be derived from the os.Args array, or a generated command
+// line argument (or one read in from an external source).
 //
-// * The appDescription is used as the text description of the application.
-//   This is displayed in --help output
+// The appName is the name of the CLI application, optionally followed
+// by a colon character (":") and the text description of the application.
+// These are primarily used in presenting --help information.
 //
 func Run(grammar []cli.Option, args []string, appName string) error {
 
