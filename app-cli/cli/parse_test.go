@@ -366,8 +366,8 @@ func TestContext_ParseGrammar(t *testing.T) {
 				ExpectedParameterCount: tt.fields.ExpectedParameterCount,
 				ParameterDescription:   tt.fields.ParameterDescription,
 			}
-			if err := c.ParseGrammar(tt.args.args); (err != nil) != tt.wantErr {
-				t.Errorf("Context.ParseGrammar() error = %v, wantErr %v", err, tt.wantErr)
+			if err := c.parseGrammar(tt.args.args); (err != nil) != tt.wantErr {
+				t.Errorf("Context.parseGrammar() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

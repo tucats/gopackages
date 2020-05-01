@@ -10,31 +10,18 @@ import (
 	"github.com/tucats/gopackages/app-cli/ui"
 )
 
-// MainProgramDescription is the description of the main program
-var MainProgramDescription string
-
-// Action is the function to invoke on the last subcommand found in parsing.
-var Action func(c *Context) error
-
-// Globals is a copy of the outermost grammar definition, and is used to find
-// global values later.
-var Globals *[]Option
-
-// Parse accepts a grammar definition and parses the current argument
-// list against that grammar. Unrecognized options or subcommands, as
-// well as invalid values are reported as an error. If there is an
-// action routine associated with an option or a subcommand, that
-// action is executed.
-func (c *Context) Parse(description string) error {
+// Parse processes the grammar associated with the current context,
+// using the []string array of arguments for that context.
+//
+// Unrecognized options or subcommands, as well as invalid values
+// are reported as an error. If there is an action routine associated
+// with an option or a subcommand, that action is executed.
+func (c *Context) Parse() error {
 
 	args := c.Args
 	c.MainProgram = filepath.Base(args[0])
-	c.Description = ""
-	MainProgramDescription = description
 	c.Command = ""
-	Action = nil
-
-	Globals = &c.Grammar
+	c.Action = nil
 
 	// If there are no arguments other than the main program name, dump out the help by default.
 	if len(args) == 1 {
@@ -43,11 +30,13 @@ func (c *Context) Parse(description string) error {
 	}
 
 	// Start parsing using the top-level grammar.
-	return c.ParseGrammar(args[1:])
+	return c.parseGrammar(args[1:])
 }
 
-// ParseGrammar accepts an argument list and a grammar definition, and parses
-func (c *Context) ParseGrammar(args []string) error {
+// ParseGrammar accepts an argument list and parses it using the current context grammar
+// definition. This is abstracted from Parse because it allows for recursion for subcomamnds.
+// This is never called by the user directly.
+func (c *Context) parseGrammar(args []string) error {
 
 	lastArg := len(args)
 	var err error
@@ -150,10 +139,10 @@ func (c *Context) ParseGrammar(args []string) error {
 					c.FindGlobal().ParameterDescription = entry.ParameterDescription
 
 					if entry.Action != nil {
-						Action = entry.Action
+						c.Action = entry.Action
 					}
 					ui.Debug("Transferring control to subgrammar for %s", entry.LongName)
-					return subContext.ParseGrammar(args[currentArg+1:])
+					return subContext.parseGrammar(args[currentArg+1:])
 				}
 			}
 
@@ -255,8 +244,8 @@ func (c *Context) ParseGrammar(args []string) error {
 
 		// Did we ever find an action routine? If so, let's run it. Otherwise,
 		// there wasn't enough command to determine what to do, so show the help.
-		if Action != nil {
-			err = Action(c)
+		if c.Action != nil {
+			err = c.Action(c)
 		} else {
 			ShowHelp(c)
 		}

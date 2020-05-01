@@ -64,7 +64,7 @@ func ShowHelp(c *Context) {
 		minimumFirstColumnWidth = 26
 	}
 	if c.Parent == nil {
-		c.Description = MainProgramDescription + ", " + Version
+		c.Description = c.Description + ", " + Version
 	}
 	fmt.Printf("\nUsage:\n   %-26s   %s\n\n", composedCommand, c.Description)
 	headerShown := false

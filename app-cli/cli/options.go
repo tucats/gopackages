@@ -53,4 +53,5 @@ type Context struct {
 	ParameterCount         int
 	ExpectedParameterCount int
 	ParameterDescription   string
+	Action                 func(c *Context) error
 }
