@@ -7,18 +7,6 @@ import (
 	"github.com/tucats/gopackages/app-cli/ui"
 )
 
-// Copyright contains the copyright string (if any) used in help output
-var Copyright string
-
-// Version is a string representation of the current program.
-var Version string = "v.0.0-1"
-
-// SetCopyright sets the copyright string. If not set, then no copyright
-// message is displayed as part of help.
-func SetCopyright(s string) {
-	Copyright = s
-}
-
 // ShowHelp displays help text for the grammar, using a standardized format.
 // The help shows subcommands as well as options, including value type cues.
 // The output is automatically directed to the stdout console output.
@@ -26,8 +14,8 @@ func SetCopyright(s string) {
 // This function uses the tables package to create uniform columns of output.
 func ShowHelp(c *Context) {
 
-	if Copyright != "" {
-		fmt.Printf("%s\n", Copyright)
+	if c.Copyright != "" {
+		fmt.Printf("%s\n", c.Copyright)
 	}
 
 	composedCommand := c.MainProgram + " " + c.Command
@@ -63,9 +51,10 @@ func ShowHelp(c *Context) {
 	if minimumFirstColumnWidth < 26 {
 		minimumFirstColumnWidth = 26
 	}
-	if c.Parent == nil {
-		c.Description = c.Description + ", " + Version
+	if c.Parent == nil && c.Version != "" {
+		c.Description = c.Description + ", " + c.Version
 	}
+
 	fmt.Printf("\nUsage:\n   %-26s   %s\n\n", composedCommand, c.Description)
 	headerShown := false
 

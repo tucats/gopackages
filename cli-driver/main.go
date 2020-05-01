@@ -14,9 +14,11 @@ import (
 
 func main() {
 
-	app.SetCopyright("(c) 2020 Tom Cole. All rights reserved.")
-	app.SetVersion([]int{1, 1, 1})
-	err := app.Run(commands.Grammar, os.Args, "cli-driver: test driver for CLI development")
+	app := app.New("cli-driver: test driver for CLI development")
+	app.SetVersion(1, 1, 1)
+	app.SetCopyright("(C) Copyright Tom Cole 2020")
+
+	err := app.Run(commands.Grammar, os.Args)
 
 	// If something went wrong, report it to the user and force an exit
 	// status of 1. @TOMCOLE later this should be extended to allow an error

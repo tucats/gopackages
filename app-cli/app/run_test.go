@@ -185,10 +185,11 @@ func TestRun(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			SetCopyright("(c) 2020 Tom Cole. All rights reserved.")
-			SetVersion([]int{1, 1, 1})
+			app := New("tt.args.appName")
+			app.SetCopyright("(c) 2020 Tom Cole. All rights reserved.")
+			app.SetVersion(1, 1, 0)
 
-			if err := Run(tt.args.grammar, tt.args.args, tt.args.appName); (err != nil) != tt.wantErr {
+			if err := app.Run(tt.args.grammar, tt.args.args); (err != nil) != tt.wantErr {
 				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

@@ -49,8 +49,9 @@ func (c *Context) GetInteger(name string) (int, bool) {
 	return 0, false
 }
 
-// GetBool returns the value of a named integer from the
-// parsed grammar, or a zero if not found.
+// GetBool returns the value of a named boolean. If the boolean option
+// was found during processing, this routine returns true. Otherwise it
+// returns false.
 func (c *Context) GetBool(name string) bool {
 
 	for _, entry := range c.Grammar {
@@ -66,9 +67,10 @@ func (c *Context) GetBool(name string) bool {
 	return false
 }
 
-// GetString returns the value of a named integer from the
-// parsed grammar, or a zero if not found. The second return value
-// indicates if the value was explicitly specified.
+// GetString returns the value of a named string parameter from the
+// parsed grammar, or an empty string if not found. The second return
+// value indicates if the value was explicitly specified. This is used
+// to differentiate between "not specified" and "specified as empty".
 func (c *Context) GetString(name string) (string, bool) {
 
 	for _, entry := range c.Grammar {

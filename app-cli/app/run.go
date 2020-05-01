@@ -1,7 +1,3 @@
-// Package app provides the top-level framework for CLI execution. This includes
-// the Run() method to run the program, plus a number of action routines that can
-// be invoked from the grammar or by a user action routine. These support common or
-// global actions, like specifying which profile to use.
 package app
 
 import (
@@ -18,25 +14,11 @@ import (
 // When completed, the command line functionality will have been
 // run. It is up to the caller (typically the main() function)
 // to handle any post-processing cleanup, etc.
-//
-// The grammar is cli.Options array of cli.Option structures.
-// Each element describes a parsable token in the command line grammar.
-// This grammar is extended to include the automatic built-in
-// commands for profile management, etc.
-//
-// The args array is the array of command line arguments to be parsed.
-// This could be derived from the os.Args array, or a generated command
-// line argument (or one read in from an external source).
-//
-// The appName is the name of the CLI application, optionally followed
-// by a colon character (":") and the text description of the application.
-// These are primarily used in presenting --help information.
-//
-func Run(grammar []cli.Option, args []string, appName string) error {
+func runFromContext(context *cli.Context) error {
 
 	// Create a new grammar which prepends the default supplied options
 	// to the caller's grammar definition.
-	grammar = append([]cli.Option{
+	grammar := append([]cli.Option{
 		cli.Option{
 			LongName:    "profile",
 			Aliases:     []string{"prof"},
@@ -81,17 +63,10 @@ func Run(grammar []cli.Option, args []string, appName string) error {
 			OptionType:          cli.BooleanType,
 			Action:              QuietAction,
 			EnvironmentVariable: "CLI_QUIET",
-		}}, grammar...)
-
-	// Extract the description of the app if it was given
-	var appDescription = ""
-	if i := strings.Index(appName, ":"); i > 0 {
-		appDescription = strings.TrimSpace(appName[i+1:])
-		appName = strings.TrimSpace(appName[:i])
-	}
+		}}, context.Grammar...)
 
 	// Load the active profile, if any from the profile for this application.
-	profile.Load(appName, "default")
+	profile.Load(context.AppName, "default")
 
 	// If the CLI_DEBUG environment variable is set, then turn on
 	// debugging now, so messages will come out before that particular
@@ -102,7 +77,8 @@ func Run(grammar []cli.Option, args []string, appName string) error {
 
 	// Parse the grammar and call the actions (essentially, execute
 	// the function of the CLI)
-	context := cli.Context{Description: appDescription, Grammar: grammar, Args: args}
+	context.Grammar = grammar
+
 	err := context.Parse()
 
 	// If no errors, then write out an updated profile as needed.

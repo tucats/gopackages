@@ -45,6 +45,8 @@ type Context struct {
 	AppName                string
 	MainProgram            string
 	Description            string
+	Copyright              string
+	Version                string
 	Command                string
 	Grammar                []Option
 	Args                   []string
