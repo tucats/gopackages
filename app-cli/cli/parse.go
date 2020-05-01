@@ -139,7 +139,7 @@ func (c *Context) parseGrammar(args []string) error {
 					c.FindGlobal().ParameterDescription = entry.ParameterDescription
 
 					if entry.Action != nil {
-						c.Action = entry.Action
+						c.FindGlobal().Action = entry.Action
 					}
 					ui.Debug("Transferring control to subgrammar for %s", entry.LongName)
 					return subContext.parseGrammar(args[currentArg+1:])
@@ -244,8 +244,8 @@ func (c *Context) parseGrammar(args []string) error {
 
 		// Did we ever find an action routine? If so, let's run it. Otherwise,
 		// there wasn't enough command to determine what to do, so show the help.
-		if c.Action != nil {
-			err = c.Action(c)
+		if g.Action != nil {
+			err = g.Action(c)
 		} else {
 			ShowHelp(c)
 		}
