@@ -3,6 +3,8 @@ package cli
 import (
 	"errors"
 	"testing"
+
+	"github.com/tucats/gopackages/app-cli/ui"
 )
 
 func dummyAction(c *Context) error {
@@ -366,6 +368,7 @@ func TestContext_ParseGrammar(t *testing.T) {
 				ExpectedParameterCount: tt.fields.ExpectedParameterCount,
 				ParameterDescription:   tt.fields.ParameterDescription,
 			}
+			ui.DebugMode = true
 			if err := c.parseGrammar(tt.args.args); (err != nil) != tt.wantErr {
 				t.Errorf("Context.parseGrammar() error = %v, wantErr %v", err, tt.wantErr)
 			}

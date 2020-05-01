@@ -139,7 +139,8 @@ func (c *Context) parseGrammar(args []string) error {
 					c.FindGlobal().ParameterDescription = entry.ParameterDescription
 
 					if entry.Action != nil {
-						c.FindGlobal().Action = entry.Action
+						subContext.Action = entry.Action
+						ui.Debug("Saving action routine in subcommand context")
 					}
 					ui.Debug("Transferring control to subgrammar for %s", entry.LongName)
 					return subContext.parseGrammar(args[currentArg+1:])
@@ -244,9 +245,11 @@ func (c *Context) parseGrammar(args []string) error {
 
 		// Did we ever find an action routine? If so, let's run it. Otherwise,
 		// there wasn't enough command to determine what to do, so show the help.
-		if g.Action != nil {
-			err = g.Action(c)
+		if c.Action != nil {
+			ui.Debug("Invoking command action")
+			err = c.Action(c)
 		} else {
+			ui.Debug("No command action was ever specified during parsing")
 			ShowHelp(c)
 		}
 	}
