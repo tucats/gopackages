@@ -19,6 +19,8 @@ import (
 	"github.com/tucats/gopackages/app-cli/ui"
 )
 
+// stateNames is a local static table used to translate short
+// state names like "nc" into full names like "north carolina".
 var stateNames = map[string]string{
 	"me": "maine",
 	"nh": "new hampshire",

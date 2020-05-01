@@ -1,5 +1,6 @@
-// Package commands contains the grammar definitioin for all commands, and can
-// also contain the implementations of those commands.
+// Package commands contains the grammar definitions for all commands, and can
+// optionally contain the implementations of those commands. In this example,
+// the actions are stored in separate source files.
 package commands
 
 import "github.com/tucats/gopackages/app-cli/cli"
