@@ -55,7 +55,7 @@ func UseProfileAction(c *cli.Context) error {
 // It prints the version number information and then exits the application.
 func ShowVersionAction(c *cli.Context) error {
 
-	fmt.Printf("%s %s\n", c.MainProgram, cli.Version)
+	fmt.Printf("%s %s\n", c.MainProgram, c.Version)
 	os.Exit(0)
 	return nil
 }

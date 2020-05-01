@@ -2,8 +2,6 @@ package app
 
 import (
 	"os"
-	"strconv"
-	"strings"
 
 	"github.com/tucats/gopackages/app-cli/cli"
 	"github.com/tucats/gopackages/app-cli/profile"
@@ -87,29 +85,4 @@ func runFromContext(context *cli.Context) error {
 	}
 
 	return err
-}
-
-// SetCopyright sets the copyright string used in the help output.
-func SetCopyright(copyright string) {
-	cli.SetCopyright(copyright)
-}
-
-// SetVersion sets the version string for the application
-func SetVersion(version []int) {
-	var v strings.Builder
-
-	v.WriteString("v")
-	for i, n := range version {
-
-		if i > 1 && n == 0 {
-			break
-		}
-		if i > 1 {
-			v.WriteRune('-')
-		} else if i > 0 {
-			v.WriteRune('.')
-		}
-		v.WriteString(strconv.Itoa(n))
-	}
-	cli.Version = v.String()
 }
