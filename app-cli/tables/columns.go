@@ -49,3 +49,11 @@ func (t *Table) SelectColumnName(name string, active bool) error {
 	}
 	return nil
 }
+
+// SelectAllColumns sets the column selection attribute of all
+// columns in the table.
+func (t *Table) SelectAllColumns(active bool) {
+	for n := range t.active {
+		t.active[n] = active
+	}
+}
