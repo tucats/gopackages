@@ -79,3 +79,78 @@ func TestNew(t *testing.T) {
 		})
 	}
 }
+
+func TestNewCSV(t *testing.T) {
+	type args struct {
+		h string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    Table
+		wantErr bool
+	}{
+		{
+			name: "Simple case with one column",
+			args: args{
+				h: "First",
+			},
+			want: Table{
+				columns: []string{"First"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Simple case with two columns",
+			args: args{
+				h: "First,Second",
+			},
+			want: Table{
+				columns: []string{"First", "Second"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Empty column name",
+			args: args{
+				h: "First,,Third",
+			},
+			want: Table{
+				columns: []string{"First", "", "Third"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Extra spaces",
+			args: args{
+				h: "First, Second  ",
+			},
+			want: Table{
+				columns: []string{"First", "Second"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Quoted commas",
+			args: args{
+				h: "\"Name,Age\",Size",
+			},
+			want: Table{
+				columns: []string{"Name,Age", "Size"},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewCSV(tt.args.h)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewCSV() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got.columns, tt.want.columns) {
+				t.Errorf("NewCSV() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

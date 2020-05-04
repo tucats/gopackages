@@ -1,6 +1,9 @@
 package tables
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 const (
 
@@ -67,4 +70,39 @@ func New(headings []string) (Table, error) {
 // the list of headings, for example
 func (t *Table) GetHeadings() []string {
 	return t.columns
+}
+
+// NewCSV creates a new table using a single string with comma-separated
+// heading names. These typically correspond to the first row in a CSV
+// data file.
+func NewCSV(h string) (Table, error) {
+
+	return New(csvSplit(h))
+}
+
+// csvSplit takes a line that is comma-separated and splits it into
+// an array of strings. Quoted commas are ignored as separators. The
+// values are trimmed of extra spaces.
+func csvSplit(data string) []string {
+	var headings []string
+	var inQuote = false
+	var currentHeading strings.Builder
+
+	for _, c := range data {
+		if c == '"' {
+			inQuote = !inQuote
+			continue
+		}
+		if !inQuote && c == ',' {
+			headings = append(headings, strings.TrimSpace(currentHeading.String()))
+			currentHeading.Reset()
+			continue
+		}
+		currentHeading.WriteRune(rune(c))
+	}
+
+	if currentHeading.Len() > 0 {
+		headings = append(headings, strings.TrimSpace(currentHeading.String()))
+	}
+	return headings
 }

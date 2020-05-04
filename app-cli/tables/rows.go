@@ -26,6 +26,12 @@ func (t *Table) AddRow(row []string) error {
 	return nil
 }
 
+// AddCSVRow addsa  row to an existing table, where the row is expressed
+// as a string with comma-separated values.
+func (t *Table) AddCSVRow(items string) error {
+	return t.AddRow(csvSplit(items))
+}
+
 // AddRowItems adds a row to an existing table using individual parameters.
 // Each parameter is converted to a string representation, and the set of all
 // formatted values are added to the table as a row.
