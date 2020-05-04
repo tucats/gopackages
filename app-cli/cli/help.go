@@ -89,6 +89,7 @@ func ShowHelp(c *Context) {
 		if option.OptionType == ParameterType {
 			if !headerShown {
 				fmt.Printf("Parameters:\n")
+				headerShow = true
 				tc.AddRowItems(option.Description)
 			}
 
