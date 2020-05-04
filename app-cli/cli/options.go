@@ -19,6 +19,9 @@ const (
 
 	// StringListType is a string value or a list of string values, separated by commas and enclosed in quotes
 	StringListType = 7
+
+	// ParameterType is a parameter from the command line. They should be declared in order
+	ParameterType = 8
 )
 
 // Option defines the structure of each option that can be parsed.

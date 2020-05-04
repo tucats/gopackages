@@ -80,6 +80,24 @@ func ShowHelp(c *Context) {
 		fmt.Printf("\n")
 	}
 
+	headerShown = false
+	tc, _ = tables.New([]string{"Parameter"})
+	tc.ShowHeadings(false)
+	tc.SetIndent(3)
+	tc.SetMinimumWidth(0, minimumFirstColumnWidth)
+	for _, option := range c.Grammar {
+		if option.OptionType == ParameterType {
+			if !headerShown {
+				fmt.Printf("Parameters:\n")
+				tc.AddRowItems(option.Description)
+			}
+
+		}
+	}
+	if headerShown {
+		tc.Print("text")
+	}
+
 	to, _ := tables.New([]string{"option", "description"})
 	to.ShowHeadings(false)
 	to.SetIndent(3)
