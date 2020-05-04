@@ -1,5 +1,7 @@
 package cli
 
+import "strings"
+
 // GetParameter returns the ith parameter string parsed, or an
 // empty string if not found.
 func (c *Context) GetParameter(i int) string {
@@ -79,8 +81,21 @@ func (c *Context) GetString(name string) (string, bool) {
 			subContext := entry.Value.(Context)
 			return subContext.GetString(name)
 		}
-		if entry.Found && entry.OptionType == StringType && name == entry.LongName {
-			return entry.Value.(string), true
+		if entry.Found && (entry.OptionType == StringListType || entry.OptionType == StringType) && name == entry.LongName {
+
+			if entry.OptionType == StringType {
+				return entry.Value.(string), true
+			}
+			var b strings.Builder
+			var v = entry.Value.([]string)
+			for i, n := range v {
+				if i > 0 {
+					b.WriteRune(',')
+				}
+				b.WriteString(n)
+			}
+			return b.String(), true
+
 		}
 	}
 	return "", false
