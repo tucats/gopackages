@@ -50,6 +50,9 @@ func (t *Table) FormatJSON() string {
 		}
 		buffer.WriteRune('{')
 		for i, header := range t.columns {
+			if t.active != nil && !t.active[i] {
+				continue
+			}
 			if i > 0 {
 				buffer.WriteRune(',')
 			}
@@ -90,7 +93,9 @@ func (t *Table) FormatText() []string {
 			buffer.WriteString(t.spacing)
 		}
 		for n, h := range t.columns {
-
+			if t.active != nil && !t.active[n] {
+				continue
+			}
 			switch t.alignment[n] {
 			case AlignmentLeft:
 				buffer.WriteString(h)
@@ -115,6 +120,9 @@ func (t *Table) FormatText() []string {
 				buffer.WriteString(t.spacing)
 			}
 			for n := range t.columns {
+				if t.active != nil && !t.active[n] {
+					continue
+				}
 				for pad := 0; pad < t.maxWidth[n]; pad++ {
 					buffer.WriteRune('=')
 				}
@@ -142,6 +150,9 @@ func (t *Table) FormatText() []string {
 		// Loop over the elements of the row. Generate pre- or post-spacing as
 		// appropriate for the requested alignment, and any intra-column spacing.
 		for n, c := range r {
+			if t.active != nil && !t.active[n] {
+				continue
+			}
 			if t.alignment[n] == AlignmentRight {
 				for pad := len(c); pad < t.maxWidth[n]; pad++ {
 					buffer.WriteRune(' ')

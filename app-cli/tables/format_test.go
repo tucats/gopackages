@@ -18,6 +18,7 @@ func TestTable_SetAlignment(t *testing.T) {
 		ascending      bool
 		rows           [][]string
 		columns        []string
+		active         []bool
 		alignment      []int
 		maxWidth       []int
 		spacing        string
@@ -39,6 +40,7 @@ func TestTable_SetAlignment(t *testing.T) {
 			fields: fields{
 				columnCount: 1,
 				alignment:   make([]int, 1),
+				active:      []bool{true},
 			},
 			args: args{
 				column:    0,
@@ -51,6 +53,7 @@ func TestTable_SetAlignment(t *testing.T) {
 			fields: fields{
 				columnCount: 1,
 				alignment:   make([]int, 1),
+				active:      []bool{true},
 			},
 			args: args{
 				column:    15,
@@ -64,6 +67,7 @@ func TestTable_SetAlignment(t *testing.T) {
 			fields: fields{
 				columnCount: 1,
 				alignment:   make([]int, 1),
+				active:      []bool{true},
 			},
 			args: args{
 				column:    -3,
@@ -77,6 +81,7 @@ func TestTable_SetAlignment(t *testing.T) {
 			fields: fields{
 				columnCount: 1,
 				alignment:   make([]int, 1),
+				active:      []bool{true},
 			},
 			args: args{
 				column:    1,
@@ -89,6 +94,7 @@ func TestTable_SetAlignment(t *testing.T) {
 			name: "Set formatting for existing column",
 			fields: fields{
 				columnCount: 1,
+				active:      []bool{true},
 				alignment:   make([]int, 1),
 			},
 			args: args{

@@ -2,7 +2,6 @@ package tables
 
 import (
 	"errors"
-	"strings"
 )
 
 const (
@@ -32,6 +31,7 @@ type Table struct {
 	columns        []string
 	alignment      []int
 	maxWidth       []int
+	active         []bool
 	spacing        string
 	indent         string
 }
@@ -47,8 +47,9 @@ func New(headings []string) (Table, error) {
 	t.rowLimit = -1
 	t.columnCount = len(headings)
 	t.columns = headings
-	t.maxWidth = make([]int, len(headings))
-	t.alignment = make([]int, len(headings))
+	t.maxWidth = make([]int, t.columnCount)
+	t.alignment = make([]int, t.columnCount)
+	t.active = make([]bool, t.columnCount)
 	t.spacing = "    "
 	t.indent = ""
 	t.rows = make([][]string, 0)
@@ -56,53 +57,11 @@ func New(headings []string) (Table, error) {
 	t.ascending = true
 	t.showUnderlines = true
 	t.showHeadings = true
-
 	for n, h := range headings {
 		t.maxWidth[n] = len(h)
 		t.columns[n] = h
 		t.alignment[n] = AlignmentLeft
+		t.active[n] = true
 	}
 	return t, nil
-}
-
-// GetHeadings returns an array of the headings already stored
-// in the table. This can be used to validate a name against
-// the list of headings, for example
-func (t *Table) GetHeadings() []string {
-	return t.columns
-}
-
-// NewCSV creates a new table using a single string with comma-separated
-// heading names. These typically correspond to the first row in a CSV
-// data file.
-func NewCSV(h string) (Table, error) {
-
-	return New(CsvSplit(h))
-}
-
-// CsvSplit takes a line that is comma-separated and splits it into
-// an array of strings. Quoted commas are ignored as separators. The
-// values are trimmed of extra spaces.
-func CsvSplit(data string) []string {
-	var headings []string
-	var inQuote = false
-	var currentHeading strings.Builder
-
-	for _, c := range data {
-		if c == '"' {
-			inQuote = !inQuote
-			continue
-		}
-		if !inQuote && c == ',' {
-			headings = append(headings, strings.TrimSpace(currentHeading.String()))
-			currentHeading.Reset()
-			continue
-		}
-		currentHeading.WriteRune(rune(c))
-	}
-
-	if currentHeading.Len() > 0 {
-		headings = append(headings, strings.TrimSpace(currentHeading.String()))
-	}
-	return headings
 }
