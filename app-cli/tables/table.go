@@ -77,7 +77,7 @@ func (t *Table) GetHeadings() []string {
 // data file.
 func NewCSV(h string) (Table, error) {
 
-	return New(csvSplit(h))
+	return New(CsvSplit(h))
 }
 
 // CsvSplit takes a line that is comma-separated and splits it into
