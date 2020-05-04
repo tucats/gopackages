@@ -97,6 +97,7 @@ func ShowHelp(c *Context) {
 	}
 	if headerShown {
 		tc.Print("text")
+		fmt.Printf("\n")
 	}
 
 	to, _ := tables.New([]string{"option", "description"})
