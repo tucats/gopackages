@@ -7,7 +7,7 @@ import (
 	"github.com/tucats/gopackages/app-cli/ui"
 )
 
-// ListGrammar is the grammar definition for the list command. It 
+// ListGrammar is the grammar definition for the list command. It
 // defines each of the command line options, the option type and
 // value type if appropriate. There are no actions defined in this
 // grammar, as the action was defined in the parent grammer for the
@@ -49,7 +49,7 @@ var ListGrammar = []cli.Option{
 
 // ListAction is the command handler to list objects. It uses option
 // values parsed by the app-cli framework to determine how to display
-// a short table of values. The action creates the table and then 
+// a short table of values. The action creates the table and then
 // uses command line options to set the characteristics of the table
 // output in the Table object.
 func ListAction(c *cli.Context) error {
@@ -64,6 +64,7 @@ func ListAction(c *cli.Context) error {
 	t.AddRow([]string{"Sarah", "25"})
 	t.AddRow([]string{"Chelsea", "27"})
 	t.AddRowItems("Anna", 25)
+	t.AddCSVRow("Claire,17")
 
 	// Add formatting and other control settings the user might specify.
 	_ = t.SetAlignment(1, tables.AlignmentRight)
@@ -76,7 +77,7 @@ func ListAction(c *cli.Context) error {
 			return err
 		}
 	}
-	
+
 	if startingRow, present := c.GetInteger("start"); present {
 		if err := t.SetStartingRow(startingRow); err != nil {
 			return err

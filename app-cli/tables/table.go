@@ -80,10 +80,10 @@ func NewCSV(h string) (Table, error) {
 	return New(csvSplit(h))
 }
 
-// csvSplit takes a line that is comma-separated and splits it into
+// CsvSplit takes a line that is comma-separated and splits it into
 // an array of strings. Quoted commas are ignored as separators. The
 // values are trimmed of extra spaces.
-func csvSplit(data string) []string {
+func CsvSplit(data string) []string {
 	var headings []string
 	var inQuote = false
 	var currentHeading strings.Builder

@@ -1,8 +1,0 @@
-github.com/google/uuid v1.1.1 h1:Gkbcsh/GbpXz7lPftLA3P6TYMwjCLYm83jiFQZF/3gY=
-github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/tucats/gopackages v0.0.0-20200501181310-4496a1aa1a52 h1:cZvVKljTh+j/ltyFrdlw2U2PT+F/1pd9juiQ3by8EQw=
-github.com/tucats/gopackages v0.0.0-20200501194416-9405b22a77d9 h1:mpRSVnGh6D1Kj3Hlcwx1qSrAfoWZUaJ1TWZD4FoT+QU=
-github.com/tucats/gopackages/app-cli v0.0.0-20200501184200-fc2ef719f7d3 h1:6L8h3v4e06S0iuODGrTA0in23i5v0CbXYcbrXfr6vKM=
-github.com/tucats/gopackages/app-cli v0.0.0-20200501184200-fc2ef719f7d3/go.mod h1:BBAamaLixBeIYcTBt0tUciq56MLXQlnFFsjcuH27yEk=
-github.com/tucats/gopackages/app-cli v0.0.0-20200501194416-9405b22a77d9 h1:2Cn3oU2Bv0aH6G1SY/lMYQPAYONRk3mchW4BKByShS8=
-github.com/tucats/gopackages/app-cli v0.0.0-20200501194416-9405b22a77d9/go.mod h1:BBAamaLixBeIYcTBt0tUciq56MLXQlnFFsjcuH27yEk=
