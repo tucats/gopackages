@@ -3,6 +3,7 @@ package tables
 import (
 	"errors"
 	"strconv"
+	"strings"
 )
 
 // GetHeadings returns an array of the headings already stored
@@ -32,5 +33,19 @@ func (t *Table) SelectColumn(n int, active bool) error {
 	}
 	t.active[n-1] = active
 
+	return nil
+}
+
+// SelectColumnName sets the status of a specific column by name to
+// active or inactive.
+func (t *Table) SelectColumnName(name string, active bool) error {
+	for columnNumber, columnName := range t.GetHeadings() {
+		if strings.ToLower(columnName) == strings.ToLower(name) {
+			err := t.SelectColumn(columnNumber+1, active)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
