@@ -101,7 +101,7 @@ func (t *Table) SetColumnOrderByName(order []string) error {
 		if !found {
 			return errors.New("invalid column order specification: " + strconv.Itoa(v))
 		}
-		newOrder[n] = v - 1
+		newOrder[n] = v
 	}
 	t.columnOrder = newOrder
 	return nil

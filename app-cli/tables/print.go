@@ -78,6 +78,7 @@ func (t *Table) FormatJSON() string {
 // FormatText will output a table using current rows and format specifications.
 func (t *Table) FormatText() []string {
 
+	ui.Debug("Print column order: %v", t.columnOrder)
 	output := make([]string, 0)
 
 	var buffer strings.Builder
