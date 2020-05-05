@@ -115,6 +115,7 @@ func TestContext_ParseGrammar(t *testing.T) {
 		Option{
 			ShortName:   "i",
 			LongName:    "integer",
+			Aliases:     []string{"int"},
 			OptionType:  IntType,
 			Description: "integer option",
 			Action:      integerAction,
@@ -183,6 +184,14 @@ func TestContext_ParseGrammar(t *testing.T) {
 			fields: fields1,
 			args: args{
 				args: []string{"-i=42"},
+			},
+			wantErr: false,
+		},
+		{
+			name:   "Option with alias name test",
+			fields: fields1,
+			args: args{
+				args: []string{"-int=42"},
 			},
 			wantErr: false,
 		},

@@ -96,6 +96,13 @@ func (c *Context) parseGrammar(args []string) error {
 				if (isShort && entry.ShortName == name) || (!isShort && entry.LongName == name) {
 					location = &(c.Grammar[n])
 					break
+				} else {
+					for _, a := range entry.Aliases {
+						if a == name {
+							location = &(c.Grammar[n])
+							break
+						}
+					}
 				}
 			}
 		}
