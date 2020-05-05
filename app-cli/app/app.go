@@ -20,6 +20,7 @@ type App struct {
 	Copyright   string
 	Version     string
 	Context     *cli.Context
+	Action      func(c *cli.Context) error
 }
 
 // New creates a new instance of an application context, given the name of the
@@ -46,8 +47,17 @@ func (app *App) SetCopyright(s string) {
 	app.Copyright = s
 }
 
+// Parse runs a grammar, and then calls the provided action routine. It is typically
+// used in cases where there are no subcommands, and an action should be run after
+// parsing options.
+func (app *App) Parse(grammar []cli.Option, args []string, action func(c *cli.Context) error) error {
+	app.Action = action
+	return app.Run(grammar, args)
+}
+
 // Run runs a grammar given a set of arguments in the current
-// applciation.
+// applciation. The grammar must declare action routines for the
+// various subcommands, which will be executed by the parser.
 func (app *App) Run(grammar []cli.Option, args []string) error {
 
 	context := cli.Context{
@@ -57,6 +67,7 @@ func (app *App) Run(grammar []cli.Option, args []string) error {
 		AppName:     app.Name,
 		Grammar:     grammar,
 		Args:        args,
+		Action:      app.Action,
 	}
 	app.Context = &context
 
