@@ -48,7 +48,7 @@ func (t *Table) FormatJSON() string {
 		if n < t.startingRow {
 			continue
 		}
-		if t.rowLimit > 0 && n > t.startingRow+t.rowLimit {
+		if t.rowLimit > 0 && n >= t.startingRow+t.rowLimit {
 			break
 		}
 		if n > t.startingRow {
