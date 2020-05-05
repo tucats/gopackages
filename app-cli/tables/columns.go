@@ -54,7 +54,7 @@ func (t *Table) SetColumnOrderByName(order []string) error {
 	for n, name := range order {
 		v, found := t.FindColumn(name)
 		if !found {
-			return errors.New("invalid column order specification: " + strconv.Itoa(v))
+			return errors.New("invalid column order specification: " + name)
 		}
 		newOrder[n] = v
 	}
