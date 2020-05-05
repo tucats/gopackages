@@ -45,12 +45,19 @@ func (t *Table) FormatJSON() string {
 
 	buffer.WriteRune('[')
 	for n, row := range t.rows {
-		if n > 0 {
+		if n < t.startingRow {
+			continue
+		}
+		if t.rowLimit > 0 && n > t.startingRow+t.rowLimit {
+			break
+		}
+		if n > t.startingRow {
 			buffer.WriteRune(',')
 		}
 		buffer.WriteRune('{')
-		for i, header := range t.columns {
-			if i > 0 {
+		for ith, i := range t.columnOrder {
+			header := t.columns[i]
+			if ith > 0 {
 				buffer.WriteRune(',')
 			}
 			buffer.WriteRune('"')
