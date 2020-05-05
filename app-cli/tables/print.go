@@ -50,9 +50,6 @@ func (t *Table) FormatJSON() string {
 		}
 		buffer.WriteRune('{')
 		for i, header := range t.columns {
-			if t.active != nil && !t.active[i] {
-				continue
-			}
 			if i > 0 {
 				buffer.WriteRune(',')
 			}
@@ -93,20 +90,16 @@ func (t *Table) FormatText() []string {
 			buffer.WriteString("Row")
 			buffer.WriteString(t.spacing)
 		}
-		for _, hp := range t.columnOrder {
-			h := t.columns[hp]
-
-			if t.active != nil && !t.active[hp] {
-				continue
-			}
-			switch t.alignment[hp] {
+		for _, n := range t.columnOrder {
+			h := t.columns[n]
+			switch t.alignment[n] {
 			case AlignmentLeft:
 				buffer.WriteString(h)
-				for pad := len(h); pad < t.maxWidth[hp]; pad++ {
+				for pad := len(h); pad < t.maxWidth[n]; pad++ {
 					buffer.WriteRune(' ')
 				}
 			case AlignmentRight:
-				for pad := len(h); pad < t.maxWidth[hp]; pad++ {
+				for pad := len(h); pad < t.maxWidth[n]; pad++ {
 					buffer.WriteRune(' ')
 				}
 				buffer.WriteString(h)
@@ -122,10 +115,7 @@ func (t *Table) FormatText() []string {
 				buffer.WriteString("===")
 				buffer.WriteString(t.spacing)
 			}
-			for n := range t.columnOrder {
-				if t.active != nil && !t.active[n] {
-					continue
-				}
+			for _, n := range t.columnOrder {
 				for pad := 0; pad < t.maxWidth[n]; pad++ {
 					buffer.WriteRune('=')
 				}
@@ -154,9 +144,6 @@ func (t *Table) FormatText() []string {
 		// appropriate for the requested alignment, and any intra-column spacing.
 		for _, n := range t.columnOrder {
 			c := r[n]
-			if t.active != nil && !t.active[n] {
-				continue
-			}
 			if t.alignment[n] == AlignmentRight {
 				for pad := len(c); pad < t.maxWidth[n]; pad++ {
 					buffer.WriteRune(' ')

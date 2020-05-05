@@ -32,7 +32,6 @@ type Table struct {
 	alignment      []int
 	maxWidth       []int
 	columnOrder    []int
-	active         []bool
 	spacing        string
 	indent         string
 }
@@ -50,7 +49,6 @@ func New(headings []string) (Table, error) {
 	t.columns = headings
 	t.maxWidth = make([]int, t.columnCount)
 	t.alignment = make([]int, t.columnCount)
-	t.active = make([]bool, t.columnCount)
 	t.columnOrder = make([]int, t.columnCount)
 	t.spacing = "    "
 	t.indent = ""
@@ -63,7 +61,6 @@ func New(headings []string) (Table, error) {
 		t.maxWidth[n] = len(h)
 		t.columns[n] = h
 		t.alignment[n] = AlignmentLeft
-		t.active[n] = true
 		t.columnOrder[n] = n
 	}
 	return t, nil
