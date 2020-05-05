@@ -88,9 +88,9 @@ func (t *Table) SetColumnOrder(order []int) error {
 	return nil
 }
 
-// SetColumnOrderName accepts a list of column positions and uses it
+// SetColumnOrderByName accepts a list of column positions and uses it
 // to set the order in which columns of output are printed.
-func (t *Table) SetColumnOrderName(order []string) error {
+func (t *Table) SetColumnOrderByName(order []string) error {
 	if len(order) == 0 {
 		return errors.New("invalid empty column order specification")
 	}
