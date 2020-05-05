@@ -23,7 +23,7 @@ func (c *Context) Parse() error {
 	c.Command = ""
 
 	// If there are no arguments other than the main program name, dump out the help by default.
-	if len(args) == 1 {
+	if len(args) == 1 && c.Action == nil {
 		ShowHelp(c)
 		return nil
 	}
