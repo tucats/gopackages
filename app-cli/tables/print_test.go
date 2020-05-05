@@ -17,6 +17,7 @@ func TestTable_FormatJSON(t *testing.T) {
 		columns        []string
 		alignment      []int
 		maxWidth       []int
+		columnOrder    []int
 		spacing        string
 		indent         string
 		active         []bool
@@ -32,6 +33,7 @@ func TestTable_FormatJSON(t *testing.T) {
 				columnCount: 1,
 				columns:     []string{"one"},
 				rows:        [][]string{[]string{"1"}},
+				columnOrder: []int{1},
 				active:      []bool{true},
 			},
 			want: "[{\"one\":1}]",
@@ -43,6 +45,7 @@ func TestTable_FormatJSON(t *testing.T) {
 				columns:     []string{"one", "two", "three"},
 				rows:        [][]string{[]string{"1", "true", "Tom"}},
 				active:      []bool{true, true, true},
+				columnOrder: []int{1, 2, 3},
 			},
 			want: "[{\"one\":1,\"two\":true,\"three\":\"Tom\"}]",
 		},
@@ -51,6 +54,7 @@ func TestTable_FormatJSON(t *testing.T) {
 			fields: fields{
 				columnCount: 3,
 				columns:     []string{"one", "two"},
+				columnOrder: []int{1, 2},
 				rows: [][]string{
 					[]string{"60", "Tom"},
 					[]string{"59", "Mary"},
@@ -75,6 +79,7 @@ func TestTable_FormatJSON(t *testing.T) {
 				ascending:      tt.fields.ascending,
 				rows:           tt.fields.rows,
 				columns:        tt.fields.columns,
+				columnOrder:    tt.fields.columnOrder,
 				alignment:      tt.fields.alignment,
 				maxWidth:       tt.fields.maxWidth,
 				spacing:        tt.fields.spacing,

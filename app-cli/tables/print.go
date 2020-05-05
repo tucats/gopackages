@@ -92,18 +92,20 @@ func (t *Table) FormatText() []string {
 			buffer.WriteString("Row")
 			buffer.WriteString(t.spacing)
 		}
-		for n, h := range t.columns {
-			if t.active != nil && !t.active[n] {
+		for _, hp := range t.columnOrder {
+			h := t.columns[hp]
+
+			if t.active != nil && !t.active[hp] {
 				continue
 			}
-			switch t.alignment[n] {
+			switch t.alignment[hp] {
 			case AlignmentLeft:
 				buffer.WriteString(h)
-				for pad := len(h); pad < t.maxWidth[n]; pad++ {
+				for pad := len(h); pad < t.maxWidth[hp]; pad++ {
 					buffer.WriteRune(' ')
 				}
 			case AlignmentRight:
-				for pad := len(h); pad < t.maxWidth[n]; pad++ {
+				for pad := len(h); pad < t.maxWidth[hp]; pad++ {
 					buffer.WriteRune(' ')
 				}
 				buffer.WriteString(h)
@@ -119,7 +121,7 @@ func (t *Table) FormatText() []string {
 				buffer.WriteString("===")
 				buffer.WriteString(t.spacing)
 			}
-			for n := range t.columns {
+			for n := range t.columnOrder {
 				if t.active != nil && !t.active[n] {
 					continue
 				}
@@ -149,7 +151,8 @@ func (t *Table) FormatText() []string {
 
 		// Loop over the elements of the row. Generate pre- or post-spacing as
 		// appropriate for the requested alignment, and any intra-column spacing.
-		for n, c := range r {
+		for _, n := range t.columnOrder {
+			c := r[n]
 			if t.active != nil && !t.active[n] {
 				continue
 			}
