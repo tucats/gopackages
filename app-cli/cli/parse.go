@@ -21,7 +21,6 @@ func (c *Context) Parse() error {
 	args := c.Args
 	c.MainProgram = filepath.Base(args[0])
 	c.Command = ""
-	c.Action = nil
 
 	// If there are no arguments other than the main program name, dump out the help by default.
 	if len(args) == 1 {
