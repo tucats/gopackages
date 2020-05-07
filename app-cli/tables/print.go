@@ -147,6 +147,9 @@ func (t *Table) FormatText() []string {
 			break
 		}
 
+		buffer.Reset()
+		buffer.WriteString(t.indent)
+
 		if e != nil {
 			// Load up the symbol tables with column values and the row number
 			symbols := map[string]interface{}{"row": i + 1}
@@ -155,7 +158,6 @@ func (t *Table) FormatText() []string {
 			}
 			v, err := e.Eval(symbols)
 			if err != nil {
-				buffer.Reset()
 				buffer.WriteString(fmt.Sprintf("*** where clause error: %s", err.Error()))
 				break
 			}
@@ -163,8 +165,6 @@ func (t *Table) FormatText() []string {
 				continue
 			}
 		}
-		buffer.Reset()
-		buffer.WriteString(t.indent)
 		if t.showRowNumbers {
 			buffer.WriteString(fmt.Sprintf("%3d", i+1))
 			buffer.WriteString(t.spacing)
