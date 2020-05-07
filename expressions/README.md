@@ -183,7 +183,7 @@ result is the numerically largest value.
     
     min("shoe", "mouse", "cake", "whistle")
     
-This returns the string value "cake".
+This returns the string value "whistle".
 
 ### User Suppied Functions
 The caller of the expressions package can supply additional functions to
