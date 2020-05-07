@@ -148,8 +148,8 @@ func (t *Table) FormatText() []string {
 		}
 
 		if e != nil {
-			// Load up the symbol tables with column values
-			symbols := map[string]interface{}{"row": i}
+			// Load up the symbol tables with column values and the row number
+			symbols := map[string]interface{}{"row": i + 1}
 			for _, n := range t.columnOrder {
 				symbols[t.columns[n]] = r[n]
 			}
