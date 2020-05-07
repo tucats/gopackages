@@ -43,6 +43,11 @@ func (t *Table) Print(format string) error {
 func (t *Table) FormatJSON() string {
 
 	var buffer strings.Builder
+	var e *expressions.Expression
+
+	if t.where != "" {
+		e = expressions.New(t.where)
+	}
 
 	buffer.WriteRune('[')
 	for n, row := range t.rows {
@@ -52,6 +57,23 @@ func (t *Table) FormatJSON() string {
 		if t.rowLimit > 0 && n >= t.startingRow+t.rowLimit {
 			break
 		}
+
+		if e != nil {
+			// Load up the symbol tables with column values and the row number
+			symbols := map[string]interface{}{"row": n + 1}
+			for _, n := range t.columnOrder {
+				symbols[strings.ToLower(t.columns[n])] = row[n]
+			}
+			v, err := e.Eval(symbols)
+			if err != nil {
+				buffer.WriteString(fmt.Sprintf("*** where clause error: %s", err.Error()))
+				break
+			}
+			if !expressions.GetBool(v) {
+				continue
+			}
+		}
+
 		if n > t.startingRow {
 			buffer.WriteRune(',')
 		}
@@ -154,7 +176,7 @@ func (t *Table) FormatText() []string {
 			// Load up the symbol tables with column values and the row number
 			symbols := map[string]interface{}{"row": i + 1}
 			for _, n := range t.columnOrder {
-				symbols[t.columns[n]] = r[n]
+				symbols[strings.ToLower(t.columns[n])] = r[n]
 			}
 			v, err := e.Eval(symbols)
 			if err != nil {

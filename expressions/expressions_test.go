@@ -16,14 +16,9 @@ func TestNew(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Multiple paren terms",
-			expr: "(i=42) & (name=\"Tom\")",
-			want: true,
-		},
-		{
-			name: "Invalid multiple paren terms",
-			expr: "(i=42) & (name=\"Tom\"",
-			want: nil,
+			name: "Case insensitive symbol names",
+			expr: "name + NaMe",
+			want: "TomTom",
 		},
 		{
 			name: "Simple addition",
@@ -56,6 +51,16 @@ func TestNew(t *testing.T) {
 			want: 94,
 		},
 		{
+			name: "Multiple paren terms",
+			expr: "(i=42) & (name=\"Tom\")",
+			want: true,
+		},
+		{
+			name: "Invalid multiple paren terms",
+			expr: "(i=42) & (name=\"Tom\"",
+			want: nil,
+		},
+		{
 			name: "Unary negation of single term",
 			expr: "-i",
 			want: -42,
@@ -69,11 +74,6 @@ func TestNew(t *testing.T) {
 			name: "Unary negation of subexpression",
 			expr: "-(5+pi)",
 			want: -8.14,
-		},
-		{
-			name: "len function",
-			expr: "len(name) + 4",
-			want: 7,
 		},
 		{
 			name: "Type promotion bool to int",
@@ -129,6 +129,71 @@ func TestNew(t *testing.T) {
 			name: "Cast value to string",
 			expr: "string(003.14)",
 			want: "3.14",
+		},
+		{
+			name: "len function",
+			expr: "len(name) + 4",
+			want: 7,
+		},
+		{
+			name: "left function",
+			expr: "left(name, 2)",
+			want: "To",
+		},
+		{
+			name: "right function",
+			expr: "right(name, 2)",
+			want: "om",
+		},
+		{
+			name: "index function",
+			expr: "index(name, \"o\")",
+			want: 2,
+		},
+		{
+			name: "index not found function",
+			expr: "index(name, \"g\")",
+			want: 0,
+		},
+		{
+			name: "substring function",
+			expr: "substring(\"ABCDEF\", 2, 3)",
+			want: "BCD",
+		},
+		{
+			name: "empty substring function",
+			expr: "substring(\"ABCDEF\", 5, 0)",
+			want: "",
+		},
+		{
+			name: "Invalid argument count to function",
+			expr: "substring(\"ABCDEF\", 5)",
+			want: nil,
+		},
+		{
+			name: "upper function",
+			expr: "upper(name)",
+			want: "TOM",
+		},
+		{
+			name: "lower function",
+			expr: "lower(name)",
+			want: "tom",
+		},
+		{
+			name: "min homogeneous args function",
+			expr: "min(15,33,11,6)",
+			want: 6,
+		},
+		{
+			name: "min hetergenous args function",
+			expr: "min(15,33.5,\"11\",6)",
+			want: 6,
+		},
+		{
+			name: "max hetergenous args function",
+			expr: "max(15.1,33.5,\"11\",6)",
+			want: 33.5,
 		},
 		// TODO: Add test cases.
 	}

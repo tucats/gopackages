@@ -3,6 +3,7 @@ package expressions
 import (
 	"errors"
 	"strconv"
+	"strings"
 )
 
 func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}, error) {
@@ -53,6 +54,7 @@ func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}
 
 	if symbol(runeValue) {
 
+		t := strings.ToLower(t)
 		// Check for special cases of boolean constants, else look up symbol
 		switch t {
 		case "true":
