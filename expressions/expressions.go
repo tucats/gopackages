@@ -38,6 +38,7 @@ func New(expr string) *Expression {
 		Source: expr,
 	}
 	var ep = &e
+	ep.Parse()
 	return ep
 }
 

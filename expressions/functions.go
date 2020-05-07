@@ -38,6 +38,10 @@ func (e *Expression) functionCall(fname string, symbols map[string]interface{}) 
 // AddBuiltins adds or overrides the default function library to the symbol map
 func AddBuiltins(symbols map[string]interface{}) {
 	symbols["len()"] = functionLen
+	symbols["int()"] = functionInt
+	symbols["float()"] = functionFloat
+	symbols["string()"] = functionString
+	symbols["bool()"] = functionBool
 }
 
 // functionLen implements the len() function
@@ -50,4 +54,53 @@ func functionLen(args []interface{}) (interface{}, error) {
 	v := Coerce(args[0], "")
 	return len(v.(string)), nil
 
+}
+
+//functionInt implements the int() function
+func functionInt(args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of arguments to int() function")
+	}
+
+	v := Coerce(args[0], 1)
+	if v == nil {
+		return nil, errors.New("invalid value to coerce to integer type")
+	}
+	return v.(int), nil
+}
+
+//functionFloat implements the float() function
+func functionFloat(args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of arguments to float() function")
+	}
+
+	v := Coerce(args[0], 1.0)
+	if v == nil {
+		return nil, errors.New("invalid value to coerce to float type")
+	}
+	return v.(float64), nil
+}
+
+//functionString implements the string() function
+func functionString(args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of arguments to int() function")
+	}
+
+	v := Coerce(args[0], "")
+	return v.(string), nil
+}
+
+//functionBool implements the bool() function
+func functionBool(args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of arguments to bool() function")
+	}
+
+	v := Coerce(args[0], true)
+	if v == nil {
+		return nil, errors.New("invalid value to coerce to bool type")
+	}
+	return v.(bool), nil
 }

@@ -6,7 +6,7 @@ import "errors"
 // with the same scanned string, but with different symbols.
 func (e *Expression) multDivide(symbols map[string]interface{}) (interface{}, error) {
 
-	v1, err := e.expressionAtom(symbols)
+	v1, err := e.unary(symbols)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (e *Expression) multDivide(symbols map[string]interface{}) (interface{}, er
 		if inList(op, []string{"*", "/", "|"}) {
 			e.TokenP = e.TokenP + 1
 
-			v2, err := e.expressionAtom(symbols)
+			v2, err := e.unary(symbols)
 			if err != nil {
 				return nil, err
 			}
@@ -52,7 +52,10 @@ func (e *Expression) multDivide(symbols map[string]interface{}) (interface{}, er
 
 			case "|":
 				v1 = Coerce(v1, true)
-				v1 = Coerce(v2, true)
+				v2 = Coerce(v2, true)
+				if v1 == nil || v2 == nil {
+					return nil, errors.New("invalid value for coercion to bool")
+				}
 				v1 = v1.(bool) || v2.(bool)
 			}
 

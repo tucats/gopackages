@@ -50,7 +50,10 @@ func (e *Expression) addSubtract(symbols map[string]interface{}) (interface{}, e
 
 			case "&":
 				v1 = Coerce(v1, true)
-				v1 = Coerce(v2, true)
+				v2 = Coerce(v2, true)
+				if v1 == nil || v2 == nil {
+					return nil, errors.New("invalid value for coercion to bool")
+				}
 				v1 = v1.(bool) && v2.(bool)
 			}
 

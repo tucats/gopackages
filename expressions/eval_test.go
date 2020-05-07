@@ -25,6 +25,28 @@ func TestExpression_Eval(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "Unary negation",
+			fields: fields{
+				Tokens: []string{"-", "a", "+", "1"},
+			},
+			args: args{
+				symbols: map[string]interface{}{"a": 42, "pi": 3.14},
+			},
+			want:    -41,
+			wantErr: false,
+		},
+		{
+			name: "Unary not",
+			fields: fields{
+				Tokens: []string{"true", "&", "!", "true"},
+			},
+			args: args{
+				symbols: map[string]interface{}{"a": 42, "pi": 3.14},
+			},
+			want:    false,
+			wantErr: false,
+		},
+		{
 			name: "Function call",
 			fields: fields{
 				Tokens: []string{"len", "(", "\"test\"", ")"},
@@ -34,6 +56,17 @@ func TestExpression_Eval(t *testing.T) {
 			},
 			want:    4,
 			wantErr: false,
+		},
+		{
+			name: "Unknown function call",
+			fields: fields{
+				Tokens: []string{"foobar", "(", "\"test\"", ")"},
+			},
+			args: args{
+				symbols: map[string]interface{}{"a": 42, "pi": 3.14},
+			},
+			want:    nil,
+			wantErr: true,
 		},
 		{
 			name: "Order precedence",
