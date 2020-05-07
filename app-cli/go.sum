@@ -1,2 +1,4 @@
 github.com/google/uuid v1.1.1 h1:Gkbcsh/GbpXz7lPftLA3P6TYMwjCLYm83jiFQZF/3gY=
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/tucats/gopackages v0.0.0-20200507154150-b8530b2ceedb h1:lOIDIyVYycYtx6JzlYLVMQBsDSxbFnHHTWPjUc83RG8=
+github.com/tucats/gopackages v0.0.0-20200507154150-b8530b2ceedb/go.mod h1:Dsix+3Mjw/EzyPNOhf5snKdhnk3+2Q6v9fmXrywbp+Q=

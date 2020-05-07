@@ -34,6 +34,7 @@ type Table struct {
 	columnOrder    []int
 	spacing        string
 	indent         string
+	where          string
 }
 
 // New creates a new table object, given a list of headings
@@ -64,4 +65,10 @@ func New(headings []string) (Table, error) {
 		t.columnOrder[n] = n
 	}
 	return t, nil
+}
+
+// SetWhere sets an expression to be used as a "where" clause
+// to select table rows.
+func (t *Table) SetWhere(clause string) {
+	t.where = clause
 }

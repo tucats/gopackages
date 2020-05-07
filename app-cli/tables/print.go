@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/expressions"
 )
 
 // Print will output a table using current rows and format specifications.
@@ -85,6 +86,11 @@ func (t *Table) FormatText() []string {
 	ui.Debug("Print column order: %v", t.columnOrder)
 	output := make([]string, 0)
 
+	var e *expressions.Expression
+	if t.where != "" {
+		e = expressions.New(t.where)
+	}
+
 	var buffer strings.Builder
 	var rowLimit = t.rowLimit
 	if rowLimit < 0 {
@@ -139,6 +145,23 @@ func (t *Table) FormatText() []string {
 		}
 		if i >= t.startingRow+rowLimit {
 			break
+		}
+
+		if e != nil {
+			// Load up the symbol tables with column values
+			symbols := map[string]interface{}{"row": i}
+			for _, n := range t.columnOrder {
+				symbols[t.columns[n]] = r[n]
+			}
+			v, err := e.Eval(symbols)
+			if err != nil {
+				buffer.Reset()
+				buffer.WriteString(fmt.Sprintf("*** where clause error: %s", err.Error()))
+				break
+			}
+			if !expressions.GetBool(v) {
+				continue
+			}
 		}
 		buffer.Reset()
 		buffer.WriteString(t.indent)
