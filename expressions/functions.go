@@ -72,7 +72,7 @@ func (e *Expression) functionCall(fname string, symbols map[string]interface{}) 
 
 	// Quick sanity check on argument count for builtin functions
 	fd, found := FunctionDictionary[fname]
-	if found && len(args) < fd.min || len(args) > fd.max {
+	if found && ((len(args) < fd.min) || (len(args) > fd.max)) {
 		return nil, errors.New("incorred number of arguments for " + fname + "()")
 	}
 
