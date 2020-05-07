@@ -158,7 +158,7 @@ func (t *Table) FormatText() []string {
 			}
 			v, err := e.Eval(symbols)
 			if err != nil {
-				buffer.WriteString(fmt.Sprintf("*** where clause error: %s", err.Error()))
+				output = append(output, fmt.Sprintf("*** where clause error: %s", err.Error()))
 				break
 			}
 			if !expressions.GetBool(v) {
