@@ -10,7 +10,6 @@ import (
 func (e *Expression) Eval(symbols map[string]interface{}) (interface{}, error) {
 
 	e.TokenP = 0
-	var err error
 
 	if symbols == nil {
 		symbols = map[string]interface{}{}
@@ -18,8 +17,7 @@ func (e *Expression) Eval(symbols map[string]interface{}) (interface{}, error) {
 	}
 
 	AddBuiltins(symbols)
-	e.Value, err = e.relations(symbols)
-	return e.Value, err
+	return e.relations(symbols)
 }
 
 // Coerce returns the value after it has been converted to the type of the

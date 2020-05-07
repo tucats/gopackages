@@ -8,8 +8,6 @@ import (
 func TestExpression_Eval(t *testing.T) {
 	type fields struct {
 		Source   string
-		Type     ValueType
-		Value    interface{}
 		Tokens   []string
 		TokenPos []int
 		TokenP   int
@@ -293,7 +291,6 @@ func TestExpression_Eval(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &Expression{
 				Source:   tt.fields.Source,
-				Value:    tt.fields.Value,
 				Tokens:   tt.fields.Tokens,
 				TokenPos: tt.fields.TokenPos,
 				TokenP:   tt.fields.TokenP,
