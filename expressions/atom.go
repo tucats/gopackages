@@ -64,12 +64,17 @@ func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}
 			// @TOMCOLE Will need to peek ahead for () argument list for
 			// function calls here.
 
+			if e.TokenP < len(e.Tokens)-1 && e.Tokens[e.TokenP+1] == "(" {
+				e.TokenP = e.TokenP + 1
+				return e.functionCall(t, symbols)
+			}
 			i, found := symbols[t]
 			if found {
 				e.TokenP = e.TokenP + 1
 				return i, nil
 			}
 			return nil, errors.New("symbol not found: " + t)
+
 		}
 	}
 

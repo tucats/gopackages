@@ -25,6 +25,17 @@ func TestExpression_Eval(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "Function call",
+			fields: fields{
+				Tokens: []string{"len", "(", "\"test\"", ")"},
+			},
+			args: args{
+				symbols: map[string]interface{}{"a": 42, "pi": 3.14},
+			},
+			want:    4,
+			wantErr: false,
+		},
+		{
 			name: "Order precedence",
 			fields: fields{
 				Tokens: []string{"5", "+", "2", "*", "3"},
@@ -249,7 +260,6 @@ func TestExpression_Eval(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &Expression{
 				Source:   tt.fields.Source,
-				Type:     tt.fields.Type,
 				Value:    tt.fields.Value,
 				Tokens:   tt.fields.Tokens,
 				TokenPos: tt.fields.TokenPos,

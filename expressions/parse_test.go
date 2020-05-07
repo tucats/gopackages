@@ -49,7 +49,6 @@ func TestExpression_Parse(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &Expression{
 				Source: tt.fields.Source,
-				Type:   tt.fields.Type,
 				Value:  tt.fields.Value,
 				Tokens: tt.fields.Tokens,
 				TokenP: tt.fields.TokenP,
