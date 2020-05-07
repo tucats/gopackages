@@ -17,14 +17,42 @@ func (e *Expression) Parse() error {
 // Tokenize breaks the string up into an array of tokens
 func Tokenize(src string) []string {
 
-	var t = make([]string, 0)
+	var tokens = make([]string, 0)
 
 	var s scanner.Scanner
 	s.Init(strings.NewReader(src))
 	s.Filename = "example"
+	previousToken := ""
+
 	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
-		t = append(t, s.TokenText())
+
+		// See if this is one of the special cases where we patch up the previous token
+
+		nextToken := s.TokenText()
+
+		if nextToken == "=" {
+			if inList(previousToken, []string{"!", "<", ">"}) {
+				tokens[len(tokens)-1] = previousToken + nextToken
+				previousToken = ""
+				continue
+			}
+		}
+
+		previousToken = nextToken
+		tokens = append(tokens, nextToken)
+
 	}
 
-	return t
+	return tokens
+}
+
+// inList is an internal function to determine if a string is in a set of
+// other possible strings.
+func inList(s string, list []string) bool {
+	for _, i := range list {
+		if s == i {
+			return true
+		}
+	}
+	return false
 }

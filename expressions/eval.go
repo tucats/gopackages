@@ -1,7 +1,6 @@
 package expressions
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 )
@@ -11,58 +10,97 @@ import (
 func (e *Expression) Eval(symbols map[string]interface{}) (interface{}, error) {
 
 	e.TokenP = 0
+	return e.relations(symbols)
+}
 
-	v1, err := e.eval1(symbols)
-	if err != nil {
-		return nil, err
+// Coerce returns the value after it has been converted to the type of the
+// model value.
+func Coerce(v interface{}, model interface{}) interface{} {
+
+	switch model.(type) {
+
+	case int:
+		switch value := v.(type) {
+		case bool:
+			if value {
+				return 1
+			}
+			return 0
+
+		case int:
+			return value
+
+		case float64:
+			return int(value)
+
+		case string:
+			st, _ := strconv.Atoi(value)
+
+			return st
+		}
+
+	case float64:
+		switch value := v.(type) {
+		case bool:
+			if value {
+				return 1.0
+			}
+			return 0.0
+
+		case int:
+			return float64(value)
+
+		case float64:
+			return value
+
+		case string:
+			st, _ := strconv.ParseFloat(value, 64)
+			return st
+		}
+
+	case string:
+		switch value := v.(type) {
+		case bool:
+			if value {
+				return "true"
+			}
+			return "false"
+
+		case int:
+			return strconv.Itoa(value)
+
+		case float64:
+			return fmt.Sprintf("%v", value)
+
+		case string:
+			return value
+		}
+
+	case bool:
+
+		switch v.(type) {
+		case bool:
+			return v
+
+		case int:
+			return v.(int) != 0
+
+		case float64:
+			return v.(float64) != 0.0
+
+		case string:
+			switch v.(string) {
+			case "true":
+				return true
+			case "false":
+				return false
+			default:
+				return nil
+			}
+		}
 	}
 
-	var parsing = true
-	for parsing {
-		if e.TokenP >= len(e.Tokens) {
-			break
-		}
-		op := e.Tokens[e.TokenP]
-		if op == "+" || op == "-" {
-			e.TokenP = e.TokenP + 1
-
-			v2, err := e.eval1(symbols)
-			if err != nil {
-				return nil, err
-			}
-
-			v1, v2 = Normalize(v1, v2)
-			switch op {
-
-			case "+":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) + v2.(int)
-				case string:
-					v1 = v1.(string) + v2.(string)
-				case float64:
-					v1 = v1.(float64) + v2.(float64)
-				case bool:
-					v1 = v1.(bool) && v2.(bool)
-				}
-
-			case "-":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) - v2.(int)
-				case float64:
-					v1 = v1.(float64) - v2.(float64)
-				default:
-					return nil, errors.New("invlid type for '-' operator")
-				}
-
-			}
-
-		} else {
-			parsing = false
-		}
-	}
-	return v1, nil
+	return nil
 }
 
 // Normalize accepts two different values and promotes them to
@@ -117,81 +155,30 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 			}
 			return v1, 0
 		}
+
+	case bool:
+		switch v2.(type) {
+		case string:
+			if v1.(bool) {
+				return "true", v2.(string)
+			}
+			return "false", v2.(string)
+
+		case int:
+			if v1.(bool) {
+				return 1, v2.(int)
+			}
+			return 0, v2.(int)
+
+		case float64:
+			if v1.(bool) {
+				return 1.0, v2.(float64)
+			}
+			return 0.0, v2.(float64)
+
+		case bool:
+			return v1, v2
+		}
 	}
 	return v1, v2
-}
-
-func (e *Expression) eval1(symbols map[string]interface{}) (interface{}, error) {
-
-	// If the token is a number, convert it
-
-	t := e.Tokens[e.TokenP]
-	if i, err := strconv.Atoi(t); err == nil {
-		e.TokenP = e.TokenP + 1
-		return i, nil
-	}
-
-	if i, err := strconv.ParseFloat(t, 64); err == nil {
-		e.TokenP = e.TokenP + 1
-		return i, nil
-	}
-
-	if i, err := strconv.ParseBool(t); err == nil {
-		e.TokenP = e.TokenP + 1
-		return i, nil
-	}
-
-	if i, err := strconv.Atoi(t); err == nil {
-		e.TokenP = e.TokenP + 1
-		return i, nil
-	}
-
-	runeValue := t[0:1]
-	if runeValue == "\"" {
-		return t[1 : len(t)-1], nil
-	}
-
-	if symbol(runeValue) {
-		i, found := symbols[t]
-		if found {
-			return i, nil
-		}
-		return nil, errors.New("symbol not found: " + t)
-	}
-
-	return t, nil
-}
-
-func symbol(s string) bool {
-
-	for n, c := range s {
-		if isLetter(c) {
-			continue
-		}
-
-		if isDigit(c) && n > 0 {
-			continue
-		}
-		return false
-	}
-	return true
-}
-
-func isLetter(c rune) bool {
-	for _, d := range "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" {
-		if c == d {
-			return true
-		}
-	}
-	return false
-}
-
-func isDigit(c rune) bool {
-
-	for _, d := range "0123456789" {
-		if c == d {
-			return true
-		}
-	}
-	return false
 }

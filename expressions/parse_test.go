@@ -35,6 +35,14 @@ func TestExpression_Parse(t *testing.T) {
 			wantErr:    false,
 			wantTokens: []string{"a", "=", "\"Tom\""},
 		},
+		{
+			name: "Compound operators",
+			fields: fields{
+				Source: "a >= \"Tom\"",
+			},
+			wantErr:    false,
+			wantTokens: []string{"a", ">=", "\"Tom\""},
+		},
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
@@ -51,6 +59,63 @@ func TestExpression_Parse(t *testing.T) {
 			}
 			if !reflect.DeepEqual(e.Tokens, tt.wantTokens) {
 				t.Errorf("Expression.Parse() got %v, want %v", e.Tokens, tt.wantTokens)
+			}
+		})
+	}
+}
+
+func TestTokenize(t *testing.T) {
+	type args struct {
+		src string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{
+			name: "Simple alphanumeric name",
+			args: args{
+				src: "wage55",
+			},
+			want: []string{"wage55"},
+		},
+		{
+			name: "Integer expression with spaces",
+			args: args{
+				src: "11 + 15",
+			},
+			want: []string{"11", "+", "15"},
+		},
+		{
+			name: "Integer expression without spaces",
+			args: args{
+				src: "11+15",
+			},
+			want: []string{"11", "+", "15"},
+		},
+		{
+			name: "String expression with spaces",
+			args: args{
+				src: "name + \"User\"",
+			},
+			want: []string{"name", "+", "\"User\""},
+		},
+
+		{
+			name: "Float expression",
+			args: args{
+				src: "3.14 + 2",
+			},
+			want: []string{"3.14", "+", "2"},
+		},
+
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Tokenize(tt.args.src); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Tokenize() = %v, want %v", got, tt.want)
 			}
 		})
 	}
