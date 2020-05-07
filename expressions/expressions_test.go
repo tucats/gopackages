@@ -16,6 +16,16 @@ func TestNew(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "Multiple paren terms",
+			expr: "(i=42) & (name=\"Tom\")",
+			want: true,
+		},
+		{
+			name: "Invalid multiple paren terms",
+			expr: "(i=42) & (name=\"Tom\"",
+			want: nil,
+		},
+		{
 			name: "Simple addition",
 			expr: "5 + i",
 			want: 47,

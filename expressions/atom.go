@@ -12,12 +12,12 @@ func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}
 	// Is this a parenthesis expression?
 	if t == "(" {
 		e.TokenP = e.TokenP + 1
-		v, err := e.addSubtract(symbols)
+		v, err := e.relations(symbols)
 		if err != nil {
 			return nil, err
 		}
 
-		if e.Tokens[e.TokenP] != ")" {
+		if e.TokenP >= len(e.Tokens) || e.Tokens[e.TokenP] != ")" {
 			return nil, errors.New("mismatched parenthesis")
 		}
 		e.TokenP = e.TokenP + 1
