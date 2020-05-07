@@ -44,6 +44,7 @@ func (t *Table) FormatJSON() string {
 
 	var buffer strings.Builder
 	var e *expressions.Expression
+	var firstRow = true
 
 	if t.where != "" {
 		e = expressions.New(t.where)
@@ -74,9 +75,10 @@ func (t *Table) FormatJSON() string {
 			}
 		}
 
-		if n > t.startingRow {
+		if !firstRow {
 			buffer.WriteRune(',')
 		}
+		firstRow = false
 		buffer.WriteRune('{')
 		for ith, i := range t.columnOrder {
 			header := t.columns[i]
