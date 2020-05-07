@@ -2,6 +2,16 @@
 // a rudementary symbol table with scoping, and knows about four data
 // types (string, integer, double, and boolean). It does type casting as
 // need automatically.
+//
+// The general pattern of use is:
+//
+//    e := expressions.New("expression string")
+//    v, err := expressions.eval(symbolTableMap)
+//    i := GetInt(v)
+//    f := GetFloag(v)
+//    s := GetString(v)
+//    b := GetBool(v)
+//
 package expressions
 
 // ValueType is the type of an expression result.
