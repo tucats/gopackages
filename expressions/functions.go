@@ -48,7 +48,7 @@ func (e *Expression) functionCall(fname string, symbols map[string]interface{}) 
 	e.TokenP = e.TokenP + 1
 
 	for e.Tokens[e.TokenP] != ")" {
-		v, err := e.relations(symbols)
+		v, err := e.conditional(symbols)
 		if err != nil {
 			return v, err
 		}

@@ -13,7 +13,7 @@ func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}
 	// Is this a parenthesis expression?
 	if t == "(" {
 		e.TokenP = e.TokenP + 1
-		v, err := e.relations(symbols)
+		v, err := e.conditional(symbols)
 		if err != nil {
 			return nil, err
 		}
