@@ -43,8 +43,14 @@ func (e *Expression) multDivide(symbols map[string]interface{}) (interface{}, er
 			case "/":
 				switch v1.(type) {
 				case int:
+					if v2.(int) == 0 {
+						return nil, errors.New("divide by zero")
+					}
 					v1 = v1.(int) / v2.(int)
 				case float64:
+					if v2.(float64) == 0.0 {
+						return nil, errors.New("divide by zero")
+					}
 					v1 = v1.(float64) / v2.(float64)
 				default:
 					return nil, errors.New("invalid type for '/' operator")

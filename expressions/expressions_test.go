@@ -36,9 +36,19 @@ func TestNew(t *testing.T) {
 			want: 47,
 		},
 		{
-			name: "Simple multiplication",
+			name: "Simple integer multiplication",
 			expr: "5 * 20",
 			want: 100,
+		},
+		{
+			name: "Simple floating multiplication",
+			expr: "5. * 20.",
+			want: 100.,
+		},
+		{
+			name: "Invalid type for  multiplication",
+			expr: "true * \"many\"",
+			want: nil,
 		},
 		{
 			name: "Simple subtraction",
@@ -66,6 +76,16 @@ func TestNew(t *testing.T) {
 			want: nil,
 		},
 		{
+			name: "Integer divide by zero ",
+			expr: "17 / 0",
+			want: nil,
+		},
+		{
+			name: "Float divide by zero ",
+			expr: "3.33 / 0.0 ",
+			want: nil,
+		},
+		{
 			name: "Order precedence",
 			expr: "5 + i / 7",
 			want: 11,
@@ -89,6 +109,11 @@ func TestNew(t *testing.T) {
 			name: "Unary negation of single term",
 			expr: "-i",
 			want: -42,
+		},
+		{
+			name: "Invalid unary negation",
+			expr: "-name",
+			want: nil,
 		},
 		{
 			name: "Unary negation of diadic operator",
