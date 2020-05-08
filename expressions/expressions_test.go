@@ -21,6 +21,11 @@ func TestNew(t *testing.T) {
 			want: "TomTom",
 		},
 		{
+			name: "Alphanumeric  symbol names",
+			expr: "roman12 + \".\"",
+			want: "XII.",
+		},
+		{
 			name: "Simple addition",
 			expr: "5 + i",
 			want: 47,
@@ -36,9 +41,24 @@ func TestNew(t *testing.T) {
 			want: 2.14,
 		},
 		{
+			name: "Invalid type for subtraction",
+			expr: "\"test\" - \"st\"",
+			want: nil,
+		},
+		{
 			name: "Simple division",
 			expr: "i / 7",
 			want: 6,
+		},
+		{
+			name: "Float division",
+			expr: "10.0 / 4.0",
+			want: 2.5,
+		},
+		{
+			name: "Invalid division",
+			expr: "\"house\" / \"cat\" ",
+			want: nil,
 		},
 		{
 			name: "Order precedence",
@@ -91,6 +111,11 @@ func TestNew(t *testing.T) {
 			want: 8.14,
 		},
 		{
+			name: "Type coercion bool to int",
+			expr: "int(true) + int(false)",
+			want: 1,
+		},
+		{
 			name: "Type coercion int to bool",
 			expr: "i & true",
 			want: true,
@@ -126,9 +151,29 @@ func TestNew(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "Cast value to string",
+			name: "Cast float to string",
 			expr: "string(003.14)",
 			want: "3.14",
+		},
+		{
+			name: "Cast bool to string",
+			expr: "string(b) + string(!b)",
+			want: "truefalse",
+		},
+		{
+			name: "Cast int to string",
+			expr: "string(i)",
+			want: "42",
+		},
+		{
+			name: "Invalid argument list to function",
+			expr: "len(1 3)",
+			want: nil,
+		},
+		{
+			name: "Incomplete argument list to function",
+			expr: "len(13",
+			want: nil,
 		},
 		{
 			name: "len function",
@@ -186,6 +231,16 @@ func TestNew(t *testing.T) {
 			want: 6,
 		},
 		{
+			name: "min float args function",
+			expr: "min(3.0, 1.0, 2.0)",
+			want: 1.0,
+		},
+		{
+			name: "min string args function",
+			expr: "min(\"house\", \"cake\", \"pig\" )",
+			want: "cake",
+		},
+		{
 			name: "min hetergenous args function",
 			expr: "min(15,33.5,\"11\",6)",
 			want: 6,
@@ -195,6 +250,16 @@ func TestNew(t *testing.T) {
 			expr: "max(15.1,33.5,\"11\",6)",
 			want: 33.5,
 		},
+		{
+			name: "sum hetergenous args function",
+			expr: "sum(10.1, 5, \"2\")",
+			want: 17.1,
+		},
+		{
+			name: "sum homogeneous args function",
+			expr: "sum(\"abc\", \"137\", \"def\")",
+			want: "abc137def",
+		},
 		// TODO: Add test cases.
 	}
 
@@ -203,10 +268,11 @@ func TestNew(t *testing.T) {
 
 			e := New(tt.expr)
 			symbols := map[string]interface{}{
-				"i":    42,
-				"pi":   3.14,
-				"name": "Tom",
-				"b":    true,
+				"i":       42,
+				"pi":      3.14,
+				"name":    "Tom",
+				"b":       true,
+				"roman12": "XII",
 			}
 
 			v1, err := e.Eval(symbols)

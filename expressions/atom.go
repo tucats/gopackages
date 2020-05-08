@@ -52,32 +52,24 @@ func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}
 		return t[1 : len(t)-1], nil
 	}
 
-	if symbol(runeValue) {
+	if symbol(t) {
 
 		t := strings.ToLower(t)
-		// Check for special cases of boolean constants, else look up symbol
-		switch t {
-		case "true":
-			return true, nil
-		case "false":
-			return false, nil
-		default:
 
-			// @TOMCOLE Will need to peek ahead for () argument list for
-			// function calls here.
-
-			if e.TokenP < len(e.Tokens)-1 && e.Tokens[e.TokenP+1] == "(" {
-				e.TokenP = e.TokenP + 1
-				return e.functionCall(t, symbols)
-			}
-			i, found := symbols[t]
-			if found {
-				e.TokenP = e.TokenP + 1
-				return i, nil
-			}
-			return nil, errors.New("symbol not found: " + t)
-
+		// Peek ahead to see if it's the start of a function call...
+		if e.TokenP < len(e.Tokens)-1 && e.Tokens[e.TokenP+1] == "(" {
+			e.TokenP = e.TokenP + 1
+			return e.functionCall(t, symbols)
 		}
+
+		// Nope, resolve from the symbol table if possible...
+		i, found := symbols[t]
+		if found {
+			e.TokenP = e.TokenP + 1
+			return i, nil
+		}
+		return nil, errors.New("symbol not found: " + t)
+
 	}
 
 	return t, nil
