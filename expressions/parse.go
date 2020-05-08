@@ -31,7 +31,7 @@ func Tokenize(src string) []string {
 		nextToken := s.TokenText()
 
 		if nextToken == "=" {
-			if inList(previousToken, []string{"!", "<", ">"}) {
+			if inList(previousToken, []string{"!", "<", ">", ":"}) {
 				tokens[len(tokens)-1] = previousToken + nextToken
 				previousToken = ""
 				continue

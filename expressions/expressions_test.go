@@ -16,6 +16,11 @@ func TestNew(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "Assignment",
+			expr: "x := 3",
+			want: 3,
+		},
+		{
 			name: "Case insensitive symbol names",
 			expr: "name + NaMe",
 			want: "TomTom",

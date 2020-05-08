@@ -17,6 +17,17 @@ func (e *Expression) Eval(symbols map[string]interface{}) (interface{}, error) {
 	}
 
 	AddBuiltins(symbols)
+
+	// Let's check for the special case of an assignment operation
+	if len(e.Tokens) > 2 && symbol(e.Tokens[0]) && e.Tokens[1] == ":=" {
+		e.TokenP = 2
+		v, err := e.relations(symbols)
+		if err != nil {
+			return nil, err
+		}
+		symbols[e.Tokens[0]] = v
+		return v, nil
+	}
 	return e.relations(symbols)
 }
 
