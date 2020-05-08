@@ -27,6 +27,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"lower":     FunctionDefinition{min: 1, max: 1, f: functionLower},
 	"min":       FunctionDefinition{min: 1, max: 99999, f: functionMin},
 	"max":       FunctionDefinition{min: 1, max: 99999, f: functionMax},
+	"sum":       FunctionDefinition{min: 1, max: 99999, f: functionSum},
 }
 
 func (e *Expression) functionCall(fname string, symbols map[string]interface{}) (interface{}, error) {
@@ -273,4 +274,25 @@ func functionMax(args []interface{}) (interface{}, error) {
 		}
 	}
 	return r, nil
+}
+
+// functionSum implements the sum() function
+func functionSum(args []interface{}) (interface{}, error) {
+
+	base := args[0]
+	for _, addend := range args[1:] {
+		addend = expressions.Coerce(addend, base)
+		switch addend.(type) {
+		case int:
+			base = base.(int) + addend.(int)
+		case float64:
+			base = base.(float64) + addend.(float64)
+		case string:
+			base = base.(string) + addend.(string)
+
+		case bool:
+			base = base.(bool) || addend.(bool)
+		}
+	}
+	return base, nil
 }
