@@ -281,7 +281,7 @@ func functionSum(args []interface{}) (interface{}, error) {
 
 	base := args[0]
 	for _, addend := range args[1:] {
-		addend = expressions.Coerce(addend, base)
+		addend = Coerce(addend, base)
 		switch addend.(type) {
 		case int:
 			base = base.(int) + addend.(int)
