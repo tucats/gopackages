@@ -5,6 +5,7 @@
 package expressions
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -15,11 +16,6 @@ func TestNew(t *testing.T) {
 		want    interface{}
 		wantErr bool
 	}{
-		{
-			name: "Assignment",
-			expr: "x := 3",
-			want: 3,
-		},
 		{
 			name: "Case insensitive symbol names",
 			expr: "name + NaMe",
@@ -195,7 +191,37 @@ func TestNew(t *testing.T) {
 			expr: "string(i)",
 			want: "42",
 		},
+
 		{
+			name: "Homogeneous array constant",
+			expr: "[1,2]",
+			want: []interface{}{1, 2},
+		},
+		{
+			name: "Heterogeneous array constant",
+			expr: "[true,name, 33.5]",
+			want: []interface{}{true, "Tom", 33.5},
+		},
+		{
+			name: "Index into array",
+			expr: "array[2]",
+			want: "tom",
+		},
+		{
+			name: "Add to array",
+			expr: "[1,2] + 3",
+			want: []interface{}{1, 2, 3},
+		},
+		{
+			name: "Concatenate array",
+			expr: "[1,2] + [3,4]",
+			want: []interface{}{1, 2, 3, 4},
+		},
+		{
+			name: "Subtract from array",
+			expr: "[1,2,3] - 2",
+			want: []interface{}{1, 3},
+		}, {
 			name: "Invalid argument list to function",
 			expr: "len(1 3)",
 			want: nil,
@@ -206,9 +232,14 @@ func TestNew(t *testing.T) {
 			want: nil,
 		},
 		{
-			name: "len function",
+			name: "len of string function",
 			expr: "len(name) + 4",
 			want: 7,
+		},
+		{
+			name: "len of array function",
+			expr: "len(array) + 4",
+			want: 8,
 		},
 		{
 			name: "left function",
@@ -221,13 +252,23 @@ func TestNew(t *testing.T) {
 			want: "om",
 		},
 		{
-			name: "index function",
+			name: "index of string function",
 			expr: "index(name, \"o\")",
 			want: 2,
 		},
 		{
 			name: "index not found function",
 			expr: "index(name, \"g\")",
+			want: 0,
+		},
+		{
+			name: "index of array function",
+			expr: "index(array, false)",
+			want: 4,
+		},
+		{
+			name: "index of array not found",
+			expr: "index(array, 55.5)",
 			want: 0,
 		},
 		{
@@ -313,13 +354,14 @@ func TestNew(t *testing.T) {
 				"name":    "Tom",
 				"b":       true,
 				"roman12": "XII",
+				"array":   []interface{}{1, "tom", 33., false},
 			}
 
 			v1, err := e.Eval(symbols)
 			if err != nil && tt.want != nil {
 				t.Errorf("Expression test, unexpected error %v", err)
 			} else {
-				if v1 != tt.want {
+				if !reflect.DeepEqual(v1, tt.want) {
 					t.Errorf("Expression test, got %v, want %v", v1, tt.want)
 				}
 			}

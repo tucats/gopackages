@@ -1,6 +1,9 @@
 package expressions
 
-import "errors"
+import (
+	"errors"
+	"reflect"
+)
 
 func (e *Expression) addSubtract(symbols map[string]interface{}) (interface{}, error) {
 
@@ -23,6 +26,40 @@ func (e *Expression) addSubtract(symbols map[string]interface{}) (interface{}, e
 				return nil, err
 			}
 
+			// Let's handle special case of an array, which just
+			// appends the item to the array.
+			switch a := v1.(type) {
+			case []interface{}:
+
+				switch op {
+				case "+":
+
+					switch element := v2.(type) {
+
+					// If second item also an array, append elements
+					case []interface{}:
+						v1 = append(a, element...)
+
+					// Else append the opaque object.
+					default:
+						v1 = append(a, v2)
+					}
+
+				case "-":
+					vNew := make([]interface{}, 0)
+					for _, t := range a {
+						if !reflect.DeepEqual(t, v2) {
+							vNew = append(vNew, t)
+						}
+					}
+					v1 = vNew
+				default:
+					return nil, errors.New("Unsupported operation on array")
+				}
+				return v1, nil
+			}
+
+			// Otherwise, normalize the two items and go...
 			v1, v2 = Normalize(v1, v2)
 			switch op {
 

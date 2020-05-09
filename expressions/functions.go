@@ -2,6 +2,7 @@ package expressions
 
 import (
 	"errors"
+	"reflect"
 	"strings"
 )
 
@@ -159,10 +160,22 @@ func functionRight(args []interface{}) (interface{}, error) {
 // functionIndex implements the index() function
 func functionIndex(args []interface{}) (interface{}, error) {
 
-	v := GetString(args[0])
-	p := GetString(args[1])
+	switch arg := args[0].(type) {
 
-	return strings.Index(v, p) + 1, nil
+	case []interface{}:
+		for n, v := range arg {
+			if reflect.DeepEqual(v, args[1]) {
+				return n + 1, nil
+			}
+		}
+		return 0, nil
+
+	default:
+		v := GetString(args[0])
+		p := GetString(args[1])
+
+		return strings.Index(v, p) + 1, nil
+	}
 }
 
 // functionSubstring implements the substring() function
@@ -189,9 +202,13 @@ func functionSubstring(args []interface{}) (interface{}, error) {
 // functionLen implements the len() function
 func functionLen(args []interface{}) (interface{}, error) {
 
-	v := Coerce(args[0], "")
-	return len(v.(string)), nil
-
+	switch arg := args[0].(type) {
+	case []interface{}:
+		return len(arg), nil
+	default:
+		v := Coerce(args[0], "")
+		return len(v.(string)), nil
+	}
 }
 
 // functionLower implements the lower() function

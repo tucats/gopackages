@@ -25,6 +25,11 @@ func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}
 		return v, nil
 	}
 
+	// Is this an array constant?
+	if t == "[" {
+		return e.parseArray(symbols)
+	}
+
 	// If the token is a number, convert it
 	if i, err := strconv.Atoi(t); err == nil {
 		e.TokenP = e.TokenP + 1
@@ -66,6 +71,24 @@ func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}
 		i, found := symbols[t]
 		if found {
 			e.TokenP = e.TokenP + 1
+
+			// But before we go, make sure it's not an array reference...
+			if e.TokenP < len(e.Tokens)-1 && e.Tokens[e.TokenP] == "[" {
+				e.TokenP = e.TokenP + 1
+				idx, err := e.conditional(symbols)
+				if err != nil {
+					return nil, err
+				}
+				if e.TokenP > len(e.Tokens)-1 || e.Tokens[e.TokenP] != "]" {
+					return nil, errors.New("missing ] in array reference")
+				}
+				switch a := i.(type) {
+				case []interface{}:
+					i = a[GetInt(idx)-1]
+				default:
+					return nil, errors.New("invalid array reference")
+				}
+			}
 			return i, nil
 		}
 		return nil, errors.New("symbol not found: " + t)
@@ -107,4 +130,41 @@ func isDigit(c rune) bool {
 		}
 	}
 	return false
+}
+
+func (e *Expression) parseArray(symbols map[string]interface{}) ([]interface{}, error) {
+
+	args := make([]interface{}, 0)
+
+	var listTerminator = ""
+	if e.Tokens[e.TokenP] == "(" {
+		listTerminator = ")"
+	}
+	if e.Tokens[e.TokenP] == "[" {
+		listTerminator = "]"
+	}
+	if listTerminator == "" {
+		return args, nil
+	}
+	e.TokenP = e.TokenP + 1
+	for e.Tokens[e.TokenP] != listTerminator {
+		v, err := e.conditional(symbols)
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, v)
+		if e.TokenP >= len(e.Tokens) {
+			break
+		}
+		if e.Tokens[e.TokenP] == listTerminator {
+			break
+		}
+		if e.Tokens[e.TokenP] != "," {
+			return nil, errors.New("invalid list")
+		}
+		e.TokenP = e.TokenP + 1
+	}
+
+	e.TokenP = e.TokenP + 1
+	return args, nil
 }
