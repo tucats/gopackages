@@ -68,15 +68,15 @@ func TestByteCode_Emit(t *testing.T) {
 				emit: []I{
 					I{Push, 33},
 					I{Push, "stuff"},
-					I{opcode: Add},
-					I{opcode: Stop},
+					I{Opcode: Add},
+					I{Opcode: Stop},
 				},
 			},
 			want: []I{
 				I{Push, 33},
 				I{Push, "stuff"},
-				I{opcode: Add},
-				I{opcode: Stop},
+				I{Opcode: Add},
+				I{Opcode: Stop},
 			},
 		},
 		// TODO: Add test cases.
@@ -93,7 +93,7 @@ func TestByteCode_Emit(t *testing.T) {
 				running: tt.fields.running,
 			}
 			for _, i := range tt.args.emit {
-				b.Emit(i)
+				b.Emit(i.Opcode, i.Operand)
 			}
 
 			for n, i := range b.opcodes {

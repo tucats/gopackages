@@ -17,6 +17,26 @@ func TestNew(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "Simple unary not",
+			expr: "(!b)",
+			want: false,
+		},
+		{
+			name: "Cast bool to string",
+			expr: "string(b) + string(!b)",
+			want: "truefalse",
+		},
+		{
+			name: "Simple division",
+			expr: "i / 7",
+			want: 6,
+		},
+		{
+			name: "String subtraction",
+			expr: "\"test\" - \"st\"",
+			want: "te",
+		},
+		{
 			name: "Case insensitive symbol names",
 			expr: "name + NaMe",
 			want: "TomTom",
@@ -50,16 +70,6 @@ func TestNew(t *testing.T) {
 			name: "Simple subtraction",
 			expr: "pi - 1",
 			want: 2.14,
-		},
-		{
-			name: "Invalid type for subtraction",
-			expr: "\"test\" - \"st\"",
-			want: nil,
-		},
-		{
-			name: "Simple division",
-			expr: "i / 7",
-			want: 6,
 		},
 		{
 			name: "Float division",
@@ -154,7 +164,7 @@ func TestNew(t *testing.T) {
 		{
 			name: "Invalid type coercion string to bool",
 			expr: "\"bob\" | false",
-			want: nil,
+			want: false,
 		},
 		{
 			name: "Cast value to int",
@@ -180,11 +190,6 @@ func TestNew(t *testing.T) {
 			name: "Cast float to string",
 			expr: "string(003.14)",
 			want: "3.14",
-		},
-		{
-			name: "Cast bool to string",
-			expr: "string(b) + string(!b)",
-			want: "truefalse",
 		},
 		{
 			name: "Cast int to string",
@@ -348,6 +353,7 @@ func TestNew(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			e := New(tt.expr)
+
 			symbols := map[string]interface{}{
 				"i":       42,
 				"pi":      3.14,

@@ -3,38 +3,51 @@ package expressions
 import (
 	"errors"
 
-	"github.com/tucats/gopackages/util"
+	bc "github.com/tucats/gopackages/bytecode"
 )
 
 // conditional handles parsing the ?: trinary operator. The first term is
 // converted to a boolean value, and if true the second term is returned, else
 // the third term. All terms must be present.
-func (e *Expression) conditional(symbols map[string]interface{}) (interface{}, error) {
+func (e *Expression) conditional() error {
 
 	// Parse the conditional
-	v, err := e.relations(symbols)
+	err := e.relations()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// If this is not a conditional, we're done.
 
 	if e.TokenP >= len(e.Tokens) || e.Tokens[e.TokenP] != "?" {
-		return v, nil
+		return nil
 	}
+
+	m1 := e.b.Mark()
+	e.b.Emit(bc.BranchFalse, 0)
 
 	// Parse both parts of the alternate values
 	e.TokenP = e.TokenP + 1
-	v1, err := e.relations(symbols)
+	err = e.relations()
+	if err != nil {
+		return err
+	}
 	if e.TokenP >= len(e.Tokens) || e.Tokens[e.TokenP] != ":" {
-		return nil, errors.New("missing colon in conditional")
+		return errors.New("missing colon in conditional")
 	}
-	e.TokenP = e.TokenP + 1
-	v2, err := e.relations(symbols)
+	m2 := e.b.Mark()
+	e.b.Emit(bc.Branch, 0)
 
-	if util.GetBool(v) {
-		return v1, nil
+	e.b.SetAddressHere(m1)
+	e.TokenP = e.TokenP + 1
+	err = e.relations()
+	if err != nil {
+		return err
 	}
-	return v2, nil
+
+	// Patch up the forward references.
+	e.b.SetAddressHere(m2)
+
+	return nil
 
 }

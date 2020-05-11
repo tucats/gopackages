@@ -1,51 +1,33 @@
 package expressions
 
-import (
-	"errors"
+import bc "github.com/tucats/gopackages/bytecode"
 
-	"github.com/tucats/gopackages/util"
-)
-
-func (e *Expression) unary(symbols map[string]interface{}) (interface{}, error) {
+func (e *Expression) unary() error {
 
 	// Check for unary negation or not before passing into top-level diadic operators.
 
-	for e.TokenP < len(e.Tokens) {
-
-		t := e.Tokens[e.TokenP]
-		switch t {
-		case "-":
-			e.TokenP = e.TokenP + 1
-			v, err := e.expressionAtom(symbols)
-			if err != nil {
-				return nil, err
-			}
-			switch value := v.(type) {
-			case bool:
-				return !value, nil
-
-			case int:
-				return -value, nil
-			case float64:
-				return 0.0 - value, nil
-
-			case string:
-				return nil, errors.New("invalid data type for negation")
-			}
-
-		case "!":
-			e.TokenP = e.TokenP + 1
-			v, err := e.expressionAtom(symbols)
-			if err != nil {
-				return nil, err
-			}
-
-			return !(util.Coerce(v, true).(bool)), nil
-
-		default:
-			return e.expressionAtom(symbols)
-
+	t := e.Tokens[e.TokenP]
+	switch t {
+	case "-":
+		e.TokenP = e.TokenP + 1
+		err := e.expressionAtom()
+		if err != nil {
+			return err
 		}
+		e.b.Emit(bc.Negate, 0)
+		return nil
+
+	case "!":
+		e.TokenP = e.TokenP + 1
+		err := e.expressionAtom()
+		if err != nil {
+			return err
+		}
+		e.b.Emit(bc.Negate, 0)
+		return nil
+
+	default:
+		return e.expressionAtom()
+
 	}
-	return e.expressionAtom(symbols)
 }

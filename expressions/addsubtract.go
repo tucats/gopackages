@@ -1,17 +1,14 @@
 package expressions
 
 import (
-	"errors"
-	"reflect"
-
-	"github.com/tucats/gopackages/util"
+	bc "github.com/tucats/gopackages/bytecode"
 )
 
-func (e *Expression) addSubtract(symbols map[string]interface{}) (interface{}, error) {
+func (e *Expression) addSubtract() error {
 
-	v1, err := e.multDivide(symbols)
+	err := e.multDivide()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var parsing = true
@@ -23,82 +20,26 @@ func (e *Expression) addSubtract(symbols map[string]interface{}) (interface{}, e
 		if inList(op, []string{"+", "-", "&"}) {
 			e.TokenP = e.TokenP + 1
 
-			v2, err := e.multDivide(symbols)
+			err := e.multDivide()
 			if err != nil {
-				return nil, err
+				return err
 			}
 
-			// Let's handle special case of an array, which just
-			// appends the item to the array.
-			switch a := v1.(type) {
-			case []interface{}:
-
-				switch op {
-				case "+":
-
-					switch element := v2.(type) {
-
-					// If second item also an array, append elements
-					case []interface{}:
-						v1 = append(a, element...)
-
-					// Else append the opaque object.
-					default:
-						v1 = append(a, v2)
-					}
-
-				case "-":
-					vNew := make([]interface{}, 0)
-					for _, t := range a {
-						if !reflect.DeepEqual(t, v2) {
-							vNew = append(vNew, t)
-						}
-					}
-					v1 = vNew
-				default:
-					return nil, errors.New("Unsupported operation on array")
-				}
-				return v1, nil
-			}
-
-			// Otherwise, normalize the two items and go...
-			v1, v2 = util.Normalize(v1, v2)
 			switch op {
 
 			case "+":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) + v2.(int)
-				case string:
-					v1 = v1.(string) + v2.(string)
-				case float64:
-					v1 = v1.(float64) + v2.(float64)
-				case bool:
-					v1 = v1.(bool) && v2.(bool)
-				}
+				e.b.Emit(bc.Add, nil)
 
 			case "-":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) - v2.(int)
-				case float64:
-					v1 = v1.(float64) - v2.(float64)
-				default:
-					return nil, errors.New("invlid type for '-' operator")
-				}
+				e.b.Emit(bc.Sub, nil)
 
 			case "&":
-				v1 = util.Coerce(v1, true)
-				v2 = util.Coerce(v2, true)
-				if v1 == nil || v2 == nil {
-					return nil, errors.New("invalid value for coercion to bool")
-				}
-				v1 = v1.(bool) && v2.(bool)
+				e.b.Emit(bc.And, nil)
 			}
 
 		} else {
 			parsing = false
 		}
 	}
-	return v1, nil
+	return nil
 }

@@ -16,6 +16,24 @@ func StopOpcode(b *ByteCode, i *I) error {
 	return nil
 }
 
+// ArrayOpcode implementation
+func ArrayOpcode(b *ByteCode, i *I) error {
+
+	count := util.GetInt(i.Operand)
+	array := make([]interface{}, count)
+
+	for n := 0; n < count; n++ {
+		v, err := b.Pop()
+		if err != nil {
+			return err
+		}
+		array[(count-n)-1] = v
+	}
+
+	b.Push(array)
+	return nil
+}
+
 // StoreOpcode implementation
 func StoreOpcode(b *ByteCode, i *I) error {
 
@@ -24,18 +42,18 @@ func StoreOpcode(b *ByteCode, i *I) error {
 		return err
 	}
 
-	b.Set(util.GetString(i.operand), v)
+	b.Set(util.GetString(i.Operand), v)
 	return nil
 }
 
 // LoadOpcode implementation
 func LoadOpcode(b *ByteCode, i *I) error {
 
-	name := util.GetString(i.operand)
+	name := util.GetString(i.Operand)
 	if len(name) == 0 {
 		return fmt.Errorf("invalid symbol name: %v", name)
 	}
-	v := b.Get(util.GetString(i.operand))
+	v := b.Get(util.GetString(i.Operand))
 	if v == nil {
 		return fmt.Errorf("unknown symbol: %v", name)
 	}
@@ -49,12 +67,13 @@ func CallOpcode(b *ByteCode, i *I) error {
 
 	var fname string
 	var err error
+	var v interface{}
 
 	// Argument count is in operand
-	argc := i.operand.(int)
+	argc := i.Operand.(int)
 
 	// Function name is last item on stack
-	v, err := b.Pop()
+	v, err = b.Pop()
 	if err != nil {
 		return err
 	}
@@ -63,23 +82,32 @@ func CallOpcode(b *ByteCode, i *I) error {
 	// Arguments are in reverse order on stack.
 	args := make([]interface{}, argc)
 	for n := 0; n < argc; n = n + 1 {
-		v, err := b.Pop()
+		v, err = b.Pop()
 		if err != nil {
 			return err
 		}
 		args[(argc-n)-1] = v
 	}
 
+	// Is it in the dictionary?
 	fn, found := util.FunctionDictionary[fname]
-	if !found {
-		return errors.New("undefined function: " + fname)
-	}
-	if argc > fn.Max || argc < fn.Min {
-		return errors.New("incorrect number of function arguments")
-	}
+	if found {
+		if argc > fn.Max || argc < fn.Min {
+			return errors.New("incorrect number of function arguments")
+		}
 
-	f := fn.F
-	v, err = f.(func([]interface{}) (interface{}, error))(args)
+		f := fn.F
+		v, err = f.(func([]interface{}) (interface{}, error))(args)
+	} else {
+
+		// How about as a user-defined function? These are in the symbol
+		// table with "()" as the suffix.
+		f, found := b.symbols[fname+"()"]
+		if !found {
+			return fmt.Errorf("undefined function: %v", fname)
+		}
+		v, err = f.(func([]interface{}) (interface{}, error))(args)
+	}
 
 	if err != nil {
 		return err
@@ -90,7 +118,7 @@ func CallOpcode(b *ByteCode, i *I) error {
 
 // PushOpcode bytecode implementation
 func PushOpcode(b *ByteCode, i *I) error {
-	return b.Push(i.operand)
+	return b.Push(i.Operand)
 }
 
 // AddOpcode bytecode implementation
@@ -99,32 +127,51 @@ func AddOpcode(b *ByteCode, i *I) error {
 	if b.sp < 1 {
 		return errors.New("stack underflow")
 	}
-	v1, err := b.Pop()
-	if err != nil {
-		return err
-	}
 	v2, err := b.Pop()
 	if err != nil {
 		return err
 	}
+	v1, err := b.Pop()
+	if err != nil {
+		return err
+	}
 
-	v1, v2 = util.Normalize(v1, v2)
-	switch v1.(type) {
-	case int:
-		return b.Push(v1.(int) + v2.(int))
-	case float64:
-		return b.Push(v1.(float64) + v2.(float64))
-	case string:
-		return b.Push(v1.(string) + v2.(string))
-	case bool:
-		return b.Push(v1.(bool) && v2.(bool))
+	switch vx := v1.(type) {
+
+	// Is it an array we are concatenating to?
+	case []interface{}:
+
+		switch vy := v2.(type) {
+		// Array requires a deep concatnation
+		case []interface{}:
+			newArray := append(vx, vy...)
+			return b.Push(newArray)
+
+		// Everything else is a simple append.
+		default:
+			newArray := append(vx, v2)
+			return b.Push(newArray)
+		}
+		// All other types are scalar math
 	default:
-		return errors.New("unsupported datatype")
+		v1, v2 = util.Normalize(v1, v2)
+		switch v1.(type) {
+		case int:
+			return b.Push(v1.(int) + v2.(int))
+		case float64:
+			return b.Push(v1.(float64) + v2.(float64))
+		case string:
+			return b.Push(v1.(string) + v2.(string))
+		case bool:
+			return b.Push(v1.(bool) && v2.(bool))
+		default:
+			return errors.New("unsupported datatype")
+		}
 	}
 }
 
-// SubOpcode bytecode implementation
-func SubOpcode(b *ByteCode, i *I) error {
+// AndOpcode bytecode implementation
+func AndOpcode(b *ByteCode, i *I) error {
 
 	if b.sp < 1 {
 		return errors.New("stack underflow")
@@ -138,17 +185,70 @@ func SubOpcode(b *ByteCode, i *I) error {
 		return err
 	}
 
-	v1, v2 = util.Normalize(v1, v2)
-	switch v1.(type) {
-	case int:
-		return b.Push(v1.(int) - v2.(int))
-	case float64:
-		return b.Push(v1.(float64) - v2.(float64))
-	case string:
-		s := strings.ReplaceAll(v1.(string), v2.(string), "")
-		return b.Push(s)
+	return b.Push(util.GetBool(v1) && util.GetBool(v2))
+
+}
+
+// OrOpcode bytecode implementation
+func OrOpcode(b *ByteCode, i *I) error {
+
+	if b.sp < 1 {
+		return errors.New("stack underflow")
+	}
+	v1, err := b.Pop()
+	if err != nil {
+		return err
+	}
+	v2, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	return b.Push(util.GetBool(v1) || util.GetBool(v2))
+
+}
+
+// SubOpcode bytecode implementation
+func SubOpcode(b *ByteCode, i *I) error {
+
+	if b.sp < 1 {
+		return errors.New("stack underflow")
+	}
+	v2, err := b.Pop()
+	if err != nil {
+		return err
+	}
+	v1, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	switch vx := v1.(type) {
+
+	// For an array, make a copy removing the item to be subtracted.
+	case []interface{}:
+		newArray := make([]interface{}, 0)
+		for _, v := range vx {
+			if !reflect.DeepEqual(v2, v) {
+				newArray = append(newArray, v)
+			}
+		}
+		return b.Push(newArray)
+
+	// Everything else is a scalar subtraction
 	default:
-		return errors.New("unsupported datatype")
+		v1, v2 = util.Normalize(v1, v2)
+		switch v1.(type) {
+		case int:
+			return b.Push(v1.(int) - v2.(int))
+		case float64:
+			return b.Push(v1.(float64) - v2.(float64))
+		case string:
+			s := strings.ReplaceAll(v1.(string), v2.(string), "")
+			return b.Push(s)
+		default:
+			return errors.New("unsupported datatype")
+		}
 	}
 }
 
@@ -158,11 +258,11 @@ func MulOpcode(b *ByteCode, i *I) error {
 	if b.sp < 1 {
 		return errors.New("stack underflow")
 	}
-	v1, err := b.Pop()
+	v2, err := b.Pop()
 	if err != nil {
 		return err
 	}
-	v2, err := b.Pop()
+	v1, err := b.Pop()
 	if err != nil {
 		return err
 	}
@@ -186,11 +286,11 @@ func DivOpcode(b *ByteCode, i *I) error {
 	if b.sp < 1 {
 		return errors.New("stack underflow")
 	}
-	v1, err := b.Pop()
+	v2, err := b.Pop()
 	if err != nil {
 		return err
 	}
-	v2, err := b.Pop()
+	v1, err := b.Pop()
 	if err != nil {
 		return err
 	}
@@ -222,7 +322,7 @@ func BranchFalseOpcode(b *ByteCode, i *I) error {
 	}
 
 	// Get destination
-	address := util.GetInt(i.operand)
+	address := util.GetInt(i.Operand)
 	if address < 0 || address > b.emitPos {
 		return errors.New("invalid destination address: " + strconv.Itoa(address))
 	}
@@ -237,7 +337,7 @@ func BranchFalseOpcode(b *ByteCode, i *I) error {
 func BranchOpcode(b *ByteCode, i *I) error {
 
 	// Get destination
-	address := util.GetInt(i.operand)
+	address := util.GetInt(i.Operand)
 	if address < 0 || address > b.emitPos {
 		return errors.New("invalid destination address: " + strconv.Itoa(address))
 	}
@@ -256,7 +356,7 @@ func BranchTrueOpcode(b *ByteCode, i *I) error {
 	}
 
 	// Get destination
-	address := util.GetInt(i.operand)
+	address := util.GetInt(i.Operand)
 	if address < 0 || address > b.emitPos {
 		return errors.New("invalid destination address: " + strconv.Itoa(address))
 	}
@@ -501,5 +601,57 @@ func LessThanOrEqualOpcode(b *ByteCode, i *I) error {
 		}
 	}
 	b.Push(r)
+	return nil
+}
+
+// IndexOpcode implementation
+func IndexOpcode(b *ByteCode, i *I) error {
+
+	index, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	array, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	subscript := util.GetInt(index)
+	switch a := array.(type) {
+	case []interface{}:
+		if subscript < 1 || subscript > len(a) {
+			return fmt.Errorf("invalid array index: %v", subscript)
+		}
+		v := a[subscript-1]
+		b.Push(v)
+
+	default:
+		return fmt.Errorf("invalid type for index operation")
+	}
+
+	return nil
+}
+
+// NegateOpcode implementation
+func NegateOpcode(b *ByteCode, i *I) error {
+
+	v, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	switch value := v.(type) {
+	case bool:
+		b.Push(!value)
+
+	case int:
+		b.Push(-value)
+	case float64:
+		b.Push(0.0 - value)
+
+	case string:
+		return errors.New("invalid data type for negation")
+	}
 	return nil
 }

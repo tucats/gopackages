@@ -1,18 +1,16 @@
 package expressions
 
 import (
-	"errors"
-
-	"github.com/tucats/gopackages/util"
+	bc "github.com/tucats/gopackages/bytecode"
 )
 
 // Eval evaluates the parsed expression. This can be called multiple times
 // with the same scanned string, but with different symbols.
-func (e *Expression) multDivide(symbols map[string]interface{}) (interface{}, error) {
+func (e *Expression) multDivide() error {
 
-	v1, err := e.unary(symbols)
+	err := e.unary()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var parsing = true
@@ -24,54 +22,27 @@ func (e *Expression) multDivide(symbols map[string]interface{}) (interface{}, er
 		if inList(op, []string{"*", "/", "|"}) {
 			e.TokenP = e.TokenP + 1
 
-			v2, err := e.unary(symbols)
+			err := e.unary()
 			if err != nil {
-				return nil, err
+				return err
 			}
 
-			v1, v2 = util.Normalize(v1, v2)
 			switch op {
 
 			case "*":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) * v2.(int)
-				case float64:
-					v1 = v1.(float64) * v2.(float64)
-				case bool:
-					v1 = v1.(bool) || v2.(bool)
-				default:
-					return nil, errors.New("Invalid operand types for *")
-				}
+				e.b.Emit(bc.Mul, 0)
 
 			case "/":
-				switch v1.(type) {
-				case int:
-					if v2.(int) == 0 {
-						return nil, errors.New("divide by zero")
-					}
-					v1 = v1.(int) / v2.(int)
-				case float64:
-					if v2.(float64) == 0.0 {
-						return nil, errors.New("divide by zero")
-					}
-					v1 = v1.(float64) / v2.(float64)
-				default:
-					return nil, errors.New("invalid type for '/' operator")
-				}
+				e.b.Emit(bc.Div, 0)
 
 			case "|":
-				v1 = util.Coerce(v1, true)
-				v2 = util.Coerce(v2, true)
-				if v1 == nil || v2 == nil {
-					return nil, errors.New("invalid value for coercion to bool")
-				}
-				v1 = v1.(bool) || v2.(bool)
+				e.b.Emit(bc.Or, 0)
+
 			}
 
 		} else {
 			parsing = false
 		}
 	}
-	return v1, nil
+	return nil
 }

@@ -5,58 +5,57 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tucats/gopackages/util"
+	bc "github.com/tucats/gopackages/bytecode"
 )
 
-func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}, error) {
+func (e *Expression) expressionAtom() error {
 
 	t := e.Tokens[e.TokenP]
 
 	// Is this a parenthesis expression?
 	if t == "(" {
 		e.TokenP = e.TokenP + 1
-		v, err := e.conditional(symbols)
+		err := e.conditional()
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		if e.TokenP >= len(e.Tokens) || e.Tokens[e.TokenP] != ")" {
-			return nil, errors.New("mismatched parenthesis")
+			return errors.New("mismatched parenthesis")
 		}
 		e.TokenP = e.TokenP + 1
-		return v, nil
+		return nil
 	}
 
 	// Is this an array constant?
 	if t == "[" {
-		return e.parseArray(symbols)
+		return e.parseArray()
 	}
 
 	// If the token is a number, convert it
 	if i, err := strconv.Atoi(t); err == nil {
 		e.TokenP = e.TokenP + 1
-		return i, nil
+		e.b.Emit(bc.Push, i)
+		return nil
 	}
 
 	if i, err := strconv.ParseFloat(t, 64); err == nil {
 		e.TokenP = e.TokenP + 1
-		return i, nil
+		e.b.Emit(bc.Push, i)
+		return nil
 	}
 
 	if i, err := strconv.ParseBool(t); err == nil {
 		e.TokenP = e.TokenP + 1
-		return i, nil
-	}
-
-	if i, err := strconv.Atoi(t); err == nil {
-		e.TokenP = e.TokenP + 1
-		return i, nil
+		e.b.Emit(bc.Push, i)
+		return nil
 	}
 
 	runeValue := t[0:1]
 	if runeValue == "\"" {
 		e.TokenP = e.TokenP + 1
-		return t[1 : len(t)-1], nil
+		e.b.Emit(bc.Push, t[1:len(t)-1])
+		return nil
 	}
 
 	if symbol(t) {
@@ -66,38 +65,32 @@ func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}
 		// Peek ahead to see if it's the start of a function call...
 		if e.TokenP < len(e.Tokens)-1 && e.Tokens[e.TokenP+1] == "(" {
 			e.TokenP = e.TokenP + 1
-			return e.functionCall(t, symbols)
+			return e.functionCall(t)
 		}
 
-		// Nope, resolve from the symbol table if possible...
-		i, found := symbols[t]
-		if found {
+		// Nope, probably name from the symbol table
+		e.TokenP = e.TokenP + 1
+		e.b.Emit(bc.Load, t)
+
+		// But before we go, make sure it's not an array reference...
+		if e.TokenP < len(e.Tokens)-1 && e.Tokens[e.TokenP] == "[" {
 			e.TokenP = e.TokenP + 1
-
-			// But before we go, make sure it's not an array reference...
-			if e.TokenP < len(e.Tokens)-1 && e.Tokens[e.TokenP] == "[" {
-				e.TokenP = e.TokenP + 1
-				idx, err := e.conditional(symbols)
-				if err != nil {
-					return nil, err
-				}
-				if e.TokenP > len(e.Tokens)-1 || e.Tokens[e.TokenP] != "]" {
-					return nil, errors.New("missing ] in array reference")
-				}
-				switch a := i.(type) {
-				case []interface{}:
-					i = a[util.GetInt(idx)-1]
-				default:
-					return nil, errors.New("invalid array reference")
-				}
+			err := e.conditional()
+			if err != nil {
+				return err
 			}
-			return i, nil
+			if e.TokenP > len(e.Tokens)-1 || e.Tokens[e.TokenP] != "]" {
+				return errors.New("missing ] in array reference")
+			}
+			e.b.Emit(bc.Index, 0)
 		}
-		return nil, errors.New("symbol not found: " + t)
+
+		return nil
 
 	}
 
-	return t, nil
+	e.b.Emit(bc.Push, t)
+	return nil
 }
 
 func symbol(s string) bool {
@@ -134,9 +127,7 @@ func isDigit(c rune) bool {
 	return false
 }
 
-func (e *Expression) parseArray(symbols map[string]interface{}) ([]interface{}, error) {
-
-	args := make([]interface{}, 0)
+func (e *Expression) parseArray() error {
 
 	var listTerminator = ""
 	if e.Tokens[e.TokenP] == "(" {
@@ -146,15 +137,17 @@ func (e *Expression) parseArray(symbols map[string]interface{}) ([]interface{}, 
 		listTerminator = "]"
 	}
 	if listTerminator == "" {
-		return args, nil
+		return nil
 	}
 	e.TokenP = e.TokenP + 1
+	count := 0
+
 	for e.Tokens[e.TokenP] != listTerminator {
-		v, err := e.conditional(symbols)
+		err := e.conditional()
 		if err != nil {
-			return nil, err
+			return err
 		}
-		args = append(args, v)
+		count = count + 1
 		if e.TokenP >= len(e.Tokens) {
 			break
 		}
@@ -162,11 +155,13 @@ func (e *Expression) parseArray(symbols map[string]interface{}) ([]interface{}, 
 			break
 		}
 		if e.Tokens[e.TokenP] != "," {
-			return nil, errors.New("invalid list")
+			return errors.New("invalid list")
 		}
 		e.TokenP = e.TokenP + 1
 	}
 
+	e.b.Emit(bc.Array, count)
+
 	e.TokenP = e.TokenP + 1
-	return args, nil
+	return nil
 }

@@ -14,11 +14,18 @@ type DispatchMap map[int]OpcodeHandler
 var dispatch = DispatchMap{
 	Stop:               StopOpcode,
 	Push:               PushOpcode,
+	Array:              ArrayOpcode,
+	Index:              IndexOpcode,
 	Add:                AddOpcode,
 	Sub:                SubOpcode,
 	Mul:                MulOpcode,
 	Div:                DivOpcode,
+	And:                AndOpcode,
+	Or:                 OrOpcode,
+	Negate:             NegateOpcode,
 	Call:               CallOpcode,
+	Load:               LoadOpcode,
+	Store:              StoreOpcode,
 	Branch:             BranchOpcode,
 	BranchTrue:         BranchTrueOpcode,
 	BranchFalse:        BranchFalseOpcode,
@@ -35,13 +42,14 @@ var dispatch = DispatchMap{
 const GrowStackBy = 50
 
 // Run executes a bytecode context
-func (b *ByteCode) Run() error {
+func (b *ByteCode) Run(symbols map[string]interface{}) error {
 
 	var err error
 
 	b.pc = 0
 	b.running = true
 	b.sp = 0
+	b.symbols = symbols
 
 	for b.running {
 
@@ -51,9 +59,9 @@ func (b *ByteCode) Run() error {
 		i := b.opcodes[b.pc]
 		b.pc = b.pc + 1
 
-		imp, found := dispatch[i.opcode]
+		imp, found := dispatch[i.Opcode]
 		if !found {
-			return errors.New("inimplemented instruction: " + strconv.Itoa(i.opcode))
+			return errors.New("inimplemented instruction: " + strconv.Itoa(i.Opcode))
 		}
 		err = imp(b, &i)
 		if err != nil {
@@ -66,7 +74,7 @@ func (b *ByteCode) Run() error {
 
 // Pop removes the top-most item from the stack
 func (b *ByteCode) Pop() (interface{}, error) {
-	if b.sp < 0 {
+	if b.sp <= 0 || len(b.stack) < b.sp {
 		return nil, errors.New("stack underflow")
 	}
 

@@ -2,33 +2,28 @@ package expressions
 
 import (
 	"errors"
+	"fmt"
 
+	bc "github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/util"
 )
 
-func (e *Expression) functionCall(fname string, symbols map[string]interface{}) (interface{}, error) {
+func (e *Expression) functionCall(fname string) error {
 
 	// validate this is a function
-
 	if e.Tokens[e.TokenP] != "(" {
-		return nil, errors.New("invalid function call format")
+		return errors.New("invalid function call format")
 	}
-	f, found := symbols[fname+"()"]
-	if !found {
-		return nil, errors.New("function not found: " + fname)
-	}
-
-	// Parse the argument list, if any
-	var args []interface{}
 
 	e.TokenP = e.TokenP + 1
+	argc := 0
 
 	for e.Tokens[e.TokenP] != ")" {
-		v, err := e.conditional(symbols)
+		err := e.conditional()
 		if err != nil {
-			return v, err
+			return err
 		}
-		args = append(args, v)
+		argc = argc + 1
 		if e.TokenP >= len(e.Tokens) {
 			break
 		}
@@ -36,25 +31,27 @@ func (e *Expression) functionCall(fname string, symbols map[string]interface{}) 
 			break
 		}
 		if e.Tokens[e.TokenP] != "," {
-			return nil, errors.New("invalid argument list")
+			return errors.New("invalid argument list")
 		}
 		e.TokenP = e.TokenP + 1
 	}
 
 	// Ensure trailing parenthesis
 	if e.TokenP >= len(e.Tokens) || e.Tokens[e.TokenP] != ")" {
-		return nil, errors.New("mismatched parenthesis in argument list")
+		return errors.New("mismatched parenthesis in argument list")
 	}
 	e.TokenP = e.TokenP + 1
 
 	// Quick sanity check on argument count for builtin functions
 	fd, found := util.FunctionDictionary[fname]
-	if found && ((len(args) < fd.Min) || (len(args) > fd.Max)) {
-		return nil, errors.New("incorred number of arguments for " + fname + "()")
+	if found && ((argc < fd.Min) || (argc > fd.Max)) {
+		return fmt.Errorf("incorred number of arguments for %s()", fname)
 	}
 
 	// Call the function
-	return f.(func([]interface{}) (interface{}, error))(args)
+	e.b.Emit(bc.Push, fname)
+	e.b.Emit(bc.Call, argc)
+	return nil
 }
 
 // AddBuiltins adds or overrides the default function library in the symbol map.

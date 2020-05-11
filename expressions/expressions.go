@@ -23,6 +23,7 @@ type Expression struct {
 	TokenPos []int
 	TokenP   int
 	b        *bytecode.ByteCode
+	err      error
 }
 
 // New creates a new Expression object. The expression to evaluate is
@@ -32,6 +33,17 @@ func New(expr string) *Expression {
 		Source: expr,
 	}
 	var ep = &e
+
+	// tokenize
 	ep.Parse()
+
+	// compile
+	e.b = bytecode.New(expr)
+	e.err = e.conditional()
 	return ep
+}
+
+// Error returns the last error seen on the expression object.
+func (e *Expression) Error() error {
+	return e.err
 }

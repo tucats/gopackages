@@ -101,7 +101,7 @@ func Coerce(v interface{}, model interface{}) interface{} {
 			return v
 
 		case int:
-			return v.(int) != 0
+			return (v.(int) != 0)
 
 		case float64:
 			return v.(float64) != 0.0
@@ -113,7 +113,7 @@ func Coerce(v interface{}, model interface{}) interface{} {
 			case "false":
 				return false
 			default:
-				return nil
+				return false
 			}
 		}
 	}

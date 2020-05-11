@@ -1,16 +1,14 @@
 package expressions
 
 import (
-	"errors"
-
-	"github.com/tucats/gopackages/util"
+	bc "github.com/tucats/gopackages/bytecode"
 )
 
-func (e *Expression) relations(symbols map[string]interface{}) (interface{}, error) {
+func (e *Expression) relations() error {
 
-	v1, err := e.addSubtract(symbols)
+	err := e.addSubtract()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var parsing = true
@@ -22,90 +20,36 @@ func (e *Expression) relations(symbols map[string]interface{}) (interface{}, err
 		if op == "=" || op == "!=" || op == "<" || op == "<=" || op == ">" || op == ">=" {
 			e.TokenP = e.TokenP + 1
 
-			v2, err := e.addSubtract(symbols)
+			err := e.addSubtract()
 			if err != nil {
-				return nil, err
+				return err
 			}
 
-			v1, v2 = util.Normalize(v1, v2)
 			switch op {
 
 			case "=":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) == v2.(int)
-				case string:
-					v1 = v1.(string) == v2.(string)
-				case float64:
-					v1 = v1.(float64) == v2.(float64)
-				case bool:
-					v1 = v1.(bool) == v2.(bool)
-				}
+				e.b.Emit(bc.Equal, nil)
 
 			case "!=":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) != v2.(int)
-				case string:
-					v1 = v1.(string) != v2.(string)
-				case float64:
-					v1 = v1.(float64) != v2.(float64)
-				case bool:
-					v1 = v1.(bool) != v2.(bool)
-				}
+				e.b.Emit(bc.NotEqual, nil)
 
 			case "<":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) < v2.(int)
-				case string:
-					v1 = v1.(string) < v2.(string)
-				case float64:
-					v1 = v1.(float64) < v2.(float64)
-				default:
-					return nil, errors.New("invalid type for < operator")
-				}
+				e.b.Emit(bc.LessThan, nil)
 
 			case "<=":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) <= v2.(int)
-				case string:
-					v1 = v1.(string) <= v2.(string)
-				case float64:
-					v1 = v1.(float64) <= v2.(float64)
-				default:
-					return nil, errors.New("invalid type for <= operator")
-				}
+				e.b.Emit(bc.LessThanOrEqual, nil)
 
 			case ">":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) > v2.(int)
-				case string:
-					v1 = v1.(string) > v2.(string)
-				case float64:
-					v1 = v1.(float64) > v2.(float64)
-				default:
-					return nil, errors.New("invalid type for > operator")
-				}
+				e.b.Emit(bc.GreaterThan, nil)
 
 			case ">=":
-				switch v1.(type) {
-				case int:
-					v1 = v1.(int) >= v2.(int)
-				case string:
-					v1 = v1.(string) >= v2.(string)
-				case float64:
-					v1 = v1.(float64) >= v2.(float64)
-				default:
-					return nil, errors.New("invalid type for >= operator")
-				}
+				e.b.Emit(bc.GreaterThanOrEqual, nil)
+
 			}
 
 		} else {
 			parsing = false
 		}
 	}
-	return v1, nil
+	return nil
 }
