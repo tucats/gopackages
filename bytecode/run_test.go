@@ -21,20 +21,7 @@ func TestByteCode_Run(t *testing.T) {
 		fields  fields
 		wantErr bool
 	}{
-		{
-			name: "left(n, 5) of string constant",
-			fields: fields{
-				opcodes: []I{
-					// Arguments are pushed in the order parsed
-					I{opcode: Push, operand: "fruitcake"},
-					I{opcode: Push, operand: 5},
-					I{opcode: Push, operand: "left"},
-					I{opcode: Call, operand: 2},
-					I{opcode: Stop},
-				},
-				result: "fruit",
-			},
-		},
+
 		{
 			name: "stop",
 			fields: fields{
@@ -124,6 +111,102 @@ func TestByteCode_Run(t *testing.T) {
 			},
 		},
 		{
+			name: "equal int test",
+			fields: fields{
+				opcodes: []I{
+					I{opcode: Push, operand: 5},
+					I{opcode: Push, operand: 5},
+					I{opcode: Equal},
+					I{opcode: Stop},
+				},
+				result: true,
+			},
+		},
+		{
+			name: "equal mixed test",
+			fields: fields{
+				opcodes: []I{
+					I{opcode: Push, operand: 5},
+					I{opcode: Push, operand: 5.0},
+					I{opcode: Equal},
+					I{opcode: Stop},
+				},
+				result: true,
+			},
+		},
+		{
+			name: "not equal int test",
+			fields: fields{
+				opcodes: []I{
+					I{opcode: Push, operand: 5},
+					I{opcode: Push, operand: 5},
+					I{opcode: NotEqual},
+					I{opcode: Stop},
+				},
+				result: false,
+			},
+		},
+		{
+			name: "not equal string test",
+			fields: fields{
+				opcodes: []I{
+					I{opcode: Push, operand: "fruit"},
+					I{opcode: Push, operand: "fruit"},
+					I{opcode: NotEqual},
+					I{opcode: Stop},
+				},
+				result: false,
+			},
+		},
+		{
+			name: "not equal bool test",
+			fields: fields{
+				opcodes: []I{
+					I{opcode: Push, operand: false},
+					I{opcode: Push, operand: false},
+					I{opcode: NotEqual},
+					I{opcode: Stop},
+				},
+				result: false,
+			},
+		},
+		{
+			name: "not equal float test",
+			fields: fields{
+				opcodes: []I{
+					I{opcode: Push, operand: 5.00000},
+					I{opcode: Push, operand: 5.00001},
+					I{opcode: NotEqual},
+					I{opcode: Stop},
+				},
+				result: true,
+			},
+		},
+		{
+			name: "greater than test",
+			fields: fields{
+				opcodes: []I{
+					I{opcode: Push, operand: 11.0},
+					I{opcode: Push, operand: 5},
+					I{opcode: GreaterThan},
+					I{opcode: Stop},
+				},
+				result: true,
+			},
+		},
+		{
+			name: "greater than or equals test",
+			fields: fields{
+				opcodes: []I{
+					I{opcode: Push, operand: "tom"},
+					I{opcode: Push, operand: "tom"},
+					I{opcode: GreaterThanOrEqual},
+					I{opcode: Stop},
+				},
+				result: true,
+			},
+		},
+		{
 			name: "length of string constant",
 			fields: fields{
 				opcodes: []I{
@@ -135,6 +218,21 @@ func TestByteCode_Run(t *testing.T) {
 				result: 9,
 			},
 		},
+		{
+			name: "left(n, 5) of string constant",
+			fields: fields{
+				opcodes: []I{
+					// Arguments are pushed in the order parsed
+					I{opcode: Push, operand: "fruitcake"},
+					I{opcode: Push, operand: 5},
+					I{opcode: Push, operand: "left"},
+					I{opcode: Call, operand: 2},
+					I{opcode: Stop},
+				},
+				result: "fruit",
+			},
+		},
+
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {

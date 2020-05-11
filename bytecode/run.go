@@ -12,13 +12,22 @@ type OpcodeHandler func(b *ByteCode, i *I) error
 type DispatchMap map[int]OpcodeHandler
 
 var dispatch = DispatchMap{
-	Stop: StopOpcode,
-	Push: PushOpcode,
-	Add:  AddOpcode,
-	Sub:  SubOpcode,
-	Mul:  MulOpcode,
-	Div:  DivOpcode,
-	Call: CallOpcode,
+	Stop:               StopOpcode,
+	Push:               PushOpcode,
+	Add:                AddOpcode,
+	Sub:                SubOpcode,
+	Mul:                MulOpcode,
+	Div:                DivOpcode,
+	Call:               CallOpcode,
+	Branch:             BranchOpcode,
+	BranchTrue:         BranchTrueOpcode,
+	BranchFalse:        BranchFalseOpcode,
+	Equal:              EqualOpcode,
+	NotEqual:           NotEqualOpcode,
+	LessThan:           LessThanOpcode,
+	LessThanOrEqual:    LessThanOrEqualOpcode,
+	GreaterThan:        GreaterThanOpcode,
+	GreaterThanOrEqual: GreaterThanOrEqualOpcode,
 }
 
 // GrowStackBy indicates the number of eleemnts to add to the stack when
@@ -35,6 +44,10 @@ func (b *ByteCode) Run() error {
 	b.sp = 0
 
 	for b.running {
+
+		if b.pc > len(b.opcodes) {
+			return errors.New("ran off end of incomplete bytecode")
+		}
 		i := b.opcodes[b.pc]
 		b.pc = b.pc + 1
 

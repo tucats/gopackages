@@ -1,10 +1,13 @@
 package expressions
 
+import "github.com/tucats/gopackages/bytecode"
+
 // Eval evaluates the parsed expression. This can be called multiple times
 // with the same scanned string, but with different symbols.
 func (e *Expression) Eval(symbols map[string]interface{}) (interface{}, error) {
 
 	e.TokenP = 0
+	e.b = bytecode.New("expression")
 
 	if symbols == nil {
 		symbols = map[string]interface{}{}

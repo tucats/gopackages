@@ -2,6 +2,9 @@ package bytecode
 
 import (
 	"errors"
+	"fmt"
+	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/tucats/gopackages/util"
@@ -10,6 +13,34 @@ import (
 // StopOpcode bytecode implementation
 func StopOpcode(b *ByteCode, i *I) error {
 	b.running = false
+	return nil
+}
+
+// StoreOpcode implementation
+func StoreOpcode(b *ByteCode, i *I) error {
+
+	v, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	b.Set(util.GetString(i.operand), v)
+	return nil
+}
+
+// LoadOpcode implementation
+func LoadOpcode(b *ByteCode, i *I) error {
+
+	name := util.GetString(i.operand)
+	if len(name) == 0 {
+		return fmt.Errorf("invalid symbol name: %v", name)
+	}
+	v := b.Get(util.GetString(i.operand))
+	if v == nil {
+		return fmt.Errorf("unknown symbol: %v", name)
+	}
+
+	b.Push(v)
 	return nil
 }
 
@@ -179,4 +210,296 @@ func DivOpcode(b *ByteCode, i *I) error {
 	default:
 		return errors.New("unsupported datatype")
 	}
+}
+
+// BranchFalseOpcode bytecode implementation
+func BranchFalseOpcode(b *ByteCode, i *I) error {
+
+	// Get test value
+	v, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	// Get destination
+	address := util.GetInt(i.operand)
+	if address < 0 || address > b.emitPos {
+		return errors.New("invalid destination address: " + strconv.Itoa(address))
+	}
+
+	if !util.GetBool(v) {
+		b.pc = address
+	}
+	return nil
+}
+
+// BranchOpcode bytecode implementation
+func BranchOpcode(b *ByteCode, i *I) error {
+
+	// Get destination
+	address := util.GetInt(i.operand)
+	if address < 0 || address > b.emitPos {
+		return errors.New("invalid destination address: " + strconv.Itoa(address))
+	}
+
+	b.pc = address
+	return nil
+}
+
+// BranchTrueOpcode bytecode implementation
+func BranchTrueOpcode(b *ByteCode, i *I) error {
+
+	// Get test value
+	v, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	// Get destination
+	address := util.GetInt(i.operand)
+	if address < 0 || address > b.emitPos {
+		return errors.New("invalid destination address: " + strconv.Itoa(address))
+	}
+
+	if util.GetBool(v) {
+		b.pc = address
+	}
+	return nil
+}
+
+// EqualOpcode implementation
+func EqualOpcode(b *ByteCode, i *I) error {
+
+	// Terms pushed in reverse order
+	v2, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	v1, err := b.Pop()
+	if err != nil {
+		return err
+	}
+	var r bool
+
+	switch v1.(type) {
+
+	case []interface{}:
+		r = reflect.DeepEqual(v1, v2)
+
+	default:
+		v1, v2 = util.Normalize(v1, v2)
+		switch v1.(type) {
+		case int:
+			r = v1.(int) == v2.(int)
+		case float64:
+			r = v1.(float64) == v2.(float64)
+		case string:
+			r = v1.(string) == v2.(string)
+		case bool:
+			r = v1.(bool) == v2.(bool)
+
+		}
+	}
+
+	b.Push(r)
+	return nil
+
+}
+
+// NotEqualOpcode implementation
+func NotEqualOpcode(b *ByteCode, i *I) error {
+
+	// Terms pushed in reverse order
+	v2, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	v1, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	var r bool
+
+	switch v1.(type) {
+
+	case []interface{}:
+		r = !reflect.DeepEqual(v1, v2)
+
+	default:
+		v1, v2 = util.Normalize(v1, v2)
+		switch v1.(type) {
+		case int:
+			r = v1.(int) != v2.(int)
+		case float64:
+			r = v1.(float64) != v2.(float64)
+		case string:
+			r = v1.(string) != v2.(string)
+		case bool:
+			r = v1.(bool) != v2.(bool)
+
+		}
+	}
+
+	b.Push(r)
+	return nil
+
+}
+
+// GreaterThanOpcode implementation
+func GreaterThanOpcode(b *ByteCode, i *I) error {
+
+	// Terms pushed in reverse order
+	v2, err := b.Pop()
+	if err != nil {
+		return err
+	}
+	v1, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	var r bool
+
+	switch v1.(type) {
+
+	case []interface{}:
+		return errors.New("unsupported array operation")
+
+	default:
+		v1, v2 = util.Normalize(v1, v2)
+		switch v1.(type) {
+		case int:
+			r = v1.(int) > v2.(int)
+		case float64:
+			r = v1.(float64) > v2.(float64)
+		case string:
+			r = v1.(string) > v2.(string)
+
+		default:
+			return errors.New("unsupported type for operation")
+
+		}
+	}
+	b.Push(r)
+	return nil
+}
+
+// GreaterThanOrEqualOpcode implementation
+func GreaterThanOrEqualOpcode(b *ByteCode, i *I) error {
+
+	// Terms pushed in reverse order
+	v2, err := b.Pop()
+	if err != nil {
+		return err
+	}
+	v1, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	var r bool
+
+	switch v1.(type) {
+
+	case []interface{}:
+		return errors.New("unsupported array operation")
+
+	default:
+		v1, v2 = util.Normalize(v1, v2)
+		switch v1.(type) {
+		case int:
+			r = v1.(int) >= v2.(int)
+		case float64:
+			r = v1.(float64) >= v2.(float64)
+		case string:
+			r = v1.(string) >= v2.(string)
+
+		default:
+			return errors.New("unsupported type for operation")
+
+		}
+	}
+	b.Push(r)
+	return nil
+}
+
+// LessThanOpcode implementation
+func LessThanOpcode(b *ByteCode, i *I) error {
+
+	// Terms pushed in reverse order
+	v2, err := b.Pop()
+	if err != nil {
+		return err
+	}
+	v1, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	var r bool
+
+	switch v1.(type) {
+
+	case []interface{}:
+		return errors.New("unsupported array operation")
+
+	default:
+		v1, v2 = util.Normalize(v1, v2)
+		switch v1.(type) {
+		case int:
+			r = v1.(int) < v2.(int)
+		case float64:
+			r = v1.(float64) < v2.(float64)
+		case string:
+			r = v1.(string) < v2.(string)
+
+		default:
+			return errors.New("unsupported type for operation")
+
+		}
+	}
+	b.Push(r)
+	return nil
+}
+
+// LessThanOrEqualOpcode implementation
+func LessThanOrEqualOpcode(b *ByteCode, i *I) error {
+
+	// Terms pushed in reverse order
+	v2, err := b.Pop()
+	if err != nil {
+		return err
+	}
+	v1, err := b.Pop()
+	if err != nil {
+		return err
+	}
+
+	var r bool
+
+	switch v1.(type) {
+
+	case []interface{}:
+		return errors.New("unsupported array operation")
+
+	default:
+		v1, v2 = util.Normalize(v1, v2)
+		switch v1.(type) {
+		case int:
+			r = v1.(int) <= v2.(int)
+		case float64:
+			r = v1.(float64) <= v2.(float64)
+		case string:
+			r = v1.(string) <= v2.(string)
+
+		default:
+			return errors.New("unsupported type for operation")
+
+		}
+	}
+	b.Push(r)
+	return nil
 }

@@ -14,12 +14,15 @@
 //
 package expressions
 
+import "github.com/tucats/gopackages/bytecode"
+
 // Expression is the type for an instance of the expresssion evaluator.
 type Expression struct {
 	Source   string
 	Tokens   []string
 	TokenPos []int
 	TokenP   int
+	b        *bytecode.ByteCode
 }
 
 // New creates a new Expression object. The expression to evaluate is
