@@ -1,6 +1,10 @@
 package expressions
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/tucats/gopackages/util"
+)
 
 // Eval evaluates the parsed expression. This can be called multiple times
 // with the same scanned string, but with different symbols.
@@ -25,7 +29,7 @@ func (e *Expression) multDivide(symbols map[string]interface{}) (interface{}, er
 				return nil, err
 			}
 
-			v1, v2 = Normalize(v1, v2)
+			v1, v2 = util.Normalize(v1, v2)
 			switch op {
 
 			case "*":
@@ -57,8 +61,8 @@ func (e *Expression) multDivide(symbols map[string]interface{}) (interface{}, er
 				}
 
 			case "|":
-				v1 = Coerce(v1, true)
-				v2 = Coerce(v2, true)
+				v1 = util.Coerce(v1, true)
+				v2 = util.Coerce(v2, true)
 				if v1 == nil || v2 == nil {
 					return nil, errors.New("invalid value for coercion to bool")
 				}

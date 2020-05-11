@@ -3,6 +3,8 @@ package expressions
 import (
 	"errors"
 	"reflect"
+
+	"github.com/tucats/gopackages/util"
 )
 
 func (e *Expression) addSubtract(symbols map[string]interface{}) (interface{}, error) {
@@ -60,7 +62,7 @@ func (e *Expression) addSubtract(symbols map[string]interface{}) (interface{}, e
 			}
 
 			// Otherwise, normalize the two items and go...
-			v1, v2 = Normalize(v1, v2)
+			v1, v2 = util.Normalize(v1, v2)
 			switch op {
 
 			case "+":
@@ -86,8 +88,8 @@ func (e *Expression) addSubtract(symbols map[string]interface{}) (interface{}, e
 				}
 
 			case "&":
-				v1 = Coerce(v1, true)
-				v2 = Coerce(v2, true)
+				v1 = util.Coerce(v1, true)
+				v2 = util.Coerce(v2, true)
 				if v1 == nil || v2 == nil {
 					return nil, errors.New("invalid value for coercion to bool")
 				}

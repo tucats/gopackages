@@ -4,6 +4,8 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+
+	"github.com/tucats/gopackages/util"
 )
 
 func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}, error) {
@@ -84,7 +86,7 @@ func (e *Expression) expressionAtom(symbols map[string]interface{}) (interface{}
 				}
 				switch a := i.(type) {
 				case []interface{}:
-					i = a[GetInt(idx)-1]
+					i = a[util.GetInt(idx)-1]
 				default:
 					return nil, errors.New("invalid array reference")
 				}

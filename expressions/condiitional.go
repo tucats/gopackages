@@ -1,6 +1,10 @@
 package expressions
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/tucats/gopackages/util"
+)
 
 // conditional handles parsing the ?: trinary operator. The first term is
 // converted to a boolean value, and if true the second term is returned, else
@@ -28,7 +32,7 @@ func (e *Expression) conditional(symbols map[string]interface{}) (interface{}, e
 	e.TokenP = e.TokenP + 1
 	v2, err := e.relations(symbols)
 
-	if GetBool(v) {
+	if util.GetBool(v) {
 		return v1, nil
 	}
 	return v2, nil

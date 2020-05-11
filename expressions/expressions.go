@@ -32,27 +32,3 @@ func New(expr string) *Expression {
 	ep.Parse()
 	return ep
 }
-
-// GetInt takes a generic interface and returns the integer value, using
-// type coercion if needed.
-func GetInt(v interface{}) int {
-	return Coerce(v, 1).(int)
-}
-
-// GetBool takes a generic interface and returns the boolean value, using
-// type coercion if needed.
-func GetBool(v interface{}) bool {
-	return Coerce(v, true).(bool)
-}
-
-// GetString takes a generic interface and returns the string value, using
-// type coercion if needed.
-func GetString(v interface{}) string {
-	return Coerce(v, "").(string)
-}
-
-// GetFloat takes a generic interface and returns the float64 value, using
-// type coercion if needed.
-func GetFloat(v interface{}) float64 {
-	return Coerce(v, float64(0)).(float64)
-}

@@ -1,6 +1,10 @@
 package expressions
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/tucats/gopackages/util"
+)
 
 func (e *Expression) unary(symbols map[string]interface{}) (interface{}, error) {
 
@@ -36,7 +40,7 @@ func (e *Expression) unary(symbols map[string]interface{}) (interface{}, error) 
 				return nil, err
 			}
 
-			return !(Coerce(v, true).(bool)), nil
+			return !(util.Coerce(v, true).(bool)), nil
 
 		default:
 			return e.expressionAtom(symbols)

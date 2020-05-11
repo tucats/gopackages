@@ -1,6 +1,10 @@
 package expressions
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/tucats/gopackages/util"
+)
 
 func (e *Expression) relations(symbols map[string]interface{}) (interface{}, error) {
 
@@ -23,7 +27,7 @@ func (e *Expression) relations(symbols map[string]interface{}) (interface{}, err
 				return nil, err
 			}
 
-			v1, v2 = Normalize(v1, v2)
+			v1, v2 = util.Normalize(v1, v2)
 			switch op {
 
 			case "=":
