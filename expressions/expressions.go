@@ -47,3 +47,8 @@ func New(expr string) *Expression {
 func (e *Expression) Error() error {
 	return e.err
 }
+
+// Disasm calls the bytecode disassembler.
+func (e *Expression) Disasm() {
+	e.b.Disasm()
+}
