@@ -114,6 +114,9 @@ func (t *Table) FormatText() []string {
 	var e *expressions.Expression
 	if t.where != "" {
 		e = expressions.New(t.where)
+		if ui.DebugMode {
+			e.Disasm()
+		}
 	}
 
 	var buffer strings.Builder
