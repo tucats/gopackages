@@ -6,8 +6,9 @@ import (
 )
 
 // Parse parses a text expression
-func (e *Expression) Parse() error {
+func (e *Expression) Parse(s string) error {
 
+	e.Source = s
 	e.Tokens = Tokenize(e.Source)
 	e.TokenP = 0
 

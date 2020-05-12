@@ -46,11 +46,10 @@ func TestExpression_Parse(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &Expression{
-				Source: tt.fields.Source,
 				Tokens: tt.fields.Tokens,
 				TokenP: tt.fields.TokenP,
 			}
-			if err := e.Parse(); (err != nil) != tt.wantErr {
+			if err := e.Parse(tt.fields.Source); (err != nil) != tt.wantErr {
 				t.Errorf("Expression.Parse() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(e.Tokens, tt.wantTokens) {

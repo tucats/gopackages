@@ -29,18 +29,30 @@ type Expression struct {
 // New creates a new Expression object. The expression to evaluate is
 // provided.
 func New(expr string) *Expression {
-	var e = Expression{
-		Source: expr,
-	}
-	var ep = &e
+
+	// Create a new bytecode object, and then use it to create a new
+	// expression object.
+	b := bytecode.New(expr)
+	e := NewWithBytecode(b)
 
 	// tokenize
-	ep.Parse()
+	e.Parse(expr)
 
 	// compile
-	e.b = bytecode.New(expr)
 	e.err = e.conditional()
+
+	return e
+
+}
+
+// NewWithBytecode allocates an expression object and
+// attaches the provided bytecode structure.
+func NewWithBytecode(b *bytecode.ByteCode) *Expression {
+	var e = Expression{}
+	var ep = &e
+	ep.b = b
 	return ep
+
 }
 
 // Error returns the last error seen on the expression object.
