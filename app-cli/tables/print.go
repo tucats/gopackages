@@ -8,6 +8,7 @@ import (
 
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/expressions"
+	"github.com/tucats/gopackages/util"
 )
 
 // Print will output a table using current rows and format specifications.
@@ -70,7 +71,7 @@ func (t *Table) FormatJSON() string {
 				buffer.WriteString(fmt.Sprintf("*** where clause error: %s", err.Error()))
 				break
 			}
-			if !expressions.GetBool(v) {
+			if !util.GetBool(v) {
 				continue
 			}
 		}
@@ -185,7 +186,7 @@ func (t *Table) FormatText() []string {
 				output = append(output, fmt.Sprintf("*** where clause error: %s", err.Error()))
 				break
 			}
-			if !expressions.GetBool(v) {
+			if !util.GetBool(v) {
 				continue
 			}
 		}

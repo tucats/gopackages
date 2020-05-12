@@ -30,13 +30,13 @@ func (e *Expression) multDivide() error {
 			switch op {
 
 			case "*":
-				e.b.Emit(bc.Mul, 0)
+				e.b.Emit(bc.Mul, nil)
 
 			case "/":
-				e.b.Emit(bc.Div, 0)
+				e.b.Emit(bc.Div, nil)
 
 			case "|":
-				e.b.Emit(bc.Or, 0)
+				e.b.Emit(bc.Or, nil)
 
 			}
 

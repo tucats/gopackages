@@ -48,5 +48,5 @@ func (b *ByteCode) Disasm() {
 		fmt.Printf("%4d: %s %s\n", n, opname, f)
 	}
 
-	fmt.Printf("\n%d instructions\n", len(b.opcodes))
+	fmt.Printf("\n%d instructions\n", b.emitPos)
 }
