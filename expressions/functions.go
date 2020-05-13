@@ -57,9 +57,9 @@ func (e *Expression) functionCall(fname string) error {
 // AddBuiltins adds or overrides the default function library in the symbol map.
 // Function names are distinct in the map because they always have the "()"
 // suffix for the key.
-func AddBuiltins(symbols bc.SymbolTable) {
+func AddBuiltins(symbols *bc.SymbolTable) {
 
 	for n, d := range util.FunctionDictionary {
-		symbols[n+"()"] = d.F
+		symbols.Set(n+"()", d.F)
 	}
 }

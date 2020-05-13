@@ -2,9 +2,6 @@ package bytecode
 
 import "errors"
 
-// SymbolTable contains an abstract symbol table
-type SymbolTable map[string]interface{}
-
 // Context holds the runtime information about an instance of bytecode being
 // executed.
 type Context struct {
@@ -13,12 +10,7 @@ type Context struct {
 	stack   []interface{}
 	sp      int
 	running bool
-	symbols SymbolTable
-}
-
-// NewSymbolTable creates a new symbol table object
-func NewSymbolTable() SymbolTable {
-	return map[string]interface{}{}
+	symbols *SymbolTable
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode
@@ -27,7 +19,7 @@ func NewSymbolTable() SymbolTable {
 // can continue to be modified after it is associated with a context.
 // @TOMCOLE Is this a good idea? Should a context take a snapshot of the bytecode at
 // the time so it is immutable?
-func NewContext(s SymbolTable, b *ByteCode) *Context {
+func NewContext(s *SymbolTable, b *ByteCode) *Context {
 	ctx := Context{
 		bc:      b,
 		pc:      0,
@@ -47,16 +39,18 @@ func (c *Context) SetByteCode(b *ByteCode) {
 	c.bc = b
 }
 
-// Get retrieves a symbol value from the symbol table
+// Get is a helper function that retrieves a symbol value from the associated
+// symbol table
 func (c *Context) Get(name string) (interface{}, bool) {
 
-	v, found := c.symbols[name]
+	v, found := c.symbols.Get(name)
 	return v, found
 }
 
-// Set sets a symbol value in the symbol table
+// Set is a helper function that sets a symbol value in the associated
+// symbol table
 func (c *Context) Set(name string, value interface{}) {
-	c.symbols[name] = value
+	c.symbols.Set(name, value)
 }
 
 // Pop removes the top-most item from the stack

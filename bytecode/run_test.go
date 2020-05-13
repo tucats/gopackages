@@ -290,7 +290,8 @@ func TestByteCode_Run(t *testing.T) {
 				emitPos: tt.fields.emitPos,
 			}
 			b.emitPos = len(b.opcodes)
-			c := NewContext(NewSymbolTable(), b)
+			s := NewSymbolTable(tt.name)
+			c := NewContext(s, b)
 			if err := c.Run(); (err != nil) != tt.wantErr {
 				t.Errorf("ByteCode.Run() error = %v, wantErr %v", err, tt.wantErr)
 			}

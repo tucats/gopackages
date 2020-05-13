@@ -15,7 +15,12 @@ Here is a trival example of generating bytecode and executing it.
     b.Emit(I{bytecode.Call, 2})
     b.Emit(I{bytecode.Stop, 0})
 
-    err := b.Run()
+    // Make a runtime context for this bytecode, and then run it.
+    // The context contains the stack symbol table (if any), etc.
+    c := bytecode.NewContext(nil, b)
+    err := c.Run()
+
+    // Retrieve the last value
     v, err := b.Pop()
 
     fmt.Printf("The result is %s\n", util.GetString(v))

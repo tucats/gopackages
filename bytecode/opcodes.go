@@ -102,7 +102,7 @@ func CallOpcode(c *Context, i *I) error {
 
 		// How about as a user-defined function? These are in the symbol
 		// table with "()" as the suffix.
-		f, found := c.symbols[fname+"()"]
+		f, found := c.symbols.Get(fname + "()")
 		if !found {
 			return fmt.Errorf("undefined function: %v", fname)
 		}

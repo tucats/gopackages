@@ -356,14 +356,14 @@ func TestNew(t *testing.T) {
 
 			e := New(tt.expr)
 
-			symbols := bytecode.SymbolTable{
-				"i":       42,
-				"pi":      3.14,
-				"name":    "Tom",
-				"b":       true,
-				"roman12": "XII",
-				"array":   []interface{}{1, "tom", 33., false},
-			}
+			// Create a common symbol table.
+			symbols := bytecode.NewSymbolTable(tt.name)
+			symbols.Set("i", 42)
+			symbols.Set("pi", 3.14)
+			symbols.Set("name", "Tom")
+			symbols.Set("b", true)
+			symbols.Set("roman12", "XII")
+			symbols.Set("array", []interface{}{1, "tom", 33., false})
 
 			v1, err := e.Eval(symbols)
 			if err != nil && tt.want != nil {

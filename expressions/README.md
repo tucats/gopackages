@@ -15,7 +15,7 @@ and then operate on them, performing type coercions as needed.
 
 Here is a simple example of using the expression handler:
 
-    symbols := SymbolTable{ "name": "Tom", "age": 35}
+    symbols := bytecode.SymbolTable{ "name": "Tom", "age": 35}
     e := expressions.New("age + 10")
     v, err := e.eval(symbols)
   
