@@ -13,7 +13,7 @@ func (e *Expression) functionCall(fname string) error {
 	// Note, caller already consumed the opening paren
 	argc := 0
 
-	for e.t.Peek() != ")" {
+	for e.t.Peek(1) != ")" {
 		err := e.conditional()
 		if err != nil {
 			return err
@@ -22,17 +22,17 @@ func (e *Expression) functionCall(fname string) error {
 		if e.t.AtEnd() {
 			break
 		}
-		if e.t.Peek() == ")" {
+		if e.t.Peek(1) == ")" {
 			break
 		}
-		if e.t.Peek() != "," {
+		if e.t.Peek(1) != "," {
 			return errors.New("invalid argument list")
 		}
 		e.t.Advance(1)
 	}
 
 	// Ensure trailing parenthesis
-	if e.t.AtEnd() || e.t.Peek() != ")" {
+	if e.t.AtEnd() || e.t.Peek(1) != ")" {
 		return errors.New("mismatched parenthesis in argument list")
 	}
 	e.t.Advance(1)

@@ -18,7 +18,7 @@ func (e *Expression) reference() error {
 	// is there a trailing structure or array reference?
 	for !e.t.AtEnd() {
 
-		op := e.t.Peek()
+		op := e.t.Peek(1)
 		switch op {
 
 		// Structure member reference

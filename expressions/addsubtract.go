@@ -17,7 +17,7 @@ func (e *Expression) addSubtract() error {
 		if e.t.AtEnd() {
 			break
 		}
-		op := e.t.Peek()
+		op := e.t.Peek(1)
 		if tokenizer.InList(op, []string{"+", "-", "&"}) {
 			e.t.Advance(1)
 

@@ -16,7 +16,7 @@ func (e *Expression) relations() error {
 		if e.t.AtEnd() {
 			break
 		}
-		op := e.t.Peek()
+		op := e.t.Peek(1)
 		if op == "=" || op == "!=" || op == "<" || op == "<=" || op == ">" || op == ">=" {
 			e.t.Advance(1)
 

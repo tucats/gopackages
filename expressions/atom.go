@@ -11,7 +11,7 @@ import (
 
 func (e *Expression) expressionAtom() error {
 
-	t := e.t.Peek()
+	t := e.t.Peek(1)
 
 	// Is this a parenthesis expression?
 	if t == "(" {
@@ -120,10 +120,10 @@ func isDigit(c rune) bool {
 func (e *Expression) parseArray() error {
 
 	var listTerminator = ""
-	if e.t.Peek() == "(" {
+	if e.t.Peek(1) == "(" {
 		listTerminator = ")"
 	}
-	if e.t.Peek() == "[" {
+	if e.t.Peek(1) == "[" {
 		listTerminator = "]"
 	}
 	if listTerminator == "" {
@@ -132,7 +132,7 @@ func (e *Expression) parseArray() error {
 	e.t.Advance(1)
 	count := 0
 
-	for e.t.Peek() != listTerminator {
+	for e.t.Peek(1) != listTerminator {
 		err := e.conditional()
 		if err != nil {
 			return err
@@ -141,10 +141,10 @@ func (e *Expression) parseArray() error {
 		if e.t.AtEnd() {
 			break
 		}
-		if e.t.Peek() == listTerminator {
+		if e.t.Peek(1) == listTerminator {
 			break
 		}
-		if e.t.Peek() != "," {
+		if e.t.Peek(1) != "," {
 			return errors.New("invalid list")
 		}
 		e.t.Advance(1)
@@ -163,18 +163,18 @@ func (e *Expression) parseStruct() error {
 	e.t.Advance(1)
 	count := 0
 
-	for e.t.Peek() != listTerminator {
+	for e.t.Peek(1) != listTerminator {
 
 		// First element: name
 
-		name := e.t.Peek()
+		name := e.t.Peek(1)
 		if !symbol(name) {
 			return fmt.Errorf("invalid member name: %v", name)
 		}
 
 		// Second element: colon
 		e.t.Advance(1)
-		if e.t.Peek() != ":" {
+		if e.t.Peek(1) != ":" {
 			return errors.New("missing colon")
 		}
 
@@ -191,10 +191,10 @@ func (e *Expression) parseStruct() error {
 		if e.t.AtEnd() {
 			break
 		}
-		if e.t.Peek() == listTerminator {
+		if e.t.Peek(1) == listTerminator {
 			break
 		}
-		if e.t.Peek() != "," {
+		if e.t.Peek(1) != "," {
 			return errors.New("invalid list")
 		}
 		e.t.Advance(1)

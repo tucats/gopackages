@@ -61,11 +61,11 @@ func (t *Tokenizer) Next() string {
 }
 
 // Peek looks ahead at the next token without advancing the pointer.
-func (t *Tokenizer) Peek() string {
-	if t.TokenP >= len(t.Tokens) {
+func (t *Tokenizer) Peek(offset int) string {
+	if t.TokenP+(offset-1) >= len(t.Tokens) {
 		return EndOfTokens
 	}
-	return t.Tokens[t.TokenP]
+	return t.Tokens[t.TokenP+(offset-1)]
 }
 
 // AtEnd indicates if we are at the end of the string
@@ -98,7 +98,7 @@ func InList(s string, list []string) bool {
 // IsNext tests to see if the next token is the given token, and if so
 // advances and returns true, else does not advance and returns false.
 func (t *Tokenizer) IsNext(test string) bool {
-	if t.Peek() == test {
+	if t.Peek(1) == test {
 		t.Advance(1)
 		return true
 	}
@@ -110,7 +110,7 @@ func (t *Tokenizer) IsNext(test string) bool {
 // advance and returns false.
 func (t *Tokenizer) IsAnyNext(test []string) bool {
 
-	n := t.Peek()
+	n := t.Peek(1)
 	for _, v := range test {
 		if n == v {
 			t.Advance(1)

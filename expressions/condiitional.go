@@ -19,7 +19,7 @@ func (e *Expression) conditional() error {
 
 	// If this is not a conditional, we're done.
 
-	if e.t.AtEnd() || e.t.Peek() != "?" {
+	if e.t.AtEnd() || e.t.Peek(1) != "?" {
 		return nil
 	}
 
@@ -32,7 +32,7 @@ func (e *Expression) conditional() error {
 	if err != nil {
 		return err
 	}
-	if e.t.AtEnd() || e.t.Peek() != ":" {
+	if e.t.AtEnd() || e.t.Peek(1) != ":" {
 		return errors.New("missing colon in conditional")
 	}
 	m2 := e.b.Mark()

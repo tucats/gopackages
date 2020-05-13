@@ -6,7 +6,7 @@ func (e *Expression) unary() error {
 
 	// Check for unary negation or not before passing into top-level diadic operators.
 
-	t := e.t.Peek()
+	t := e.t.Peek(1)
 	switch t {
 	case "-":
 		e.t.Advance(1)
