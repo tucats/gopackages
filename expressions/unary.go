@@ -10,7 +10,7 @@ func (e *Expression) unary() error {
 	switch t {
 	case "-":
 		e.TokenP = e.TokenP + 1
-		err := e.expressionAtom()
+		err := e.reference()
 		if err != nil {
 			return err
 		}
@@ -19,7 +19,7 @@ func (e *Expression) unary() error {
 
 	case "!":
 		e.TokenP = e.TokenP + 1
-		err := e.expressionAtom()
+		err := e.reference()
 		if err != nil {
 			return err
 		}
@@ -27,7 +27,7 @@ func (e *Expression) unary() error {
 		return nil
 
 	default:
-		return e.expressionAtom()
+		return e.reference()
 
 	}
 }

@@ -239,6 +239,20 @@ func TestNew(t *testing.T) {
 			want: nil,
 		},
 		{
+			name: "Struct constant member",
+			expr: "{name:\"Tom\", age:50}.age",
+			want: 50,
+		},
+		{
+			name: "Struct constant nested array member",
+			expr: "{name:\"Tom\",sizes:[10, 12], age:50}.sizes",
+			want: []interface{}{10, 12},
+		},
+		{
+			name: "Struct constant nested array member indexed",
+			expr: "{name:\"Tom\",sizes:[10, 12], age:50}.sizes[2]",
+			want: 12,
+		}, {
 			name: "len of string function",
 			expr: "len(name) + 4",
 			want: 7,

@@ -77,19 +77,6 @@ func (e *Expression) expressionAtom() error {
 		e.TokenP = e.TokenP + 1
 		e.b.Emit(bc.Load, t)
 
-		// But before we go, make sure it's not an array reference...
-		if e.TokenP < len(e.Tokens)-1 && e.Tokens[e.TokenP] == "[" {
-			e.TokenP = e.TokenP + 1
-			err := e.conditional()
-			if err != nil {
-				return err
-			}
-			if e.TokenP > len(e.Tokens)-1 || e.Tokens[e.TokenP] != "]" {
-				return errors.New("missing ] in array reference")
-			}
-			e.b.Emit(bc.Index, 0)
-		}
-
 		return nil
 
 	}
@@ -216,7 +203,6 @@ func (e *Expression) parseStruct() error {
 	}
 
 	e.b.Emit(bc.Struct, count)
-
 	e.TokenP = e.TokenP + 1
 	return nil
 }
