@@ -2,6 +2,7 @@ package bytecode
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/util"
@@ -36,13 +37,24 @@ var opcodeNames = map[int]string{
 // Disasm prints out a representation of the bytecode for debugging purposes
 func (b *ByteCode) Disasm() {
 
+	// What is the maximum opcode name length?
+	width := 0
+	for _, k := range opcodeNames {
+		if len(k) > width {
+			width = len(k)
+		}
+	}
+
 	ui.Debug("*** Disassembly %s", b.Name)
 	for n := 0; n < b.emitPos; n++ {
 		i := b.opcodes[n]
 		opname, found := opcodeNames[i.Opcode]
+
 		if !found {
 			opname = fmt.Sprintf("Unknown %d", i.Opcode)
 		}
+		opname = (opname + strings.Repeat(" ", width))[:width]
+
 		f := util.Format(i.Operand)
 		if i.Operand == nil {
 			f = ""

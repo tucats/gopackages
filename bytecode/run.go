@@ -3,6 +3,8 @@ package bytecode
 import (
 	"errors"
 	"strconv"
+
+	"github.com/tucats/gopackages/app-cli/ui"
 )
 
 // OpcodeHandler defines a function that implements an opcode
@@ -43,13 +45,26 @@ const GrowStackBy = 50
 
 // Run executes a bytecode context
 func (c *Context) Run() error {
+	return c.RunFromAddress(0)
+}
+
+// RunFromAddress executes a bytecode context from a given starting address.
+func (c *Context) RunFromAddress(addr int) error {
 
 	var err error
 
-	c.pc = 0
+	// Reset the runtime context
+	c.pc = addr
 	c.running = true
 	c.sp = 0
 
+	// Make sure the opcode array ends in a Stop operation
+	if c.bc.emitPos == 0 || c.bc.opcodes[c.bc.emitPos-1].Opcode != Stop {
+		ui.Debug("Adding trailing Stop opcode")
+		c.bc.Emit(Stop, nil)
+	}
+
+	// Loop over the bytecodes and run.
 	for c.running {
 
 		if c.pc > len(c.bc.opcodes) {
