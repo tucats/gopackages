@@ -25,9 +25,6 @@ const (
 	And
 	Or
 	Negate
-	Branch
-	BranchTrue
-	BranchFalse
 	Equal
 	NotEqual
 	GreaterThan
@@ -37,6 +34,14 @@ const (
 	Load
 	Store
 	Index
+
+	// Everything from here on is a branch instruction, whose
+	// operand must be present and is an integer instruction
+	// address in the bytecode array
+	BranchInstructions
+	Branch
+	BranchTrue
+	BranchFalse
 )
 
 // I contains the information about a single bytecode instruction.

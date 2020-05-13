@@ -47,6 +47,9 @@ func (b *ByteCode) Disasm() {
 		if i.Operand == nil {
 			f = ""
 		}
+		if i.Opcode >= BranchInstructions {
+			f = "addr " + f
+		}
 		ui.Debug("%4d: %s %s", n, opname, f)
 	}
 
