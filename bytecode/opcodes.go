@@ -169,7 +169,29 @@ func CallOpcode(c *Context, i *I) error {
 		if !found {
 			return fmt.Errorf("undefined function: %v", fname)
 		}
-		v, err = f.(func([]interface{}) (interface{}, error))(args)
+
+		// Depends on the type here as to what we call...
+
+		switch af := f.(type) {
+		case *ByteCode:
+
+			// Make a new symbol table for the fucntion to run with,
+			// and a new execution context. Store the argument list in
+			// the child table.
+			sf := NewChildSymbolTable("Function "+fname, c.symbols)
+			cx := NewContext(sf, af)
+			sf.Set("_args", args)
+
+			// Run the function. If it doesn't get an error, then
+			// extract the stop stack item as the result
+			err = cx.Run()
+			if err == nil {
+				v, err = cx.Pop()
+			}
+
+		default:
+			v, err = f.(func([]interface{}) (interface{}, error))(args)
+		}
 	}
 
 	if err != nil {

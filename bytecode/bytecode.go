@@ -89,6 +89,11 @@ func New(name string) *ByteCode {
 	return &bc
 }
 
+// Emit0 emits an instruction with no operand
+func (b *ByteCode) Emit0(opcode int) {
+	b.Emit(opcode, nil)
+}
+
 // Emit emits a single instruction
 func (b *ByteCode) Emit(opcode int, operand interface{}) {
 	if b.emitPos >= len(b.opcodes) {
@@ -150,4 +155,22 @@ func DefineInstruction(opcode int, name string, implementation OpcodeHandler) er
 	dispatch[opcode] = implementation
 
 	return nil
+}
+
+// Run generates a one-time context for executing this bytecode.
+func (b *ByteCode) Run(s *SymbolTable) error {
+	c := NewContext(s, b)
+	return c.Run()
+}
+
+// Call generates a one-time context for executing this bytecode,
+// and returns a value as well as an error.
+func (b *ByteCode) Call(s *SymbolTable) (interface{}, error) {
+	c := NewContext(s, b)
+	err := c.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Pop()
 }

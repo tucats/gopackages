@@ -13,37 +13,43 @@ type OpcodeHandler func(b *Context, i *I) error
 // DispatchMap is a map that is used to locate the function for an opcode
 type DispatchMap map[int]OpcodeHandler
 
-var dispatch = DispatchMap{
-	Stop:               StopOpcode,
-	Push:               PushOpcode,
-	Array:              ArrayOpcode,
-	Index:              IndexOpcode,
-	Struct:             StructOpcode,
-	Member:             MemberOpcode,
-	Add:                AddOpcode,
-	Sub:                SubOpcode,
-	Mul:                MulOpcode,
-	Div:                DivOpcode,
-	And:                AndOpcode,
-	Or:                 OrOpcode,
-	Negate:             NegateOpcode,
-	Call:               CallOpcode,
-	Load:               LoadOpcode,
-	Store:              StoreOpcode,
-	Branch:             BranchOpcode,
-	BranchTrue:         BranchTrueOpcode,
-	BranchFalse:        BranchFalseOpcode,
-	Equal:              EqualOpcode,
-	NotEqual:           NotEqualOpcode,
-	LessThan:           LessThanOpcode,
-	LessThanOrEqual:    LessThanOrEqualOpcode,
-	GreaterThan:        GreaterThanOpcode,
-	GreaterThanOrEqual: GreaterThanOrEqualOpcode,
-}
+var dispatch DispatchMap
 
 // GrowStackBy indicates the number of eleemnts to add to the stack when
 // it runs out of space.
 const GrowStackBy = 50
+
+func initializeDispatch() {
+	if dispatch == nil {
+		dispatch = DispatchMap{
+			Stop:               StopOpcode,
+			Push:               PushOpcode,
+			Array:              ArrayOpcode,
+			Index:              IndexOpcode,
+			Struct:             StructOpcode,
+			Member:             MemberOpcode,
+			Add:                AddOpcode,
+			Sub:                SubOpcode,
+			Mul:                MulOpcode,
+			Div:                DivOpcode,
+			And:                AndOpcode,
+			Or:                 OrOpcode,
+			Negate:             NegateOpcode,
+			Call:               CallOpcode,
+			Load:               LoadOpcode,
+			Store:              StoreOpcode,
+			Branch:             BranchOpcode,
+			BranchTrue:         BranchTrueOpcode,
+			BranchFalse:        BranchFalseOpcode,
+			Equal:              EqualOpcode,
+			NotEqual:           NotEqualOpcode,
+			LessThan:           LessThanOpcode,
+			LessThanOrEqual:    LessThanOrEqualOpcode,
+			GreaterThan:        GreaterThanOpcode,
+			GreaterThanOrEqual: GreaterThanOrEqualOpcode,
+		}
+	}
+}
 
 // Run executes a bytecode context
 func (c *Context) Run() error {
@@ -54,6 +60,9 @@ func (c *Context) Run() error {
 func (c *Context) RunFromAddress(addr int) error {
 
 	var err error
+
+	// Make sure globals are initialized
+	initializeDispatch()
 
 	// Reset the runtime context
 	c.pc = addr
