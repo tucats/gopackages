@@ -14,10 +14,6 @@ func TestByteCode_New(t *testing.T) {
 			Name:    "testing",
 			opcodes: make([]I, InitialOpcodeSize),
 			emitPos: 0,
-			pc:      0,
-			sp:      0,
-			stack:   make([]interface{}, InitialStackSize),
-			running: false,
 		}
 		if !reflect.DeepEqual(*b, want) {
 			t.Error("new() did not return expected object")
@@ -87,10 +83,6 @@ func TestByteCode_Emit(t *testing.T) {
 				Name:    tt.fields.Name,
 				opcodes: tt.fields.opcodes,
 				emitPos: tt.fields.emitPos,
-				pc:      tt.fields.pc,
-				stack:   tt.fields.stack,
-				sp:      tt.fields.sp,
-				running: tt.fields.running,
 			}
 			for _, i := range tt.args.emit {
 				b.Emit(i.Opcode, i.Operand)

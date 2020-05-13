@@ -50,11 +50,6 @@ type ByteCode struct {
 	Name    string
 	opcodes []I
 	emitPos int
-	pc      int
-	stack   []interface{}
-	sp      int
-	running bool
-	symbols map[string]interface{}
 }
 
 // New generates and initializes a new bytecode
@@ -63,11 +58,7 @@ func New(name string) *ByteCode {
 	bc := ByteCode{
 		Name:    name,
 		opcodes: make([]I, InitialOpcodeSize),
-		stack:   make([]interface{}, InitialStackSize),
 		emitPos: 0,
-		running: false,
-		pc:      0,
-		sp:      0,
 	}
 
 	return &bc
@@ -105,14 +96,4 @@ func (b *ByteCode) SetAddress(mark int, address int) error {
 	i.Operand = address
 	b.opcodes[mark] = i
 	return nil
-}
-
-// Get retrieves a symbol value from the symbol table
-func (b *ByteCode) Get(name string) interface{} {
-	return b.symbols[name]
-}
-
-// Set sets a symbol value in the symbol table
-func (b *ByteCode) Set(name string, value interface{}) {
-	b.symbols[name] = value
 }

@@ -354,7 +354,7 @@ func TestNew(t *testing.T) {
 
 			e := New(tt.expr)
 
-			symbols := map[string]interface{}{
+			symbols := SymbolTable{
 				"i":       42,
 				"pi":      3.14,
 				"name":    "Tom",

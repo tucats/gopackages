@@ -15,7 +15,7 @@ func TestByteCode_Run(t *testing.T) {
 		sp      int
 		running bool
 		result  interface{}
-		symbols map[string]interface{}
+		symbols SymbolTable
 	}
 	tests := []struct {
 		name    string
@@ -288,20 +288,17 @@ func TestByteCode_Run(t *testing.T) {
 				Name:    tt.fields.Name,
 				opcodes: tt.fields.opcodes,
 				emitPos: tt.fields.emitPos,
-				pc:      tt.fields.pc,
-				stack:   tt.fields.stack,
-				sp:      tt.fields.sp,
-				running: tt.fields.running,
 			}
 			b.emitPos = len(b.opcodes)
-			if err := b.Run(map[string]interface{}{}); (err != nil) != tt.wantErr {
+			c := NewContext(NewSymbolTable(), b)
+			if err := c.Run(); (err != nil) != tt.wantErr {
 				t.Errorf("ByteCode.Run() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if b.running {
+			if c.running {
 				t.Error("ByteCode Run() failed to stop interpreter")
 			}
 			if tt.fields.result != nil {
-				v, err := b.Pop()
+				v, err := c.Pop()
 				if err != nil && !tt.wantErr {
 					t.Error("ByteCode Run() unexpected " + err.Error())
 				}
