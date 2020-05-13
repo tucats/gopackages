@@ -12,7 +12,6 @@ var opcodeNames = map[int]string{
 	Stop:               "Stop",
 	Call:               "Call",
 	Push:               "Push",
-	Array:              "Array",
 	Add:                "Add",
 	Sub:                "Sub",
 	Div:                "Div",
@@ -31,7 +30,10 @@ var opcodeNames = map[int]string{
 	LessThanOrEqual:    "LessThanOrEqual",
 	Load:               "Load",
 	Store:              "Store",
+	Array:              "Array",
 	Index:              "Index",
+	Struct:             "Struct",
+	Member:             "Member",
 }
 
 // Disasm prints out a representation of the bytecode for debugging purposes

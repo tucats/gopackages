@@ -34,6 +34,69 @@ func ArrayOpcode(c *Context, i *I) error {
 	return nil
 }
 
+// StructOpcode implementation. The operand is a count
+// of elements on the stack. These are pulled off in pairs,
+// where the first value is the name of the struct field and
+// the second value is the value of the struct field.
+func StructOpcode(c *Context, i *I) error {
+
+	count := util.GetInt(i.Operand)
+
+	m := map[string]interface{}{}
+
+	for n := 0; n < count; n++ {
+		name, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		value, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		m[util.GetString(name)] = value
+	}
+
+	c.Push(m)
+	return nil
+}
+
+// MemberOpcode implementation. This pops two values from
+// the stack (the first must be a string and the second a
+// map) and indexes into the map to get the matching value
+// and puts back on the stack.
+func MemberOpcode(c *Context, i *I) error {
+
+	var name string
+	if i.Operand != nil {
+		name = util.GetString(i.Operand)
+	} else {
+		v, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		name = util.GetString(v)
+	}
+
+	m, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	// The only the type that is supported is a map
+	switch mv := m.(type) {
+	case map[string]interface{}:
+		v, found := mv[name]
+		if !found {
+			return fmt.Errorf("no such member: %s", name)
+		}
+		c.Push(v)
+
+	default:
+		return errors.New("not a map")
+	}
+	return nil
+}
+
 // StoreOpcode implementation
 func StoreOpcode(c *Context, i *I) error {
 

@@ -31,7 +31,6 @@ const (
 	Stop = 0
 	Call = iota + BuiltinInstructions
 	Push
-	Array
 	Add
 	Sub
 	Div
@@ -47,7 +46,10 @@ const (
 	LessThanOrEqual
 	Load
 	Store
+	Array
 	Index
+	Struct
+	Member
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction

@@ -18,6 +18,8 @@ var dispatch = DispatchMap{
 	Push:               PushOpcode,
 	Array:              ArrayOpcode,
 	Index:              IndexOpcode,
+	Struct:             StructOpcode,
+	Member:             MemberOpcode,
 	Add:                AddOpcode,
 	Sub:                SubOpcode,
 	Mul:                MulOpcode,
