@@ -2,6 +2,7 @@ package expressions
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -32,6 +33,10 @@ func (e *Expression) expressionAtom() error {
 		return e.parseArray()
 	}
 
+	// Is it a struct constant?
+	if t == "{" {
+		return e.parseStruct()
+	}
 	// If the token is a number, convert it
 	if i, err := strconv.Atoi(t); err == nil {
 		e.TokenP = e.TokenP + 1
@@ -161,6 +166,56 @@ func (e *Expression) parseArray() error {
 	}
 
 	e.b.Emit(bc.Array, count)
+
+	e.TokenP = e.TokenP + 1
+	return nil
+}
+
+func (e *Expression) parseStruct() error {
+
+	var listTerminator = "}"
+
+	e.TokenP = e.TokenP + 1
+	count := 0
+
+	for e.Tokens[e.TokenP] != listTerminator {
+
+		// First element: name
+
+		name := e.Tokens[e.TokenP]
+		if !symbol(name) {
+			return fmt.Errorf("invalid member name: %v", name)
+		}
+
+		// Second element: colon
+		e.TokenP = e.TokenP + 1
+		if e.Tokens[e.TokenP] != ":" {
+			return errors.New("missing colon")
+		}
+
+		// Third element: value, which is emitted.
+		e.TokenP = e.TokenP + 1
+		err := e.conditional()
+		if err != nil {
+			return err
+		}
+		// Now write the name as a string.
+		e.b.Emit(bc.Push, name)
+
+		count = count + 1
+		if e.TokenP >= len(e.Tokens) {
+			break
+		}
+		if e.Tokens[e.TokenP] == listTerminator {
+			break
+		}
+		if e.Tokens[e.TokenP] != "," {
+			return errors.New("invalid list")
+		}
+		e.TokenP = e.TokenP + 1
+	}
+
+	e.b.Emit(bc.Struct, count)
 
 	e.TokenP = e.TokenP + 1
 	return nil
