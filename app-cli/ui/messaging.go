@@ -52,6 +52,12 @@ func Debug(format string, args ...interface{}) {
 
 // Log displays a message to stdout
 func Log(class string, format string, args ...interface{}) {
+	s := LogMessage(class, format, args...)
+	fmt.Println(s)
+}
+
+// LogMessage displays a message to stdout
+func LogMessage(class string, format string, args ...interface{}) string {
 	pid := os.Getpid()
 	s := fmt.Sprintf(format, args...)
 
@@ -60,8 +66,8 @@ func Log(class string, format string, args ...interface{}) {
 
 	sequence = sequence + 1
 	sequenceString := fmt.Sprintf("%d, %d", pid, sequence)
-	fmt.Printf("[%s] %-10s %-7s: %s\n", time.Now().Format(time.RFC3339), sequenceString, strings.ToUpper(class), s)
-
+	s = fmt.Sprintf("[%s] %-10s %-7s: %s", time.Now().Format(time.RFC3339), sequenceString, strings.ToUpper(class), s)
+	return s
 }
 
 // Say displays a message to the user unless we are in "quiet" mode
