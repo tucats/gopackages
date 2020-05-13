@@ -27,13 +27,14 @@ func Format(arg interface{}) string {
 		for n, k := range keys {
 			i := v[k]
 			if n > 0 {
-				b.WriteString(", ")
+				b.WriteString(",")
 			}
+			b.WriteRune(' ')
 			b.WriteString(k)
-			b.WriteRune(':')
+			b.WriteString(": ")
 			b.WriteString(Format(i))
 		}
-		b.WriteString("]]")
+		b.WriteString(" ]]")
 		return b.String()
 
 	case []interface{}:

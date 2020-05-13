@@ -1,0 +1,65 @@
+package tokenizer
+
+import (
+	"reflect"
+	"testing"
+)
+
+func TestTokenize(t *testing.T) {
+	type args struct {
+		src string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{
+			name: "Simple alphanumeric name",
+			args: args{
+				src: "wage55",
+			},
+			want: []string{"wage55"},
+		},
+		{
+			name: "Integer expression with spaces",
+			args: args{
+				src: "11 + 15",
+			},
+			want: []string{"11", "+", "15"},
+		},
+		{
+			name: "Integer expression without spaces",
+			args: args{
+				src: "11+15",
+			},
+			want: []string{"11", "+", "15"},
+		},
+		{
+			name: "String expression with spaces",
+			args: args{
+				src: "name + \"User\"",
+			},
+			want: []string{"name", "+", "\"User\""},
+		},
+
+		{
+			name: "Float expression",
+			args: args{
+				src: "3.14 + 2",
+			},
+			want: []string{"3.14", "+", "2"},
+		},
+
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tk := New(tt.args.src)
+			got := tk.Tokens
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Tokenize() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
