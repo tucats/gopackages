@@ -16,27 +16,26 @@ func (e *Expression) reference() error {
 	}
 
 	// is there a trailing structure or array reference?
-	for e.TokenP < len(e.Tokens)-1 {
+	for !e.t.AtEnd() {
 
-		op := e.Tokens[e.TokenP]
+		op := e.t.Peek()
 		switch op {
 
 		// Structure member reference
 		case ".":
-			e.TokenP = e.TokenP + 1
-			name := e.Tokens[e.TokenP]
-			e.TokenP = e.TokenP + 1
+			e.t.Advance(1)
+			name := e.t.Next()
 			e.b.Emit(bc.Push, name)
 			e.b.Emit(bc.Member, nil)
 
 		// Array index reference
 		case "[":
-			e.TokenP = e.TokenP + 1
+			e.t.Advance(1)
 			err := e.conditional()
 			if err != nil {
 				return err
 			}
-			if e.TokenP > len(e.Tokens)-1 || e.Tokens[e.TokenP] != "]" {
+			if e.t.Next() != "]" {
 				return errors.New("missing ] in array reference")
 			}
 			e.b.Emit(bc.Index, nil)

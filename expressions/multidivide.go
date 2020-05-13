@@ -2,6 +2,7 @@ package expressions
 
 import (
 	bc "github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/tokenizer"
 )
 
 // Eval evaluates the parsed expression. This can be called multiple times
@@ -15,12 +16,12 @@ func (e *Expression) multDivide() error {
 
 	var parsing = true
 	for parsing {
-		if e.TokenP >= len(e.Tokens) {
+		if e.t.AtEnd() {
 			break
 		}
-		op := e.Tokens[e.TokenP]
-		if inList(op, []string{"*", "/", "|"}) {
-			e.TokenP = e.TokenP + 1
+		op := e.t.Peek()
+		if tokenizer.InList(op, []string{"*", "/", "|"}) {
+			e.t.Advance(1)
 
 			err := e.unary()
 			if err != nil {

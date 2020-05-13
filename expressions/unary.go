@@ -6,10 +6,10 @@ func (e *Expression) unary() error {
 
 	// Check for unary negation or not before passing into top-level diadic operators.
 
-	t := e.Tokens[e.TokenP]
+	t := e.t.Peek()
 	switch t {
 	case "-":
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 		err := e.reference()
 		if err != nil {
 			return err
@@ -18,7 +18,7 @@ func (e *Expression) unary() error {
 		return nil
 
 	case "!":
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 		err := e.reference()
 		if err != nil {
 			return err

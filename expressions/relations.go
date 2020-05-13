@@ -13,12 +13,12 @@ func (e *Expression) relations() error {
 
 	var parsing = true
 	for parsing {
-		if e.TokenP >= len(e.Tokens) {
+		if e.t.AtEnd() {
 			break
 		}
-		op := e.Tokens[e.TokenP]
+		op := e.t.Peek()
 		if op == "=" || op == "!=" || op == "<" || op == "<=" || op == ">" || op == ">=" {
-			e.TokenP = e.TokenP + 1
+			e.t.Advance(1)
 
 			err := e.addSubtract()
 			if err != nil {

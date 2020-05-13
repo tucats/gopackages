@@ -10,37 +10,32 @@ import (
 
 func (e *Expression) functionCall(fname string) error {
 
-	// validate this is a function
-	if e.Tokens[e.TokenP] != "(" {
-		return errors.New("invalid function call format")
-	}
-
-	e.TokenP = e.TokenP + 1
+	// Note, caller already consumed the opening paren
 	argc := 0
 
-	for e.Tokens[e.TokenP] != ")" {
+	for e.t.Peek() != ")" {
 		err := e.conditional()
 		if err != nil {
 			return err
 		}
 		argc = argc + 1
-		if e.TokenP >= len(e.Tokens) {
+		if e.t.AtEnd() {
 			break
 		}
-		if e.Tokens[e.TokenP] == ")" {
+		if e.t.Peek() == ")" {
 			break
 		}
-		if e.Tokens[e.TokenP] != "," {
+		if e.t.Peek() != "," {
 			return errors.New("invalid argument list")
 		}
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 	}
 
 	// Ensure trailing parenthesis
-	if e.TokenP >= len(e.Tokens) || e.Tokens[e.TokenP] != ")" {
+	if e.t.AtEnd() || e.t.Peek() != ")" {
 		return errors.New("mismatched parenthesis in argument list")
 	}
-	e.TokenP = e.TokenP + 1
+	e.t.Advance(1)
 
 	// Quick sanity check on argument count for builtin functions
 	fd, found := util.FunctionDictionary[fname]

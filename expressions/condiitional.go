@@ -19,7 +19,7 @@ func (e *Expression) conditional() error {
 
 	// If this is not a conditional, we're done.
 
-	if e.TokenP >= len(e.Tokens) || e.Tokens[e.TokenP] != "?" {
+	if e.t.AtEnd() || e.t.Peek() != "?" {
 		return nil
 	}
 
@@ -27,19 +27,19 @@ func (e *Expression) conditional() error {
 	e.b.Emit(bc.BranchFalse, 0)
 
 	// Parse both parts of the alternate values
-	e.TokenP = e.TokenP + 1
+	e.t.Advance(1)
 	err = e.relations()
 	if err != nil {
 		return err
 	}
-	if e.TokenP >= len(e.Tokens) || e.Tokens[e.TokenP] != ":" {
+	if e.t.AtEnd() || e.t.Peek() != ":" {
 		return errors.New("missing colon in conditional")
 	}
 	m2 := e.b.Mark()
 	e.b.Emit(bc.Branch, 0)
 
 	e.b.SetAddressHere(m1)
-	e.TokenP = e.TokenP + 1
+	e.t.Advance(1)
 	err = e.relations()
 	if err != nil {
 		return err

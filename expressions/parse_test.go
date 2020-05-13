@@ -3,6 +3,8 @@ package expressions
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tucats/gopackages/tokenizer"
 )
 
 func TestExpression_Parse(t *testing.T) {
@@ -45,15 +47,16 @@ func TestExpression_Parse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &Expression{
-				Tokens: tt.fields.Tokens,
-				TokenP: tt.fields.TokenP,
-			}
+			e := &Expression{}
+			e.t = tokenizer.New("")
+			e.t.Tokens = tt.fields.Tokens
+			e.t.TokenP = tt.fields.TokenP
+
 			if err := e.Parse(tt.fields.Source); (err != nil) != tt.wantErr {
 				t.Errorf("Expression.Parse() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if !reflect.DeepEqual(e.Tokens, tt.wantTokens) {
-				t.Errorf("Expression.Parse() got %v, want %v", e.Tokens, tt.wantTokens)
+			if !reflect.DeepEqual(e.t.Tokens, tt.wantTokens) {
+				t.Errorf("Expression.Parse() got %v, want %v", e.t.Tokens, tt.wantTokens)
 			}
 		})
 	}
@@ -109,7 +112,9 @@ func TestTokenize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Tokenize(tt.args.src); !reflect.DeepEqual(got, tt.want) {
+			tk := tokenizer.New(tt.args.src)
+			got := tk.Tokens
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Tokenize() = %v, want %v", got, tt.want)
 			}
 		})

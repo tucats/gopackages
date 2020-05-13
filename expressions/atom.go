@@ -11,20 +11,19 @@ import (
 
 func (e *Expression) expressionAtom() error {
 
-	t := e.Tokens[e.TokenP]
+	t := e.t.Peek()
 
 	// Is this a parenthesis expression?
 	if t == "(" {
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 		err := e.conditional()
 		if err != nil {
 			return err
 		}
 
-		if e.TokenP >= len(e.Tokens) || e.Tokens[e.TokenP] != ")" {
+		if e.t.Next() != ")" {
 			return errors.New("mismatched parenthesis")
 		}
-		e.TokenP = e.TokenP + 1
 		return nil
 	}
 
@@ -39,42 +38,41 @@ func (e *Expression) expressionAtom() error {
 	}
 	// If the token is a number, convert it
 	if i, err := strconv.Atoi(t); err == nil {
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 		e.b.Emit(bc.Push, i)
 		return nil
 	}
 
 	if i, err := strconv.ParseFloat(t, 64); err == nil {
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 		e.b.Emit(bc.Push, i)
 		return nil
 	}
 
 	if i, err := strconv.ParseBool(t); err == nil {
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 		e.b.Emit(bc.Push, i)
 		return nil
 	}
 
 	runeValue := t[0:1]
 	if runeValue == "\"" {
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 		e.b.Emit(bc.Push, t[1:len(t)-1])
 		return nil
 	}
 
 	if symbol(t) {
 
+		e.t.Advance(1)
 		t := strings.ToLower(t)
 
 		// Peek ahead to see if it's the start of a function call...
-		if e.TokenP < len(e.Tokens)-1 && e.Tokens[e.TokenP+1] == "(" {
-			e.TokenP = e.TokenP + 1
+		if e.t.IsNext("(") {
 			return e.functionCall(t)
 		}
 
 		// Nope, probably name from the symbol table
-		e.TokenP = e.TokenP + 1
 		e.b.Emit(bc.Load, t)
 
 		return nil
@@ -122,39 +120,39 @@ func isDigit(c rune) bool {
 func (e *Expression) parseArray() error {
 
 	var listTerminator = ""
-	if e.Tokens[e.TokenP] == "(" {
+	if e.t.Peek() == "(" {
 		listTerminator = ")"
 	}
-	if e.Tokens[e.TokenP] == "[" {
+	if e.t.Peek() == "[" {
 		listTerminator = "]"
 	}
 	if listTerminator == "" {
 		return nil
 	}
-	e.TokenP = e.TokenP + 1
+	e.t.Advance(1)
 	count := 0
 
-	for e.Tokens[e.TokenP] != listTerminator {
+	for e.t.Peek() != listTerminator {
 		err := e.conditional()
 		if err != nil {
 			return err
 		}
 		count = count + 1
-		if e.TokenP >= len(e.Tokens) {
+		if e.t.AtEnd() {
 			break
 		}
-		if e.Tokens[e.TokenP] == listTerminator {
+		if e.t.Peek() == listTerminator {
 			break
 		}
-		if e.Tokens[e.TokenP] != "," {
+		if e.t.Peek() != "," {
 			return errors.New("invalid list")
 		}
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 	}
 
 	e.b.Emit(bc.Array, count)
 
-	e.TokenP = e.TokenP + 1
+	e.t.Advance(1)
 	return nil
 }
 
@@ -162,26 +160,26 @@ func (e *Expression) parseStruct() error {
 
 	var listTerminator = "}"
 
-	e.TokenP = e.TokenP + 1
+	e.t.Advance(1)
 	count := 0
 
-	for e.Tokens[e.TokenP] != listTerminator {
+	for e.t.Peek() != listTerminator {
 
 		// First element: name
 
-		name := e.Tokens[e.TokenP]
+		name := e.t.Peek()
 		if !symbol(name) {
 			return fmt.Errorf("invalid member name: %v", name)
 		}
 
 		// Second element: colon
-		e.TokenP = e.TokenP + 1
-		if e.Tokens[e.TokenP] != ":" {
+		e.t.Advance(1)
+		if e.t.Peek() != ":" {
 			return errors.New("missing colon")
 		}
 
 		// Third element: value, which is emitted.
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 		err := e.conditional()
 		if err != nil {
 			return err
@@ -190,19 +188,19 @@ func (e *Expression) parseStruct() error {
 		e.b.Emit(bc.Push, name)
 
 		count = count + 1
-		if e.TokenP >= len(e.Tokens) {
+		if e.t.AtEnd() {
 			break
 		}
-		if e.Tokens[e.TokenP] == listTerminator {
+		if e.t.Peek() == listTerminator {
 			break
 		}
-		if e.Tokens[e.TokenP] != "," {
+		if e.t.Peek() != "," {
 			return errors.New("invalid list")
 		}
-		e.TokenP = e.TokenP + 1
+		e.t.Advance(1)
 	}
 
 	e.b.Emit(bc.Struct, count)
-	e.TokenP = e.TokenP + 1
+	e.t.Advance(1)
 	return nil
 }

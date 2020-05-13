@@ -19,14 +19,14 @@ func TestNew(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Simple unary not",
-			expr: "(!b)",
-			want: false,
-		},
-		{
 			name: "Cast bool to string",
 			expr: "string(b) + string(!b)",
 			want: "truefalse",
+		},
+		{
+			name: "Simple unary not",
+			expr: "(!b)",
+			want: false,
 		},
 		{
 			name: "Simple division",

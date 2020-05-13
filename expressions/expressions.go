@@ -14,16 +14,16 @@
 //
 package expressions
 
-import "github.com/tucats/gopackages/bytecode"
+import (
+	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/tokenizer"
+)
 
 // Expression is the type for an instance of the expresssion evaluator.
 type Expression struct {
-	Source   string
-	Tokens   []string
-	TokenPos []int
-	TokenP   int
-	b        *bytecode.ByteCode
-	err      error
+	t   *tokenizer.Tokenizer
+	b   *bytecode.ByteCode
+	err error
 }
 
 // New creates a new Expression object. The expression to evaluate is
@@ -37,6 +37,25 @@ func New(expr string) *Expression {
 
 	// tokenize
 	e.Parse(expr)
+
+	// compile
+	e.err = e.conditional()
+
+	return e
+
+}
+
+// NewWithTokenizer creates a new Expression object. The expression to evaluate is
+// provided.
+func NewWithTokenizer(t *tokenizer.Tokenizer) *Expression {
+
+	// Create a new bytecode object, and then use it to create a new
+	// expression object.
+	b := bytecode.New("<tokenized>")
+	e := NewWithBytecode(b)
+
+	// tokenized already, just attach in progress
+	e.t = t
 
 	// compile
 	e.err = e.conditional()
