@@ -83,3 +83,25 @@ func (e *Expression) Error() error {
 func (e *Expression) Disasm() {
 	e.b.Disasm()
 }
+
+// GetBytecode returns the active bytecode for the expression
+func (e *Expression) GetBytecode() *bytecode.ByteCode {
+	return e.b
+}
+
+// Compile accepts a tokenizer and returns a segment of
+// bytecode and an error state (or nil if no error)
+func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
+
+	// Create a new bytecode object, and then use it to create a new
+	// expression object.
+	b := bytecode.New("<tokenized>")
+	e := NewWithBytecode(b)
+
+	// tokenized already, just attach in progress
+	e.t = t
+
+	// compile
+	e.err = e.conditional()
+	return e.GetBytecode(), e.err
+}
