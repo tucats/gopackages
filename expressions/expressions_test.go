@@ -7,6 +7,8 @@ package expressions
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tucats/gopackages/bytecode"
 )
 
 func TestNew(t *testing.T) {
@@ -354,7 +356,7 @@ func TestNew(t *testing.T) {
 
 			e := New(tt.expr)
 
-			symbols := SymbolTable{
+			symbols := bytecode.SymbolTable{
 				"i":       42,
 				"pi":      3.14,
 				"name":    "Tom",
