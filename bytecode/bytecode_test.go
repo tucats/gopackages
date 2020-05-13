@@ -96,3 +96,90 @@ func TestByteCode_Emit(t *testing.T) {
 		})
 	}
 }
+
+func TestByteCode_Append(t *testing.T) {
+	type fields struct {
+		Name    string
+		opcodes []I
+		emitPos int
+	}
+	type args struct {
+		a *ByteCode
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []I
+		wantPos int
+	}{
+		{
+			name: "simple append",
+			fields: fields{
+				opcodes: []I{
+					I{Push, 0},
+					I{Push, 0},
+				},
+				emitPos: 2,
+			},
+			args: args{
+				a: &ByteCode{
+					opcodes: []I{
+						I{Add, nil},
+					},
+					emitPos: 1,
+				},
+			},
+			want: []I{
+				I{Push, 0},
+				I{Push, 0},
+				I{Add, nil},
+			},
+			wantPos: 3,
+		},
+		{
+			name: "branch append",
+			fields: fields{
+				opcodes: []I{
+					I{Push, 0},
+					I{Push, 0},
+				},
+				emitPos: 2,
+			},
+			args: args{
+				a: &ByteCode{
+					opcodes: []I{
+						I{Branch, 2}, // Must be updated
+						I{Add, nil},
+					},
+					emitPos: 1,
+				},
+			},
+			want: []I{
+				I{Push, 0},
+				I{Push, 0},
+				I{Branch, 4}, // Updated from new offset
+				I{Add, nil},
+			},
+			wantPos: 4,
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &ByteCode{
+				Name:    tt.fields.Name,
+				opcodes: tt.fields.opcodes,
+				emitPos: tt.fields.emitPos,
+			}
+			b.Append(tt.args.a)
+			if tt.wantPos != b.emitPos {
+				t.Errorf("Append() wrong emitPos, got %d, want %d", b.emitPos, tt.wantPos)
+			}
+			// Check the slice of intentionally emitted opcodes (array may be larger)
+			if !reflect.DeepEqual(tt.want, b.opcodes[:tt.wantPos]) {
+				t.Errorf("Append() wrong array, got %v, want %v", b.opcodes, tt.want)
+			}
+		})
+	}
+}

@@ -1,6 +1,10 @@
 package bytecode
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/tucats/gopackages/util"
+)
 
 // GrowOpcodesBy indicates the number of elements to add to the
 // opcode array when storage is exhausted in the current array.
@@ -101,4 +105,18 @@ func (b *ByteCode) SetAddress(mark int, address int) error {
 	i.Operand = address
 	b.opcodes[mark] = i
 	return nil
+}
+
+// Append appends another bytecode to the current bytecode,
+// and updates all the link references.
+func (b *ByteCode) Append(a *ByteCode) {
+
+	base := b.emitPos
+
+	for _, i := range a.opcodes {
+		if i.Opcode > BranchInstructions {
+			i.Operand = util.GetInt(i.Operand) + base
+		}
+		b.Emit(i.Opcode, i.Operand)
+	}
 }
