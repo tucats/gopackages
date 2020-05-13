@@ -215,6 +215,21 @@ func AddOpcode(c *Context, i *I) error {
 			newArray := append(vx, v2)
 			return c.Push(newArray)
 		}
+
+		// You can add a map to another map
+	case map[string]interface{}:
+
+		switch vy := v2.(type) {
+		case map[string]interface{}:
+			for k, v := range vy {
+				vx[k] = v
+			}
+			return c.Push(vx)
+
+		default:
+			return errors.New("unsupported datatype")
+		}
+
 		// All other types are scalar math
 	default:
 		v1, v2 = util.Normalize(v1, v2)
@@ -680,9 +695,20 @@ func IndexOpcode(c *Context, i *I) error {
 		return err
 	}
 
-	subscript := util.GetInt(index)
 	switch a := array.(type) {
+
+	// Index into map is just member access
+	case map[string]interface{}:
+		subscript := util.GetString(index)
+		v, f := a[subscript]
+		if !f {
+			return fmt.Errorf("member not found: %s", subscript)
+		}
+		c.Push(v)
+
+	// Index into array is integer index (1-based)
 	case []interface{}:
+		subscript := util.GetInt(index)
 		if subscript < 1 || subscript > len(a) {
 			return fmt.Errorf("invalid array index: %v", subscript)
 		}

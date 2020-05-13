@@ -142,6 +142,14 @@ func FunctionSubstring(args []interface{}) (interface{}, error) {
 func FunctionLen(args []interface{}) (interface{}, error) {
 
 	switch arg := args[0].(type) {
+
+	case map[string]interface{}:
+		keys := make([]string, 0)
+		for k := range arg {
+			keys = append(keys, k)
+		}
+		return len(keys), nil
+
 	case []interface{}:
 		return len(arg), nil
 	default:

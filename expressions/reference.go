@@ -21,7 +21,7 @@ func (e *Expression) reference() error {
 		op := e.t.Peek(1)
 		switch op {
 
-		// Structure member reference
+		// Map member reference
 		case ".":
 			e.t.Advance(1)
 			name := e.t.Next()

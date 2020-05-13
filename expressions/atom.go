@@ -32,7 +32,7 @@ func (e *Expression) expressionAtom() error {
 		return e.parseArray()
 	}
 
-	// Is it a struct constant?
+	// Is it a map constant?
 	if t == "[[" {
 		return e.parseStruct()
 	}
