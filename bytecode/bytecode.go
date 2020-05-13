@@ -2,6 +2,7 @@ package bytecode
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/tucats/gopackages/util"
 )
@@ -16,10 +17,19 @@ const InitialOpcodeSize = 20
 // InitialStackSize is the initial stack size.
 const InitialStackSize = 100
 
+// BranchInstruction is the mininum value for a branch instruction, which has
+// special meaning during relocation and linking
+const BranchInstruction = 65536
+
+// BuiltinInstructions defines the lowest number (other than Stop) of the
+// builtin instructions provided by the bytecode package. User instructions
+// are added between 1 and this value.
+const BuiltinInstructions = BranchInstruction - 2048
+
 // Constant describing instruction opcodes
 const (
-	Stop = iota
-	Call
+	Stop = 0
+	Call = iota + BuiltinInstructions
 	Push
 	Array
 	Add
@@ -42,10 +52,14 @@ const (
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction
 	// address in the bytecode array
-	BranchInstructions
+	BranchInstructions = iota + BranchInstruction
 	Branch
 	BranchTrue
 	BranchFalse
+
+	// After this value, additional user branch instructions are
+	// can be defined.
+	UserBranchInstructions
 )
 
 // I contains the information about a single bytecode instruction.
@@ -119,4 +133,19 @@ func (b *ByteCode) Append(a *ByteCode) {
 		}
 		b.Emit(i.Opcode, i.Operand)
 	}
+}
+
+// DefineInstruction adds a user-defined instruction to the bytecode
+// set.
+func DefineInstruction(opcode int, name string, implementation OpcodeHandler) error {
+
+	// First, make sure this isn't a duplicate
+	if _, found := dispatch[opcode]; found {
+		return fmt.Errorf("opcode already defined: %d", opcode)
+	}
+
+	opcodeNames[opcode] = name
+	dispatch[opcode] = implementation
+
+	return nil
 }
