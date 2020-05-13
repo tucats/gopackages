@@ -28,6 +28,14 @@ func TestFormat(t *testing.T) {
 			arg:  []interface{}{3, []interface{}{"tom", true}, 55},
 			want: "[3, [\"tom\", true], 55]",
 		},
+		{
+			name: "simple structure",
+			arg: map[string]interface{}{
+				"name": "Tom",
+				"age":  59,
+			},
+			want: "[[age:59, name:\"Tom\"]]",
+		},
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {

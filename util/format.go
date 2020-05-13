@@ -23,7 +23,7 @@ func Format(arg interface{}) string {
 		}
 		sort.Strings(keys)
 
-		b.WriteRune('{')
+		b.WriteString("[[")
 		for n, k := range keys {
 			i := v[k]
 			if n > 0 {
@@ -33,7 +33,7 @@ func Format(arg interface{}) string {
 			b.WriteRune(':')
 			b.WriteString(Format(i))
 		}
-		b.WriteRune('}')
+		b.WriteString("]]")
 		return b.String()
 
 	case []interface{}:
