@@ -109,7 +109,7 @@ func symbol(s string) bool {
 }
 
 func isLetter(c rune) bool {
-	for _, d := range "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" {
+	for _, d := range "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" {
 		if c == d {
 			return true
 		}
