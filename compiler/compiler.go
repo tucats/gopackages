@@ -18,7 +18,7 @@ type Compiler struct {
 func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
 
 	b := bytecode.New("compile-unit")
-	cInstance := Compiler{b: b, t: t}
+	cInstance := Compiler{b: b, t: t, s: bytecode.SymbolTable{Name: "compile-unit"}}
 	c := &cInstance
 
 	c.t.Reset()

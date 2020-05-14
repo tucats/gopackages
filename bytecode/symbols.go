@@ -54,5 +54,8 @@ func (s *SymbolTable) Get(name string) (interface{}, bool) {
 // Set stores a symbol value in the local table. No value in
 // any parent table is affected.
 func (s *SymbolTable) Set(name string, v interface{}) {
+	if s.Symbols == nil {
+		s.Symbols = map[string]interface{}{}
+	}
 	s.Symbols[name] = v
 }

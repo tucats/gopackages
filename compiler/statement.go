@@ -10,6 +10,11 @@ import (
 // Statement parses a single statement
 func (c *Compiler) Statement() error {
 
+	// We just eat statement separators
+	if c.t.IsNext(";") {
+		return nil
+	}
+
 	// Statement block
 	if c.t.IsNext("{") {
 		return c.Block()
@@ -36,6 +41,9 @@ func (c *Compiler) Statement() error {
 		return c.Print()
 	}
 
+	if c.t.IsNext("return") {
+		return c.Return()
+	}
 	if c.t.IsNext("function") {
 		return c.Function()
 	}

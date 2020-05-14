@@ -9,9 +9,9 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${fileDirname}",
+            "program": "/Users/tom/Go/src/github.com/tucats/solve/main.go",
             "env": {},
-            "args": []
+            "args": ["function dbl(a) { return a*2 } ; print dbl(55) "]
         }
     ]
 }
