@@ -62,7 +62,7 @@ func (e *Expression) expressionAtom() error {
 		return nil
 	}
 
-	if symbol(t) {
+	if Symbol(t) {
 
 		e.t.Advance(1)
 		t := strings.ToLower(t)
@@ -83,7 +83,8 @@ func (e *Expression) expressionAtom() error {
 	return nil
 }
 
-func symbol(s string) bool {
+// Symbol is a utility function to determine if a token is a symbol name.
+func Symbol(s string) bool {
 
 	for n, c := range s {
 		if isLetter(c) {
@@ -168,7 +169,7 @@ func (e *Expression) parseStruct() error {
 		// First element: name
 
 		name := e.t.Peek(1)
-		if !symbol(name) {
+		if !Symbol(name) {
 			return fmt.Errorf("invalid member name: %v", name)
 		}
 

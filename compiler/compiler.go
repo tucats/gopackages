@@ -10,6 +10,7 @@ import (
 type Compiler struct {
 	b *bytecode.ByteCode
 	t *tokenizer.Tokenizer
+	s bytecode.SymbolTable
 }
 
 // Compile starts a compilation unit, and returns a bytecode
@@ -29,6 +30,12 @@ func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
 		}
 	}
 
+	// Append any symbols created to the bytecode's table
+	st := c.Symbols()
+	for k, v := range st.Symbols {
+		b.Symbols.Set(k, v)
+
+	}
 	return c.b, nil
 }
 
@@ -37,4 +44,9 @@ func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
 func (c *Compiler) StatementEnd() bool {
 	next := c.t.Peek(1)
 	return (next == ";") || (next == "}")
+}
+
+// Symbols returns the symbol table map from compilation
+func (c *Compiler) Symbols() bytecode.SymbolTable {
+	return c.s
 }

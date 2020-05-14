@@ -25,6 +25,23 @@ func TestCompile(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "Simple if else",
+			arg:  "if false print 1 else print 2",
+			want: []bytecode.I{
+				{Opcode: bytecode.Push, Operand: false},
+				{Opcode: bytecode.Push, Operand: "bool"},
+				{Opcode: bytecode.Call, Operand: 1},
+				{Opcode: bytecode.BranchFalse, Operand: 8},
+				{Opcode: bytecode.Push, Operand: 1},
+				{Opcode: bytecode.Print, Operand: nil},
+				{Opcode: bytecode.Newline, Operand: nil},
+				{Opcode: bytecode.Branch, Operand: 11},
+				{Opcode: bytecode.Push, Operand: 2},
+				{Opcode: bytecode.Print, Operand: nil},
+				{Opcode: bytecode.Newline, Operand: nil},
+			},
+		},
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {

@@ -77,6 +77,7 @@ type ByteCode struct {
 	Name    string
 	opcodes []I
 	emitPos int
+	Symbols SymbolTable
 }
 
 // New generates and initializes a new bytecode
@@ -86,6 +87,7 @@ func New(name string) *ByteCode {
 		Name:    name,
 		opcodes: make([]I, InitialOpcodeSize),
 		emitPos: 0,
+		Symbols: SymbolTable{},
 	}
 
 	return &bc

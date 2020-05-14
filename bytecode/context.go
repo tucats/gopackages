@@ -31,7 +31,20 @@ func NewContext(s *SymbolTable, b *ByteCode) *Context {
 	ctxp := &ctx
 	ctxp.SetByteCode(b)
 
+	// Append the bytecode symbols into the symbol table.
+	for k, v := range b.Symbols.Symbols {
+		s.Set(k, v)
+	}
 	return ctxp
+}
+
+// AppendSymbols appends a symbol table to the current
+// context. This is used to add in compiler maps, for
+// example.
+func (c *Context) AppendSymbols(s SymbolTable) {
+	for k, v := range s.Symbols {
+		c.symbols.Set(k, v)
+	}
 }
 
 // SetByteCode attaches a new bytecode object to the current run context.

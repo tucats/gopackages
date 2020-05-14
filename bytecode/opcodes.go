@@ -31,7 +31,7 @@ func PrintOpcode(c *Context, i *I) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%s", util.Format(v))
+		fmt.Printf("%s", util.FormatUnquoted(v))
 	}
 	return nil
 }

@@ -1,7 +1,7 @@
 package compiler
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/expressions"
@@ -28,9 +28,17 @@ func (c *Compiler) Statement() error {
 		return nil
 	}
 
+	if c.t.IsNext("if") {
+		return c.If()
+	}
+
 	if c.t.IsNext("print") {
 		return c.Print()
 	}
-	
-	return errors.New("unrecognized statement")
+
+	if c.t.IsNext("function") {
+		return c.Function()
+	}
+
+	return fmt.Errorf("unrecognized statement: %s", c.t.Peek(1))
 }

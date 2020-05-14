@@ -6,6 +6,17 @@ import (
 	"strings"
 )
 
+// FormatUnquoted formats a value but does not
+// put quotes on strings.
+func FormatUnquoted(arg interface{}) string {
+	switch v := arg.(type) {
+	case string:
+		return v
+	default:
+		return Format(v)
+	}
+}
+
 // Format converts the given object into a string representation.
 // In particular, this varies from a simple "%v" format in Go because
 // it puts commas in the array list output to match the syntax of an
