@@ -34,7 +34,7 @@ func TestFormat(t *testing.T) {
 				"name": "Tom",
 				"age":  59,
 			},
-			want: "[[ age: 59, name: \"Tom\" ]]",
+			want: "{ age: 59, name: \"Tom\" }",
 		},
 		// TODO: Add test cases.
 	}

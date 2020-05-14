@@ -240,22 +240,22 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name: "map constant member",
-			expr: "[[name:\"Tom\", age:50]].age",
+			expr: "{name:\"Tom\", age:50}.age",
 			want: 50,
 		},
 		{
 			name: "map constant nested array member",
-			expr: "[[name:\"Tom\",sizes:[10, 12], age:50]].sizes",
+			expr: "{name:\"Tom\",sizes:[10, 12], age:50}.sizes",
 			want: []interface{}{10, 12},
 		},
 		{
 			name: "map constant nested array member indexed",
-			expr: "[[name:\"Tom\",sizes:[10, 12], age:50]].sizes[2]",
+			expr: "{name:\"Tom\",sizes:[10, 12], age:50}.sizes[2]",
 			want: 12,
 		},
 		{
 			name: "add two maps",
-			expr: "[[name:\"Tom\"]] + [[ age:50]]",
+			expr: "{name:\"Tom\"} + { age:50}",
 			want: map[string]interface{}{"name": "Tom", "age": 50},
 		},
 		{

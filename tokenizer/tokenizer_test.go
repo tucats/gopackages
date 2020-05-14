@@ -91,16 +91,6 @@ And if there were, you wouldn't find them.`,
 			want: `
 And if there were, you wouldn't find them.`,
 		},
-		{
-			name: "Seral line comment",
-			args: args{
-				source: `# there are no comments 
-# here to speak of.
-And if there were, you wouldn't find them.`,
-			},
-			want: `
-And if there were, you wouldn't find them.`,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

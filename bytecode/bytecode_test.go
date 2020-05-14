@@ -141,8 +141,8 @@ func TestByteCode_Append(t *testing.T) {
 			name: "branch append",
 			fields: fields{
 				opcodes: []I{
-					I{Push, 0},
-					I{Push, 0},
+					I{Push, 11},
+					I{Push, 22},
 				},
 				emitPos: 2,
 			},
@@ -152,12 +152,12 @@ func TestByteCode_Append(t *testing.T) {
 						I{Branch, 2}, // Must be updated
 						I{Add, nil},
 					},
-					emitPos: 1,
+					emitPos: 2,
 				},
 			},
 			want: []I{
-				I{Push, 0},
-				I{Push, 0},
+				I{Push, 11},
+				I{Push, 22},
 				I{Branch, 4}, // Updated from new offset
 				I{Add, nil},
 			},
