@@ -1,6 +1,7 @@
 package tokenizer
 
 import (
+	"fmt"
 	"strings"
 	"text/scanner"
 )
@@ -10,6 +11,8 @@ type Tokenizer struct {
 	Source string
 	Tokens []string
 	TokenP int
+	Line   []int
+	Pos    []int
 }
 
 // EndOfTokens is a reserved token that means end of the buffer was reached.
@@ -19,13 +22,15 @@ const EndOfTokens = "$$$$$EOF$$$$!"
 // up into an array of tokens
 func New(src string) *Tokenizer {
 
+	// Strip '#' comments from input file
+	src = stripComments(src)
 	t := Tokenizer{Source: src, TokenP: 0}
-
 	t.Tokens = make([]string, 0)
 
 	var s scanner.Scanner
 	s.Init(strings.NewReader(src))
-	s.Filename = "string input"
+	s.Filename = "Input"
+
 	previousToken := ""
 
 	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
@@ -60,10 +65,22 @@ func New(src string) *Tokenizer {
 
 		previousToken = nextToken
 		t.Tokens = append(t.Tokens, nextToken)
-
+		t.Line = append(t.Line, s.Line)
+		t.Pos = append(t.Pos, s.Column)
 	}
 
 	return &t
+}
+
+// PositionString reports the position of the current
+// token in terms of line and column information.
+func (t *Tokenizer) PositionString() string {
+
+	p := t.TokenP
+	if p >= len(t.Line) {
+		p = len(t.Line) - 1
+	}
+	return fmt.Sprintf("at line %d, column %d,", t.Line[p], t.Pos[p])
 }
 
 // Next gets the next token in the tokenizer
@@ -134,4 +151,30 @@ func (t *Tokenizer) IsAnyNext(test []string) bool {
 		}
 	}
 	return false
+}
+
+func stripComments(source string) string {
+
+	var result strings.Builder
+
+	ignore := false
+	startOfLine := true
+	for _, c := range source {
+
+		// Is this a # on the start of a line? If so, start
+		// ignoring characters. If it's the end of line, then
+		// reset to end-of-line and resume processing characters.
+		// Finally, if nothing else, copy character if not ignoring.
+		if c == '#' && startOfLine {
+			ignore = true
+		} else if c == '\n' {
+			ignore = false
+			startOfLine = true
+			result.WriteRune(c)
+		} else if !ignore {
+			result.WriteRune(c)
+		}
+	}
+
+	return result.String()
 }

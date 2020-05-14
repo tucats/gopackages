@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/tucats/gopackages/expressions"
+	"github.com/tucats/gopackages/tokenizer"
 )
 
 // Statement parses a single statement
@@ -12,6 +13,10 @@ func (c *Compiler) Statement() error {
 
 	// We just eat statement separators
 	if c.t.IsNext(";") {
+		return nil
+	}
+
+	if c.t.IsNext(tokenizer.EndOfTokens) {
 		return nil
 	}
 
