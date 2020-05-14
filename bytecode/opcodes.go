@@ -16,6 +16,32 @@ func StopOpcode(c *Context, i *I) error {
 	return nil
 }
 
+// PrintOpcode implementation. If the operand
+// is given, it represents the number of items
+// to remove from the stack.
+func PrintOpcode(c *Context, i *I) error {
+
+	count := 1
+	if i.Operand != nil {
+		count = util.GetInt(i.Operand)
+	}
+
+	for n := 0; n < count; n = n + 1 {
+		v, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%s", util.Format(v))
+	}
+	return nil
+}
+
+// NewlineOpcode implementation.
+func NewlineOpcode(c *Context, i *I) error {
+	fmt.Printf("\n")
+	return nil
+}
+
 // ArrayOpcode implementation
 func ArrayOpcode(c *Context, i *I) error {
 

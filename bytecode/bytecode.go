@@ -50,6 +50,8 @@ const (
 	Index
 	Struct
 	Member
+	Print
+	Newline
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction
@@ -134,7 +136,7 @@ func (b *ByteCode) Append(a *ByteCode) {
 
 	base := b.emitPos
 
-	for _, i := range a.opcodes {
+	for _, i := range a.opcodes[:a.emitPos] {
 		if i.Opcode > BranchInstructions {
 			i.Operand = util.GetInt(i.Operand) + base
 		}
@@ -173,4 +175,9 @@ func (b *ByteCode) Call(s *SymbolTable) (interface{}, error) {
 	}
 
 	return c.Pop()
+}
+
+// Opcodes returns the opcode list for this byteocde array
+func (b *ByteCode) Opcodes() []I {
+	return b.opcodes[:b.emitPos]
 }

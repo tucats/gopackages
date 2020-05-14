@@ -47,6 +47,8 @@ func initializeDispatch() {
 			LessThanOrEqual:    LessThanOrEqualOpcode,
 			GreaterThan:        GreaterThanOpcode,
 			GreaterThanOrEqual: GreaterThanOrEqualOpcode,
+			Print:              PrintOpcode,
+			Newline:            NewlineOpcode,
 		}
 	}
 }

@@ -34,6 +34,8 @@ var opcodeNames = map[int]string{
 	Index:              "Index",
 	Struct:             "Struct",
 	Member:             "Member",
+	Print:              "Print",
+	Newline:            "Newline",
 }
 
 // Disasm prints out a representation of the bytecode for debugging purposes
@@ -62,10 +64,42 @@ func (b *ByteCode) Disasm() {
 			f = ""
 		}
 		if i.Opcode >= BranchInstructions {
-			f = "addr " + f
+			f = "@" + f
 		}
 		ui.Debug("%4d: %s %s", n, opname, f)
 	}
 
 	ui.Debug("*** Disassembled %d instructions", b.emitPos)
+}
+
+// Format formats an array of bytecodes
+func Format(opcodes []I) string {
+	var b strings.Builder
+	b.WriteRune('[')
+	for n, i := range opcodes {
+
+		if n > 0 {
+			b.WriteRune(',')
+		}
+		opname, found := opcodeNames[i.Opcode]
+
+		if !found {
+			opname = fmt.Sprintf("Unknown %d", i.Opcode)
+		}
+
+		f := util.Format(i.Operand)
+		if i.Operand == nil {
+			f = ""
+		}
+		if i.Opcode >= BranchInstructions {
+			f = "@" + f
+		}
+		b.WriteString(opname)
+		if len(f) > 0 {
+			b.WriteRune(' ')
+			b.WriteString(f)
+		}
+	}
+	b.WriteRune(']')
+	return b.String()
 }
