@@ -45,7 +45,7 @@ func (c *Compiler) Function() error {
 	for n, name := range parameters {
 		b.Emit(bytecode.Load, "_args")
 		b.Emit(bytecode.Push, n+1)
-		b.Emit0(bytecode.Index)
+		b.Emit0(bytecode.LoadIndex)
 		b.Emit(bytecode.Store, name)
 	}
 

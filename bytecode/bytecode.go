@@ -47,7 +47,8 @@ const (
 	Load
 	Store
 	Array
-	Index
+	LoadIndex
+	StoreIndex
 	Struct
 	Member
 	Print

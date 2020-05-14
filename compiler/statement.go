@@ -1,9 +1,9 @@
 package compiler
 
 import (
+	"errors"
 	"fmt"
 
-	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/expressions"
 )
 
@@ -21,15 +21,22 @@ func (c *Compiler) Statement() error {
 	}
 
 	// Crude assignment statement test
-	if c.t.Peek(2) == ":=" {
-		name := c.t.Next()
-		c.t.Advance(1)
+	if c.IsLValue() {
+
+		lv, err := c.LValue()
+		if err != nil {
+			return err
+		}
+		if !c.t.IsNext(":=") {
+			return errors.New("expected := not found")
+		}
+
 		bc, err := expressions.Compile(c.t)
 		if err != nil {
 			return err
 		}
 		c.b.Append(bc)
-		c.b.Emit(bytecode.Store, name)
+		c.b.Append(lv)
 		return nil
 	}
 

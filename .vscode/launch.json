@@ -11,7 +11,7 @@
             "mode": "auto",
             "program": "/Users/tom/Go/src/github.com/tucats/solve/main.go",
             "env": {},
-            "args": ["function dbl(a) { return a*2 } ; print dbl(55) "]
+            "args": ["-d", "x := 3 ; x := [1,2,3] ; x[2] := 55 ; print x"]
         }
     ]
 }

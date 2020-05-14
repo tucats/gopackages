@@ -38,7 +38,7 @@ func (e *Expression) reference() error {
 			if e.t.Next() != "]" {
 				return errors.New("missing ] in array reference")
 			}
-			e.b.Emit(bc.Index, nil)
+			e.b.Emit(bc.LoadIndex, nil)
 
 		// Nothing else, term is complete
 		default:

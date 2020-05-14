@@ -33,7 +33,7 @@ func (e *Expression) expressionAtom() error {
 	}
 
 	// Is it a map constant?
-	if t == "[[" {
+	if t == "{" {
 		return e.parseStruct()
 	}
 	// If the token is a number, convert it
@@ -159,7 +159,7 @@ func (e *Expression) parseArray() error {
 
 func (e *Expression) parseStruct() error {
 
-	var listTerminator = "]]"
+	var listTerminator = "}"
 
 	e.t.Advance(1)
 	count := 0

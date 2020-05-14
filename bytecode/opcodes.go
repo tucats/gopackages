@@ -730,8 +730,8 @@ func LessThanOrEqualOpcode(c *Context, i *I) error {
 	return nil
 }
 
-// IndexOpcode implementation
-func IndexOpcode(c *Context, i *I) error {
+// LoadIndexOpcode implementation
+func LoadIndexOpcode(c *Context, i *I) error {
 
 	index, err := c.Pop()
 	if err != nil {
@@ -762,6 +762,48 @@ func IndexOpcode(c *Context, i *I) error {
 		}
 		v := a[subscript-1]
 		c.Push(v)
+
+	default:
+		return fmt.Errorf("invalid type for index operation")
+	}
+
+	return nil
+}
+
+// StoreIndexOpcode implementation
+func StoreIndexOpcode(c *Context, i *I) error {
+
+	index, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	array, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	v, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	switch a := array.(type) {
+
+	// Index into map is just member access
+	case map[string]interface{}:
+		subscript := util.GetString(index)
+		a[subscript] = v
+		c.Push(a)
+
+	// Index into array is integer index (1-based)
+	case []interface{}:
+		subscript := util.GetInt(index)
+		if subscript < 1 || subscript > len(a) {
+			return fmt.Errorf("invalid array index: %v", subscript)
+		}
+		a[subscript-1] = v
+		c.Push(a)
 
 	default:
 		return fmt.Errorf("invalid type for index operation")
