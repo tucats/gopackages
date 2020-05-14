@@ -3,6 +3,8 @@ package compiler
 import (
 	"fmt"
 
+	"github.com/tucats/gopackages/app-cli/ui"
+
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/expressions"
 )
@@ -60,5 +62,9 @@ func (c *Compiler) Function() error {
 
 	// Store the compiled code is the compiler's symbol table
 	c.s.Set(fname+"()", b)
+
+	if ui.DebugMode {
+		b.Disasm()
+	}
 	return nil
 }
