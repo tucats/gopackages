@@ -1,8 +1,6 @@
 package compiler
 
 import (
-	"fmt"
-
 	"github.com/tucats/gopackages/app-cli/ui"
 
 	"github.com/tucats/gopackages/bytecode"
@@ -16,7 +14,7 @@ func (c *Compiler) Function() error {
 
 	fname := c.t.Next()
 	if !expressions.Symbol(fname) {
-		return fmt.Errorf("invalid function name: %s", fname)
+		return c.NewTokenError("invalid function name")
 	}
 
 	// Process parameter names
@@ -25,12 +23,11 @@ func (c *Compiler) Function() error {
 			if c.t.AtEnd() {
 				break
 			}
-			name := c.t.Peek(1)
+			name := c.t.Next()
 			if expressions.Symbol(name) {
-				c.t.Advance(1)
 				parameters = append(parameters, name)
 			} else {
-				return fmt.Errorf("invalid parameter: %s", name)
+				return c.NewTokenError("invalid parameter")
 			}
 			if c.t.IsNext(",") {
 				// No action

@@ -1,8 +1,6 @@
 package expressions
 
 import (
-	"errors"
-
 	bc "github.com/tucats/gopackages/bytecode"
 )
 
@@ -36,7 +34,7 @@ func (e *Expression) reference() error {
 				return err
 			}
 			if e.t.Next() != "]" {
-				return errors.New("missing ] in array reference")
+				return e.NewError("missing ] in array reference")
 			}
 			e.b.Emit(bc.LoadIndex, nil)
 

@@ -1,8 +1,6 @@
 package expressions
 
 import (
-	"errors"
-
 	bc "github.com/tucats/gopackages/bytecode"
 )
 
@@ -33,7 +31,7 @@ func (e *Expression) conditional() error {
 		return err
 	}
 	if e.t.AtEnd() || e.t.Peek(1) != ":" {
-		return errors.New("missing colon in conditional")
+		return e.NewError("missing colon in conditional")
 	}
 	m2 := e.b.Mark()
 	e.b.Emit(bc.Branch, 0)

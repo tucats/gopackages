@@ -1,9 +1,6 @@
 package compiler
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/expressions"
 )
@@ -37,7 +34,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 	name := c.t.Next()
 
 	if !expressions.Symbol(name) {
-		return nil, fmt.Errorf("invalid symbol name: %s", name)
+		return nil, c.NewTokenError("invalid symbol name")
 	}
 
 	needLoad := true
@@ -72,7 +69,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		}
 		bc.Append(ix)
 		if !c.t.IsNext("]") {
-			return errors.New("missing ] on array index")
+			return c.NewError("missing ] on array index")
 		}
 		bc.Emit0(bytecode.StoreIndex)
 		return nil
@@ -82,7 +79,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		c.t.Advance(1)
 		member := c.t.Next()
 		if !expressions.Symbol(member) {
-			return fmt.Errorf("invalid member name: %s", member)
+			return c.NewTokenError("invalid member name")
 		}
 		bc.Emit(bytecode.Push, member)
 		bc.Emit0(bytecode.StoreIndex)

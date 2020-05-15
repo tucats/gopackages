@@ -1,7 +1,6 @@
 package bytecode
 
 import (
-	"errors"
 	"strconv"
 
 	"github.com/tucats/gopackages/app-cli/ui"
@@ -23,6 +22,7 @@ func initializeDispatch() {
 	if dispatch == nil {
 		dispatch = DispatchMap{
 			Stop:               StopOpcode,
+			AtLine:             AtLineOpcode,
 			Push:               PushOpcode,
 			Array:              ArrayOpcode,
 			LoadIndex:          LoadIndexOpcode,
@@ -83,14 +83,14 @@ func (c *Context) RunFromAddress(addr int) error {
 	for c.running {
 
 		if c.pc > len(c.bc.opcodes) {
-			return errors.New("ran off end of incomplete bytecode")
+			return c.NewError("ran off end of incomplete bytecode")
 		}
 		i := c.bc.opcodes[c.pc]
 		c.pc = c.pc + 1
 
 		imp, found := dispatch[i.Opcode]
 		if !found {
-			return errors.New("inimplemented instruction: " + strconv.Itoa(i.Opcode))
+			return c.NewStringError("unimplemented instruction", strconv.Itoa(i.Opcode))
 		}
 		err = imp(c, i.Operand)
 		if err != nil {

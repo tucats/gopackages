@@ -17,7 +17,7 @@ type Compiler struct {
 // of the compiled material.
 func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
 
-	b := bytecode.New("compile-unit")
+	b := bytecode.New("")
 	cInstance := Compiler{b: b, t: t, s: bytecode.SymbolTable{Name: "compile-unit"}}
 	c := &cInstance
 

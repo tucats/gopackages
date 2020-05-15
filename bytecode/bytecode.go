@@ -28,8 +28,9 @@ const BuiltinInstructions = BranchInstruction - 2048
 
 // Constant describing instruction opcodes
 const (
-	Stop = 0
-	Call = iota + BuiltinInstructions
+	Stop   = 0
+	AtLine = iota + BuiltinInstructions
+	Call
 	Push
 	Drop
 	Add

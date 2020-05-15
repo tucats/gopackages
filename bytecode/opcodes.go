@@ -1,7 +1,6 @@
 package bytecode
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -14,6 +13,15 @@ import (
 // StopOpcode bytecode implementation
 func StopOpcode(c *Context, i interface{}) error {
 	c.running = false
+	return nil
+}
+
+// AtLineOpcode implementation. This identifies the
+// start of a new statement, and tags the line number
+// from the source where this was found. This is used
+// in error messaging, primarily.
+func AtLineOpcode(c *Context, i interface{}) error {
+	c.line = util.GetInt(i)
 	return nil
 }
 
@@ -114,12 +122,12 @@ func MemberOpcode(c *Context, i interface{}) error {
 	case map[string]interface{}:
 		v, found := mv[name]
 		if !found {
-			return fmt.Errorf("no such member: %s", name)
+			return c.NewStringError("no such member", name)
 		}
 		c.Push(v)
 
 	default:
-		return errors.New("not a map")
+		return c.NewError("not a map")
 	}
 	return nil
 }
@@ -141,11 +149,11 @@ func LoadOpcode(c *Context, i interface{}) error {
 
 	name := util.GetString(i)
 	if len(name) == 0 {
-		return fmt.Errorf("invalid symbol name: %v", name)
+		return c.NewStringError("invalid symbol name", name)
 	}
 	v, found := c.Get(util.GetString(i))
 	if !found {
-		return fmt.Errorf("unknown symbol: %v", name)
+		return c.NewStringError("unknown symbol", name)
 	}
 
 	c.Push(v)
@@ -183,7 +191,7 @@ func CallOpcode(c *Context, i interface{}) error {
 	fn, found := functions.FunctionDictionary[fname]
 	if found {
 		if argc > fn.Max || argc < fn.Min {
-			return errors.New("incorrect number of function arguments")
+			return c.NewError("incorrect number of function arguments")
 		}
 
 		f := fn.F
@@ -194,7 +202,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		// table with "()" as the suffix.
 		f, found := c.symbols.Get(fname + "()")
 		if !found {
-			return fmt.Errorf("undefined function: %v", fname)
+			return c.NewStringError("undefined function: %v", fname)
 		}
 
 		// Depends on the type here as to what we call...
@@ -243,7 +251,7 @@ func DropOpcode(c *Context, i interface{}) error {
 func AddOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
-		return errors.New("stack underflow")
+		return c.NewError("stack underflow")
 	}
 	v2, err := c.Pop()
 	if err != nil {
@@ -282,7 +290,7 @@ func AddOpcode(c *Context, i interface{}) error {
 			return c.Push(vx)
 
 		default:
-			return errors.New("unsupported datatype")
+			return c.NewError("unsupported datatype")
 		}
 
 		// All other types are scalar math
@@ -298,7 +306,7 @@ func AddOpcode(c *Context, i interface{}) error {
 		case bool:
 			return c.Push(v1.(bool) && v2.(bool))
 		default:
-			return errors.New("unsupported datatype")
+			return c.NewError("unsupported datatype")
 		}
 	}
 }
@@ -307,7 +315,7 @@ func AddOpcode(c *Context, i interface{}) error {
 func AndOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
-		return errors.New("stack underflow")
+		return c.NewError("stack underflow")
 	}
 	v1, err := c.Pop()
 	if err != nil {
@@ -326,7 +334,7 @@ func AndOpcode(c *Context, i interface{}) error {
 func OrOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
-		return errors.New("stack underflow")
+		return c.NewError("stack underflow")
 	}
 	v1, err := c.Pop()
 	if err != nil {
@@ -345,7 +353,7 @@ func OrOpcode(c *Context, i interface{}) error {
 func SubOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
-		return errors.New("stack underflow")
+		return c.NewError("stack underflow")
 	}
 	v2, err := c.Pop()
 	if err != nil {
@@ -380,7 +388,7 @@ func SubOpcode(c *Context, i interface{}) error {
 			s := strings.ReplaceAll(v1.(string), v2.(string), "")
 			return c.Push(s)
 		default:
-			return errors.New("unsupported datatype")
+			return c.NewError("unsupported datatype")
 		}
 	}
 }
@@ -389,7 +397,7 @@ func SubOpcode(c *Context, i interface{}) error {
 func MulOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
-		return errors.New("stack underflow")
+		return c.NewError("stack underflow")
 	}
 	v2, err := c.Pop()
 	if err != nil {
@@ -409,7 +417,7 @@ func MulOpcode(c *Context, i interface{}) error {
 	case bool:
 		return c.Push(v1.(bool) || v2.(bool))
 	default:
-		return errors.New("unsupported datatype")
+		return c.NewError("unsupported datatype")
 	}
 }
 
@@ -417,7 +425,7 @@ func MulOpcode(c *Context, i interface{}) error {
 func DivOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
-		return errors.New("stack underflow")
+		return c.NewError("stack underflow")
 	}
 	v2, err := c.Pop()
 	if err != nil {
@@ -432,16 +440,16 @@ func DivOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 	case int:
 		if v2.(int) == 0 {
-			return errors.New("divide by zero")
+			return c.NewError("divide by zero")
 		}
 		return c.Push(v1.(int) / v2.(int))
 	case float64:
 		if v2.(float64) == 0 {
-			return errors.New("divide by zero")
+			return c.NewError("divide by zero")
 		}
 		return c.Push(v1.(float64) / v2.(float64))
 	default:
-		return errors.New("unsupported datatype")
+		return c.NewError("unsupported datatype")
 	}
 }
 
@@ -457,7 +465,7 @@ func BranchFalseOpcode(c *Context, i interface{}) error {
 	// Get destination
 	address := util.GetInt(i)
 	if address < 0 || address > c.bc.emitPos {
-		return errors.New("invalid destination address: " + strconv.Itoa(address))
+		return c.NewError("invalid destination address: " + strconv.Itoa(address))
 	}
 
 	if !util.GetBool(v) {
@@ -472,7 +480,7 @@ func BranchOpcode(c *Context, i interface{}) error {
 	// Get destination
 	address := util.GetInt(i)
 	if address < 0 || address > c.bc.emitPos {
-		return errors.New("invalid destination address: " + strconv.Itoa(address))
+		return c.NewError("invalid destination address: " + strconv.Itoa(address))
 	}
 
 	c.pc = address
@@ -491,7 +499,7 @@ func BranchTrueOpcode(c *Context, i interface{}) error {
 	// Get destination
 	address := util.GetInt(i)
 	if address < 0 || address > c.bc.emitPos {
-		return errors.New("invalid destination address: " + strconv.Itoa(address))
+		return c.NewError("invalid destination address: " + strconv.Itoa(address))
 	}
 
 	if util.GetBool(v) {
@@ -599,7 +607,7 @@ func GreaterThanOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 
 	case []interface{}:
-		return errors.New("unsupported array operation")
+		return c.NewError("unsupported array operation")
 
 	default:
 		v1, v2 = util.Normalize(v1, v2)
@@ -612,7 +620,7 @@ func GreaterThanOpcode(c *Context, i interface{}) error {
 			r = v1.(string) > v2.(string)
 
 		default:
-			return errors.New("unsupported type for operation")
+			return c.NewError("unsupported type for operation")
 
 		}
 	}
@@ -638,7 +646,7 @@ func GreaterThanOrEqualOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 
 	case []interface{}:
-		return errors.New("unsupported array operation")
+		return c.NewError("unsupported array operation")
 
 	default:
 		v1, v2 = util.Normalize(v1, v2)
@@ -651,7 +659,7 @@ func GreaterThanOrEqualOpcode(c *Context, i interface{}) error {
 			r = v1.(string) >= v2.(string)
 
 		default:
-			return errors.New("unsupported type for operation")
+			return c.NewError("unsupported type for operation")
 
 		}
 	}
@@ -677,7 +685,7 @@ func LessThanOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 
 	case []interface{}:
-		return errors.New("unsupported array operation")
+		return c.NewError("unsupported array operation")
 
 	default:
 		v1, v2 = util.Normalize(v1, v2)
@@ -690,7 +698,7 @@ func LessThanOpcode(c *Context, i interface{}) error {
 			r = v1.(string) < v2.(string)
 
 		default:
-			return errors.New("unsupported type for operation")
+			return c.NewError("unsupported type for operation")
 
 		}
 	}
@@ -716,7 +724,7 @@ func LessThanOrEqualOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 
 	case []interface{}:
-		return errors.New("unsupported array operation")
+		return c.NewError("unsupported array operation")
 
 	default:
 		v1, v2 = util.Normalize(v1, v2)
@@ -729,7 +737,7 @@ func LessThanOrEqualOpcode(c *Context, i interface{}) error {
 			r = v1.(string) <= v2.(string)
 
 		default:
-			return errors.New("unsupported type for operation")
+			return c.NewError("unsupported type for operation")
 
 		}
 	}
@@ -757,7 +765,7 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 		subscript := util.GetString(index)
 		v, f := a[subscript]
 		if !f {
-			return fmt.Errorf("member not found: %s", subscript)
+			return c.NewStringError("member not found", subscript)
 		}
 		c.Push(v)
 
@@ -765,13 +773,13 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 	case []interface{}:
 		subscript := util.GetInt(index)
 		if subscript < 1 || subscript > len(a) {
-			return fmt.Errorf("invalid array index: %v", subscript)
+			return c.NewIntError("invalid array index", subscript)
 		}
 		v := a[subscript-1]
 		c.Push(v)
 
 	default:
-		return fmt.Errorf("invalid type for index operation")
+		return c.NewError("invalid type for index operation")
 	}
 
 	return nil
@@ -807,13 +815,13 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 	case []interface{}:
 		subscript := util.GetInt(index)
 		if subscript < 1 || subscript > len(a) {
-			return fmt.Errorf("invalid array index: %v", subscript)
+			return c.NewIntError("invalid array index", subscript)
 		}
 		a[subscript-1] = v
 		c.Push(a)
 
 	default:
-		return fmt.Errorf("invalid type for index operation")
+		return c.NewError("invalid type for index operation")
 	}
 
 	return nil
@@ -837,7 +845,7 @@ func NegateOpcode(c *Context, i interface{}) error {
 		c.Push(0.0 - value)
 
 	case string:
-		return errors.New("invalid data type for negation")
+		return c.NewError("invalid data type for negation")
 	}
 	return nil
 }

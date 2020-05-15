@@ -1,9 +1,6 @@
 package expressions
 
 import (
-	"errors"
-	"fmt"
-
 	bc "github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/functions"
 )
@@ -26,21 +23,21 @@ func (e *Expression) functionCall(fname string) error {
 			break
 		}
 		if e.t.Peek(1) != "," {
-			return errors.New("invalid argument list")
+			return e.NewError("invalid argument list")
 		}
 		e.t.Advance(1)
 	}
 
 	// Ensure trailing parenthesis
 	if e.t.AtEnd() || e.t.Peek(1) != ")" {
-		return errors.New("mismatched parenthesis in argument list")
+		return e.NewError("mismatched parenthesis in argument list")
 	}
 	e.t.Advance(1)
 
 	// Quick sanity check on argument count for builtin functions
 	fd, found := functions.FunctionDictionary[fname]
 	if found && ((argc < fd.Min) || (argc > fd.Max)) {
-		return fmt.Errorf("incorred number of arguments for %s()", fname)
+		return e.NewStringError("incorrect number of arguments for function", fname)
 	}
 
 	// Call the function

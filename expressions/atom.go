@@ -1,8 +1,6 @@
 package expressions
 
 import (
-	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -22,7 +20,7 @@ func (e *Expression) expressionAtom() error {
 		}
 
 		if e.t.Next() != ")" {
-			return errors.New("mismatched parenthesis")
+			return e.NewError("mismatched parenthesis")
 		}
 		return nil
 	}
@@ -146,7 +144,7 @@ func (e *Expression) parseArray() error {
 			break
 		}
 		if e.t.Peek(1) != "," {
-			return errors.New("invalid list")
+			return e.NewError("invalid list")
 		}
 		e.t.Advance(1)
 	}
@@ -168,19 +166,17 @@ func (e *Expression) parseStruct() error {
 
 		// First element: name
 
-		name := e.t.Peek(1)
+		name := e.t.Next()
 		if !Symbol(name) {
-			return fmt.Errorf("invalid member name: %v", name)
+			return e.NewTokenError("invalid member name")
 		}
 
 		// Second element: colon
-		e.t.Advance(1)
-		if e.t.Peek(1) != ":" {
-			return errors.New("missing colon")
+		if e.t.Next() != ":" {
+			return e.NewError("missing colon")
 		}
 
 		// Third element: value, which is emitted.
-		e.t.Advance(1)
 		err := e.conditional()
 		if err != nil {
 			return err
@@ -196,7 +192,7 @@ func (e *Expression) parseStruct() error {
 			break
 		}
 		if e.t.Peek(1) != "," {
-			return errors.New("invalid list")
+			return e.NewError("invalid list")
 		}
 		e.t.Advance(1)
 	}

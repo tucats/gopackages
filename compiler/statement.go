@@ -2,8 +2,8 @@ package compiler
 
 import (
 	"errors"
-	"fmt"
 
+	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/expressions"
 	"github.com/tucats/gopackages/tokenizer"
 )
@@ -24,6 +24,14 @@ func (c *Compiler) Statement() error {
 	if c.t.IsNext("{") {
 		return c.Block()
 	}
+
+	if c.t.IsNext("function") {
+		return c.Function()
+	}
+
+	// It's a single statement, so let's drop down
+	// a linenumber marker
+	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
 
 	// Crude assignment statement test
 	if c.IsLValue() {
@@ -61,9 +69,6 @@ func (c *Compiler) Statement() error {
 		return c.Return()
 	}
 
-	if c.t.IsNext("function") {
-		return c.Function()
-	}
-
-	return fmt.Errorf("unrecognized statement: %s", c.t.Peek(1))
+	c.t.Next()
+	return c.NewTokenError("unrecognized statement")
 }

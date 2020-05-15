@@ -1,15 +1,15 @@
 package bytecode
 
-import "errors"
-
 // Context holds the runtime information about an instance of bytecode being
 // executed.
 type Context struct {
+	Name    string
 	bc      *ByteCode
 	pc      int
 	stack   []interface{}
 	sp      int
 	running bool
+	line    int
 	symbols *SymbolTable
 }
 
@@ -21,11 +21,13 @@ type Context struct {
 // the time so it is immutable?
 func NewContext(s *SymbolTable, b *ByteCode) *Context {
 	ctx := Context{
+		Name:    b.Name,
 		bc:      b,
 		pc:      0,
 		stack:   make([]interface{}, InitialStackSize),
 		sp:      0,
 		running: false,
+		line:    0,
 		symbols: s,
 	}
 	ctxp := &ctx
@@ -69,7 +71,7 @@ func (c *Context) Set(name string, value interface{}) {
 // Pop removes the top-most item from the stack
 func (c *Context) Pop() (interface{}, error) {
 	if c.sp <= 0 || len(c.stack) < c.sp {
-		return nil, errors.New("stack underflow")
+		return nil, c.NewError("stack underflow")
 	}
 
 	c.sp = c.sp - 1

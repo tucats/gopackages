@@ -1,8 +1,6 @@
 package compiler
 
 import (
-	"errors"
-
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/expressions"
 )
@@ -15,7 +13,7 @@ func (c *Compiler) Call() error {
 	// Let's peek ahead to see if this is a legit function call
 
 	if !expressions.Symbol(c.t.Peek(1)) || (c.t.Peek(2) != "(" && c.t.Peek(2) != ".") {
-		return errors.New("invalid function call")
+		return c.NewError("invalid function call")
 	}
 
 	// Parse the function as an expression, which we then ignore the
