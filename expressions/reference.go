@@ -23,8 +23,8 @@ func (e *Expression) reference() error {
 		case ".":
 			e.t.Advance(1)
 			name := e.t.Next()
-			e.b.Emit(bc.Push, name)
-			e.b.Emit(bc.Member, nil)
+			e.b.Emit2(bc.Push, name)
+			e.b.Emit1(bc.Member)
 
 		// Array index reference
 		case "[":
@@ -36,7 +36,7 @@ func (e *Expression) reference() error {
 			if e.t.Next() != "]" {
 				return e.NewError("missing ] in array reference")
 			}
-			e.b.Emit(bc.LoadIndex, nil)
+			e.b.Emit1(bc.LoadIndex)
 
 		// Nothing else, term is complete
 		default:

@@ -28,22 +28,22 @@ func (e *Expression) relations() error {
 			switch op {
 
 			case "=":
-				e.b.Emit(bc.Equal, nil)
+				e.b.Emit1(bc.Equal)
 
 			case "!=":
-				e.b.Emit(bc.NotEqual, nil)
+				e.b.Emit1(bc.NotEqual)
 
 			case "<":
-				e.b.Emit(bc.LessThan, nil)
+				e.b.Emit1(bc.LessThan)
 
 			case "<=":
-				e.b.Emit(bc.LessThanOrEqual, nil)
+				e.b.Emit1(bc.LessThanOrEqual)
 
 			case ">":
-				e.b.Emit(bc.GreaterThan, nil)
+				e.b.Emit1(bc.GreaterThan)
 
 			case ">=":
-				e.b.Emit(bc.GreaterThanOrEqual, nil)
+				e.b.Emit1(bc.GreaterThanOrEqual)
 
 			}
 

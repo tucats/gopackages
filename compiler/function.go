@@ -41,10 +41,10 @@ func (c *Compiler) Function() error {
 	// as part of the function call during bytecode exectuion.
 	// Note that the array is 1-based.
 	for n, name := range parameters {
-		b.Emit(bytecode.Load, "_args")
-		b.Emit(bytecode.Push, n+1)
-		b.Emit0(bytecode.LoadIndex)
-		b.Emit(bytecode.Store, name)
+		b.Emit2(bytecode.Load, "_args")
+		b.Emit2(bytecode.Push, n+1)
+		b.Emit1(bytecode.LoadIndex)
+		b.Emit2(bytecode.Store, name)
 	}
 
 	// Now compile a statement or block into the function body.

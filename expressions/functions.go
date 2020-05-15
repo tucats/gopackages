@@ -41,8 +41,8 @@ func (e *Expression) functionCall(fname string) error {
 	}
 
 	// Call the function
-	e.b.Emit(bc.Push, fname)
-	e.b.Emit(bc.Call, argc)
+	e.b.Emit2(bc.Push, fname)
+	e.b.Emit2(bc.Call, argc)
 	return nil
 }
 

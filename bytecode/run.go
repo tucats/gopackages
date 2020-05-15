@@ -76,7 +76,7 @@ func (c *Context) RunFromAddress(addr int) error {
 	// Make sure the opcode array ends in a Stop operation
 	if c.bc.emitPos == 0 || c.bc.opcodes[c.bc.emitPos-1].Opcode != Stop {
 		ui.Debug("Adding trailing Stop opcode")
-		c.bc.Emit(Stop, nil)
+		c.bc.Emit1(Stop)
 	}
 
 	// Loop over the bytecodes and run.

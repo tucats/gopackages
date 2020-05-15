@@ -21,7 +21,7 @@ func TestByteCode_New(t *testing.T) {
 	})
 }
 
-func TestByteCode_Emit(t *testing.T) {
+func TestByteCode_Emit2(t *testing.T) {
 	type fields struct {
 		Name    string
 		opcodes []I
@@ -85,7 +85,7 @@ func TestByteCode_Emit(t *testing.T) {
 				emitPos: tt.fields.emitPos,
 			}
 			for _, i := range tt.args.emit {
-				b.Emit(i.Opcode, i.Operand)
+				b.Emit2(i.Opcode, i.Operand)
 			}
 
 			for n, i := range b.opcodes {

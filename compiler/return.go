@@ -15,7 +15,7 @@ func (c *Compiler) Return() error {
 		}
 		c.b.Append(bc)
 	}
-	c.b.Emit0(bytecode.Stop)
+	c.b.Emit1(bytecode.Stop)
 
 	return nil
 }

@@ -24,6 +24,6 @@ func (c *Compiler) Call() error {
 		return err
 	}
 	c.b.Append(bc)
-	c.b.Emit0(bytecode.Drop)
+	c.b.Emit1(bytecode.Drop)
 	return nil
 }

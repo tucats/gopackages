@@ -38,26 +38,26 @@ func (e *Expression) expressionAtom() error {
 	// If the token is a number, convert it
 	if i, err := strconv.Atoi(t); err == nil {
 		e.t.Advance(1)
-		e.b.Emit(bc.Push, i)
+		e.b.Emit2(bc.Push, i)
 		return nil
 	}
 
 	if i, err := strconv.ParseFloat(t, 64); err == nil {
 		e.t.Advance(1)
-		e.b.Emit(bc.Push, i)
+		e.b.Emit2(bc.Push, i)
 		return nil
 	}
 
 	if i, err := strconv.ParseBool(t); err == nil {
 		e.t.Advance(1)
-		e.b.Emit(bc.Push, i)
+		e.b.Emit2(bc.Push, i)
 		return nil
 	}
 
 	runeValue := t[0:1]
 	if runeValue == "\"" {
 		e.t.Advance(1)
-		e.b.Emit(bc.Push, t[1:len(t)-1])
+		e.b.Emit2(bc.Push, t[1:len(t)-1])
 		return nil
 	}
 
@@ -72,13 +72,13 @@ func (e *Expression) expressionAtom() error {
 		}
 
 		// Nope, probably name from the symbol table
-		e.b.Emit(bc.Load, t)
+		e.b.Emit2(bc.Load, t)
 
 		return nil
 
 	}
 
-	e.b.Emit(bc.Push, t)
+	e.b.Emit2(bc.Push, t)
 	return nil
 }
 
@@ -115,7 +115,7 @@ func (e *Expression) parseArray() error {
 		e.t.Advance(1)
 	}
 
-	e.b.Emit(bc.Array, count)
+	e.b.Emit2(bc.Array, count)
 
 	e.t.Advance(1)
 	return nil
@@ -148,7 +148,7 @@ func (e *Expression) parseStruct() error {
 			return err
 		}
 		// Now write the name as a string.
-		e.b.Emit(bc.Push, name)
+		e.b.Emit2(bc.Push, name)
 
 		count = count + 1
 		if e.t.AtEnd() {
@@ -163,7 +163,7 @@ func (e *Expression) parseStruct() error {
 		e.t.Advance(1)
 	}
 
-	e.b.Emit(bc.Struct, count)
+	e.b.Emit2(bc.Struct, count)
 	e.t.Advance(1)
 	return nil
 }

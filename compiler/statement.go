@@ -31,7 +31,7 @@ func (c *Compiler) Statement() error {
 
 	// It's a single statement, so let's drop down
 	// a linenumber marker
-	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
+	c.b.Emit2(bytecode.AtLine, c.t.Line[c.t.TokenP])
 
 	// Crude assignment statement test
 	if c.IsLValue() {

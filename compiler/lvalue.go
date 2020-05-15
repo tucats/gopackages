@@ -43,7 +43,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 	for c.t.Peek(1) == "." || c.t.Peek(1) == "[" {
 
 		if needLoad {
-			bc.Emit(bytecode.Load, name)
+			bc.Emit2(bytecode.Load, name)
 			needLoad = false
 		}
 		err := c.lvalueTerm(bc)
@@ -53,7 +53,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 
 	}
 
-	bc.Emit(bytecode.Store, name)
+	bc.Emit2(bytecode.Store, name)
 
 	return bc, nil
 }
@@ -72,7 +72,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		if !c.t.IsNext("]") {
 			return c.NewError("missing ] on array index")
 		}
-		bc.Emit0(bytecode.StoreIndex)
+		bc.Emit1(bytecode.StoreIndex)
 		return nil
 	}
 
@@ -82,8 +82,8 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		if !tokenizer.IsSymbol(member) {
 			return c.NewTokenError("invalid member name")
 		}
-		bc.Emit(bytecode.Push, member)
-		bc.Emit0(bytecode.StoreIndex)
+		bc.Emit2(bytecode.Push, member)
+		bc.Emit1(bytecode.StoreIndex)
 		return nil
 	}
 
