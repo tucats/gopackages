@@ -199,18 +199,24 @@ This returns the string value "whistle".
 The caller of the expressions package can supply additional functions to
 supplement the built-in functions.  The function must be declared as a
 function of type func([]interface{})(interface{}, error).  For example,
+this is a simplified function that creates a floating point sum of all
+the supplied values (which will be type-coerced to be floats):
     
     func sum( args []interface{})(interface{}, error) {
-
+        result := 0
+        for _, v := range args {
+            result = result + util.GetInt(v)
+        }
+        return result, nil
     }
 
-The body of the function operats on the argument list, processing values
+The body of the function operates on the argument list, processing values
 as appropriate for the function. The service functions GetInt, GetFloat,
 GetString, and GetBool can be used to get the value of an opaque argument
-and coerce it to the desired type The function can also implement type
-switch statements to handle differnt argument types.
+and coerce it to the desired type. The function can also implement type
+switch statements to handle other argument types.
 
-The result is always returend as an int, float64, string, or bool. In
+The result is always returned as an int, float64, string, or bool. In
 addition, if the function encounters an error (for example, an incorrect
 number of arguments passed in) then an error should be returned. When an
 error is returned, the function result is ignored and the expression
@@ -221,7 +227,7 @@ symbol table. The name must be the name of the function as it would be
 specified in an expression, followed by "()". The value of the item
 in the symbol table map is the function pointer or value itself.
     
-    symbols["sum()"] = sum
+    symbols.Set("sum()", sum)
 
 This will add the sum function described above to the available symbols
 for processing an expression. Note that user-supplied functions must be
