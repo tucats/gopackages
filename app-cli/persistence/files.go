@@ -1,7 +1,4 @@
-// Package profile manages the persistent user profile used by the command
-// application infrastructure. This includes automatically reading any
-// profile in as part of startup, and of updating the profile as needed.
-package profile
+package persistence
 
 import (
 	"encoding/json"
@@ -38,9 +35,9 @@ var CurrentConfiguration *Configuration
 // explicitValues contains overridden default values
 var explicitValues = Configuration{Description: "overridden defaults", Items: map[string]string{}}
 
-// profileDirty is set to true when a key value is written or deleted, which
+// ProfileDirty is set to true when a key value is written or deleted, which
 // tells us to rewrite the profile. If false, then no update is required.
-var profileDirty = false
+var ProfileDirty = false
 
 // Configurations is a map keyed by the configuration name for each
 // configuration in the config file.
@@ -91,7 +88,7 @@ func Load(application string, name string) error {
 		if !found {
 			c = Configuration{Description: "Default configuration", Items: map[string]string{}}
 			Configurations[name] = c
-			profileDirty = true
+			ProfileDirty = true
 		}
 		ProfileName = name
 		CurrentConfiguration = &c
@@ -104,7 +101,7 @@ func Load(application string, name string) error {
 func Save() error {
 
 	// So we even need to do anything?
-	if !profileDirty {
+	if !ProfileDirty {
 		return nil
 	}
 
@@ -148,7 +145,7 @@ func UseProfile(name string) {
 	if !found {
 		c = Configuration{Description: name + " configuration", Items: map[string]string{}}
 		Configurations[name] = c
-		profileDirty = true
+		ProfileDirty = true
 	}
 	ProfileName = name
 	CurrentConfiguration = &c
@@ -161,7 +158,7 @@ func Set(key string, value string) {
 
 	c := *CurrentConfiguration
 	c.Items[key] = value
-	profileDirty = true
+	ProfileDirty = true
 	ui.Debug("Setting profile key \"%s\" = \"%s\"", key, value)
 
 }
@@ -195,7 +192,7 @@ func Delete(key string) {
 	c := *CurrentConfiguration
 	delete(c.Items, key)
 	delete(explicitValues.Items, key)
-	profileDirty = true
+	ProfileDirty = true
 	ui.Debug("Deleting profile key \"%s\"", key)
 }
 

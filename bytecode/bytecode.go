@@ -31,6 +31,7 @@ const (
 	Stop = 0
 	Call = iota + BuiltinInstructions
 	Push
+	Drop
 	Add
 	Sub
 	Div

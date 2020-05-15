@@ -8,7 +8,7 @@ import (
 )
 
 // OpcodeHandler defines a function that implements an opcode
-type OpcodeHandler func(b *Context, i *I) error
+type OpcodeHandler func(b *Context, i interface{}) error
 
 // DispatchMap is a map that is used to locate the function for an opcode
 type DispatchMap map[int]OpcodeHandler
@@ -50,6 +50,7 @@ func initializeDispatch() {
 			GreaterThanOrEqual: GreaterThanOrEqualOpcode,
 			Print:              PrintOpcode,
 			Newline:            NewlineOpcode,
+			Drop:               DropOpcode,
 		}
 	}
 }
@@ -91,7 +92,7 @@ func (c *Context) RunFromAddress(addr int) error {
 		if !found {
 			return errors.New("inimplemented instruction: " + strconv.Itoa(i.Opcode))
 		}
-		err = imp(c, &i)
+		err = imp(c, i.Operand)
 		if err != nil {
 			return err
 		}

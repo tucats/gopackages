@@ -1,9 +1,13 @@
-package util
+package functions
 
 import (
 	"errors"
 	"reflect"
 	"strings"
+
+	"github.com/google/uuid"
+	"github.com/tucats/gopackages/app-cli/persistence"
+	"github.com/tucats/gopackages/util"
 )
 
 // FunctionDefinition is an element in the function dictionary
@@ -29,12 +33,33 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"min":       FunctionDefinition{Min: 1, Max: 99999, F: FunctionMin},
 	"max":       FunctionDefinition{Min: 1, Max: 99999, F: FunctionMax},
 	"sum":       FunctionDefinition{Min: 1, Max: 99999, F: FunctionSum},
+	"uuid":      FunctionDefinition{Min: 0, Max: 0, F: FunctionUUID},
+	"profile":   FunctionDefinition{Min: 1, Max: 2, F: FunctionProfile},
+}
+
+// FunctionProfile implements the profile() function
+func FunctionProfile(args []interface{}) (interface{}, error) {
+
+	key := util.GetString(args[0])
+
+	if len(args) == 1 {
+		return persistence.Get(key), nil
+	}
+	value := util.GetString(args[1])
+	persistence.Set(key, value)
+	return true, nil
+}
+
+// FunctionUUID implements the uuid() function
+func FunctionUUID(args []interface{}) (interface{}, error) {
+	u := uuid.New()
+	return u.String(), nil
 }
 
 // FunctionInt implements the int() function
 func FunctionInt(args []interface{}) (interface{}, error) {
 
-	v := Coerce(args[0], 1)
+	v := util.Coerce(args[0], 1)
 	if v == nil {
 		return nil, errors.New("invalid value to coerce to integer type")
 	}
@@ -44,7 +69,7 @@ func FunctionInt(args []interface{}) (interface{}, error) {
 // FunctionFloat implements the float() function
 func FunctionFloat(args []interface{}) (interface{}, error) {
 
-	v := Coerce(args[0], 1.0)
+	v := util.Coerce(args[0], 1.0)
 	if v == nil {
 		return nil, errors.New("invalid value to coerce to float type")
 	}
@@ -54,13 +79,13 @@ func FunctionFloat(args []interface{}) (interface{}, error) {
 // FunctionString implements the string() function
 func FunctionString(args []interface{}) (interface{}, error) {
 
-	return GetString(args[0]), nil
+	return util.GetString(args[0]), nil
 }
 
 // FunctionBool implements the bool() function
 func FunctionBool(args []interface{}) (interface{}, error) {
 
-	v := Coerce(args[0], true)
+	v := util.Coerce(args[0], true)
 	if v == nil {
 		return nil, errors.New("invalid value to coerce to bool type")
 	}
@@ -70,8 +95,8 @@ func FunctionBool(args []interface{}) (interface{}, error) {
 // FunctionLeft implements the left() function
 func FunctionLeft(args []interface{}) (interface{}, error) {
 
-	v := GetString(args[0])
-	p := GetInt(args[1])
+	v := util.GetString(args[0])
+	p := util.GetInt(args[1])
 
 	if p <= 0 {
 		return "", nil
@@ -84,8 +109,8 @@ func FunctionLeft(args []interface{}) (interface{}, error) {
 
 // FunctionRight implements the right() function
 func FunctionRight(args []interface{}) (interface{}, error) {
-	v := GetString(args[0])
-	p := GetInt(args[1])
+	v := util.GetString(args[0])
+	p := util.GetInt(args[1])
 
 	if p <= 0 {
 		return "", nil
@@ -110,8 +135,8 @@ func FunctionIndex(args []interface{}) (interface{}, error) {
 		return 0, nil
 
 	default:
-		v := GetString(args[0])
-		p := GetString(args[1])
+		v := util.GetString(args[0])
+		p := util.GetString(args[1])
 
 		return strings.Index(v, p) + 1, nil
 	}
@@ -120,9 +145,9 @@ func FunctionIndex(args []interface{}) (interface{}, error) {
 // FunctionSubstring implements the substring() function
 func FunctionSubstring(args []interface{}) (interface{}, error) {
 
-	v := GetString(args[0])
-	p1 := GetInt(args[1])
-	p2 := GetInt(args[2])
+	v := util.GetString(args[0])
+	p1 := util.GetInt(args[1])
+	p2 := util.GetInt(args[2])
 
 	if p1 < 1 {
 		p1 = 1
@@ -153,19 +178,19 @@ func FunctionLen(args []interface{}) (interface{}, error) {
 	case []interface{}:
 		return len(arg), nil
 	default:
-		v := Coerce(args[0], "")
+		v := util.Coerce(args[0], "")
 		return len(v.(string)), nil
 	}
 }
 
 // FunctionLower implements the lower() function
 func FunctionLower(args []interface{}) (interface{}, error) {
-	return strings.ToLower(GetString(args[0])), nil
+	return strings.ToLower(util.GetString(args[0])), nil
 }
 
 // FunctionUpper implements the upper() function
 func FunctionUpper(args []interface{}) (interface{}, error) {
-	return strings.ToUpper(GetString(args[0])), nil
+	return strings.ToUpper(util.GetString(args[0])), nil
 }
 
 // FunctionMin implements the min() function
@@ -178,7 +203,7 @@ func FunctionMin(args []interface{}) (interface{}, error) {
 	r := args[0]
 
 	for _, v := range args[1:] {
-		v = Coerce(v, r)
+		v = util.Coerce(v, r)
 		switch r.(type) {
 		case int:
 			if v.(int) < r.(int) {
@@ -214,7 +239,7 @@ func FunctionMax(args []interface{}) (interface{}, error) {
 	r := args[0]
 
 	for _, v := range args[1:] {
-		v = Coerce(v, r)
+		v = util.Coerce(v, r)
 		switch r.(type) {
 		case int:
 			if v.(int) > r.(int) {
@@ -245,7 +270,7 @@ func FunctionSum(args []interface{}) (interface{}, error) {
 
 	base := args[0]
 	for _, addend := range args[1:] {
-		addend = Coerce(addend, base)
+		addend = util.Coerce(addend, base)
 		switch addend.(type) {
 		case int:
 			base = base.(int) + addend.(int)

@@ -53,9 +53,14 @@ func (c *Compiler) Statement() error {
 		return c.Print()
 	}
 
+	if c.t.IsNext("call") {
+		return c.Call()
+	}
+
 	if c.t.IsNext("return") {
 		return c.Return()
 	}
+
 	if c.t.IsNext("function") {
 		return c.Function()
 	}

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/tucats/gopackages/app-cli/cli"
+	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/app-cli/profile"
 	"github.com/tucats/gopackages/app-cli/ui"
 )
@@ -64,7 +65,7 @@ func runFromContext(context *cli.Context) error {
 		}}, context.Grammar...)
 
 	// Load the active profile, if any from the profile for this application.
-	profile.Load(context.AppName, "default")
+	persistence.Load(context.AppName, "default")
 
 	// If the CLI_DEBUG environment variable is set, then turn on
 	// debugging now, so messages will come out before that particular
@@ -81,7 +82,7 @@ func runFromContext(context *cli.Context) error {
 
 	// If no errors, then write out an updated profile as needed.
 	if err == nil {
-		err = profile.Save()
+		err = persistence.Save()
 	}
 
 	return err

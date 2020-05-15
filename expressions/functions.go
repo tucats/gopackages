@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	bc "github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/util"
+	"github.com/tucats/gopackages/functions"
 )
 
 func (e *Expression) functionCall(fname string) error {
@@ -38,7 +38,7 @@ func (e *Expression) functionCall(fname string) error {
 	e.t.Advance(1)
 
 	// Quick sanity check on argument count for builtin functions
-	fd, found := util.FunctionDictionary[fname]
+	fd, found := functions.FunctionDictionary[fname]
 	if found && ((argc < fd.Min) || (argc > fd.Max)) {
 		return fmt.Errorf("incorred number of arguments for %s()", fname)
 	}
@@ -54,7 +54,7 @@ func (e *Expression) functionCall(fname string) error {
 // suffix for the key.
 func AddBuiltins(symbols *bc.SymbolTable) {
 
-	for n, d := range util.FunctionDictionary {
+	for n, d := range functions.FunctionDictionary {
 		symbols.Set(n+"()", d.F)
 	}
 }

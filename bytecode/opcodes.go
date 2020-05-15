@@ -7,11 +7,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/util"
 )
 
 // StopOpcode bytecode implementation
-func StopOpcode(c *Context, i *I) error {
+func StopOpcode(c *Context, i interface{}) error {
 	c.running = false
 	return nil
 }
@@ -19,11 +20,11 @@ func StopOpcode(c *Context, i *I) error {
 // PrintOpcode implementation. If the operand
 // is given, it represents the number of items
 // to remove from the stack.
-func PrintOpcode(c *Context, i *I) error {
+func PrintOpcode(c *Context, i interface{}) error {
 
 	count := 1
-	if i.Operand != nil {
-		count = util.GetInt(i.Operand)
+	if i != nil {
+		count = util.GetInt(i)
 	}
 
 	for n := 0; n < count; n = n + 1 {
@@ -37,15 +38,15 @@ func PrintOpcode(c *Context, i *I) error {
 }
 
 // NewlineOpcode implementation.
-func NewlineOpcode(c *Context, i *I) error {
+func NewlineOpcode(c *Context, i interface{}) error {
 	fmt.Printf("\n")
 	return nil
 }
 
 // ArrayOpcode implementation
-func ArrayOpcode(c *Context, i *I) error {
+func ArrayOpcode(c *Context, i interface{}) error {
 
-	count := util.GetInt(i.Operand)
+	count := util.GetInt(i)
 	array := make([]interface{}, count)
 
 	for n := 0; n < count; n++ {
@@ -64,9 +65,9 @@ func ArrayOpcode(c *Context, i *I) error {
 // of elements on the stack. These are pulled off in pairs,
 // where the first value is the name of the struct field and
 // the second value is the value of the struct field.
-func StructOpcode(c *Context, i *I) error {
+func StructOpcode(c *Context, i interface{}) error {
 
-	count := util.GetInt(i.Operand)
+	count := util.GetInt(i)
 
 	m := map[string]interface{}{}
 
@@ -90,11 +91,11 @@ func StructOpcode(c *Context, i *I) error {
 // the stack (the first must be a string and the second a
 // map) and indexes into the map to get the matching value
 // and puts back on the stack.
-func MemberOpcode(c *Context, i *I) error {
+func MemberOpcode(c *Context, i interface{}) error {
 
 	var name string
-	if i.Operand != nil {
-		name = util.GetString(i.Operand)
+	if i != nil {
+		name = util.GetString(i)
 	} else {
 		v, err := c.Pop()
 		if err != nil {
@@ -124,25 +125,25 @@ func MemberOpcode(c *Context, i *I) error {
 }
 
 // StoreOpcode implementation
-func StoreOpcode(c *Context, i *I) error {
+func StoreOpcode(c *Context, i interface{}) error {
 
 	v, err := c.Pop()
 	if err != nil {
 		return err
 	}
 
-	c.Set(util.GetString(i.Operand), v)
+	c.Set(util.GetString(i), v)
 	return nil
 }
 
 // LoadOpcode implementation
-func LoadOpcode(c *Context, i *I) error {
+func LoadOpcode(c *Context, i interface{}) error {
 
-	name := util.GetString(i.Operand)
+	name := util.GetString(i)
 	if len(name) == 0 {
 		return fmt.Errorf("invalid symbol name: %v", name)
 	}
-	v, found := c.Get(util.GetString(i.Operand))
+	v, found := c.Get(util.GetString(i))
 	if !found {
 		return fmt.Errorf("unknown symbol: %v", name)
 	}
@@ -152,14 +153,14 @@ func LoadOpcode(c *Context, i *I) error {
 }
 
 // CallOpcode bytecode implementation.
-func CallOpcode(c *Context, i *I) error {
+func CallOpcode(c *Context, i interface{}) error {
 
 	var fname string
 	var err error
 	var v interface{}
 
 	// Argument count is in operand
-	argc := i.Operand.(int)
+	argc := i.(int)
 
 	// Function name is last item on stack
 	v, err = c.Pop()
@@ -179,7 +180,7 @@ func CallOpcode(c *Context, i *I) error {
 	}
 
 	// Is it in the dictionary?
-	fn, found := util.FunctionDictionary[fname]
+	fn, found := functions.FunctionDictionary[fname]
 	if found {
 		if argc > fn.Max || argc < fn.Min {
 			return errors.New("incorrect number of function arguments")
@@ -228,12 +229,18 @@ func CallOpcode(c *Context, i *I) error {
 }
 
 // PushOpcode bytecode implementation
-func PushOpcode(c *Context, i *I) error {
-	return c.Push(i.Operand)
+func PushOpcode(c *Context, i interface{}) error {
+	return c.Push(i)
+}
+
+// DropOpcode implementation
+func DropOpcode(c *Context, i interface{}) error {
+	_, err := c.Pop()
+	return err
 }
 
 // AddOpcode bytecode implementation
-func AddOpcode(c *Context, i *I) error {
+func AddOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
 		return errors.New("stack underflow")
@@ -297,7 +304,7 @@ func AddOpcode(c *Context, i *I) error {
 }
 
 // AndOpcode bytecode implementation
-func AndOpcode(c *Context, i *I) error {
+func AndOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
 		return errors.New("stack underflow")
@@ -316,7 +323,7 @@ func AndOpcode(c *Context, i *I) error {
 }
 
 // OrOpcode bytecode implementation
-func OrOpcode(c *Context, i *I) error {
+func OrOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
 		return errors.New("stack underflow")
@@ -335,7 +342,7 @@ func OrOpcode(c *Context, i *I) error {
 }
 
 // SubOpcode bytecode implementation
-func SubOpcode(c *Context, i *I) error {
+func SubOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
 		return errors.New("stack underflow")
@@ -379,7 +386,7 @@ func SubOpcode(c *Context, i *I) error {
 }
 
 // MulOpcode bytecode implementation
-func MulOpcode(c *Context, i *I) error {
+func MulOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
 		return errors.New("stack underflow")
@@ -407,7 +414,7 @@ func MulOpcode(c *Context, i *I) error {
 }
 
 // DivOpcode bytecode implementation
-func DivOpcode(c *Context, i *I) error {
+func DivOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
 		return errors.New("stack underflow")
@@ -439,7 +446,7 @@ func DivOpcode(c *Context, i *I) error {
 }
 
 // BranchFalseOpcode bytecode implementation
-func BranchFalseOpcode(c *Context, i *I) error {
+func BranchFalseOpcode(c *Context, i interface{}) error {
 
 	// Get test value
 	v, err := c.Pop()
@@ -448,7 +455,7 @@ func BranchFalseOpcode(c *Context, i *I) error {
 	}
 
 	// Get destination
-	address := util.GetInt(i.Operand)
+	address := util.GetInt(i)
 	if address < 0 || address > c.bc.emitPos {
 		return errors.New("invalid destination address: " + strconv.Itoa(address))
 	}
@@ -460,10 +467,10 @@ func BranchFalseOpcode(c *Context, i *I) error {
 }
 
 // BranchOpcode bytecode implementation
-func BranchOpcode(c *Context, i *I) error {
+func BranchOpcode(c *Context, i interface{}) error {
 
 	// Get destination
-	address := util.GetInt(i.Operand)
+	address := util.GetInt(i)
 	if address < 0 || address > c.bc.emitPos {
 		return errors.New("invalid destination address: " + strconv.Itoa(address))
 	}
@@ -473,7 +480,7 @@ func BranchOpcode(c *Context, i *I) error {
 }
 
 // BranchTrueOpcode bytecode implementation
-func BranchTrueOpcode(c *Context, i *I) error {
+func BranchTrueOpcode(c *Context, i interface{}) error {
 
 	// Get test value
 	v, err := c.Pop()
@@ -482,7 +489,7 @@ func BranchTrueOpcode(c *Context, i *I) error {
 	}
 
 	// Get destination
-	address := util.GetInt(i.Operand)
+	address := util.GetInt(i)
 	if address < 0 || address > c.bc.emitPos {
 		return errors.New("invalid destination address: " + strconv.Itoa(address))
 	}
@@ -494,7 +501,7 @@ func BranchTrueOpcode(c *Context, i *I) error {
 }
 
 // EqualOpcode implementation
-func EqualOpcode(c *Context, i *I) error {
+func EqualOpcode(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -534,7 +541,7 @@ func EqualOpcode(c *Context, i *I) error {
 }
 
 // NotEqualOpcode implementation
-func NotEqualOpcode(c *Context, i *I) error {
+func NotEqualOpcode(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -575,7 +582,7 @@ func NotEqualOpcode(c *Context, i *I) error {
 }
 
 // GreaterThanOpcode implementation
-func GreaterThanOpcode(c *Context, i *I) error {
+func GreaterThanOpcode(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -614,7 +621,7 @@ func GreaterThanOpcode(c *Context, i *I) error {
 }
 
 // GreaterThanOrEqualOpcode implementation
-func GreaterThanOrEqualOpcode(c *Context, i *I) error {
+func GreaterThanOrEqualOpcode(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -653,7 +660,7 @@ func GreaterThanOrEqualOpcode(c *Context, i *I) error {
 }
 
 // LessThanOpcode implementation
-func LessThanOpcode(c *Context, i *I) error {
+func LessThanOpcode(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -692,7 +699,7 @@ func LessThanOpcode(c *Context, i *I) error {
 }
 
 // LessThanOrEqualOpcode implementation
-func LessThanOrEqualOpcode(c *Context, i *I) error {
+func LessThanOrEqualOpcode(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -731,7 +738,7 @@ func LessThanOrEqualOpcode(c *Context, i *I) error {
 }
 
 // LoadIndexOpcode implementation
-func LoadIndexOpcode(c *Context, i *I) error {
+func LoadIndexOpcode(c *Context, i interface{}) error {
 
 	index, err := c.Pop()
 	if err != nil {
@@ -771,7 +778,7 @@ func LoadIndexOpcode(c *Context, i *I) error {
 }
 
 // StoreIndexOpcode implementation
-func StoreIndexOpcode(c *Context, i *I) error {
+func StoreIndexOpcode(c *Context, i interface{}) error {
 
 	index, err := c.Pop()
 	if err != nil {
@@ -813,7 +820,7 @@ func StoreIndexOpcode(c *Context, i *I) error {
 }
 
 // NegateOpcode implementation
-func NegateOpcode(c *Context, i *I) error {
+func NegateOpcode(c *Context, i interface{}) error {
 
 	v, err := c.Pop()
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/cli"
+	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/app-cli/tables"
 	"github.com/tucats/gopackages/app-cli/ui"
 )
@@ -73,7 +74,7 @@ func ShowAction(c *cli.Context) error {
 
 	t, _ := tables.New([]string{"Key", "Value"})
 
-	for k, v := range CurrentConfiguration.Items {
+	for k, v := range persistence.CurrentConfiguration.Items {
 		t.AddRowItems(k, v)
 	}
 	t.SetOrderBy("key")
@@ -88,7 +89,7 @@ func ListAction(c *cli.Context) error {
 
 	t, _ := tables.New([]string{"Name", "Description"})
 
-	for k, v := range Configurations {
+	for k, v := range persistence.Configurations {
 		t.AddRowItems(k, v.Description)
 	}
 	t.SetOrderBy("name")
@@ -104,7 +105,7 @@ func SetOutputAction(c *cli.Context) error {
 	if c.GetParameterCount() == 1 {
 		outputType := c.GetParameter(0)
 		if outputType == "text" || outputType == "json" {
-			Set("output-format", outputType)
+			persistence.Set("output-format", outputType)
 			return nil
 		}
 		return errors.New("Invalid output type: " + outputType)
@@ -128,10 +129,10 @@ func SetAction(c *cli.Context) error {
 	}
 
 	if valueFound {
-		Set(key, value)
+		persistence.Set(key, value)
 		ui.Say("Profile key %s written", key)
 	} else {
-		Delete(key)
+		persistence.Delete(key)
 		ui.Say("Profile key %s deleted", key)
 	}
 
@@ -142,7 +143,7 @@ func SetAction(c *cli.Context) error {
 func DeleteAction(c *cli.Context) error {
 
 	key := c.GetParameter(0)
-	Delete(key)
+	persistence.Delete(key)
 	ui.Say("Profile key %s deleted", key)
 
 	return nil
@@ -151,10 +152,10 @@ func DeleteAction(c *cli.Context) error {
 // SetDescriptionAction sets the profile description string
 func SetDescriptionAction(c *cli.Context) error {
 
-	config := Configurations[ProfileName]
+	config := persistence.Configurations[persistence.ProfileName]
 	config.Description = c.GetParameter(0)
-	Configurations[ProfileName] = config
-	profileDirty = true
+	persistence.Configurations[persistence.ProfileName] = config
+	persistence.ProfileDirty = true
 
 	return nil
 }

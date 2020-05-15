@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/cli"
-	"github.com/tucats/gopackages/app-cli/profile"
+	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/app-cli/ui"
 )
 
@@ -25,7 +25,7 @@ func OutputFormatAction(c *cli.Context) error {
 		default:
 			return errors.New("Invalid output format specified: " + formatString)
 		}
-		profile.SetDefault("output-format", strings.ToLower(formatString))
+		persistence.SetDefault("output-format", strings.ToLower(formatString))
 	}
 	return nil
 }
@@ -47,7 +47,7 @@ func QuietAction(c *cli.Context) error {
 func UseProfileAction(c *cli.Context) error {
 	name, _ := c.GetString("profile")
 	ui.Debug("Using profile %s", name)
-	profile.UseProfile(name)
+	persistence.UseProfile(name)
 	return nil
 }
 
