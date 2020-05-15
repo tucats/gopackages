@@ -1,6 +1,10 @@
 package functions
 
-import "github.com/tucats/gopackages/util"
+import (
+	"errors"
+
+	"github.com/tucats/gopackages/util"
+)
 
 // FunctionMin implements the min() function
 func FunctionMin(args []interface{}) (interface{}, error) {
@@ -13,6 +17,9 @@ func FunctionMin(args []interface{}) (interface{}, error) {
 
 	for _, v := range args[1:] {
 		v = util.Coerce(v, r)
+		if v == nil {
+			return nil, errors.New("invalid type")
+		}
 		switch r.(type) {
 		case int:
 			if v.(int) < r.(int) {
@@ -33,6 +40,9 @@ func FunctionMin(args []interface{}) (interface{}, error) {
 			if v.(bool) == false {
 				r = v
 			}
+		default:
+			return nil, errors.New("invalid type")
+
 		}
 	}
 	return r, nil
@@ -49,6 +59,9 @@ func FunctionMax(args []interface{}) (interface{}, error) {
 
 	for _, v := range args[1:] {
 		v = util.Coerce(v, r)
+		if v == nil {
+			return nil, errors.New("invalid type")
+		}
 		switch r.(type) {
 		case int:
 			if v.(int) > r.(int) {
@@ -69,6 +82,9 @@ func FunctionMax(args []interface{}) (interface{}, error) {
 			if v.(bool) == true {
 				r = v
 			}
+
+		default:
+			return nil, errors.New("invalid type")
 		}
 	}
 	return r, nil
@@ -80,6 +96,9 @@ func FunctionSum(args []interface{}) (interface{}, error) {
 	base := args[0]
 	for _, addend := range args[1:] {
 		addend = util.Coerce(addend, base)
+		if addend == nil {
+			return nil, errors.New("invalid type")
+		}
 		switch addend.(type) {
 		case int:
 			base = base.(int) + addend.(int)
@@ -90,6 +109,9 @@ func FunctionSum(args []interface{}) (interface{}, error) {
 
 		case bool:
 			base = base.(bool) || addend.(bool)
+		default:
+			return nil, errors.New("invalid type")
+
 		}
 	}
 	return base, nil

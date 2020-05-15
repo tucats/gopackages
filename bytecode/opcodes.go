@@ -196,6 +196,13 @@ func CallOpcode(c *Context, i interface{}) error {
 
 		f := fn.F
 		v, err = f.(func([]interface{}) (interface{}, error))(args)
+
+		// Functions implemented natively cannot wrap them up as runtime
+		// errors, so let's help them out.
+		if err != nil {
+			err = c.NewError(err.Error())
+		}
+
 	} else {
 
 		// How about as a user-defined function? These are in the symbol
@@ -226,6 +233,12 @@ func CallOpcode(c *Context, i interface{}) error {
 
 		default:
 			v, err = f.(func([]interface{}) (interface{}, error))(args)
+
+			// Functions implemented natively cannot wrap them up as runtime
+			// errors, so let's help them out.
+			if err != nil {
+				err = c.NewError(err.Error())
+			}
 		}
 	}
 
