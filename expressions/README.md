@@ -191,7 +191,7 @@ comparison and the result will be the lexigraphically lsat element. IF the
 values are int or float values, then a numeric comparison is done and the
 result is the numerically largest value.
     
-    min("shoe", "mouse", "cake", "whistle")
+    max("shoe", "mouse", "cake", "whistle")
     
 This returns the string value "whistle".
 
