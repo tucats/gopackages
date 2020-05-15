@@ -1,6 +1,8 @@
 package functions
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/util"
@@ -50,4 +52,35 @@ func FunctionLen(args []interface{}) (interface{}, error) {
 		v := util.Coerce(args[0], "")
 		return len(v.(string)), nil
 	}
+}
+
+// FunctionArray implements the array() function, which creates
+// an empty array of the given size. IF there are two parameters,
+// the first must be an existing array which is resized to match
+// the new array
+func FunctionArray(args []interface{}) (interface{}, error) {
+
+	var array []interface{}
+	count := 0
+
+	if len(args) == 2 {
+		switch v := args[0].(type) {
+		case []interface{}:
+			count = util.GetInt(args[1])
+			if count < len(v) {
+				array = v[:count]
+			} else if count == len(v) {
+				array = v
+			} else {
+				array = append(v, make([]interface{}, count-len(v))...)
+			}
+		default:
+			return nil, errors.New("first argument must be array")
+		}
+	} else {
+		count = util.GetInt(args[0])
+		array = make([]interface{}, count)
+	}
+	return array, nil
+
 }

@@ -69,6 +69,10 @@ func (c *Compiler) Statement() error {
 		return c.Return()
 	}
 
+	if c.t.IsNext("array") {
+		return c.Array()
+	}
+
 	c.t.Next()
 	return c.NewTokenError("unrecognized or unexpected token")
 }

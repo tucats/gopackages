@@ -53,6 +53,7 @@ func initializeDispatch() {
 			Print:              PrintOpcode,
 			Newline:            NewlineOpcode,
 			Drop:               DropOpcode,
+			MakeArray:          MakeArrayOpcode,
 		}
 	}
 }

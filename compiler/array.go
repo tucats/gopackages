@@ -1,0 +1,40 @@
+package compiler
+
+import (
+	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/expressions"
+	"github.com/tucats/gopackages/tokenizer"
+)
+
+// Array compiles the array statement
+func (c *Compiler) Array() error {
+
+	name := c.t.Next()
+	if !tokenizer.IsSymbol(name) {
+		c.NewTokenError("invalid array name")
+	}
+	if !c.t.IsNext("[") {
+		return c.NewError("missing [ in array")
+	}
+
+	bc, err := expressions.Compile(c.t)
+	if err != nil {
+		return err
+	}
+	c.b.Append(bc)
+	if !c.t.IsNext("]") {
+		return c.NewError("missing ] in array")
+	}
+	if c.t.IsNext(":=") {
+		bc, err = expressions.Compile(c.t)
+		if err != nil {
+			return nil
+		}
+		c.b.Append(bc)
+		c.b.Emit2(bytecode.MakeArray, 2)
+	} else {
+		c.b.Emit2(bytecode.MakeArray, 1)
+	}
+	c.b.Emit2(bytecode.Store, name)
+	return nil
+}

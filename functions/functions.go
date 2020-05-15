@@ -25,4 +25,5 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"sum":       FunctionDefinition{Min: 1, Max: 99999, F: FunctionSum},
 	"uuid":      FunctionDefinition{Min: 0, Max: 0, F: FunctionUUID},
 	"profile":   FunctionDefinition{Min: 1, Max: 2, F: FunctionProfile},
+	"array":     FunctionDefinition{Min: 1, Max: 2, F: FunctionArray},
 }

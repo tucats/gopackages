@@ -51,6 +51,49 @@ func NewlineOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
+// MakeArrayOpcode implementation
+func MakeArrayOpcode(c *Context, i interface{}) error {
+
+	parms := util.GetInt(i)
+
+	if parms == 2 {
+		initialValue, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		sv, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		size := util.GetInt(sv)
+		if size < 0 {
+			size = 0
+		}
+		array := make([]interface{}, size)
+		for n := 0; n < size; n++ {
+			array[n] = initialValue
+		}
+		c.Push(array)
+		return nil
+	}
+
+	// No initializer, so get the size and make it
+	// a non-negative integer
+	sv, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	size := util.GetInt(sv)
+	if size < 0 {
+		size = 0
+	}
+	array := make([]interface{}, size)
+	c.Push(array)
+
+	return nil
+}
+
 // ArrayOpcode implementation
 func ArrayOpcode(c *Context, i interface{}) error {
 

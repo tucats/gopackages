@@ -19,6 +19,21 @@ runs in its own scope; it can access variables from outer scopes but cannot
 set them. Functions defined within another function only exist as long as
 that function is running.
 
+## array
+The `array` statement is used to allocate an array. An array can also be
+created as an array constant and stored in a variable. The array statement
+identifies the name of the array and the size, and optionally an initial
+value for each member of the array.
+
+    array x[5]
+    array y[2] := 10
+
+The first example creates an array of 5 elements, but the elements are
+`<nil>` which means they do not have a usable value yet. The array elements
+must have a value stored in them before they can be used in an expression.
+The second example assigns an initial value to each element of the array,
+so the second statement is really identical to `y := [10,10]`.
+
 ## if
 The `if` statement provides conditional execution. The statement must start
 with a expression which can be cast as a boolean value. That value is
@@ -46,7 +61,7 @@ condition is false, as in
 If the value of `flag` does not equal the string "-d" then the 
 code will call the function `regular()` instead of `debug()`.
 
-# print
+## print
 The `print` statement accepts a list of expressions, and displays them on
 the current stdout stream. There is no formatting built into the `print`
 statement at this time; each term in the list is printed sequentially,
@@ -57,7 +72,7 @@ and a newline is added after all the items are printed.
 
 Using `print` without any arguments just prints a newline character.
 
-# call
+## call
 The `call` statement is used to invoke a function that does not return
 a value. It is followed by a function name and arguments, and these are
 used to call the named function. However, even if the function uses a
@@ -78,7 +93,7 @@ discards the result.  This is the same as using the statement:
 Where the "_" is the name of the ignored value.
 
 
-# function
+## function
 The `function` statement defines a function. This must have a name
 which is a valid symbol, and an argument list. The argument list is
 a list of names which become local variables in the running function
@@ -99,7 +114,7 @@ then be used in an expression, such as:
 
 After this code executes, `moreFun` will contain the value 4.
 
-# return
+## return
 The `return` statement contains an expression that is identified as
 the result of the function value. The generated code adds the value
 to the runtime stack, and then exits the function. The caller can

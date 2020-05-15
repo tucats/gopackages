@@ -49,6 +49,7 @@ const (
 	Load
 	Store
 	Array
+	MakeArray
 	LoadIndex
 	StoreIndex
 	Struct
