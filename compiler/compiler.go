@@ -43,6 +43,11 @@ func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
 // the end-of-statement boundary
 func (c *Compiler) StatementEnd() bool {
 	next := c.t.Peek(1)
+
+	if next == tokenizer.EndOfTokens {
+		return true
+	}
+
 	return (next == ";") || (next == "}")
 }
 
