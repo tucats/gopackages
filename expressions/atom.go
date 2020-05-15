@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	bc "github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/tokenizer"
 )
 
 func (e *Expression) expressionAtom() error {
@@ -60,7 +61,7 @@ func (e *Expression) expressionAtom() error {
 		return nil
 	}
 
-	if Symbol(t) {
+	if tokenizer.IsSymbol(t) {
 
 		e.t.Advance(1)
 		t := strings.ToLower(t)
@@ -79,41 +80,6 @@ func (e *Expression) expressionAtom() error {
 
 	e.b.Emit(bc.Push, t)
 	return nil
-}
-
-// Symbol is a utility function to determine if a token is a symbol name.
-func Symbol(s string) bool {
-
-	for n, c := range s {
-		if isLetter(c) {
-			continue
-		}
-
-		if isDigit(c) && n > 0 {
-			continue
-		}
-		return false
-	}
-	return true
-}
-
-func isLetter(c rune) bool {
-	for _, d := range "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" {
-		if c == d {
-			return true
-		}
-	}
-	return false
-}
-
-func isDigit(c rune) bool {
-
-	for _, d := range "0123456789" {
-		if c == d {
-			return true
-		}
-	}
-	return false
 }
 
 func (e *Expression) parseArray() error {
@@ -167,7 +133,7 @@ func (e *Expression) parseStruct() error {
 		// First element: name
 
 		name := e.t.Next()
-		if !Symbol(name) {
+		if !tokenizer.IsSymbol(name) {
 			return e.NewTokenError("invalid member name")
 		}
 

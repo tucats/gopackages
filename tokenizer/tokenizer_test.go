@@ -100,3 +100,54 @@ And if there were, you wouldn't find them.`,
 		})
 	}
 }
+
+func TestIsSymbol(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "alphabetic",
+			args: args{"foobar"},
+			want: true,
+		},
+		{
+			name: "alphanumeric",
+			args: args{"foobar55"},
+			want: true,
+		},
+		{
+			name: "underscore",
+			args: args{"_"},
+			want: true,
+		},
+		{
+			name: "has underscore",
+			args: args{"cat_house"},
+			want: true,
+		},
+		{
+			name: "digit first",
+			args: args{"5foobar"},
+			want: false,
+		},
+		{
+			name: "special char",
+			args: args{"!foobar"},
+			want: false,
+		},
+
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsSymbol(tt.args.s); got != tt.want {
+				t.Errorf("IsSymbol() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

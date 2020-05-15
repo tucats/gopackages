@@ -3,6 +3,7 @@ package compiler
 import (
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/expressions"
+	"github.com/tucats/gopackages/tokenizer"
 )
 
 // IsLValue peeks ahead to see if this is likely to be an lValue
@@ -10,7 +11,7 @@ import (
 // otherwise ambiguous state
 func (c *Compiler) IsLValue() bool {
 	name := c.t.Peek(1)
-	if !expressions.Symbol(name) {
+	if !tokenizer.IsSymbol(name) {
 		return false
 	}
 
@@ -33,7 +34,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 	bc := bytecode.New("lvalue")
 	name := c.t.Next()
 
-	if !expressions.Symbol(name) {
+	if !tokenizer.IsSymbol(name) {
 		return nil, c.NewTokenError("invalid symbol name")
 	}
 
@@ -78,7 +79,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 	if term == "." {
 		c.t.Advance(1)
 		member := c.t.Next()
-		if !expressions.Symbol(member) {
+		if !tokenizer.IsSymbol(member) {
 			return c.NewTokenError("invalid member name")
 		}
 		bc.Emit(bytecode.Push, member)

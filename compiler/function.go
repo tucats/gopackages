@@ -2,9 +2,8 @@ package compiler
 
 import (
 	"github.com/tucats/gopackages/app-cli/ui"
-
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/expressions"
+	"github.com/tucats/gopackages/tokenizer"
 )
 
 // Function compiles a function definition
@@ -13,7 +12,7 @@ func (c *Compiler) Function() error {
 	parameters := []string{}
 
 	fname := c.t.Next()
-	if !expressions.Symbol(fname) {
+	if !tokenizer.IsSymbol(fname) {
 		return c.NewTokenError("invalid function name")
 	}
 
@@ -24,7 +23,7 @@ func (c *Compiler) Function() error {
 				break
 			}
 			name := c.t.Next()
-			if expressions.Symbol(name) {
+			if tokenizer.IsSymbol(name) {
 				parameters = append(parameters, name)
 			} else {
 				return c.NewTokenError("invalid parameter")

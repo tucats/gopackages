@@ -178,3 +178,38 @@ func stripComments(source string) string {
 
 	return result.String()
 }
+
+// IsSymbol is a utility function to determine if a token is a symbol name.
+func IsSymbol(s string) bool {
+
+	for n, c := range s {
+		if isLetter(c) {
+			continue
+		}
+
+		if isDigit(c) && n > 0 {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+func isLetter(c rune) bool {
+	for _, d := range "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" {
+		if c == d {
+			return true
+		}
+	}
+	return false
+}
+
+func isDigit(c rune) bool {
+
+	for _, d := range "0123456789" {
+		if c == d {
+			return true
+		}
+	}
+	return false
+}
