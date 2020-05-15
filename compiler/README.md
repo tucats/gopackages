@@ -111,3 +111,8 @@ statement.
 
 This statement returns the value of the expression `salary/12.0` as
 the result of the function.
+
+If you use the `return` statement with no value, then the function
+simply stops without leaving a value on the arithmetic stack. This is
+the appropriate behavior for a function that is meant to be invoked
+with a `call` statement.

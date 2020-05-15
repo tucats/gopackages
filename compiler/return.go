@@ -8,11 +8,13 @@ import (
 // Return handles the return statment compilation
 func (c *Compiler) Return() error {
 
-	bc, err := expressions.Compile(c.t)
-	if err != nil {
-		return err
+	if !c.StatementEnd() {
+		bc, err := expressions.Compile(c.t)
+		if err != nil {
+			return err
+		}
+		c.b.Append(bc)
 	}
-	c.b.Append(bc)
 	c.b.Emit0(bytecode.Stop)
 
 	return nil
