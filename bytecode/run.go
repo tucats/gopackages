@@ -2,6 +2,7 @@ package bytecode
 
 import (
 	"strconv"
+	"sync"
 
 	"github.com/tucats/gopackages/app-cli/ui"
 )
@@ -13,6 +14,7 @@ type OpcodeHandler func(b *Context, i interface{}) error
 type DispatchMap map[int]OpcodeHandler
 
 var dispatch DispatchMap
+var dispatchMux sync.Mutex
 
 // GrowStackBy indicates the number of eleemnts to add to the stack when
 // it runs out of space.
@@ -65,8 +67,11 @@ func (c *Context) RunFromAddress(addr int) error {
 
 	var err error
 
-	// Make sure globals are initialized
+	// Make sure globals are initialized. Becuase this updates a global, let's
+	// do it in a thread-safe fashion.
+	dispatchMux.Lock()
 	initializeDispatch()
+	dispatchMux.Unlock()
 
 	// Reset the runtime context
 	c.pc = addr
