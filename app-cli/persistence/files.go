@@ -156,7 +156,7 @@ func Set(key string, value string) {
 
 	explicitValues.Items[key] = value
 
-	c := *CurrentConfiguration
+	c := getCurrentConfiguration()
 	c.Items[key] = value
 	ProfileDirty = true
 	ui.Debug("Setting profile key \"%s\" = \"%s\"", key, value)
@@ -179,7 +179,7 @@ func Get(key string) string {
 
 	v, found := explicitValues.Items[key]
 	if !found {
-		c := *CurrentConfiguration
+		c := getCurrentConfiguration()
 		v = c.Items[key]
 	}
 	ui.Debug("Reading profile key \"%s\" : \"%s\"", key, v)
@@ -189,7 +189,7 @@ func Get(key string) string {
 // Delete removes a key from the map entirely. Also removes if from the
 // active defaults.
 func Delete(key string) {
-	c := *CurrentConfiguration
+	c := getCurrentConfiguration()
 	delete(c.Items, key)
 	delete(explicitValues.Items, key)
 	ProfileDirty = true
@@ -201,8 +201,17 @@ func Exists(key string) bool {
 
 	_, exists := explicitValues.Items[key]
 	if !exists {
-		c := *CurrentConfiguration
+		c := getCurrentConfiguration()
 		_, exists = c.Items[key]
 	}
 	return exists
+}
+
+func getCurrentConfiguration() *Configuration {
+
+	if CurrentConfiguration == nil {
+		var c Configuration = Configuration{Description: "Default configuration", Items: map[string]string{}}
+		CurrentConfiguration = &c
+	}
+	return CurrentConfiguration
 }

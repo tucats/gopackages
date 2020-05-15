@@ -14,8 +14,15 @@ func FunctionProfile(args []interface{}) (interface{}, error) {
 	if len(args) == 1 {
 		return persistence.Get(key), nil
 	}
+
+	// If the value is an empty string, delete the key else
+	// store the value for the key.
 	value := util.GetString(args[1])
-	persistence.Set(key, value)
+	if value == "" {
+		persistence.Delete(key)
+	} else {
+		persistence.Set(key, value)
+	}
 	return true, nil
 }
 

@@ -101,3 +101,95 @@ func TestFunctionFloat(t *testing.T) {
 		})
 	}
 }
+
+func TestFunctionString(t *testing.T) {
+	type args struct {
+		args []interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name: "string(int)",
+			args: args{[]interface{}{33}},
+			want: "33",
+		},
+		{
+			name: "string(float64)",
+			args: args{[]interface{}{15.2}},
+			want: "15.2",
+		},
+		{
+			name: "string(string)",
+			args: args{[]interface{}{"3.14"}},
+			want: "3.14",
+		},
+		{
+			name: "string(bool)",
+			args: args{[]interface{}{true}},
+			want: "true",
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := FunctionString(tt.args.args)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FunctionString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("FunctionString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFunctionBool(t *testing.T) {
+	type args struct {
+		args []interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name: "bool(int)",
+			args: args{[]interface{}{0}},
+			want: false,
+		},
+		{
+			name: "bool(float64)",
+			args: args{[]interface{}{15.2}},
+			want: true,
+		},
+		{
+			name: "bool(string)",
+			args: args{[]interface{}{"true"}},
+			want: true,
+		},
+		{
+			name: "bool(bool)",
+			args: args{[]interface{}{false}},
+			want: false,
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := FunctionBool(tt.args.args)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FunctionBool() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("FunctionBool() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
