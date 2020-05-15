@@ -70,5 +70,5 @@ func (c *Compiler) Statement() error {
 	}
 
 	c.t.Next()
-	return c.NewTokenError("unrecognized statement")
+	return c.NewTokenError("unrecognized or unexpected token")
 }

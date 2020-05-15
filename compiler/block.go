@@ -19,6 +19,10 @@ func (c *Compiler) Block() error {
 		if c.t.IsNext(";") {
 			// No action needed
 		}
+
+		if c.t.AtEnd() {
+			return c.NewError("unclosed statement block")
+		}
 	}
 	return nil
 }
