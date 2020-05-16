@@ -1,82 +1,71 @@
 package compiler
 
 import (
-	"errors"
-
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/expressions"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
 // Statement parses a single statement
 func (c *Compiler) Statement() error {
 
-	// We just eat statement separators
+	// We just eat statement separators and we also
+	// terminate processing when we hit the end of the
+	// token stream.
 	if c.t.IsNext(";") {
 		return nil
 	}
-
 	if c.t.IsNext(tokenizer.EndOfTokens) {
 		return nil
 	}
 
-	// Statement block
-	if c.t.IsNext("{") {
-		return c.Block()
-	}
-
+	// Is it a function definition? These aren't compiled
+	// inline, so we call a special compile unit that will
+	// compile the function and store it in the bytecode
+	// symbol table.
 	if c.t.IsNext("function") {
 		return c.Function()
 	}
 
-	// It's a single statement, so let's drop down
-	// a linenumber marker
+	// At this point, we know we're trying to compile
+	// a statement, so go ahead and drop down a line
+	// number is the stream to help us form runtime
+	// error messages as needed.
 	c.b.Emit2(bytecode.AtLine, c.t.Line[c.t.TokenP])
 
-	// Crude assignment statement test
+	// If the next item(s) constitute a value LValue,
+	// then this is an assignment statement.
 	if c.IsLValue() {
-
-		lv, err := c.LValue()
-		if err != nil {
-			return err
-		}
-		if !c.t.IsNext(":=") {
-			return errors.New("expected := not found")
-		}
-
-		bc, err := expressions.Compile(c.t)
-		if err != nil {
-			return err
-		}
-		c.b.Append(bc)
-		c.b.Append(lv)
-		return nil
+		return c.Assignment()
 	}
 
-	if c.t.IsNext("if") {
+	// Remaining statement types all have a starting
+	// term that defines which compiler unit to call.
+
+	switch c.t.Next() {
+
+	case "{":
+		return c.Block()
+
+	case "if":
 		return c.If()
-	}
 
-	if c.t.IsNext("for") {
+	case "for":
 		return c.For()
-	}
 
-	if c.t.IsNext("print") {
+	case "print":
 		return c.Print()
-	}
 
-	if c.t.IsNext("call") {
+	case "call":
 		return c.Call()
-	}
 
-	if c.t.IsNext("return") {
+	case "return":
 		return c.Return()
-	}
 
-	if c.t.IsNext("array") {
+	case "array":
 		return c.Array()
+
 	}
 
-	c.t.Next()
+	// Unknown statement, return an error
 	return c.NewTokenError("unrecognized or unexpected token")
 }
