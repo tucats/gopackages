@@ -8,9 +8,8 @@ import (
 // Statement parses a single statement
 func (c *Compiler) Statement() error {
 
-	// We just eat statement separators and we also
-	// terminate processing when we hit the end of the
-	// token stream.
+	// We just eat statement separators and we also terminate
+	// processing when we hit the end of the token stream.
 	if c.t.IsNext(";") {
 		return nil
 	}
@@ -18,29 +17,26 @@ func (c *Compiler) Statement() error {
 		return nil
 	}
 
-	// Is it a function definition? These aren't compiled
-	// inline, so we call a special compile unit that will
-	// compile the function and store it in the bytecode
-	// symbol table.
+	// Is it a function definition? These aren't compiled inline,
+	// so we call a special compile unit that will compile the
+	// function and store it in the bytecode symbol table.
 	if c.t.IsNext("function") {
 		return c.Function()
 	}
 
-	// At this point, we know we're trying to compile
-	// a statement, so go ahead and drop down a line
-	// number is the stream to help us form runtime
-	// error messages as needed.
+	// At this point, we know we're trying to compile a statement,
+	// so store the current line number in the stream to help us
+	// form runtime error messages as needed.
 	c.b.Emit2(bytecode.AtLine, c.t.Line[c.t.TokenP])
 
-	// If the next item(s) constitute a value LValue,
-	// then this is an assignment statement.
+	// If the next item(s) constitute a value LValue, then this is
+	// an assignment statement.
 	if c.IsLValue() {
 		return c.Assignment()
 	}
 
-	// Remaining statement types all have a starting
-	// term that defines which compiler unit to call.
-
+	// Remaining statement types all have a starting term that defines
+	// which compiler unit to call.
 	switch c.t.Next() {
 
 	case "{":
