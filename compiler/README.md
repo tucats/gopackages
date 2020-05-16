@@ -131,3 +131,50 @@ If you use the `return` statement with no value, then the function
 simply stops without leaving a value on the arithmetic stack. This is
 the appropriate behavior for a function that is meant to be invoked
 with a `call` statement.
+
+## for
+The `for` statement defines a looping construct. A single statement
+or a statement block is executed based on the definition of the 
+loop. There are two kinds of loops.
+
+    x := [101, 232,363]
+    for n:=0; n < len(x); n := n + 1 {
+        print "element ", n, " is ", x[n]
+    }
+
+This example creates an array, and then uses a loop to read all
+the values of the array. The `for` statement is followed by three
+clauses, each separated by a ";" character. The first clause must
+be a valid assignment that initializes the loop value. The second
+clause is a condition which is tested at the start of each loop;
+when the condition results in a false value, the loop stop 
+executing. The third clause must be a statement that updates the
+loop value.  This is followed by a block containing the statement(s)
+to execute each time through the loop.
+
+When using a loop to index over an array, you can use a short
+hand version of this.
+
+   x := [101, 232, 363]
+   for n := range x {
+       print "The value is ", n
+   }
+
+In this example, the value of `n` will take on each element of
+the array in turn as the body of the loop executes. You can
+have the `range` option give you both the index number and
+the value.
+
+    x := 101, 232, 363]
+    for i, n := range x {
+        print "Element ", i, " is ", n
+    }
+
+Here, the array index is stored in `i` and the value of
+the array index is stored in `n`. This is symantically
+identical to the following more explicit loop structure:
+
+    for i := 1; i <= len(x); i := i + 1 {
+        n := x[i]
+        print "Element ", i, " is ", n
+    }
