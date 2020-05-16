@@ -26,7 +26,7 @@ func (c *Compiler) IsLValue() bool {
 	return false
 }
 
-// LValue compiles the informaiton on the left side of
+// LValue compiles the information on the left side of
 // an assignment. This information is used later to store the
 // data in the named object.
 func (c *Compiler) LValue() (*bytecode.ByteCode, error) {

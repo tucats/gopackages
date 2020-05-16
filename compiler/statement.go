@@ -57,6 +57,10 @@ func (c *Compiler) Statement() error {
 		return c.If()
 	}
 
+	if c.t.IsNext("for") {
+		return c.For()
+	}
+
 	if c.t.IsNext("print") {
 		return c.Print()
 	}
