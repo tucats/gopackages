@@ -47,6 +47,10 @@ func FunctionLen(args []interface{}) (interface{}, error) {
 		return nil, errors.New("incorrect number of function arguments")
 	}
 
+	if args[0] == nil {
+		return 0, nil
+	}
+
 	switch arg := args[0].(type) {
 
 	case map[string]interface{}:
@@ -58,6 +62,10 @@ func FunctionLen(args []interface{}) (interface{}, error) {
 
 	case []interface{}:
 		return len(arg), nil
+
+	case nil:
+		return 0, nil
+
 	default:
 		v := util.Coerce(args[0], "")
 		return len(v.(string)), nil

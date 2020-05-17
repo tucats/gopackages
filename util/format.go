@@ -35,7 +35,7 @@ func Format(arg interface{}) string {
 		return "false"
 
 	case float64:
-		return fmt.Sprintf("%f", v)
+		return fmt.Sprintf("%v", v)
 
 	case map[string]interface{}:
 		var b strings.Builder

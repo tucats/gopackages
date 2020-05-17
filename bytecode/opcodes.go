@@ -248,7 +248,7 @@ func CallOpcode(c *Context, i interface{}) error {
 			v, err = cx.Pop()
 		}
 
-	default:
+	case func([]interface{}) (interface{}, error):
 		v, err = v.(func([]interface{}) (interface{}, error))(args)
 
 		// Functions implemented natively cannot wrap them up as runtime
@@ -257,6 +257,8 @@ func CallOpcode(c *Context, i interface{}) error {
 			err = c.NewError(err.Error())
 		}
 
+	default:
+		c.NewError("invalid target of function call")
 	}
 
 	if err != nil {
