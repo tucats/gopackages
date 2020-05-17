@@ -25,6 +25,18 @@ func Format(arg interface{}) string {
 
 	switch v := arg.(type) {
 
+	case int:
+		return fmt.Sprintf("%d", v)
+
+	case bool:
+		if v {
+			return "true"
+		}
+		return "false"
+
+	case float64:
+		return fmt.Sprintf("%f", v)
+
 	case map[string]interface{}:
 		var b strings.Builder
 
@@ -65,7 +77,10 @@ func Format(arg interface{}) string {
 	case string:
 		return "\"" + v + "\""
 
+	case func([]interface{}) (interface{}, error):
+		return fmt.Sprintf("<builtin %v>", arg)
+
 	default:
-		return fmt.Sprintf("%v", v)
+		return "<bytecode>"
 	}
 }

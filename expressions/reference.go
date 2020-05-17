@@ -7,7 +7,7 @@ import (
 // reference parses a structure or array reference
 func (e *Expression) reference() error {
 
-	// Parse the atom
+	// Parse the function call or exprssion atom
 	err := e.expressionAtom()
 	if err != nil {
 		return err

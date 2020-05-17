@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/util"
 )
 
@@ -206,19 +205,11 @@ func LoadOpcode(c *Context, i interface{}) error {
 // CallOpcode bytecode implementation.
 func CallOpcode(c *Context, i interface{}) error {
 
-	var fname string
 	var err error
 	var v interface{}
 
 	// Argument count is in operand
 	argc := i.(int)
-
-	// Function name is last item on stack
-	v, err = c.Pop()
-	if err != nil {
-		return err
-	}
-	fname = util.GetString(v)
 
 	// Arguments are in reverse order on stack.
 	args := make([]interface{}, argc)
@@ -230,15 +221,35 @@ func CallOpcode(c *Context, i interface{}) error {
 		args[(argc-n)-1] = v
 	}
 
-	// Is it in the dictionary?
-	fn, found := functions.FunctionDictionary[fname]
-	if found {
-		if argc > fn.Max || argc < fn.Min {
-			return c.NewError("incorrect number of function arguments")
+	// Function value is last item on stack
+	v, err = c.Pop()
+	if err != nil {
+		return err
+	}
+
+	// Depends on the type here as to what we call...
+
+	switch af := v.(type) {
+	case *ByteCode:
+
+		// Make a new symbol table for the fucntion to run with,
+		// and a new execution context. Store the argument list in
+		// the child table.
+		sf := NewChildSymbolTable("Function", c.symbols)
+		cx := NewContext(sf, af)
+		cx.Tracing = c.Tracing
+
+		sf.Set("_args", args)
+
+		// Run the function. If it doesn't get an error, then
+		// extract the stop stack item as the result
+		err = cx.Run()
+		if err == nil {
+			v, err = cx.Pop()
 		}
 
-		f := fn.F
-		v, err = f.(func([]interface{}) (interface{}, error))(args)
+	default:
+		v, err = v.(func([]interface{}) (interface{}, error))(args)
 
 		// Functions implemented natively cannot wrap them up as runtime
 		// errors, so let's help them out.
@@ -246,45 +257,6 @@ func CallOpcode(c *Context, i interface{}) error {
 			err = c.NewError(err.Error())
 		}
 
-	} else {
-
-		// How about as a user-defined function? These are in the symbol
-		// table with "()" as the suffix.
-		f, found := c.symbols.Get(fname + "()")
-		if !found {
-			return c.NewStringError("undefined function: %v", fname)
-		}
-
-		// Depends on the type here as to what we call...
-
-		switch af := f.(type) {
-		case *ByteCode:
-
-			// Make a new symbol table for the fucntion to run with,
-			// and a new execution context. Store the argument list in
-			// the child table.
-			sf := NewChildSymbolTable("Function "+fname, c.symbols)
-			cx := NewContext(sf, af)
-			cx.Tracing = c.Tracing
-
-			sf.Set("_args", args)
-
-			// Run the function. If it doesn't get an error, then
-			// extract the stop stack item as the result
-			err = cx.Run()
-			if err == nil {
-				v, err = cx.Pop()
-			}
-
-		default:
-			v, err = f.(func([]interface{}) (interface{}, error))(args)
-
-			// Functions implemented natively cannot wrap them up as runtime
-			// errors, so let's help them out.
-			if err != nil {
-				err = c.NewError(err.Error())
-			}
-		}
 	}
 
 	if err != nil {

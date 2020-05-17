@@ -11,6 +11,10 @@ import (
 // FunctionProfile implements the profile() function
 func FunctionProfile(args []interface{}) (interface{}, error) {
 
+	if len(args) < 1 || len(args) > 2 {
+		return nil, errors.New("incorrect number of function arguments")
+	}
+
 	key := util.GetString(args[0])
 
 	if len(args) == 1 {
@@ -30,12 +34,18 @@ func FunctionProfile(args []interface{}) (interface{}, error) {
 
 // FunctionUUID implements the uuid() function
 func FunctionUUID(args []interface{}) (interface{}, error) {
+	if len(args) != 0 {
+		return nil, errors.New("incorrect number of function arguments")
+	}
 	u := uuid.New()
 	return u.String(), nil
 }
 
 // FunctionLen implements the len() function
 func FunctionLen(args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of function arguments")
+	}
 
 	switch arg := args[0].(type) {
 
@@ -59,6 +69,10 @@ func FunctionLen(args []interface{}) (interface{}, error) {
 // the first must be an existing array which is resized to match
 // the new array
 func FunctionArray(args []interface{}) (interface{}, error) {
+
+	if len(args) < 1 || len(args) > 2 {
+		return nil, errors.New("incorrect number of function arguments")
+	}
 
 	var array []interface{}
 	count := 0

@@ -5,7 +5,7 @@ import (
 	"github.com/tucats/gopackages/functions"
 )
 
-func (e *Expression) functionCall(fname string) error {
+func (e *Expression) functionCall() error {
 
 	// Note, caller already consumed the opening paren
 	argc := 0
@@ -34,14 +34,7 @@ func (e *Expression) functionCall(fname string) error {
 	}
 	e.t.Advance(1)
 
-	// Quick sanity check on argument count for builtin functions
-	fd, found := functions.FunctionDictionary[fname]
-	if found && ((argc < fd.Min) || (argc > fd.Max)) {
-		return e.NewStringError("incorrect number of arguments for function", fname)
-	}
-
 	// Call the function
-	e.b.Emit2(bc.Push, fname)
 	e.b.Emit2(bc.Call, argc)
 	return nil
 }
@@ -52,6 +45,36 @@ func (e *Expression) functionCall(fname string) error {
 func AddBuiltins(symbols *bc.SymbolTable) {
 
 	for n, d := range functions.FunctionDictionary {
-		symbols.Set(n+"()", d.F)
+
+		if d.Pkg == "" {
+			symbols.Set(n, d.F)
+		} else {
+			// Does package already exist? IF not, make it. The package
+			// is just a struct containing where each member is a function
+			// definition.
+			p, found := symbols.Get(d.Pkg)
+			if !found {
+				p = map[string]interface{}{}
+			}
+
+			p.(map[string]interface{})[n] = d.F
+			symbols.Set(d.Pkg, p)
+		}
 	}
+}
+
+// Function compiles a function call. The value of the
+// function has been pushed to the top of the stack.
+func (e *Expression) Function() error {
+
+	// Get the atom
+	err := e.reference()
+	if err != nil {
+		return err
+	}
+	// Peek ahead to see if it's the start of a function call...
+	if e.t.IsNext("(") {
+		return e.functionCall()
+	}
+	return nil
 }

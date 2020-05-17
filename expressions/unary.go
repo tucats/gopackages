@@ -10,7 +10,7 @@ func (e *Expression) unary() error {
 	switch t {
 	case "-":
 		e.t.Advance(1)
-		err := e.reference()
+		err := e.Function()
 		if err != nil {
 			return err
 		}
@@ -19,7 +19,7 @@ func (e *Expression) unary() error {
 
 	case "!":
 		e.t.Advance(1)
-		err := e.reference()
+		err := e.Function()
 		if err != nil {
 			return err
 		}
@@ -27,7 +27,7 @@ func (e *Expression) unary() error {
 		return nil
 
 	default:
-		return e.reference()
+		return e.Function()
 
 	}
 }

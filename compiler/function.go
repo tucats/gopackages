@@ -57,7 +57,7 @@ func (c *Compiler) Function() error {
 	}
 
 	// Store the compiled code is the compiler's symbol table
-	c.s.Set(fname+"()", b)
+	c.s.Set(fname, b)
 
 	if ui.DebugMode {
 		b.Disasm()

@@ -9,6 +9,10 @@ import (
 // FunctionInt implements the int() function
 func FunctionInt(args []interface{}) (interface{}, error) {
 
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of function arguments")
+	}
+
 	v := util.Coerce(args[0], 1)
 	if v == nil {
 		return nil, errors.New("invalid value to coerce to integer type")
@@ -18,6 +22,9 @@ func FunctionInt(args []interface{}) (interface{}, error) {
 
 // FunctionFloat implements the float() function
 func FunctionFloat(args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of function arguments")
+	}
 
 	v := util.Coerce(args[0], 1.0)
 	if v == nil {
@@ -28,12 +35,18 @@ func FunctionFloat(args []interface{}) (interface{}, error) {
 
 // FunctionString implements the string() function
 func FunctionString(args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of function arguments")
+	}
 
 	return util.GetString(args[0]), nil
 }
 
 // FunctionBool implements the bool() function
 func FunctionBool(args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of function arguments")
+	}
 
 	v := util.Coerce(args[0], true)
 	if v == nil {

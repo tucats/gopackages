@@ -66,11 +66,6 @@ func (e *Expression) expressionAtom() error {
 		e.t.Advance(1)
 		t := strings.ToLower(t)
 
-		// Peek ahead to see if it's the start of a function call...
-		if e.t.IsNext("(") {
-			return e.functionCall(t)
-		}
-
 		// Nope, probably name from the symbol table
 		e.b.Emit2(bc.Load, t)
 
