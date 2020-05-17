@@ -265,6 +265,8 @@ func CallOpcode(c *Context, i interface{}) error {
 			// the child table.
 			sf := NewChildSymbolTable("Function "+fname, c.symbols)
 			cx := NewContext(sf, af)
+			cx.Tracing = c.Tracing
+
 			sf.Set("_args", args)
 
 			// Run the function. If it doesn't get an error, then

@@ -85,6 +85,9 @@ func (c *Context) RunFromAddress(addr int) error {
 		c.bc.Emit1(Stop)
 	}
 
+	if c.Tracing {
+		ui.Debug("*** Tracing " + c.Name)
+	}
 	// Loop over the bytecodes and run.
 	for c.running {
 
@@ -111,6 +114,9 @@ func (c *Context) RunFromAddress(addr int) error {
 		if err != nil {
 			return err
 		}
+	}
+	if c.Tracing {
+		ui.Debug("*** End tracing " + c.Name)
 	}
 
 	return err
