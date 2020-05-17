@@ -91,7 +91,12 @@ func (c *Context) RunFromAddress(addr int) error {
 		if c.pc > len(c.bc.opcodes) {
 			return c.NewError("ran off end of incomplete bytecode")
 		}
+
 		i := c.bc.opcodes[c.pc]
+		if c.Tracing {
+			s := FormatInstruction(i)
+			ui.Debug("%5d: %s", c.pc, s)
+		}
 		c.pc = c.pc + 1
 
 		imp, found := dispatch[i.Opcode]

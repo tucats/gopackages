@@ -11,6 +11,7 @@ type Context struct {
 	running bool
 	line    int
 	symbols *SymbolTable
+	Tracing bool
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode
@@ -29,6 +30,7 @@ func NewContext(s *SymbolTable, b *ByteCode) *Context {
 		running: false,
 		line:    0,
 		symbols: s,
+		Tracing: false,
 	}
 	ctxp := &ctx
 	ctxp.SetByteCode(b)
