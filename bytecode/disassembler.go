@@ -113,3 +113,25 @@ func Format(opcodes []I) string {
 	b.WriteRune(']')
 	return b.String()
 }
+
+// FormatStack formats the stack for tracing output
+func FormatStack(s []interface{}) string {
+
+	if len(s) == 0 {
+		return "<empty>"
+	}
+	var b strings.Builder
+
+	for n := len(s) - 1; n >= 0; n = n - 1 {
+
+		if n < len(s)-1 {
+			b.WriteString(", ")
+		}
+
+		b.WriteString(util.Format(s[n]))
+		if b.Len() > 50 {
+			return b.String()[:50] + "..."
+		}
+	}
+	return b.String()
+}

@@ -21,6 +21,10 @@ func (e *Expression) addSubtract() error {
 		if tokenizer.InList(op, []string{"+", "-", "&"}) {
 			e.t.Advance(1)
 
+			if e.t.IsNext(tokenizer.EndOfTokens) {
+				return e.NewError("missing term")
+			}
+
 			err := e.multDivide()
 			if err != nil {
 				return err

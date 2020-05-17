@@ -20,8 +20,11 @@ func (e *Expression) multDivide() error {
 			break
 		}
 		op := e.t.Peek(1)
-		if tokenizer.InList(op, []string{"*", "/", "|"}) {
-			e.t.Advance(1)
+		if e.t.IsAnyNext([]string{"*", "/", "|"}) {
+
+			if e.t.IsNext(tokenizer.EndOfTokens) {
+				return e.NewError("missing term")
+			}
 
 			err := e.unary()
 			if err != nil {

@@ -95,7 +95,11 @@ func (c *Context) RunFromAddress(addr int) error {
 		i := c.bc.opcodes[c.pc]
 		if c.Tracing {
 			s := FormatInstruction(i)
-			ui.Debug("%5d: %s", c.pc, s)
+			s2 := FormatStack(c.stack[:c.sp])
+			if len(s2) > 50 {
+				s2 = s2[:50]
+			}
+			ui.Debug("%5d: %-30s stack: %s", c.pc, s, s2)
 		}
 		c.pc = c.pc + 1
 
