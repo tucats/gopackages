@@ -3,6 +3,7 @@ package functions
 import (
 	"errors"
 	"os"
+	"sort"
 
 	"github.com/google/uuid"
 	"github.com/tucats/gopackages/app-cli/persistence"
@@ -116,4 +117,32 @@ func FunctionGetEnv(args []interface{}) (interface{}, error) {
 	}
 
 	return os.Getenv(util.GetString(args[0])), nil
+}
+
+// FunctionMembers gets an array of the names of the fields in a structure
+func FunctionMembers(args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of function arguments")
+	}
+	switch v := args[0].(type) {
+
+	case map[string]interface{}:
+
+		keys := make([]string, 0)
+		for k := range v {
+			if k != "__readonly" {
+				keys = append(keys, k)
+			}
+		}
+		sort.Strings(keys)
+
+		a := make([]interface{}, len(keys))
+		for n, k := range keys {
+			a[n] = k
+		}
+		return a, nil
+
+	default:
+		return nil, errors.New("incorrect data type")
+	}
 }

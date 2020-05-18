@@ -23,6 +23,10 @@ func FormatUnquoted(arg interface{}) string {
 // array constant and puts quotes around string values.
 func Format(arg interface{}) string {
 
+	if arg == nil {
+		return "<nil>"
+	}
+
 	switch v := arg.(type) {
 
 	case int:
@@ -40,9 +44,13 @@ func Format(arg interface{}) string {
 	case map[string]interface{}:
 		var b strings.Builder
 
+		// Make a list of the keys, ignoring hidden members whose name
+		// starts with "__"
 		keys := make([]string, 0)
 		for k := range v {
-			keys = append(keys, k)
+			if len(k) < 2 || k[0:2] != "__" {
+				keys = append(keys, k)
+			}
 		}
 		sort.Strings(keys)
 

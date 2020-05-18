@@ -1,6 +1,10 @@
 package functions
 
-import "github.com/tucats/gopackages/symbols"
+import (
+	"reflect"
+
+	"github.com/tucats/gopackages/symbols"
+)
 
 // FunctionDefinition is an element in the function dictionary
 type FunctionDefinition struct {
@@ -30,6 +34,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"profile":   FunctionDefinition{Min: 1, Max: 2, F: FunctionProfile, Pkg: "_util"},
 	"array":     FunctionDefinition{Min: 1, Max: 2, F: FunctionArray},
 	"getenv":    FunctionDefinition{Min: 1, Max: 1, F: FunctionGetEnv, Pkg: "_util"},
+	"members":   FunctionDefinition{Min: 1, Max: 1, F: FunctionMembers, Pkg: "_util"},
 }
 
 // AddBuiltins adds or overrides the default function library in the symbol map.
@@ -48,10 +53,26 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 			p, found := symbols.Get(d.Pkg)
 			if !found {
 				p = map[string]interface{}{}
+				p.(map[string]interface{})["__readonly"] = true
 			}
 
 			p.(map[string]interface{})[n] = d.F
 			symbols.Set(d.Pkg, p)
 		}
 	}
+}
+
+// FindName returns the name of a function from the dictionary if one is found
+func FindName(f func([]interface{}) (interface{}, error)) string {
+
+	sf1 := reflect.ValueOf(f)
+
+	for name, d := range FunctionDictionary {
+		sf2 := reflect.ValueOf(d.F)
+		if sf1.Pointer() == sf2.Pointer() {
+			return name
+		}
+	}
+
+	return ""
 }

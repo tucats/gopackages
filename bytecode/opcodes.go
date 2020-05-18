@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -184,7 +185,11 @@ func StoreOpcode(c *Context, i interface{}) error {
 		return err
 	}
 
-	return c.Set(util.GetString(i), v)
+	err = c.Set(util.GetString(i), v)
+	if err != nil {
+		return c.NewError(err.Error())
+	}
+	return err
 }
 
 // LoadOpcode implementation
@@ -207,7 +212,7 @@ func LoadOpcode(c *Context, i interface{}) error {
 func CallOpcode(c *Context, i interface{}) error {
 
 	var err error
-	var v interface{}
+	var result interface{}
 
 	// Argument count is in operand
 	argc := i.(int)
@@ -215,7 +220,7 @@ func CallOpcode(c *Context, i interface{}) error {
 	// Arguments are in reverse order on stack.
 	args := make([]interface{}, argc)
 	for n := 0; n < argc; n = n + 1 {
-		v, err = c.Pop()
+		v, err := c.Pop()
 		if err != nil {
 			return err
 		}
@@ -223,14 +228,14 @@ func CallOpcode(c *Context, i interface{}) error {
 	}
 
 	// Function value is last item on stack
-	v, err = c.Pop()
+	result, err = c.Pop()
 	if err != nil {
 		return err
 	}
 
 	// Depends on the type here as to what we call...
 
-	switch af := v.(type) {
+	switch af := result.(type) {
 	case *ByteCode:
 
 		// Make a new symbol table for the fucntion to run with,
@@ -246,16 +251,20 @@ func CallOpcode(c *Context, i interface{}) error {
 		// extract the stop stack item as the result
 		err = cx.Run()
 		if err == nil {
-			v, err = cx.Pop()
+			result, err = cx.Pop()
 		}
 
 	case func([]interface{}) (interface{}, error):
-		v, err = v.(func([]interface{}) (interface{}, error))(args)
+		result, err = af(args)
 
 		// Functions implemented natively cannot wrap them up as runtime
 		// errors, so let's help them out.
 		if err != nil {
-			err = c.NewError(err.Error())
+			name := functions.FindName(af)
+			if name != "" {
+				name = " " + name
+			}
+			err = c.NewError("in function" + name + ", " + err.Error())
 		}
 
 	default:
@@ -265,7 +274,7 @@ func CallOpcode(c *Context, i interface{}) error {
 	if err != nil {
 		return err
 	}
-	c.Push(v)
+	c.Push(result)
 	return nil
 }
 
@@ -842,11 +851,19 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 	// a read-only member or a function pointer...
 	case map[string]interface{}:
 		subscript := util.GetString(index)
-		old, found := a[subscript]
 
+		// Does this member have a flag marking it as readonly?
+		old, found := a["__readonly"]
+		if found {
+			if util.GetBool(old) {
+				return c.NewError("readonly structure")
+			}
+		}
+		// Does this item already exist and is readonly?
+		old, found = a[subscript]
 		if found {
 			if subscript[0:1] == "_" {
-				return errors.New("readonly symbol")
+				return c.NewError("readonly symbol")
 			}
 
 			// Check to be sure this isn't a restricted (function code) type
