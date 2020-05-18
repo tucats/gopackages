@@ -8,24 +8,55 @@ import (
 // GetInt takes a generic interface and returns the integer value, using
 // type coercion if needed.
 func GetInt(v interface{}) int {
+
+	switch v.(type) {
+	case map[string]interface{}:
+		return 0
+
+	case []interface{}:
+		return 0
+	}
+
 	return Coerce(v, 1).(int)
 }
 
 // GetBool takes a generic interface and returns the boolean value, using
 // type coercion if needed.
 func GetBool(v interface{}) bool {
+	switch v.(type) {
+	case map[string]interface{}:
+		return false
+
+	case []interface{}:
+		return false
+	}
 	return Coerce(v, true).(bool)
 }
 
 // GetString takes a generic interface and returns the string value, using
 // type coercion if needed.
 func GetString(v interface{}) string {
+	switch v.(type) {
+	case map[string]interface{}:
+		return ""
+
+	case []interface{}:
+		return ""
+	}
 	return Coerce(v, "").(string)
 }
 
 // GetFloat takes a generic interface and returns the float64 value, using
 // type coercion if needed.
 func GetFloat(v interface{}) float64 {
+	switch v.(type) {
+	case map[string]interface{}:
+		return 0.0
+
+	case []interface{}:
+		return 0.0
+	}
+
 	return Coerce(v, float64(0)).(float64)
 }
 
