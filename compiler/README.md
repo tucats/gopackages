@@ -135,9 +135,9 @@ because all functions must return a value, but the `call` statement
 discards the result.  This is the same as using the statement:
 
     
-    _ := profile("secret", "cookies")
+    x := profile("secret", "cookies")
 
-Where the "_" is the name of the ignored value.
+Where the "x" is the name of an ignored value.
 
 
 ## function
@@ -202,17 +202,17 @@ to execute each time through the loop.
 When using a loop to index over an array, you can use a short
 hand version of this.
 
-   x := [101, 232, 363]
-   for n := range x {
-       print "The value is ", n
-   }
+    x := [ 101, 232, 363 ]
+    for n := range x {
+        print "The value is ", n
+    }
 
 In this example, the value of `n` will take on each element of
 the array in turn as the body of the loop executes. You can
 have the `range` option give you both the index number and
 the value.
 
-    x := 101, 232, 363]
+    x := [ 101, 232, 363 ]
     for i, n := range x {
         print "Element ", i, " is ", n
     }
