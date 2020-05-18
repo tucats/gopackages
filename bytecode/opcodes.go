@@ -939,15 +939,25 @@ func NegateOpcode(c *Context, i interface{}) error {
 	}
 
 	switch value := v.(type) {
+
 	case bool:
 		c.Push(!value)
 
 	case int:
 		c.Push(-value)
+
 	case float64:
 		c.Push(0.0 - value)
 
-	case string:
+	case []interface{}:
+		// Create an array in inverse order
+		r := make([]interface{}, len(value))
+		for n, d := range value {
+			r[len(value)-n-1] = d
+		}
+		c.Push(r)
+
+	default:
 		return c.NewError("invalid data type for negation")
 	}
 	return nil
