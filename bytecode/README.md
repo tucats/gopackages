@@ -19,6 +19,7 @@ by the caller as native Go code.
 ## Example
 Here is a trival example of generating bytecode and executing it.
     
+    // Create a ByteCode object and write some instructions into it.
     b := bytecode.New("sample program")
     b.Emit2(I{bytecode.Load, "left"})
     b.Emit2(I{bytecode.Push, "fruitcake"})
@@ -26,14 +27,17 @@ Here is a trival example of generating bytecode and executing it.
     b.Emit2(I{bytecode.Call, 2})
     b.Emit1(I{bytecode.Stop})
 
+    // Make a symbol table, so we can call the function library.
+    s := symbols.NewSymbolTable("sample program")
+    functions.AddBuiltins(s)
+
     // Make a runtime context for this bytecode, and then run it.
-    // The context contains the stack symbol table (if any), etc.
-    c := bytecode.NewContext(nil, b)
+    // The context has the symbol table and bytecode attached to it.
+    c := bytecode.NewContext(s, b)
     err := c.Run()
 
-    // Retrieve the last value
+    // Retrieve the last value and extract a string 
     v, err := b.Pop()
-
     fmt.Printf("The result is %s\n", util.GetString(v))
 
 This creates a new bytecode stream, and then adds instructions to it. These instructions would nominally
