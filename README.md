@@ -19,8 +19,10 @@ The command line tool developer:
   * Enable debug logging as needed
   * Generate consistently formatted tabular output
   * Generate JSON tabular output
-* Support for general expression hanndling is also provided in the github.com/tucats/gopackages/expressions subpackage.
+* Support for general expression handling is also provided in the github.com/tucats/gopackages/expressions subpackage.
 This is also used to support filtering of table output when using the app-cli/tables package.
+* A compiler and bytecode interpreter for a Go-like language called _Solve_ is included
+* A library of built-in runtime functions is provided.
 
 See related repositories at github.com/tucats/csv and github.com/tucats/weather for sample
 command line tools that demonstrate using this set of packages.

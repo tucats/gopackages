@@ -9,9 +9,9 @@ Here is a trival example of generating bytecode and executing it.
 
     
     b := bytecode.New("sample program")
+    b.Emit2(I{bytecode.Load, "left"})
     b.Emit2(I{bytecode.Push, "fruitcake"})
     b.Emit2(I{bytecode.Push, 5})
-    b.Emit2(I{bytecode.Push, "left"})
     b.Emit2(I{bytecode.Call, 2})
     b.Emit1(I{bytecode.Stop})
 
