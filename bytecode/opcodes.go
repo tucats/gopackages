@@ -185,9 +185,21 @@ func StoreOpcode(c *Context, i interface{}) error {
 		return err
 	}
 
-	err = c.Set(util.GetString(i), v)
+	varname := util.GetString(i)
+
+	err = c.Set(varname, v)
 	if err != nil {
 		return c.NewError(err.Error())
+	}
+
+	// Is this a readonly variable that is a structure? If so, mark it
+	// with the embedded readonly flag.
+
+	if len(varname) > 1 && varname[0:1] == "_" {
+		switch a := v.(type) {
+		case map[string]interface{}:
+			a["__readonly"] = true
+		}
 	}
 	return err
 }
