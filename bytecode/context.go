@@ -1,22 +1,27 @@
 package bytecode
 
 import (
+	"strings"
+
 	"github.com/tucats/gopackages/symbols"
 	sym "github.com/tucats/gopackages/symbols"
+	"github.com/tucats/gopackages/tokenizer"
+	"github.com/tucats/gopackages/util"
 )
 
 // Context holds the runtime information about an instance of bytecode being
 // executed.
 type Context struct {
-	Name    string
-	bc      *ByteCode
-	pc      int
-	stack   []interface{}
-	sp      int
-	running bool
-	line    int
-	symbols *sym.SymbolTable
-	Tracing bool
+	Name      string
+	bc        *ByteCode
+	pc        int
+	stack     []interface{}
+	sp        int
+	running   bool
+	line      int
+	symbols   *sym.SymbolTable
+	Tracing   bool
+	tokenizer *tokenizer.Tokenizer
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode
@@ -45,6 +50,16 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 		s.Set(k, v)
 	}
 	return ctxp
+}
+
+// SetTokenizer sets a tokenizer in the current context for tracing and debugging.
+func (c *Context) SetTokenizer(t *tokenizer.Tokenizer) {
+	c.tokenizer = t
+}
+
+// GetTokenizer gets the tokenizer in the current context for tracing and debugging.
+func (c *Context) GetTokenizer() *tokenizer.Tokenizer {
+	return c.tokenizer
 }
 
 // AppendSymbols appends a symbol table to the current
@@ -95,4 +110,26 @@ func (c *Context) Push(v interface{}) error {
 	c.stack[c.sp] = v
 	c.sp = c.sp + 1
 	return nil
+}
+
+// FormatStack formats the stack for tracing output
+func FormatStack(s []interface{}) string {
+
+	if len(s) == 0 {
+		return "<empty>"
+	}
+	var b strings.Builder
+
+	for n := len(s) - 1; n >= 0; n = n - 1 {
+
+		if n < len(s)-1 {
+			b.WriteString(", ")
+		}
+
+		b.WriteString(util.Format(s[n]))
+		if b.Len() > 50 {
+			return b.String()[:50] + "..."
+		}
+	}
+	return b.String()
 }

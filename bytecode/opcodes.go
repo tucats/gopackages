@@ -24,6 +24,9 @@ func StopOpcode(c *Context, i interface{}) error {
 // in error messaging, primarily.
 func AtLineOpcode(c *Context, i interface{}) error {
 	c.line = util.GetInt(i)
+	if c.tokenizer != nil {
+		fmt.Printf("%d:  %s\n", c.line, c.tokenizer.GetLine(c.line))
+	}
 	return nil
 }
 
@@ -256,6 +259,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		sf := symbols.NewChildSymbolTable("Function", c.symbols)
 		cx := NewContext(sf, af)
 		cx.Tracing = c.Tracing
+		cx.SetTokenizer(c.GetTokenizer())
 
 		sf.Set("_args", args)
 

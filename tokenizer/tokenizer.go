@@ -213,3 +213,20 @@ func isDigit(c rune) bool {
 	}
 	return false
 }
+
+// GetLine returns a given line of text from the token stream.
+func (t *Tokenizer) GetLine(line int) string {
+
+	var b strings.Builder
+
+	for n, text := range t.Tokens {
+		if t.Line[n] == line {
+			b.WriteString(text)
+			b.WriteRune(' ')
+		}
+		if t.Line[n] > line {
+			break
+		}
+	}
+	return b.String()
+}
