@@ -71,8 +71,8 @@ func (c *Context) Get(name string) (interface{}, bool) {
 
 // Set is a helper function that sets a symbol value in the associated
 // symbol table
-func (c *Context) Set(name string, value interface{}) {
-	c.symbols.Set(name, value)
+func (c *Context) Set(name string, value interface{}) error {
+	return c.symbols.Set(name, value)
 }
 
 // Pop removes the top-most item from the stack

@@ -9,9 +9,9 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "/Users/tom/Go/src/github.com/tucats/solve/main.go",
+            "program": "/Users/tom/Go/src/github.com/tucats/solve/",
             "env": {},
-            "args": ["-d", "x := 3 ; x := [1,2,3] ; x[2] := 55 ; print x"]
+            "args": ["run","test5", "-s"]
         }
     ]
 }

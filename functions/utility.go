@@ -2,6 +2,7 @@ package functions
 
 import (
 	"errors"
+	"os"
 
 	"github.com/google/uuid"
 	"github.com/tucats/gopackages/app-cli/persistence"
@@ -105,4 +106,14 @@ func FunctionArray(args []interface{}) (interface{}, error) {
 	}
 	return array, nil
 
+}
+
+// FunctionGetEnv implementes the util.getenv() function which reads
+// an environment variable from the os.
+func FunctionGetEnv(args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New("incorrect number of function arguments")
+	}
+
+	return os.Getenv(util.GetString(args[0])), nil
 }

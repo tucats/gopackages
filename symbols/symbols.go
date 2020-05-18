@@ -1,5 +1,7 @@
 package symbols
 
+import "errors"
+
 // SymbolTable contains an abstract symbol table
 type SymbolTable struct {
 	Name    string
@@ -53,9 +55,28 @@ func (s *SymbolTable) Get(name string) (interface{}, bool) {
 
 // Set stores a symbol value in the local table. No value in
 // any parent table is affected.
-func (s *SymbolTable) Set(name string, v interface{}) {
+func (s *SymbolTable) Set(name string, v interface{}) error {
 	if s.Symbols == nil {
 		s.Symbols = map[string]interface{}{}
 	}
+
+	old, found := s.Symbols[name]
+
+	if found {
+		if name[0:1] == "_" {
+			return errors.New("readonly symbol")
+		}
+
+		// Check to be sure this isn't a restricted (function code) type
+
+		switch old.(type) {
+
+		case func([]interface{}) (interface{}, error):
+			return errors.New("readonly builtin symbol")
+
+		}
+	}
+
 	s.Symbols[name] = v
+	return nil
 }

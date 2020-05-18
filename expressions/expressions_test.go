@@ -270,12 +270,12 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name: "left function",
-			expr: "strings.left(name, 2)",
+			expr: "_strings.left(name, 2)",
 			want: "To",
 		},
 		{
 			name: "right function",
-			expr: "strings.right(name, 2)",
+			expr: "_strings.right(name, 2)",
 			want: "om",
 		},
 		{
@@ -300,27 +300,27 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name: "substring function",
-			expr: "strings.substring(\"ABCDEF\", 2, 3)",
+			expr: "_strings.substring(\"ABCDEF\", 2, 3)",
 			want: "BCD",
 		},
 		{
 			name: "empty substring function",
-			expr: "strings.substring(\"ABCDEF\", 5, 0)",
+			expr: "_strings.substring(\"ABCDEF\", 5, 0)",
 			want: "",
 		},
 		{
 			name: "Invalid argument count to function",
-			expr: "strings.substring(\"ABCDEF\", 5)",
+			expr: "_strings.substring(\"ABCDEF\", 5)",
 			want: nil,
 		},
 		{
 			name: "upper function",
-			expr: "strings.upper(name)",
+			expr: "_strings.upper(name)",
 			want: "TOM",
 		},
 		{
 			name: "lower function",
-			expr: "strings.lower(name)",
+			expr: "_strings.lower(name)",
 			want: "tom",
 		},
 		{

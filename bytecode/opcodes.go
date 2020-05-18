@@ -1,6 +1,7 @@
 package bytecode
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -183,8 +184,7 @@ func StoreOpcode(c *Context, i interface{}) error {
 		return err
 	}
 
-	c.Set(util.GetString(i), v)
-	return nil
+	return c.Set(util.GetString(i), v)
 }
 
 // LoadOpcode implementation
@@ -838,9 +838,27 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 
 	switch a := array.(type) {
 
-	// Index into map is just member access
+	// Index into map is just member access. Make sure it's not
+	// a read-only member or a function pointer...
 	case map[string]interface{}:
 		subscript := util.GetString(index)
+		old, found := a[subscript]
+
+		if found {
+			if subscript[0:1] == "_" {
+				return errors.New("readonly symbol")
+			}
+
+			// Check to be sure this isn't a restricted (function code) type
+
+			switch old.(type) {
+
+			case func([]interface{}) (interface{}, error):
+				return errors.New("readonly builtin symbol")
+
+			}
+		}
+
 		a[subscript] = v
 		c.Push(a)
 
