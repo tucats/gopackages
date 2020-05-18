@@ -221,8 +221,10 @@ func (t *Tokenizer) GetLine(line int) string {
 
 	for n, text := range t.Tokens {
 		if t.Line[n] == line {
+			if b.Len() > 0 && !InList(text, []string{",", ";"}) {
+				b.WriteRune(' ')
+			}
 			b.WriteString(text)
-			b.WriteRune(' ')
 		}
 		if t.Line[n] > line {
 			break

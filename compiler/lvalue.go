@@ -15,6 +15,11 @@ func (c *Compiler) IsLValue() bool {
 		return false
 	}
 
+	// See  if it's on a reserved word.
+	if tokenizer.InList(name, []string{"print", "for", "array", "if", "call", "return"}) {
+		return false
+	}
+
 	next := c.t.Peek(2)
 	if next == "." || next == "[" {
 		return true

@@ -11,8 +11,15 @@ func (c *Compiler) Array() error {
 
 	name := c.t.Next()
 	if !tokenizer.IsSymbol(name) {
-		c.NewTokenError("invalid array name")
+		c.t.Advance(-1)
+		return c.NewTokenError("invalid array name")
 	}
+	// See  if it's on a reserved word.
+	if tokenizer.InList(name, []string{"print", "for", "array", "if", "call", "return"}) {
+		c.t.Advance(-1)
+		return c.NewTokenError("invalid array name")
+	}
+
 	if !c.t.IsNext("[") {
 		return c.NewError("missing [ in array")
 	}
