@@ -58,7 +58,9 @@ func FunctionLen(args []interface{}) (interface{}, error) {
 	case map[string]interface{}:
 		keys := make([]string, 0)
 		for k := range arg {
-			keys = append(keys, k)
+			if k != "__readonly" {
+				keys = append(keys, k)
+			}
 		}
 		return len(keys), nil
 

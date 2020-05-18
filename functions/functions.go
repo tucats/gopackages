@@ -35,6 +35,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"array":     FunctionDefinition{Min: 1, Max: 2, F: FunctionArray},
 	"getenv":    FunctionDefinition{Min: 1, Max: 1, F: FunctionGetEnv, Pkg: "_util"},
 	"members":   FunctionDefinition{Min: 1, Max: 1, F: FunctionMembers, Pkg: "_util"},
+	"sqrt":      FunctionDefinition{Min: 1, Max: 1, F: FunctionSqrt, Pkg: "_math"},
 }
 
 // AddBuiltins adds or overrides the default function library in the symbol map.
@@ -60,6 +61,21 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 			symbols.Set(d.Pkg, p)
 		}
 	}
+}
+
+// FindFunction returns the function definition associated with the
+// provided function pointer, if one is found.
+func FindFunction(f func([]interface{}) (interface{}, error)) *FunctionDefinition {
+
+	sf1 := reflect.ValueOf(f)
+
+	for _, d := range FunctionDictionary {
+		sf2 := reflect.ValueOf(d.F)
+		if sf1.Pointer() == sf2.Pointer() {
+			return &d
+		}
+	}
+	return nil
 }
 
 // FindName returns the name of a function from the dictionary if one is found

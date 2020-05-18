@@ -2,6 +2,7 @@ package functions
 
 import (
 	"errors"
+	"math"
 
 	"github.com/tucats/gopackages/util"
 )
@@ -115,4 +116,10 @@ func FunctionSum(args []interface{}) (interface{}, error) {
 		}
 	}
 	return base, nil
+}
+
+// FunctionSqrt implements the sqrt() function
+func FunctionSqrt(args []interface{}) (interface{}, error) {
+	f := util.GetFloat(args[0])
+	return math.Sqrt(f), nil
 }

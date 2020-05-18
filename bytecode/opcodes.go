@@ -188,8 +188,12 @@ func StoreOpcode(c *Context, i interface{}) error {
 		return err
 	}
 
+	// Get the name. If it is the reserved name "_" it means
+	// to just discard the value.
 	varname := util.GetString(i)
-
+	if varname == "_" {
+		return nil
+	}
 	err = c.Set(varname, v)
 	if err != nil {
 		return c.NewError(err.Error())
@@ -271,6 +275,21 @@ func CallOpcode(c *Context, i interface{}) error {
 		}
 
 	case func([]interface{}) (interface{}, error):
+
+		// First, can we check the argument count on behalf of the caller?
+		df := functions.FindFunction(af)
+		if df != nil {
+			if len(args) < df.Min || len(args) > df.Max {
+				name := functions.FindName(af)
+				if name > "" {
+					name = ": " + name
+				}
+				if len(args) < df.Min {
+					return c.NewError("insufficient arguments" + name)
+				}
+				return c.NewError("too many arguments" + name)
+			}
+		}
 		result, err = af(args)
 
 		// Functions implemented natively cannot wrap them up as runtime
