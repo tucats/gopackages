@@ -48,9 +48,9 @@ func (e *Expression) expressionAtom() error {
 		return nil
 	}
 
-	if i, err := strconv.ParseBool(t); err == nil {
+	if t == "true" || t == "false" {
 		e.t.Advance(1)
-		e.b.Emit2(bc.Push, i)
+		e.b.Emit2(bc.Push, (t == "true"))
 		return nil
 	}
 
