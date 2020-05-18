@@ -6,7 +6,7 @@
 // The general pattern of use is:
 //
 //    e := expressions.New("expression string")
-//    v, err := expressions.eval(symbolTableMap)
+//    v, err := expressions.eval(symbols.SymbolTableMap)
 //    i := GetInt(v)
 //    f := GetFloag(v)
 //    s := GetString(v)

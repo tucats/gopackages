@@ -1,5 +1,10 @@
 package bytecode
 
+import (
+	"github.com/tucats/gopackages/symbols"
+	sym "github.com/tucats/gopackages/symbols"
+)
+
 // Context holds the runtime information about an instance of bytecode being
 // executed.
 type Context struct {
@@ -10,7 +15,7 @@ type Context struct {
 	sp      int
 	running bool
 	line    int
-	symbols *SymbolTable
+	symbols *sym.SymbolTable
 	Tracing bool
 }
 
@@ -20,7 +25,7 @@ type Context struct {
 // can continue to be modified after it is associated with a context.
 // @TOMCOLE Is this a good idea? Should a context take a snapshot of the bytecode at
 // the time so it is immutable?
-func NewContext(s *SymbolTable, b *ByteCode) *Context {
+func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 	ctx := Context{
 		Name:    b.Name,
 		bc:      b,
@@ -45,7 +50,7 @@ func NewContext(s *SymbolTable, b *ByteCode) *Context {
 // AppendSymbols appends a symbol table to the current
 // context. This is used to add in compiler maps, for
 // example.
-func (c *Context) AppendSymbols(s SymbolTable) {
+func (c *Context) AppendSymbols(s symbols.SymbolTable) {
 	for k, v := range s.Symbols {
 		c.symbols.Set(k, v)
 	}

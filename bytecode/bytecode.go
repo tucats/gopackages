@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
 
@@ -81,7 +82,7 @@ type ByteCode struct {
 	Name    string
 	opcodes []I
 	emitPos int
-	Symbols SymbolTable
+	Symbols symbols.SymbolTable
 }
 
 // New generates and initializes a new bytecode
@@ -91,7 +92,7 @@ func New(name string) *ByteCode {
 		Name:    name,
 		opcodes: make([]I, InitialOpcodeSize),
 		emitPos: 0,
-		Symbols: SymbolTable{},
+		Symbols: symbols.SymbolTable{},
 	}
 
 	return &bc
@@ -166,14 +167,14 @@ func DefineInstruction(opcode int, name string, implementation OpcodeHandler) er
 }
 
 // Run generates a one-time context for executing this bytecode.
-func (b *ByteCode) Run(s *SymbolTable) error {
+func (b *ByteCode) Run(s *symbols.SymbolTable) error {
 	c := NewContext(s, b)
 	return c.Run()
 }
 
 // Call generates a one-time context for executing this bytecode,
 // and returns a value as well as an error.
-func (b *ByteCode) Call(s *SymbolTable) (interface{}, error) {
+func (b *ByteCode) Call(s *symbols.SymbolTable) (interface{}, error) {
 	c := NewContext(s, b)
 	err := c.Run()
 	if err != nil {

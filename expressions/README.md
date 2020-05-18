@@ -8,7 +8,7 @@ most common languages.
 
 The expression handler supports values of type int, float64, bool, and string. The evaluator 
 provides automatic type conversion where ever possible. The expression evaluator 
-can also access values stored in symbols, which are passed in as a SymbolTable 
+can also access values stored in symbols, which are passed in as a symbols.SymbolTable 
 object to the evaluator. Additionally, built-in and caller-supplied functions can be declared 
 in the symbol table as well. Functions accept arbitrary numbers of arguments of any type, 
 and then operate on them, performing type coercions as needed.
@@ -18,7 +18,7 @@ Here is a simple example of using the expression handler:
     // Create a symbol table for use during expression
     // evaluation. This is optional, but must be provided
     // if your expression uses variables.
-    symbols := bytecode.NewSymbolTable()
+    symbols := bytecode.Newsymbols.SymbolTable()
     symbols.Set("name", "Tom")
     symbols.Set("age", 54)
 

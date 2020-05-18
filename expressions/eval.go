@@ -1,12 +1,14 @@
 package expressions
 
 import (
-	bc "github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/functions"
+	"github.com/tucats/gopackages/symbols"
 )
 
 // Eval evaluates the parsed expression. This can be called multiple times
 // with the same scanned string, but with different symbols.
-func (e *Expression) Eval(symbols *bc.SymbolTable) (interface{}, error) {
+func (e *Expression) Eval(s *symbols.SymbolTable) (interface{}, error) {
 
 	// If the compile failed, bail out now.
 	if e.err != nil {
@@ -14,16 +16,16 @@ func (e *Expression) Eval(symbols *bc.SymbolTable) (interface{}, error) {
 	}
 
 	// If the symbol table we're given is unallocated, make one for our use now.
-	if symbols == nil {
-		symbols = bc.NewSymbolTable("")
+	if s == nil {
+		s = symbols.NewSymbolTable("")
 
 	}
 
 	// Add the builtin functions
-	AddBuiltins(symbols)
+	functions.AddBuiltins(s)
 
 	// Run the generated code to get a result
-	ctx := bc.NewContext(symbols, e.b)
+	ctx := bytecode.NewContext(s, e.b)
 	err := ctx.Run()
 	if err != nil {
 		return nil, err

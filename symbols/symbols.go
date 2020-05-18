@@ -1,4 +1,4 @@
-package bytecode
+package symbols
 
 // SymbolTable contains an abstract symbol table
 type SymbolTable struct {

@@ -51,8 +51,8 @@ func (c *Compiler) For() error {
 		b1 := c.b.Mark()
 
 		// Is index >= len of array?
+		c.b.Emit2(bytecode.Load, "len")
 		c.b.Append(arrayCode)
-		c.b.Emit2(bytecode.Push, "len")
 		c.b.Emit2(bytecode.Call, 1)
 		c.b.Emit2(bytecode.Load, indexName)
 		c.b.Emit1(bytecode.LessThan)

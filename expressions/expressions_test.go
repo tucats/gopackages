@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/symbols"
 )
 
 func TestNew(t *testing.T) {
@@ -18,6 +18,11 @@ func TestNew(t *testing.T) {
 		want    interface{}
 		wantErr bool
 	}{
+		{
+			name: "Index into array",
+			expr: "a[2]",
+			want: "tom",
+		},
 		{
 			name: "Cast bool to string",
 			expr: "string(b) + string(!b)",
@@ -210,11 +215,6 @@ func TestNew(t *testing.T) {
 			want: []interface{}{true, "Tom", 33.5},
 		},
 		{
-			name: "Index into array",
-			expr: "array[2]",
-			want: "tom",
-		},
-		{
 			name: "Add to array",
 			expr: "[1,2] + 3",
 			want: []interface{}{1, 2, 3},
@@ -265,17 +265,17 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name: "len of array function",
-			expr: "len(array) + 4",
+			expr: "len(a) + 4",
 			want: 8,
 		},
 		{
 			name: "left function",
-			expr: "left(name, 2)",
+			expr: "strings.left(name, 2)",
 			want: "To",
 		},
 		{
 			name: "right function",
-			expr: "right(name, 2)",
+			expr: "strings.right(name, 2)",
 			want: "om",
 		},
 		{
@@ -290,37 +290,37 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name: "index of array function",
-			expr: "index(array, false)",
+			expr: "index(a, false)",
 			want: 4,
 		},
 		{
 			name: "index of array not found",
-			expr: "index(array, 55.5)",
+			expr: "index(a, 55.5)",
 			want: 0,
 		},
 		{
 			name: "substring function",
-			expr: "substring(\"ABCDEF\", 2, 3)",
+			expr: "strings.substring(\"ABCDEF\", 2, 3)",
 			want: "BCD",
 		},
 		{
 			name: "empty substring function",
-			expr: "substring(\"ABCDEF\", 5, 0)",
+			expr: "strings.substring(\"ABCDEF\", 5, 0)",
 			want: "",
 		},
 		{
 			name: "Invalid argument count to function",
-			expr: "substring(\"ABCDEF\", 5)",
+			expr: "strings.substring(\"ABCDEF\", 5)",
 			want: nil,
 		},
 		{
 			name: "upper function",
-			expr: "upper(name)",
+			expr: "strings.upper(name)",
 			want: "TOM",
 		},
 		{
 			name: "lower function",
-			expr: "lower(name)",
+			expr: "strings.lower(name)",
 			want: "tom",
 		},
 		{
@@ -377,15 +377,15 @@ func TestNew(t *testing.T) {
 			e := New(tt.expr)
 
 			// Create a common symbol table.
-			symbols := bytecode.NewSymbolTable(tt.name)
-			symbols.Set("i", 42)
-			symbols.Set("pi", 3.14)
-			symbols.Set("name", "Tom")
-			symbols.Set("b", true)
-			symbols.Set("roman12", "XII")
-			symbols.Set("array", []interface{}{1, "tom", 33., false})
+			s := symbols.NewSymbolTable(tt.name)
+			s.Set("i", 42)
+			s.Set("pi", 3.14)
+			s.Set("name", "Tom")
+			s.Set("b", true)
+			s.Set("roman12", "XII")
+			s.Set("a", []interface{}{1, "tom", 33., false})
 
-			v1, err := e.Eval(symbols)
+			v1, err := e.Eval(s)
 			if err != nil && tt.want != nil {
 				t.Errorf("Expression test, unexpected error %v", err)
 			} else {

@@ -2,7 +2,6 @@ package expressions
 
 import (
 	bc "github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/functions"
 )
 
 func (e *Expression) functionCall() error {
@@ -37,30 +36,6 @@ func (e *Expression) functionCall() error {
 	// Call the function
 	e.b.Emit2(bc.Call, argc)
 	return nil
-}
-
-// AddBuiltins adds or overrides the default function library in the symbol map.
-// Function names are distinct in the map because they always have the "()"
-// suffix for the key.
-func AddBuiltins(symbols *bc.SymbolTable) {
-
-	for n, d := range functions.FunctionDictionary {
-
-		if d.Pkg == "" {
-			symbols.Set(n, d.F)
-		} else {
-			// Does package already exist? IF not, make it. The package
-			// is just a struct containing where each member is a function
-			// definition.
-			p, found := symbols.Get(d.Pkg)
-			if !found {
-				p = map[string]interface{}{}
-			}
-
-			p.(map[string]interface{})[n] = d.F
-			symbols.Set(d.Pkg, p)
-		}
-	}
 }
 
 // Function compiles a function call. The value of the

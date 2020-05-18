@@ -3,6 +3,9 @@ package bytecode
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tucats/gopackages/functions"
+	"github.com/tucats/gopackages/symbols"
 )
 
 func TestByteCode_Run(t *testing.T) {
@@ -15,7 +18,7 @@ func TestByteCode_Run(t *testing.T) {
 		sp      int
 		running bool
 		result  interface{}
-		symbols SymbolTable
+		symbols symbols.SymbolTable
 	}
 	tests := []struct {
 		name    string
@@ -211,8 +214,8 @@ func TestByteCode_Run(t *testing.T) {
 			name: "length of string constant",
 			fields: fields{
 				opcodes: []I{
+					I{Opcode: Load, Operand: "len"},
 					I{Opcode: Push, Operand: "fruitcake"},
-					I{Opcode: Push, Operand: "len"},
 					I{Opcode: Call, Operand: 1},
 					I{Opcode: Stop},
 				},
@@ -224,9 +227,11 @@ func TestByteCode_Run(t *testing.T) {
 			fields: fields{
 				opcodes: []I{
 					// Arguments are pushed in the order parsed
+					I{Opcode: Load, Operand: "strings"},
+					I{Opcode: Push, Operand: "left"},
+					I{Opcode: Member},
 					I{Opcode: Push, Operand: "fruitcake"},
 					I{Opcode: Push, Operand: 5},
-					I{Opcode: Push, Operand: "left"},
 					I{Opcode: Call, Operand: 2},
 					I{Opcode: Stop},
 				},
@@ -290,8 +295,10 @@ func TestByteCode_Run(t *testing.T) {
 				emitPos: tt.fields.emitPos,
 			}
 			b.emitPos = len(b.opcodes)
-			s := NewSymbolTable(tt.name)
+			s := symbols.NewSymbolTable(tt.name)
 			c := NewContext(s, b)
+			functions.AddBuiltins(c.symbols)
+
 			if err := c.Run(); (err != nil) != tt.wantErr {
 				t.Errorf("ByteCode.Run() error = %v, wantErr %v", err, tt.wantErr)
 			}

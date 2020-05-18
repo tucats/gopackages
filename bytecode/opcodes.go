@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
 
@@ -235,7 +236,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		// Make a new symbol table for the fucntion to run with,
 		// and a new execution context. Store the argument list in
 		// the child table.
-		sf := NewChildSymbolTable("Function", c.symbols)
+		sf := symbols.NewChildSymbolTable("Function", c.symbols)
 		cx := NewContext(sf, af)
 		cx.Tracing = c.Tracing
 

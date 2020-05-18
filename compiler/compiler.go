@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -10,7 +11,7 @@ import (
 type Compiler struct {
 	b *bytecode.ByteCode
 	t *tokenizer.Tokenizer
-	s bytecode.SymbolTable
+	s *symbols.SymbolTable
 }
 
 // Compile starts a compilation unit, and returns a bytecode
@@ -18,7 +19,7 @@ type Compiler struct {
 func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
 
 	b := bytecode.New("")
-	cInstance := Compiler{b: b, t: t, s: bytecode.SymbolTable{Name: "compile-unit"}}
+	cInstance := Compiler{b: b, t: t, s: &symbols.SymbolTable{Name: "compile-unit"}}
 	c := &cInstance
 
 	c.t.Reset()
@@ -52,6 +53,6 @@ func (c *Compiler) StatementEnd() bool {
 }
 
 // Symbols returns the symbol table map from compilation
-func (c *Compiler) Symbols() bytecode.SymbolTable {
+func (c *Compiler) Symbols() *symbols.SymbolTable {
 	return c.s
 }

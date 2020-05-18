@@ -7,9 +7,8 @@ import (
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/ui"
-	"github.com/tucats/gopackages/bytecode"
-	bc "github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/expressions"
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
 
@@ -64,7 +63,7 @@ func (t *Table) FormatJSON() string {
 
 		if e != nil {
 			// Load up the symbol tables with column values and the row number
-			symbols := bc.NewSymbolTable("rowset")
+			symbols := symbols.NewSymbolTable("rowset")
 			symbols.Set("_row_", n+1)
 			for i, n := range t.columns {
 				symbols.Set(strings.ToLower(n), row[i])
@@ -183,7 +182,7 @@ func (t *Table) FormatText() []string {
 
 		if e != nil {
 			// Load up the symbol tables with column values and the row number
-			symbols := bytecode.NewSymbolTable("rowset")
+			symbols := symbols.NewSymbolTable("rowset")
 			symbols.Set("_row_", i+1)
 			for i, n := range t.columns {
 				symbols.Set(strings.ToLower(n), r[i])
