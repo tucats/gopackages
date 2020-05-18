@@ -16,6 +16,28 @@ func TestCompile(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "Simple block",
+			arg:  "{ print ; print } ",
+			want: []bytecode.I{
+				{Opcode: bytecode.AtLine, Operand: 1},
+				{Opcode: bytecode.AtLine, Operand: 1},
+				{Opcode: bytecode.Newline, Operand: nil},
+				{Opcode: bytecode.AtLine, Operand: 1},
+				{Opcode: bytecode.Newline, Operand: nil},
+			},
+			wantErr: false,
+		},
+		{
+			name: "store to _",
+			arg:  "_ := 3",
+			want: []bytecode.I{
+				{Opcode: bytecode.AtLine, Operand: 1},
+				{Opcode: bytecode.Push, Operand: 3},
+				{Opcode: bytecode.Drop, Operand: 1},
+			},
+			wantErr: false,
+		},
+		{
 			name: "Simple print",
 			arg:  "print 1",
 			want: []bytecode.I{

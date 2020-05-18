@@ -97,3 +97,92 @@ func TestFunctionProfile(t *testing.T) {
 		})
 	}
 }
+
+func TestFunctionSort(t *testing.T) {
+	type args struct {
+		args []interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name:    "bad arg type",
+			args:    args{[]interface{}{55}},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "integer sort",
+			args: args{[]interface{}{[]interface{}{55, 2, 18}}},
+			want: []interface{}{2, 18, 55},
+		},
+		{
+			name: "float sort",
+			args: args{[]interface{}{[]interface{}{55.0, 2, "18.5"}}},
+			want: []interface{}{2.0, 18.5, 55.0},
+		},
+		{
+			name: "string sort",
+			args: args{[]interface{}{[]interface{}{"pony", "cake", "unicorn", 5}}},
+			want: []interface{}{"5", "cake", "pony", "unicorn"},
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := FunctionSort(tt.args.args)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FunctionSort() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("FunctionSort() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFunctionMembers(t *testing.T) {
+	type args struct {
+		args []interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name: "simple struct",
+			args: args{[]interface{}{map[string]interface{}{"name": "Tom", "age": 55}}},
+			want: []interface{}{"age", "name"},
+		},
+		{
+			name: "empty struct",
+			args: args{[]interface{}{map[string]interface{}{}}},
+			want: []interface{}{},
+		},
+		{
+			name:    "wrong type struct",
+			args:    args{[]interface{}{55}},
+			want:    nil,
+			wantErr: true,
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := FunctionMembers(tt.args.args)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FunctionMembers() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("FunctionMembers() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

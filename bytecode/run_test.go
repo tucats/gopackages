@@ -45,6 +45,19 @@ func TestByteCode_Run(t *testing.T) {
 			},
 		},
 		{
+			name: "drop 2 stack items",
+			fields: fields{
+				opcodes: []I{
+					I{Opcode: Push, Operand: 42},
+					I{Opcode: Push, Operand: 43},
+					I{Opcode: Push, Operand: 44},
+					I{Opcode: Drop, Operand: 2},
+					I{Opcode: Stop},
+				},
+				result: 42,
+			},
+		},
+		{
 			name: "push float",
 			fields: fields{
 				opcodes: []I{
