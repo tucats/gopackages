@@ -19,6 +19,53 @@ runs in its own scope; it can access variables from outer scopes but cannot
 set them. Functions defined within another function only exist as long as
 that function is running.
 
+## Data types
+_Solve_ support six data types, plus limited support for function pointers
+as values.
+
+| type | description |
+|:-:|:-|
+|int| 64-bit integer value |
+|float| 64-bit floating point value |
+|string| Unicode string |
+|bool| Boolean value of true or false |
+| [...] | Array of values |
+| {...} | Structure of fields |
+
+An array is a list of zero or more values. The array values can be of any
+type, including other arrays. The array elements are always indexed starting
+at a value of 1. You cannot reference a subscript that has not been allocated.
+You can use the `array` statement to initialize an array, and the `array()`
+function to change the size of an existing array.
+
+You can also define an array constant, and assign it to a value, where
+the initial array is defined by the constant.
+
+    names := [ "Tim", "Sue", "Bob", "Robin" ]
+
+This results in `names` being assigned an array containing the four string
+values given.
+
+Structures contain zero or more labeled fields. Each field label must be
+unique, and can reference a value of any type. You can create a struct
+using a literal:
+
+    employee := { name: "Susan", rate: 23.50, active:true }
+
+This creates a structure with three members (`name`, `rate`, and `active`).
+Once this is stored in a variable, you can use dot-notation to reference
+a field directly,
+
+    pay := 40 * employee.rate
+
+If the member does not exist, an error is generated. You can however add
+new fields to a structure simply by naming them in an assignment, such as
+
+    employee.weekly := pay
+
+If there isn't already a field named `weekly` in the structure, it is
+created automatically. The field is then set to the value of `pay`.
+
 ## array
 The `array` statement is used to allocate an array. An array can also be
 created as an array constant and stored in a variable. The array statement

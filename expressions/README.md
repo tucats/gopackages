@@ -62,7 +62,9 @@ from the table column names) so the expression can be re-evaluated with each row
 ## Functions
 The expression evaluator can process function calls as part of it's processing. The fucntion call
 is directed back to code that is either built-in to the expression package, or is supplied by the
-user.
+user. A function may exist globally (for example, `len()`) or may be part of a package that requires
+the package name be include (such as `_strings.lower()`). In each case below, the function name
+is given with the package name where it exists.
 
 The following provides a short summary of each of the built-in functions, broken into
 categories based on the general data types or functionality used.
@@ -108,61 +110,55 @@ Thsi returns the float64 value 3.1415.
 These functions act on string values, and usually return a string values as the
 result.
 
-#### len(string)
-Return the length of a string argument in characters as an int value.
 
-    len("fortitude")
-
-This returns the value 9.
-
-#### left(string, count)
+#### _strings.left(string, count)
 This returns `count` characters from the left side of the string.
     
-    left("abraham", 3)
+    _strings.left("abraham", 3)
 
 This returns the value "abr".
 
 
-#### right(string, count)
+#### _strings.right(string, count)
 This returns `count` characters from the right side of the string.
     
-    right("abraham", 4)
+    _strings.right("abraham", 4)
 
 This returns the value "aham".
 
-#### substring(string, start, count)
+#### _strings.substring(string, start, count)
 This extracts a substring from the string argument. The substring
 starts at the `start` character position, and includes `count` characters
 in the result.
     
-    substring("Thomas Jefferson", 8, 4)
+    _strings.substring("Thomas Jefferson", 8, 4)
 
 This returns the string "Jeff".
 
-#### index(string, substring)
+#### _strings.index(string, substring)
 This searches the `string` parameter for the first instance of the
 `substring` parameter. If it is found, the function returns the
 character position where it starts. If it was not found, it returns
 an integer zero.
     
-    index("Scores of fun", "ore")
+    _strings.index("Scores of fun", "ore")
 
 This returns the value 3, indicating that the string "ore" starts
 at the third character of the string.
 
-#### lower(string)
+#### _strings.lower(string)
 This converts the string value given to lower-case letters. If the
 value is not a string, it is first coerced to a string type.
     
-    lower("Tom")
+    _strings.lower("Tom")
 
 This results in the string value "tom".
 
-#### upper(string)
+#### _strings.upper(string)
 This converts the string value given to uooer-case letters. If the
 value is not a string, it is first coerced to a string type.
     
-    upper("Jeffrey")
+    _strings.upper("Jeffrey")
 
 This results in the string value "JEFFREY".
 
@@ -171,6 +167,24 @@ This results in the string value "JEFFREY".
 These functions work generally with any type of value, and perform coercsions
 as needed. The first value in the argument list determines the type that all
 the remaining items will be coerced to.
+
+
+#### len(string)
+Return the length of the argument. The meaning of _length_ depends on the 
+type of the argument. For a string, this returns the number of characters
+in the string. For an int, float, or bool value, it returns the number of
+characters when the value is formatted for output.
+
+Some examples:
+
+| Example | Result |
+|:-|:-|
+| len("fortitude")   | 9, the number of characters in the string. |
+| len(135)           | 3, the number of characters when 135 is converted to string "135" |
+| len(false)         | 5, the number of characters in "false" |
+| len(3.1415)        | 6, the number of characters in "3.1415" |
+| len([5,3,1])       | 3, the number of elements in the array | 
+| len({a:1, b:true}) | 2, the number of fields in the array |
 
 #### min(v1, v2...)
 This gets the minimum (smallest numeric or alphabetic) value from the list.
@@ -195,7 +209,49 @@ result is the numerically largest value.
     
 This returns the string value "whistle".
 
-### User Suppied Functions
+#### sum(v1, v2...)
+This function returns the sum of the arguments. The meaning of _sum_ depends
+on the arguments. The values must not be arrays or structures.
+
+For a numeric value (int or float), the function returns the mathematical
+sum of all the numeric values.
+
+    x := sum(3.5, 15, .5)
+
+This results in `x` having the value 19.  For a boolean value, this is the
+same as a boolean "and" operation being performed on all values.
+
+For a string, it concatenates all the string values together into a single
+long string.
+
+
+### Utility Functions
+
+These are miscellaneous funcctions to support writing programs in _Solve_.
+
+#### _util.uuid()
+This generates a UUID (universal unique identifier) and returns it formatted
+as a string value. Every call to this function will result in a new unique
+value.
+
+#### _util.members(st)
+
+Returns an array of strings containing the names of each member of the 
+structure passed as an argument. If the value passed is not a structure
+it causes an error. Note that the resulting array elements can be used
+to reference fields in a structure using array index notation.
+
+    e := { name: "Dave", age: 33 }
+    m := _utils.members(e)
+
+    e[m[1]] := 55
+
+The `_util.members()` function returns an array [ "age", "name" ]. These are
+the fields of the structure, and they are always returned in alphabetical
+order. The assignment statement uses the first array element ("age") to access
+the value of e.age.
+
+### User Supplied Functions
 The caller of the expressions package can supply additional functions to
 supplement the built-in functions.  The function must be declared as a
 function of type func([]interface{})(interface{}, error).  For example,
