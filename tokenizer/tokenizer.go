@@ -8,7 +8,7 @@ import (
 
 // Tokenizer is an instance of a tokenized string.
 type Tokenizer struct {
-	Source string
+	Source []string
 	Tokens []string
 	TokenP int
 	Line   []int
@@ -22,9 +22,7 @@ const EndOfTokens = "$$$$$EOF$$$$!"
 // up into an array of tokens
 func New(src string) *Tokenizer {
 
-	// Strip '#' comments from input file
-	src = stripComments(src)
-	t := Tokenizer{Source: src, TokenP: 0}
+	t := Tokenizer{Source: splitLines(src), TokenP: 0}
 	t.Tokens = make([]string, 0)
 
 	var s scanner.Scanner
@@ -215,20 +213,27 @@ func isDigit(c rune) bool {
 }
 
 // GetLine returns a given line of text from the token stream.
+// This actuals refers to the original line splits done when the
+// source was first received.
 func (t *Tokenizer) GetLine(line int) string {
 
-	var b strings.Builder
-
-	for n, text := range t.Tokens {
-		if t.Line[n] == line {
-			if b.Len() > 0 && !InList(text, []string{",", ";"}) {
-				b.WriteRune(' ')
-			}
-			b.WriteString(text)
-		}
-		if t.Line[n] > line {
-			break
-		}
+	if line < 1 || line > len(t.Source) {
+		return ""
 	}
-	return b.String()
+	return t.Source[line-1]
+}
+
+// splitLines splits a string by line endings, and returns the
+// source as an array of strings.
+func splitLines(src string) []string {
+
+	// Are we seeing Windows-style line endings? If so, use that as
+	// the split boundary.
+	if strings.Index(src, "\r\n") > 0 {
+		return strings.Split(src, "\r\n")
+
+	}
+
+	// Otherwise, simple split by new-line works fine.
+	return strings.Split(src, "\n")
 }
