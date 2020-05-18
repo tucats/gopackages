@@ -320,8 +320,18 @@ func PushOpcode(c *Context, i interface{}) error {
 
 // DropOpcode implementation
 func DropOpcode(c *Context, i interface{}) error {
-	_, err := c.Pop()
-	return err
+
+	count := 1
+	if i != nil {
+		count = util.GetInt(i)
+	}
+	for n := 0; n < count; n = n + 1 {
+		_, err := c.Pop()
+		if err != nil {
+			return nil
+		}
+	}
+	return nil
 }
 
 // AddOpcode bytecode implementation

@@ -58,8 +58,14 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 
 	}
 
-	bc.Emit2(bytecode.Store, name)
+	// Quick optimization; if the name is "_" it just means
+	// discard and we can shortcircuit that.
 
+	if name == "_" {
+		bc.Emit2(bytecode.Drop, 1)
+	} else {
+		bc.Emit2(bytecode.Store, name)
+	}
 	return bc, nil
 }
 
