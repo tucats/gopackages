@@ -4,9 +4,20 @@ The `bytecode` subpackage supports a simple bytecode intepreter. This allows ope
 repeated) to be compiled into an expression of the semantics of the operation, without having to have the string 
 parsed and lexically analyized repeatedly.
 
+Bytecode can be generated explicitly (as in the first example below) or by using the compiler package which accepts
+text in a Go-like language called _Solve_ and generates bytecode. Once the bytecode is generated, a runtime `Context`
+object is created which is used to manage the execution of a bytecode stream. This includes it's active symbol table,
+program counter, stack, etc. A `Context` is separate from the bytecode because the same bytecode could be executed 
+on multiple threads, each with it's own `Context`.
+
+The bytecode also supports a symbol table. This can be used to store named values and retrieve them as part of the
+execution of the bytecode. The symbol table also contains function pointers for each of the built-in function and
+function packages. Calling functions is managed by the bytecode, but can be used to call a function provided
+by the caller as native Go code.
+
+
 ## Example
 Here is a trival example of generating bytecode and executing it.
-
     
     b := bytecode.New("sample program")
     b.Emit2(I{bytecode.Load, "left"})
