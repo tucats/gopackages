@@ -180,6 +180,17 @@ func MemberOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
+// SymbolCreateOpcode implementation
+func SymbolCreateOpcode(c *Context, i interface{}) error {
+
+	n := util.GetString(i)
+	err := c.Create(n)
+	if err != nil {
+		err = c.NewError(err.Error())
+	}
+	return err
+}
+
 // SymbolDeleteOpcode implementation
 func SymbolDeleteOpcode(c *Context, i interface{}) error {
 

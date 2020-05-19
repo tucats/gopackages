@@ -41,6 +41,7 @@ var opcodeNames = map[int]string{
 	AtLine:             "AtLine",
 	MakeArray:          "MakeArray",
 	SymbolDelete:       "SymbolDelete",
+	SymbolCreate:       "SymbolCreate",
 }
 
 // Disasm prints out a representation of the bytecode for debugging purposes

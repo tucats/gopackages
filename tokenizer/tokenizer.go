@@ -37,24 +37,8 @@ func New(src string) *Tokenizer {
 
 		nextToken := s.TokenText()
 
-		if nextToken == "[" {
-			if previousToken == "[" {
-				t.Tokens[len(t.Tokens)-1] = previousToken + nextToken
-				previousToken = ""
-				continue
-			}
-		}
-
-		if nextToken == "]" {
-			if previousToken == "]" {
-				t.Tokens[len(t.Tokens)-1] = previousToken + nextToken
-				previousToken = ""
-				continue
-			}
-		}
-
 		if nextToken == "=" {
-			if InList(previousToken, []string{"!", "<", ">", ":"}) {
+			if InList(previousToken, []string{"!", "<", ">", ":", "="}) {
 				t.Tokens[len(t.Tokens)-1] = previousToken + nextToken
 				previousToken = ""
 				continue

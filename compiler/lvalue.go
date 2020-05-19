@@ -25,7 +25,7 @@ func (c *Compiler) IsLValue() bool {
 		return true
 	}
 
-	if next == ":=" {
+	if tokenizer.InList(next, []string{"=", ":="}) {
 		return true
 	}
 	return false
@@ -64,6 +64,10 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 	if name == "_" {
 		bc.Emit2(bytecode.Drop, 1)
 	} else {
+
+		if c.t.Peek(1) == ":=" {
+			bc.Emit2(bytecode.SymbolCreate, name)
+		}
 		bc.Emit2(bytecode.Store, name)
 	}
 	return bc, nil

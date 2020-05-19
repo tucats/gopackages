@@ -47,7 +47,7 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 	for n, d := range FunctionDictionary {
 
 		if d.Pkg == "" {
-			symbols.Set(n, d.F)
+			symbols.SetAlways(n, d.F)
 		} else {
 			// Does package already exist? IF not, make it. The package
 			// is just a struct containing where each member is a function
@@ -59,7 +59,7 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 			}
 
 			p.(map[string]interface{})[n] = d.F
-			symbols.Set(d.Pkg, p)
+			symbols.SetAlways(d.Pkg, p)
 		}
 	}
 }

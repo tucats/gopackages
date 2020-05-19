@@ -32,7 +32,7 @@ func (c *Compiler) Array() error {
 	if !c.t.IsNext("]") {
 		return c.NewError("missing ] in array")
 	}
-	if c.t.IsNext(":=") {
+	if c.t.IsNext("=") {
 		bc, err = expressions.Compile(c.t)
 		if err != nil {
 			return nil

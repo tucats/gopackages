@@ -17,7 +17,7 @@ func (e *Expression) relations() error {
 			break
 		}
 		op := e.t.Peek(1)
-		if op == "=" || op == "!=" || op == "<" || op == "<=" || op == ">" || op == ">=" {
+		if op == "==" || op == "!=" || op == "<" || op == "<=" || op == ">" || op == ">=" {
 			e.t.Advance(1)
 
 			err := e.addSubtract()
@@ -27,7 +27,7 @@ func (e *Expression) relations() error {
 
 			switch op {
 
-			case "=":
+			case "==":
 				e.b.Emit1(bc.Equal)
 
 			case "!=":

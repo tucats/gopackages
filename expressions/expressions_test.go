@@ -110,12 +110,12 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name: "Multiple paren terms",
-			expr: "(i=42) & (name=\"Tom\")",
+			expr: "(i==42) & (name==\"Tom\")",
 			want: true,
 		},
 		{
 			name: "Invalid multiple paren terms",
-			expr: "(i=42) & (name=\"Tom\"",
+			expr: "(i==42) & (name==\"Tom\"",
 			want: nil,
 		},
 		{
@@ -365,7 +365,7 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name: "Simple false conditional",
-			expr: "5 = 6 ? 1.1 : 1.0",
+			expr: "5 == 6 ? 1.1 : 1.0",
 			want: 1.0,
 		},
 		// TODO: Add test cases.
@@ -378,12 +378,12 @@ func TestNew(t *testing.T) {
 
 			// Create a common symbol table.
 			s := symbols.NewSymbolTable(tt.name)
-			s.Set("i", 42)
-			s.Set("pi", 3.14)
-			s.Set("name", "Tom")
-			s.Set("b", true)
-			s.Set("roman12", "XII")
-			s.Set("a", []interface{}{1, "tom", 33., false})
+			s.SetAlways("i", 42)
+			s.SetAlways("pi", 3.14)
+			s.SetAlways("name", "Tom")
+			s.SetAlways("b", true)
+			s.SetAlways("roman12", "XII")
+			s.SetAlways("a", []interface{}{1, "tom", 33., false})
 
 			v1, err := e.Eval(s)
 			if err != nil && tt.want != nil {

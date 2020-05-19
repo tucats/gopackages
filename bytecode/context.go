@@ -90,9 +90,20 @@ func (c *Context) Set(name string, value interface{}) error {
 	return c.symbols.Set(name, value)
 }
 
+// SetAlways is a helper function that sets a symbol value in the associated
+// symbol table
+func (c *Context) SetAlways(name string, value interface{}) error {
+	return c.symbols.SetAlways(name, value)
+}
+
 // Delete deletes a symbol from the current context
 func (c *Context) Delete(name string) error {
 	return c.symbols.Delete(name)
+}
+
+// Create creates a symbol
+func (c *Context) Create(name string) error {
+	return c.symbols.Create(name)
 }
 
 // Pop removes the top-most item from the stack

@@ -43,11 +43,9 @@ func (c *Compiler) For() error {
 		}
 
 		// Initialize index
-		if indexName == "" {
-			indexName = MakeSymbol()
-		}
-
+		indexName = MakeSymbol()
 		c.b.Emit2(bytecode.Push, 1)
+		c.b.Emit2(bytecode.SymbolCreate, indexName)
 		c.b.Emit2(bytecode.Store, indexName)
 
 		// Remember top of loop
@@ -135,8 +133,8 @@ func (c *Compiler) For() error {
 		return err
 	}
 
-	if !c.t.IsNext(":=") {
-		return errors.New("expected := not found")
+	if !c.t.IsNext("=") {
+		return errors.New("expected = not found")
 	}
 
 	incrementCode, err := expressions.Compile(c.t)

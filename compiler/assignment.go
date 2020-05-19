@@ -13,8 +13,8 @@ func (c *Compiler) Assignment() error {
 	if err != nil {
 		return err
 	}
-	if !c.t.IsNext(":=") {
-		return errors.New("expected := not found")
+	if !c.t.IsAnyNext([]string{":=", "="}) {
+		return errors.New("expected = or := not found")
 	}
 
 	expressionCode, err := expressions.Compile(c.t)

@@ -55,6 +55,18 @@ func (s *SymbolTable) Get(name string) (interface{}, bool) {
 	return v, f
 }
 
+// SetAlways stores a symbol value in the local table. No value in
+// any parent table is affected. This can be used for functions and
+// readonly values.
+func (s *SymbolTable) SetAlways(name string, v interface{}) error {
+	if s.Symbols == nil {
+		s.Symbols = map[string]interface{}{}
+	}
+
+	s.Symbols[name] = v
+	return nil
+}
+
 // Set stores a symbol value in the local table. No value in
 // any parent table is affected.
 func (s *SymbolTable) Set(name string, v interface{}) error {
@@ -77,6 +89,8 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 			return errors.New("readonly builtin symbol")
 
 		}
+	} else {
+		return errors.New("unknown symbol")
 	}
 
 	s.Symbols[name] = v
@@ -101,5 +115,20 @@ func (s *SymbolTable) Delete(name string) error {
 		return errors.New("symbol " + name + " not found")
 	}
 	delete(s.Symbols, name)
+	return nil
+}
+
+// Create creates a symbol name in the table
+func (s *SymbolTable) Create(name string) error {
+
+	if len(name) == 0 {
+		return errors.New("invalid symbol")
+	}
+
+	_, found := s.Symbols[name]
+	if found {
+		return errors.New("symbol already exists")
+	}
+	s.Symbols[name] = nil
 	return nil
 }
