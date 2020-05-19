@@ -19,5 +19,5 @@ func MakeSymbol() string {
 	i = index
 	indexMux.Unlock()
 
-	return "__" + strconv.Itoa(i)
+	return "COMPILER_TEMP__" + strconv.Itoa(i)
 }

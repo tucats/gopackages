@@ -1,6 +1,8 @@
 package symbols
 
-import "errors"
+import (
+	"errors"
+)
 
 // SymbolTable contains an abstract symbol table
 type SymbolTable struct {
@@ -78,5 +80,26 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 	}
 
 	s.Symbols[name] = v
+	return nil
+}
+
+// Delete removes a symbol from the table.
+func (s *SymbolTable) Delete(name string) error {
+
+	if len(name) == 0 {
+		return errors.New("invalid symbol")
+	}
+	if name[:1] == "_" {
+		return errors.New("readonly symbol")
+	}
+	if s.Symbols == nil {
+		return errors.New("SymbolDelete of " + name + " when there are no symbols")
+	}
+
+	_, f := s.Symbols[name]
+	if !f {
+		return errors.New("symbol " + name + " not found")
+	}
+	delete(s.Symbols, name)
 	return nil
 }

@@ -35,6 +35,8 @@ func (c *Compiler) For() error {
 	// Do we compile a range?
 	if c.t.IsNext("range") {
 
+		c.PushLoop(rangeLoopType)
+
 		arrayCode, err := expressions.Compile(c.t)
 		if err != nil {
 			return err
@@ -44,6 +46,7 @@ func (c *Compiler) For() error {
 		if indexName == "" {
 			indexName = MakeSymbol()
 		}
+
 		c.b.Emit2(bytecode.Push, 1)
 		c.b.Emit2(bytecode.Store, indexName)
 
@@ -72,6 +75,7 @@ func (c *Compiler) For() error {
 		}
 
 		// Increment the index
+		b3 := c.b.Mark()
 		c.b.Emit2(bytecode.Load, indexName)
 		c.b.Emit2(bytecode.Push, 1)
 		c.b.Emit1(bytecode.Add)
@@ -79,7 +83,17 @@ func (c *Compiler) For() error {
 
 		// Branch back to start of loop
 		c.b.Emit2(bytecode.Branch, b1)
+		for _, fixAddr := range c.loops.continues {
+			c.b.SetAddress(fixAddr, b3)
+		}
+
 		c.b.SetAddressHere(b2)
+
+		for _, fixAddr := range c.loops.breaks {
+			c.b.SetAddressHere(fixAddr)
+		}
+		c.PopLoop()
+		c.b.Emit2(bytecode.SymbolDelete, indexName)
 		return nil
 	}
 
@@ -88,6 +102,7 @@ func (c *Compiler) For() error {
 	if indexName != "" {
 		c.NewError("invalid index variable")
 	}
+	c.PushLoop(indexLoopType)
 
 	// The expression is the initial value of the loop.
 	initializerCode, err := expressions.Compile(c.t)
@@ -150,5 +165,58 @@ func (c *Compiler) For() error {
 	c.b.Emit2(bytecode.Branch, b1)
 	c.b.SetAddressHere(b2)
 
+	for _, fixAddr := range c.loops.continues {
+		c.b.SetAddress(fixAddr, b1)
+	}
+
+	for _, fixAddr := range c.loops.breaks {
+		c.b.SetAddressHere(fixAddr)
+	}
+
 	return nil
+}
+
+// Break processes a break statement
+func (c *Compiler) Break() error {
+
+	if c.loops == nil {
+		return c.NewError("break outside of loop")
+	}
+	fixAddr := c.b.Mark()
+	c.b.Emit2(bytecode.Branch, 0)
+	c.loops.breaks = append(c.loops.breaks, fixAddr)
+	return nil
+}
+
+// Continue processes a continue statement
+func (c *Compiler) Continue() error {
+
+	if c.loops == nil {
+		return c.NewError("continue outside of loop")
+	}
+	fixAddr := c.b.Mark()
+	c.b.Emit2(bytecode.Branch, 0)
+	c.loops.continues = append(c.loops.continues, fixAddr)
+	return nil
+}
+
+// PushLoop creates a new loop context and adds it to the
+// top of the loop stack.
+func (c *Compiler) PushLoop(loopType int) {
+
+	loop := Loop{
+		Type:      loopType,
+		breaks:    make([]int, 0),
+		continues: make([]int, 0),
+		Parent:    c.loops,
+	}
+
+	c.loops = &loop
+}
+
+// PopLoop discards the topmost loop on the loop stack.
+func (c *Compiler) PopLoop() {
+	if c.loops != nil {
+		c.loops = c.loops.Parent
+	}
 }

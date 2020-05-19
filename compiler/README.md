@@ -225,3 +225,39 @@ identical to the following more explicit loop structure:
         n := x[i]
         print "Element ", i, " is ", n
     }
+
+## break
+The `break` statement exits from the currently running loop, as if the
+loop had terminated normally.
+
+    for i := 0; i < 10; i := i + 1 {
+        if i = 5 {
+            break
+        }
+        print i
+    }
+
+This loop run run only five times, printing the values 0..4. On the next
+iteration, because the index `i` is equal to 5, the loop is terminated.
+Note that a `break` will only exit the current loop; if there are nested
+loops the `break` only exits the loop in which it occurred and all outer
+loops continue to run.
+
+The `break` statement cannot be used outside of a `for` loop.
+
+## continue
+The `continue` statement exits from the currently running loop, as if the
+loop had restarted with the next iteration.
+
+    for i := 0; i < 10; i := i + 1 {
+        if i = 5 {
+            continue
+        }
+        print i
+    }
+
+This loop run run only all ten times, but will only print the values
+0..4 and 6..9. When the index `i` is equal to 5, the loop starts again
+at the top of the loop with the next index value.
+
+The `continue` statement cannot be used outside of a `for` loop.

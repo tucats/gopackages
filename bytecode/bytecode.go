@@ -57,6 +57,7 @@ const (
 	Member
 	Print
 	Newline
+	SymbolDelete
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction

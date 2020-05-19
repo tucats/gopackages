@@ -90,6 +90,11 @@ func (c *Context) Set(name string, value interface{}) error {
 	return c.symbols.Set(name, value)
 }
 
+// Delete deletes a symbol from the current context
+func (c *Context) Delete(name string) error {
+	return c.symbols.Delete(name)
+}
+
 // Pop removes the top-most item from the stack
 func (c *Context) Pop() (interface{}, error) {
 	if c.sp <= 0 || len(c.stack) < c.sp {

@@ -48,6 +48,12 @@ func (c *Compiler) Statement() error {
 	case "for":
 		return c.For()
 
+	case "break":
+		return c.Break()
+
+	case "continue":
+		return c.Continue()
+
 	case "print":
 		return c.Print()
 

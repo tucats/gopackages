@@ -54,6 +54,7 @@ func initializeDispatch() {
 			Newline:            NewlineOpcode,
 			Drop:               DropOpcode,
 			MakeArray:          MakeArrayOpcode,
+			SymbolDelete:       SymbolDeleteOpcode,
 		}
 	}
 }

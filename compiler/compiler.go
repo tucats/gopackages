@@ -6,12 +6,29 @@ import (
 	"github.com/tucats/gopackages/tokenizer"
 )
 
+const (
+	indexLoopType = 1
+	rangeLoopType = 2
+)
+
+// Loop is a structure that defines a loop type.
+type Loop struct {
+	Parent *Loop
+	Type   int
+	// Fixup locations for break or continue statements in a
+	// loop. These are the addresses that must be fixed up with
+	// the target address.
+	breaks    []int
+	continues []int
+}
+
 // Compiler is a structure defining what we know about the
 // compilation
 type Compiler struct {
-	b *bytecode.ByteCode
-	t *tokenizer.Tokenizer
-	s *symbols.SymbolTable
+	b     *bytecode.ByteCode
+	t     *tokenizer.Tokenizer
+	s     *symbols.SymbolTable
+	loops *Loop
 }
 
 // Compile starts a compilation unit, and returns a bytecode
