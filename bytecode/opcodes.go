@@ -180,6 +180,20 @@ func MemberOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
+// PushScopeOpcode implementation
+func PushScopeOpcode(c *Context, i interface{}) error {
+
+	s := symbols.NewChildSymbolTable("new scope", c.symbols)
+	c.symbols = s
+	return nil
+}
+
+// PopScopeOpcode implementation
+func PopScopeOpcode(c *Context, i interface{}) error {
+	c.symbols = c.symbols.Parent
+	return nil
+}
+
 // SymbolCreateOpcode implementation
 func SymbolCreateOpcode(c *Context, i interface{}) error {
 

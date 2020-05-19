@@ -56,6 +56,8 @@ func initializeDispatch() {
 			MakeArray:          MakeArrayOpcode,
 			SymbolDelete:       SymbolDeleteOpcode,
 			SymbolCreate:       SymbolCreateOpcode,
+			PushScope:          PushScopeOpcode,
+			PopScope:           PopScopeOpcode,
 		}
 	}
 }

@@ -59,6 +59,8 @@ const (
 	Newline
 	SymbolDelete
 	SymbolCreate
+	PushScope
+	PopScope
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction
@@ -189,4 +191,18 @@ func (b *ByteCode) Call(s *symbols.SymbolTable) (interface{}, error) {
 // Opcodes returns the opcode list for this byteocde array
 func (b *ByteCode) Opcodes() []I {
 	return b.opcodes[:b.emitPos]
+}
+
+// Remove removes an instruction from the bytecode. The position is either
+// >= 0 in which case it is absolvete, else if it is < 0 it is the offset
+// from the end of the bytecode.
+func (b *ByteCode) Remove(n int) {
+
+	if n >= 0 {
+		b.opcodes = append(b.opcodes[:n], b.opcodes[n+1:]...)
+	} else {
+		n = b.emitPos - n
+		b.opcodes = append(b.opcodes[:n], b.opcodes[n+1:]...)
+	}
+	b.emitPos = b.emitPos - 1
 }

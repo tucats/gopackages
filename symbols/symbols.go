@@ -67,8 +67,7 @@ func (s *SymbolTable) SetAlways(name string, v interface{}) error {
 	return nil
 }
 
-// Set stores a symbol value in the local table. No value in
-// any parent table is affected.
+// Set stores a symbol value in the table where it was found.
 func (s *SymbolTable) Set(name string, v interface{}) error {
 	if s.Symbols == nil {
 		s.Symbols = map[string]interface{}{}
@@ -90,14 +89,21 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 
 		}
 	} else {
-		return errors.New("unknown symbol")
+
+		// If there are no more tables, we have an error.
+		if s.Parent == nil {
+			return errors.New("unknown symbol")
+		}
+		// Otherwise, ask the parent to try to set the value.
+		return s.Parent.Set(name, v)
 	}
 
 	s.Symbols[name] = v
 	return nil
 }
 
-// Delete removes a symbol from the table.
+// Delete removes a symbol from the table. Search from the local symbol
+// up the parent tree until you find the symbol to delete.
 func (s *SymbolTable) Delete(name string) error {
 
 	if len(name) == 0 {
@@ -112,7 +118,10 @@ func (s *SymbolTable) Delete(name string) error {
 
 	_, f := s.Symbols[name]
 	if !f {
-		return errors.New("symbol " + name + " not found")
+		if s.Parent == nil {
+			return errors.New("symbol " + name + " not found")
+		}
+		return s.Parent.Delete(name)
 	}
 	delete(s.Symbols, name)
 	return nil

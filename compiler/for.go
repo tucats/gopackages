@@ -13,6 +13,8 @@ import (
 // block that is run as described by the loop conditions.
 func (c *Compiler) For() error {
 
+	c.b.Emit1(bytecode.PushScope)
+
 	indexName := ""
 	// Is this the two-value range thing?
 	if tokenizer.IsSymbol(c.t.Peek(1)) && (c.t.Peek(2) == ",") {
@@ -35,6 +37,15 @@ func (c *Compiler) For() error {
 	// Do we compile a range?
 	if c.t.IsNext("range") {
 
+		// This is wierd, but the LValue compiler will have inserted a "SymbolCreate" in the
+		// lValue due to the syntax, but we don't really want to create it as it will have already
+		// been generated once. So use it once to create a value, and then remove the store.
+
+		c.b.Emit2(bytecode.Push, 0)
+		c.b.Append(indexStore)
+		indexStore.Remove(0)
+
+		// Make a new scope and get the array we will range over
 		c.PushLoop(rangeLoopType)
 
 		arrayCode, err := expressions.Compile(c.t)
@@ -92,6 +103,8 @@ func (c *Compiler) For() error {
 		}
 		c.PopLoop()
 		c.b.Emit2(bytecode.SymbolDelete, indexName)
+		c.b.Emit1(bytecode.PopScope)
+
 		return nil
 	}
 
@@ -170,6 +183,7 @@ func (c *Compiler) For() error {
 	for _, fixAddr := range c.loops.breaks {
 		c.b.SetAddressHere(fixAddr)
 	}
+	c.b.Emit1(bytecode.PopScope)
 
 	return nil
 }
