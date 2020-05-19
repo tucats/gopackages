@@ -61,7 +61,7 @@ a field directly,
 If the member does not exist, an error is generated. You can however add
 new fields to a structure simply by naming them in an assignment, such as
 
-    employee.weekly := pay
+    employee.weekly = pay
 
 If there isn't already a field named `weekly` in the structure, it is
 created automatically. The field is then set to the value of `pay`.
@@ -73,7 +73,7 @@ identifies the name of the array and the size, and optionally an initial
 value for each member of the array.
 
     array x[5]
-    array y[2] := 10
+    array y[2] = 10
 
 The first example creates an array of 5 elements, but the elements are
 `<nil>` which means they do not have a usable value yet. The array elements
@@ -99,7 +99,7 @@ named `aarp` with the value of the `name` symbol.
 You can optionally include an "else" clause to execute if the
 condition is false, as in 
 
-    if flag = "-d" {
+    if flag == "-d" {
         call debug()
     } else {
         call regular()
@@ -185,7 +185,7 @@ or a statement block is executed based on the definition of the
 loop. There are two kinds of loops.
 
     x := [101, 232,363]
-    for n:=0; n < len(x); n := n + 1 {
+    for n:=0; n < len(x); n = n + 1 {
         print "element ", n, " is ", x[n]
     }
 
@@ -221,7 +221,7 @@ Here, the array index is stored in `i` and the value of
 the array index is stored in `n`. This is symantically
 identical to the following more explicit loop structure:
 
-    for i := 1; i <= len(x); i := i + 1 {
+    for i := 1; i <= len(x); i = i + 1 {
         n := x[i]
         print "Element ", i, " is ", n
     }
@@ -230,8 +230,8 @@ identical to the following more explicit loop structure:
 The `break` statement exits from the currently running loop, as if the
 loop had terminated normally.
 
-    for i := 0; i < 10; i := i + 1 {
-        if i = 5 {
+    for i := 0; i < 10; i = i + 1 {
+        if i == 5 {
             break
         }
         print i
@@ -249,8 +249,8 @@ The `break` statement cannot be used outside of a `for` loop.
 The `continue` statement exits from the currently running loop, as if the
 loop had restarted with the next iteration.
 
-    for i := 0; i < 10; i := i + 1 {
-        if i = 5 {
+    for i := 0; i < 10; i = i + 1 {
+        if i == 5 {
             continue
         }
         print i
