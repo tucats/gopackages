@@ -64,9 +64,9 @@ func (t *Table) FormatJSON() string {
 		if e != nil {
 			// Load up the symbol tables with column values and the row number
 			symbols := symbols.NewSymbolTable("rowset")
-			symbols.Set("_row_", n+1)
+			symbols.SetAlways("_row_", n+1)
 			for i, n := range t.columns {
-				symbols.Set(strings.ToLower(n), row[i])
+				symbols.SetAlways(strings.ToLower(n), row[i])
 			}
 			v, err := e.Eval(symbols)
 			if err != nil {
@@ -183,9 +183,9 @@ func (t *Table) FormatText() []string {
 		if e != nil {
 			// Load up the symbol tables with column values and the row number
 			symbols := symbols.NewSymbolTable("rowset")
-			symbols.Set("_row_", i+1)
+			symbols.SetAlways("_row_", i+1)
 			for i, n := range t.columns {
-				symbols.Set(strings.ToLower(n), r[i])
+				symbols.SetAlways(strings.ToLower(n), r[i])
 			}
 			v, err := e.Eval(symbols)
 			if err != nil {

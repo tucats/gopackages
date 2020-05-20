@@ -84,7 +84,7 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 
 		switch old.(type) {
 
-		case func([]interface{}) (interface{}, error):
+		case func(*SymbolTable, []interface{}) (interface{}, error):
 			return errors.New("readonly builtin symbol")
 
 		}

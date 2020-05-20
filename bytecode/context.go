@@ -45,10 +45,18 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 	ctxp := &ctx
 	ctxp.SetByteCode(b)
 
-	// Append the bytecode symbols into the symbol table.
-	for k, v := range b.Symbols.Symbols {
-		s.Set(k, v)
+	// If we weren't given a table, create an empty temp table.
+	if s == nil {
+		s = symbols.NewSymbolTable("")
 	}
+
+	// Append any bytecode symbols into the symbol table.
+	if b.Symbols != nil {
+		for k, v := range b.Symbols.Symbols {
+			s.SetAlways(k, v)
+		}
+	}
+
 	return ctxp
 }
 
@@ -67,7 +75,7 @@ func (c *Context) GetTokenizer() *tokenizer.Tokenizer {
 // example.
 func (c *Context) AppendSymbols(s symbols.SymbolTable) {
 	for k, v := range s.Symbols {
-		c.symbols.Set(k, v)
+		c.symbols.SetAlways(k, v)
 	}
 }
 

@@ -7,11 +7,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/tucats/gopackages/app-cli/persistence"
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
 
 // FunctionProfile implements the profile() function
-func FunctionProfile(args []interface{}) (interface{}, error) {
+func FunctionProfile(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) < 1 || len(args) > 2 {
 		return nil, errors.New("incorrect number of function arguments")
@@ -35,7 +36,7 @@ func FunctionProfile(args []interface{}) (interface{}, error) {
 }
 
 // FunctionUUID implements the uuid() function
-func FunctionUUID(args []interface{}) (interface{}, error) {
+func FunctionUUID(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	if len(args) != 0 {
 		return nil, errors.New("incorrect number of function arguments")
 	}
@@ -44,7 +45,7 @@ func FunctionUUID(args []interface{}) (interface{}, error) {
 }
 
 // FunctionLen implements the len() function
-func FunctionLen(args []interface{}) (interface{}, error) {
+func FunctionLen(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	if len(args) != 1 {
 		return nil, errors.New("incorrect number of function arguments")
 	}
@@ -80,7 +81,7 @@ func FunctionLen(args []interface{}) (interface{}, error) {
 // an empty array of the given size. IF there are two parameters,
 // the first must be an existing array which is resized to match
 // the new array
-func FunctionArray(args []interface{}) (interface{}, error) {
+func FunctionArray(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) < 1 || len(args) > 2 {
 		return nil, errors.New("incorrect number of function arguments")
@@ -113,7 +114,7 @@ func FunctionArray(args []interface{}) (interface{}, error) {
 
 // FunctionGetEnv implementes the util.getenv() function which reads
 // an environment variable from the os.
-func FunctionGetEnv(args []interface{}) (interface{}, error) {
+func FunctionGetEnv(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	if len(args) != 1 {
 		return nil, errors.New("incorrect number of function arguments")
 	}
@@ -122,7 +123,7 @@ func FunctionGetEnv(args []interface{}) (interface{}, error) {
 }
 
 // FunctionMembers gets an array of the names of the fields in a structure
-func FunctionMembers(args []interface{}) (interface{}, error) {
+func FunctionMembers(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	if len(args) != 1 {
 		return nil, errors.New("incorrect number of function arguments")
 	}
@@ -150,7 +151,7 @@ func FunctionMembers(args []interface{}) (interface{}, error) {
 }
 
 // FunctionSort implements the sort() function.
-func FunctionSort(args []interface{}) (interface{}, error) {
+func FunctionSort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	switch array := args[0].(type) {
 
@@ -207,7 +208,7 @@ func FunctionSort(args []interface{}) (interface{}, error) {
 }
 
 // FunctionExit implements the _util.exit() function
-func FunctionExit(args []interface{}) (interface{}, error) {
+func FunctionExit(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	// If no arguments, just do a simple exit
 	if len(args) == 0 {
@@ -227,4 +228,9 @@ func FunctionExit(args []interface{}) (interface{}, error) {
 	}
 
 	return nil, nil
+}
+
+// FunctionSymbols implements the _util.symbols() function
+func FunctionSymbols(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	return syms.Format(false), nil
 }

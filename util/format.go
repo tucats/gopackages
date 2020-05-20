@@ -85,10 +85,7 @@ func Format(arg interface{}) string {
 	case string:
 		return "\"" + v + "\""
 
-	case func([]interface{}) (interface{}, error):
-		return fmt.Sprintf("<builtin %v>", arg)
-
 	default:
-		return "<bytecode>"
+		return "<function>"
 	}
 }

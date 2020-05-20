@@ -4,21 +4,22 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
 
 // FunctionLower implements the lower() function
-func FunctionLower(args []interface{}) (interface{}, error) {
+func FunctionLower(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return strings.ToLower(util.GetString(args[0])), nil
 }
 
 // FunctionUpper implements the upper() function
-func FunctionUpper(args []interface{}) (interface{}, error) {
+func FunctionUpper(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return strings.ToUpper(util.GetString(args[0])), nil
 }
 
 // FunctionLeft implements the left() function
-func FunctionLeft(args []interface{}) (interface{}, error) {
+func FunctionLeft(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	v := util.GetString(args[0])
 	p := util.GetInt(args[1])
@@ -33,7 +34,7 @@ func FunctionLeft(args []interface{}) (interface{}, error) {
 }
 
 // FunctionRight implements the right() function
-func FunctionRight(args []interface{}) (interface{}, error) {
+func FunctionRight(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	v := util.GetString(args[0])
 	p := util.GetInt(args[1])
@@ -48,7 +49,7 @@ func FunctionRight(args []interface{}) (interface{}, error) {
 }
 
 // FunctionIndex implements the index() function
-func FunctionIndex(args []interface{}) (interface{}, error) {
+func FunctionIndex(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	switch arg := args[0].(type) {
 
 	case []interface{}:
@@ -73,7 +74,7 @@ func FunctionIndex(args []interface{}) (interface{}, error) {
 }
 
 // FunctionSubstring implements the substring() function
-func FunctionSubstring(args []interface{}) (interface{}, error) {
+func FunctionSubstring(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.GetString(args[0])
 	p1 := util.GetInt(args[1])
 	p2 := util.GetInt(args[2])

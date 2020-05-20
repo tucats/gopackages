@@ -38,6 +38,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"sqrt":      FunctionDefinition{Min: 1, Max: 1, F: FunctionSqrt, Pkg: "_math"},
 	"sort":      FunctionDefinition{Min: 1, Max: 1, F: FunctionSort, Pkg: "_util"},
 	"exit":      FunctionDefinition{Min: 0, Max: 1, F: FunctionExit, Pkg: "_util"},
+	"symbols":   FunctionDefinition{Min: 0, Max: 1, F: FunctionSymbols, Pkg: "_util"},
 }
 
 // AddBuiltins adds or overrides the default function library in the symbol map.
@@ -67,7 +68,7 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 
 // FindFunction returns the function definition associated with the
 // provided function pointer, if one is found.
-func FindFunction(f func([]interface{}) (interface{}, error)) *FunctionDefinition {
+func FindFunction(f func(*symbols.SymbolTable, []interface{}) (interface{}, error)) *FunctionDefinition {
 
 	sf1 := reflect.ValueOf(f)
 
@@ -81,7 +82,7 @@ func FindFunction(f func([]interface{}) (interface{}, error)) *FunctionDefinitio
 }
 
 // FindName returns the name of a function from the dictionary if one is found
-func FindName(f func([]interface{}) (interface{}, error)) string {
+func FindName(f func(*symbols.SymbolTable, []interface{}) (interface{}, error)) string {
 
 	sf1 := reflect.ValueOf(f)
 

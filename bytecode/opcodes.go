@@ -183,7 +183,7 @@ func MemberOpcode(c *Context, i interface{}) error {
 // PushScopeOpcode implementation
 func PushScopeOpcode(c *Context, i interface{}) error {
 
-	s := symbols.NewChildSymbolTable("new scope", c.symbols)
+	s := symbols.NewChildSymbolTable("statement block", c.symbols)
 	c.symbols = s
 	return nil
 }
@@ -301,7 +301,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		cx.Tracing = c.Tracing
 		cx.SetTokenizer(c.GetTokenizer())
 
-		sf.Set("_args", args)
+		sf.SetAlways("_args", args)
 
 		// Run the function. If it doesn't get an error, then
 		// extract the stop stack item as the result
@@ -310,7 +310,7 @@ func CallOpcode(c *Context, i interface{}) error {
 			result, err = cx.Pop()
 		}
 
-	case func([]interface{}) (interface{}, error):
+	case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
 
 		// First, can we check the argument count on behalf of the caller?
 		df := functions.FindFunction(af)
@@ -326,7 +326,7 @@ func CallOpcode(c *Context, i interface{}) error {
 				return c.NewError("too many arguments" + name)
 			}
 		}
-		result, err = af(args)
+		result, err = af(c.symbols, args)
 
 		// Functions implemented natively cannot wrap them up as runtime
 		// errors, so let's help them out.
@@ -951,7 +951,7 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 
 			switch old.(type) {
 
-			case func([]interface{}) (interface{}, error):
+			case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
 				return errors.New("readonly builtin symbol")
 
 			}

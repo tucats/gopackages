@@ -84,4 +84,5 @@ This table enumerates the bytecode values in the `bytecode` package, and what th
 | BranchTrue <addr>   | Remove the top item. If it is true, transfer control to the instruction at the given location in the bytecode array. |
 | BranchFalse <addr>  | Remove the top item. If it is false, transfer control to the instruction at the given location in the bytecode array. |
 | Call <int>          | Remove the given number of items from the stack to form a parameter list. The remove the pointer to the function. This can be a pointer to a native function or a pointer to a `bytecode` structure containing a function written in the _Solve_ language. |
-
+| SymbolCreate <string> | Create a new symbol in the most-local table of the given name |
+| SymbolDelete <string> | Delete the symbol from the nearest scope in which it exists |

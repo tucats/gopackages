@@ -44,6 +44,7 @@ func (c *Compiler) Function() error {
 		b.Emit2(bytecode.Load, "_args")
 		b.Emit2(bytecode.Push, n+1)
 		b.Emit1(bytecode.LoadIndex)
+		b.Emit2(bytecode.SymbolCreate, name)
 		b.Emit2(bytecode.Store, name)
 	}
 
@@ -57,7 +58,7 @@ func (c *Compiler) Function() error {
 	}
 
 	// Store the compiled code is the compiler's symbol table
-	c.s.Set(fname, b)
+	c.s.SetAlways(fname, b)
 
 	if ui.DebugMode {
 		b.Disasm()

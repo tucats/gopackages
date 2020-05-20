@@ -50,8 +50,9 @@ func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
 
 	// Append any symbols created to the bytecode's table
 	st := c.Symbols()
+
 	for k, v := range st.Symbols {
-		b.Symbols.Set(k, v)
+		c.b.Symbols.SetAlways(k, v)
 
 	}
 	return c.b, nil

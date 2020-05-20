@@ -34,7 +34,7 @@ func TestFunctionLeft(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionLeft(tt.args.args)
+			got, err := FunctionLeft(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionLeft() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -81,7 +81,7 @@ func TestFunctionRight(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionRight(tt.args.args)
+			got, err := FunctionRight(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionRight() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -132,7 +132,7 @@ func TestFunctionLower(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionLower(tt.args.args)
+			got, err := FunctionLower(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionLower() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -183,7 +183,7 @@ func TestFunctionUpper(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionUpper(tt.args.args)
+			got, err := FunctionUpper(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionUpper() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -234,7 +234,7 @@ func TestFunctionSubstring(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionSubstring(tt.args.args)
+			got, err := FunctionSubstring(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionSubstring() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -305,7 +305,7 @@ func TestFunctionIndex(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionIndex(tt.args.args)
+			got, err := FunctionIndex(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionIndex() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -3,11 +3,12 @@ package functions
 import (
 	"errors"
 
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
 
 // FunctionInt implements the int() function
-func FunctionInt(args []interface{}) (interface{}, error) {
+func FunctionInt(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], 1)
 	if v == nil {
 		return nil, errors.New("invalid value to coerce to integer type")
@@ -16,7 +17,7 @@ func FunctionInt(args []interface{}) (interface{}, error) {
 }
 
 // FunctionFloat implements the float() function
-func FunctionFloat(args []interface{}) (interface{}, error) {
+func FunctionFloat(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], 1.0)
 	if v == nil {
 		return nil, errors.New("invalid value to coerce to float type")
@@ -25,12 +26,12 @@ func FunctionFloat(args []interface{}) (interface{}, error) {
 }
 
 // FunctionString implements the string() function
-func FunctionString(args []interface{}) (interface{}, error) {
+func FunctionString(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return util.GetString(args[0]), nil
 }
 
 // FunctionBool implements the bool() function
-func FunctionBool(args []interface{}) (interface{}, error) {
+func FunctionBool(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], true)
 	if v == nil {
 		return nil, errors.New("invalid value to coerce to bool type")

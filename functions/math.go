@@ -4,11 +4,12 @@ import (
 	"errors"
 	"math"
 
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
 
 // FunctionMin implements the min() function
-func FunctionMin(args []interface{}) (interface{}, error) {
+func FunctionMin(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) == 1 {
 		return args[0], nil
@@ -50,7 +51,7 @@ func FunctionMin(args []interface{}) (interface{}, error) {
 }
 
 // FunctionMax implements the max() function
-func FunctionMax(args []interface{}) (interface{}, error) {
+func FunctionMax(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) == 1 {
 		return args[0], nil
@@ -92,7 +93,7 @@ func FunctionMax(args []interface{}) (interface{}, error) {
 }
 
 // FunctionSum implements the sum() function
-func FunctionSum(args []interface{}) (interface{}, error) {
+func FunctionSum(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	base := args[0]
 	for _, addend := range args[1:] {
@@ -119,7 +120,7 @@ func FunctionSum(args []interface{}) (interface{}, error) {
 }
 
 // FunctionSqrt implements the sqrt() function
-func FunctionSqrt(args []interface{}) (interface{}, error) {
+func FunctionSqrt(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	f := util.GetFloat(args[0])
 	return math.Sqrt(f), nil
 }

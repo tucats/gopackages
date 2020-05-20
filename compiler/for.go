@@ -54,7 +54,9 @@ func (c *Compiler) For() error {
 		}
 
 		// Initialize index
-		indexName = MakeSymbol()
+		if indexName == "" {
+			indexName = MakeSymbol()
+		}
 		c.b.Emit2(bytecode.Push, 1)
 		c.b.Emit2(bytecode.SymbolCreate, indexName)
 		c.b.Emit2(bytecode.Store, indexName)

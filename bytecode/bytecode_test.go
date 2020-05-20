@@ -3,6 +3,8 @@ package bytecode
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tucats/gopackages/symbols"
 )
 
 func TestByteCode_New(t *testing.T) {
@@ -13,6 +15,7 @@ func TestByteCode_New(t *testing.T) {
 		want := ByteCode{
 			Name:    "testing",
 			opcodes: make([]I, InitialOpcodeSize),
+			Symbols: &symbols.SymbolTable{Symbols: map[string]interface{}{}},
 			emitPos: 0,
 		}
 		if !reflect.DeepEqual(*b, want) {

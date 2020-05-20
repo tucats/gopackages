@@ -196,3 +196,18 @@ The `_util.members()` function returns an array [ "age", "name" ]. These are
 the fields of the structure, and they are always returned in alphabetical
 order. The assignment statement uses the first array element ("age") to access
 the value of e.age.
+
+### _util.symbols()
+Returns a string containing a formatted expression of the symbol table at
+the moment the function is called, including all nested levels of scope.
+The typical use is to simply print the string:
+
+    x := 55
+    {
+        x = 42
+        y := "test"
+        print _util.symbols()
+    }
+
+This will print the symbols for the nested basic block as well as the
+symbols for the main program.

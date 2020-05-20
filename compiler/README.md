@@ -66,6 +66,31 @@ new fields to a structure simply by naming them in an assignment, such as
 If there isn't already a field named `weekly` in the structure, it is
 created automatically. The field is then set to the value of `pay`.
 
+## Scope
+The console input (when `solve` is run with no arguments or parameters) or
+the source file named when `solve run` is used creates the main symbol table,
+available to any statement entered by the user or in the source file.
+
+The first time a symbol is created, you must use the := notation to create
+a variable as well as set its value. All subsequent sets of that variable
+should use the = notation to store in an existing symbol.
+
+Whenever a `{ }` block is used, a new symbol table is created for use during
+that block. Any symbols created within the block are deleted when the block
+exits. The block can of course reference symbols in outer blocks using 
+standard "=" notation. For example,
+
+    x := 55
+    {
+        y := 66
+        x = 42
+    }
+
+After this code runs, the value of `x` will be 42 (because it was changed
+within the block) and the symbol `y` will not be defined (because it went
+out of scope at the end of the basic block.)
+
+
 ## array
 The `array` statement is used to allocate an array. An array can also be
 created as an array constant and stored in a variable. The array statement

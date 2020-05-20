@@ -32,7 +32,7 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 	for _, k := range keys {
 		v := s.Symbols[k]
 		switch actual := v.(type) {
-		case func([]interface{}) (interface{}, error):
+		case func(*SymbolTable, []interface{}) (interface{}, error):
 			if !includeBuiltins {
 				continue
 			}
@@ -41,7 +41,7 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 			skip := false
 			for _, k2 := range actual {
 				switch k2.(type) {
-				case func([]interface{}) (interface{}, error):
+				case func(*SymbolTable, []interface{}) (interface{}, error):
 					skip = true
 					break
 				}

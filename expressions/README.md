@@ -19,8 +19,8 @@ Here is a simple example of using the expression handler:
     // evaluation. This is optional, but must be provided
     // if your expression uses variables.
     symbols := bytecode.Newsymbols.SymbolTable()
-    symbols.Set("name", "Tom")
-    symbols.Set("age", 54)
+    symbols.SetAlways("name", "Tom")
+    symbols.SetAlways("age", 54)
 
     // Compile a string as an expression and then evaluate
     // the resulting expression to get its value
@@ -30,6 +30,10 @@ Here is a simple example of using the expression handler:
 The value of the expression is returned as an opaque interface, along with an error object. If the
 error object is nil, no errors occurred during expression evaluation. If the err object is not nil,
 it contains an error description, and the value returned will be set to nil.
+
+Note the user of the `SetAlways()` method to set symbol values. This will set a value even if
+the value doesn't already exist, and will also set a value whose name starts with "_" which
+denotes a read-only variable.
 
 It is up to the caller to handle the type of the return value. A number of functions exist to fetch
 specific types from the opaque value, performing type conversions as needed:
@@ -97,10 +101,10 @@ evaluation reports an error.
 
 To declare the function to the expression evaluator, just add it to the
 symbol table. The name must be the name of the function as it would be
-specified in an expression, followed by "()". The value of the item
+specified in an expression. The value of the item
 in the symbol table map is the function pointer or value itself.
     
-    symbols.Set("sum()", sum)
+    symbols.SetAlways("sum", sum)
 
 This will add the sum function described above to the available symbols
 for processing an expression. Note that user-supplied functions must be
