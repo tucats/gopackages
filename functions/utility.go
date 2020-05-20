@@ -205,3 +205,26 @@ func FunctionSort(args []interface{}) (interface{}, error) {
 		return nil, errors.New("not an array type")
 	}
 }
+
+// FunctionExit implements the _util.exit() function
+func FunctionExit(args []interface{}) (interface{}, error) {
+
+	// If no arguments, just do a simple exit
+	if len(args) == 0 {
+		os.Exit(0)
+	}
+
+	switch v := args[0].(type) {
+
+	case int:
+		os.Exit(v)
+
+	case string:
+		return nil, errors.New(v)
+
+	default:
+		return nil, errors.New("unsupported exit() type")
+	}
+
+	return nil, nil
+}

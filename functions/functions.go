@@ -37,6 +37,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"members":   FunctionDefinition{Min: 1, Max: 1, F: FunctionMembers, Pkg: "_util"},
 	"sqrt":      FunctionDefinition{Min: 1, Max: 1, F: FunctionSqrt, Pkg: "_math"},
 	"sort":      FunctionDefinition{Min: 1, Max: 1, F: FunctionSort, Pkg: "_util"},
+	"exit":      FunctionDefinition{Min: 0, Max: 1, F: FunctionExit, Pkg: "_util"},
 }
 
 // AddBuiltins adds or overrides the default function library in the symbol map.
