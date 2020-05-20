@@ -8,7 +8,7 @@ import (
 )
 
 // Format formats a symbol table into a string for printing/display
-func (s *SymbolTable) Format() string {
+func (s *SymbolTable) Format(includeBuiltins bool) string {
 
 	var b strings.Builder
 
@@ -31,7 +31,25 @@ func (s *SymbolTable) Format() string {
 	// Now iterate over the keys in sorted order
 	for _, k := range keys {
 		v := s.Symbols[k]
+		switch actual := v.(type) {
+		case func([]interface{}) (interface{}, error):
+			if !includeBuiltins {
+				continue
+			}
 
+		case map[string]interface{}:
+			skip := false
+			for _, k2 := range actual {
+				switch k2.(type) {
+				case func([]interface{}) (interface{}, error):
+					skip = true
+					break
+				}
+			}
+			if skip && !includeBuiltins {
+				continue
+			}
+		}
 		b.WriteString("   ")
 		b.WriteString(k)
 		b.WriteString(" = ")
@@ -40,7 +58,7 @@ func (s *SymbolTable) Format() string {
 	}
 
 	if s.Parent != nil {
-		sp := s.Parent.Format()
+		sp := s.Parent.Format(includeBuiltins)
 		b.WriteString("\n")
 		b.WriteString(sp)
 	}

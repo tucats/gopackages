@@ -16,8 +16,8 @@ var RootSymbolTable = SymbolTable{
 	Name:   "Root Symbol Table",
 	Parent: nil,
 	Symbols: map[string]interface{}{
-		"author":    "Tom Cole",
-		"copyright": "(c) Copyright 2020",
+		"_author":    "Tom Cole",
+		"_copyright": "(c) Copyright 2020",
 	},
 }
 
