@@ -89,6 +89,11 @@ func (c *Context) SetConstant(name string, v interface{}) error {
 	return c.symbols.SetConstant(name, v)
 }
 
+// IsConstant is a helper function to define a constant value
+func (c *Context) IsConstant(name string) bool {
+	return c.symbols.IsConstant(name)
+}
+
 // Get is a helper function that retrieves a symbol value from the associated
 // symbol table
 func (c *Context) Get(name string) (interface{}, bool) {

@@ -77,6 +77,11 @@ func (s *SymbolTable) SetAlways(name string, v interface{}) error {
 		s.Symbols = map[string]interface{}{}
 	}
 
+	// See if it's in the current constants table.
+	if s.IsConstant(name) {
+		return errors.New("attempt to write to constant")
+	}
+
 	s.Symbols[name] = v
 	return nil
 }
@@ -85,6 +90,11 @@ func (s *SymbolTable) SetAlways(name string, v interface{}) error {
 func (s *SymbolTable) Set(name string, v interface{}) error {
 	if s.Symbols == nil {
 		s.Symbols = map[string]interface{}{}
+	}
+
+	// See if it's in the current constants table.
+	if s.IsConstant(name) {
+		return errors.New("attempt to write to constant")
 	}
 
 	old, found := s.Symbols[name]
@@ -154,4 +164,19 @@ func (s *SymbolTable) Create(name string) error {
 	}
 	s.Symbols[name] = nil
 	return nil
+}
+
+// IsConstant determines if a name is a constant value
+func (s *SymbolTable) IsConstant(name string) bool {
+
+	if s.Constants != nil {
+		_, found := s.Constants[name]
+		if found {
+			return true
+		}
+		if s.Parent != nil {
+			return s.Parent.IsConstant(name)
+		}
+	}
+	return false
 }

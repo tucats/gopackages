@@ -198,6 +198,9 @@ func PopScopeOpcode(c *Context, i interface{}) error {
 func SymbolCreateOpcode(c *Context, i interface{}) error {
 
 	n := util.GetString(i)
+	if c.IsConstant(n) {
+		return c.NewError("attmpt to write to constant")
+	}
 	err := c.Create(n)
 	if err != nil {
 		err = c.NewError(err.Error())
