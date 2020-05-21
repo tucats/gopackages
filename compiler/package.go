@@ -40,9 +40,9 @@ func (c *Compiler) Import() error {
 		return c.NewError("cannot import inside a loop")
 	}
 
-	name := c.t.Next()
-	if len(name) > 2 && name[:1] == "\"" {
-		name = name[1 : len(name)-1]
+	fileName := c.t.Next()
+	if len(fileName) > 2 && fileName[:1] == "\"" {
+		fileName = fileName[1 : len(fileName)-1]
 	}
 	if c.loops != nil {
 		return c.NewError("cannot import inside a loop")
@@ -50,9 +50,9 @@ func (c *Compiler) Import() error {
 
 	// Get the package name from the given string. If this is
 	// a file system name, remove the extension if present.
-	pName := filepath.Base(name)
-	if filepath.Ext(pName) != "" {
-		pName = pName[:len(filepath.Ext(pName))]
+	packageName := filepath.Base(fileName)
+	if filepath.Ext(packageName) != "" {
+		packageName = packageName[:len(filepath.Ext(packageName))]
 	}
 
 	// Save some state
@@ -62,26 +62,16 @@ func (c *Compiler) Import() error {
 	savedStatementCount := c.statementCount
 
 	// Read the imported object as a file path
-
-	content, err := ioutil.ReadFile(name)
+	text, err := c.ReadFile(fileName)
 	if err != nil {
-		content, err = ioutil.ReadFile(name + ".solve")
-		if err != nil {
-			r := os.Getenv("SOLVE_PATH")
-			fn := filepath.Join(r, "lib", name+".solve")
-			content, err = ioutil.ReadFile(fn)
-			if err != nil {
-				c.t.Advance(-1)
-				return c.NewStringError("unable to read import file", err.Error())
-			}
-		}
+		return err
 	}
 
-	// Convert []byte to string
-	text := string(content)
-
+	// Set up the new compiler settings
 	c.statementCount = 0
 	c.t = tokenizer.New(text)
+	c.PackageName = packageName
+
 	for !c.t.AtEnd() {
 		err := c.Statement()
 		if err != nil {
@@ -95,4 +85,25 @@ func (c *Compiler) Import() error {
 	c.blockDepth = savedBlockDepth
 	c.statementCount = savedStatementCount
 	return nil
+}
+
+// ReadFile reads the text from a file into a string
+func (c *Compiler) ReadFile(name string) (string, error) {
+
+	content, err := ioutil.ReadFile(name)
+	if err != nil {
+		content, err = ioutil.ReadFile(name + ".solve")
+		if err != nil {
+			r := os.Getenv("SOLVE_PATH")
+			fn := filepath.Join(r, "lib", name+".solve")
+			content, err = ioutil.ReadFile(fn)
+			if err != nil {
+				c.t.Advance(-1)
+				return "", c.NewStringError("unable to read import file", err.Error())
+			}
+		}
+	}
+
+	// Convert []byte to string
+	return string(content), nil
 }
