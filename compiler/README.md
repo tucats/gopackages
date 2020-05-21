@@ -106,6 +106,22 @@ must have a value stored in them before they can be used in an expression.
 The second example assigns an initial value to each element of the array,
 so the second statement is really identical to `y := [10,10]`.
 
+## const
+The `const` statement can define constant values in the current scope. These
+values are always readonly values and you cannot use a constant name as a
+variable name. You can specify a single constant or a group of them; to specify
+more than one in a single statement enclose the list in parenthesis:
+
+    const answer = 42
+
+    const (
+        first = "a"
+        last = "z"
+    )
+
+This defines three constant values. Note that the value is set using an
+`=` character since a symbols is not actually being created.
+
 ## if
 The `if` statement provides conditional execution. The statement must start
 with a expression which can be cast as a boolean value. That value is

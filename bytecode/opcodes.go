@@ -216,6 +216,23 @@ func SymbolDeleteOpcode(c *Context, i interface{}) error {
 	return err
 }
 
+// ConstantOpcode implementation
+func ConstantOpcode(c *Context, i interface{}) error {
+
+	v, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	varname := util.GetString(i)
+	err = c.SetConstant(varname, v)
+	if err != nil {
+		return c.NewError(err.Error())
+	}
+
+	return err
+}
+
 // StoreOpcode implementation
 func StoreOpcode(c *Context, i interface{}) error {
 

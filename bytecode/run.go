@@ -58,6 +58,7 @@ func initializeDispatch() {
 			SymbolCreate:       SymbolCreateOpcode,
 			PushScope:          PushScopeOpcode,
 			PopScope:           PopScopeOpcode,
+			Constant:           ConstantOpcode,
 		}
 	}
 }

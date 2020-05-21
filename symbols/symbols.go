@@ -6,9 +6,10 @@ import (
 
 // SymbolTable contains an abstract symbol table
 type SymbolTable struct {
-	Name    string
-	Parent  *SymbolTable
-	Symbols map[string]interface{}
+	Name      string
+	Parent    *SymbolTable
+	Symbols   map[string]interface{}
+	Constants map[string]interface{}
 }
 
 // RootSymbolTable is the parent of all other tables.
@@ -25,9 +26,10 @@ var RootSymbolTable = SymbolTable{
 func NewSymbolTable(name string) *SymbolTable {
 
 	symbols := SymbolTable{
-		Name:    name,
-		Parent:  &RootSymbolTable,
-		Symbols: map[string]interface{}{},
+		Name:      name,
+		Parent:    &RootSymbolTable,
+		Symbols:   map[string]interface{}{},
+		Constants: map[string]interface{}{},
 	}
 	return &symbols
 }
@@ -37,9 +39,10 @@ func NewSymbolTable(name string) *SymbolTable {
 func NewChildSymbolTable(name string, parent *SymbolTable) *SymbolTable {
 
 	symbols := SymbolTable{
-		Name:    name,
-		Parent:  parent,
-		Symbols: map[string]interface{}{},
+		Name:      name,
+		Parent:    parent,
+		Symbols:   map[string]interface{}{},
+		Constants: map[string]interface{}{},
 	}
 	return &symbols
 }
@@ -49,10 +52,21 @@ func NewChildSymbolTable(name string, parent *SymbolTable) *SymbolTable {
 func (s *SymbolTable) Get(name string) (interface{}, bool) {
 
 	v, f := s.Symbols[name]
+
+	if !f {
+		v, f = s.Constants[name]
+	}
+
 	if !f && s.Parent != nil {
 		return s.Parent.Get(name)
 	}
 	return v, f
+}
+
+// SetConstant stores a constant for readonly use in the symbol table.
+func (s *SymbolTable) SetConstant(name string, v interface{}) error {
+	s.Constants[name] = v
+	return nil
 }
 
 // SetAlways stores a symbol value in the local table. No value in

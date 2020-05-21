@@ -39,6 +39,9 @@ func (c *Compiler) Statement() error {
 	// which compiler unit to call.
 	switch c.t.Next() {
 
+	case "const":
+		return c.Constant()
+
 	case "{":
 		return c.Block()
 

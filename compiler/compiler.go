@@ -25,10 +25,11 @@ type Loop struct {
 // Compiler is a structure defining what we know about the
 // compilation
 type Compiler struct {
-	b     *bytecode.ByteCode
-	t     *tokenizer.Tokenizer
-	s     *symbols.SymbolTable
-	loops *Loop
+	b         *bytecode.ByteCode
+	t         *tokenizer.Tokenizer
+	s         *symbols.SymbolTable
+	loops     *Loop
+	constants []string
 }
 
 // Compile starts a compilation unit, and returns a bytecode
@@ -36,7 +37,7 @@ type Compiler struct {
 func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
 
 	b := bytecode.New("")
-	cInstance := Compiler{b: b, t: t, s: &symbols.SymbolTable{Name: "compile-unit"}}
+	cInstance := Compiler{b: b, t: t, s: &symbols.SymbolTable{Name: "compile-unit"}, constants: make([]string, 0)}
 	c := &cInstance
 
 	c.t.Reset()

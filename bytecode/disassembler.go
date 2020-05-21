@@ -44,6 +44,7 @@ var opcodeNames = map[int]string{
 	SymbolCreate:       "SymbolCreate",
 	PushScope:          "PushScope",
 	PopScope:           "PopScope",
+	Constant:           "Constant",
 }
 
 // Disasm prints out a representation of the bytecode for debugging purposes

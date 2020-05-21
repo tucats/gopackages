@@ -59,6 +59,7 @@ const (
 	Newline
 	SymbolDelete
 	SymbolCreate
+	Constant
 	PushScope
 	PopScope
 

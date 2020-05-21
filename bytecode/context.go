@@ -84,6 +84,11 @@ func (c *Context) SetByteCode(b *ByteCode) {
 	c.bc = b
 }
 
+// SetConstant is a helper function to define a constant value
+func (c *Context) SetConstant(name string, v interface{}) error {
+	return c.symbols.SetConstant(name, v)
+}
+
 // Get is a helper function that retrieves a symbol value from the associated
 // symbol table
 func (c *Context) Get(name string) (interface{}, bool) {
