@@ -9,6 +9,9 @@ import (
 // Package compiles a package statement
 func (c *Compiler) Package() error {
 
+	if c.statementCount > 1 {
+		return c.NewError("package statement must be first")
+	}
 	name := c.t.Next()
 	if !tokenizer.IsSymbol(name) {
 		return c.NewTokenError("invalid package name")
@@ -44,6 +47,7 @@ func (c *Compiler) Import() error {
 	savedPackageName := c.PackageName
 	savedTokenizer := c.t
 	savedBlockDepth := c.blockDepth
+	savedStatementCount := c.statementCount
 
 	// Read the imported object as a file path
 
@@ -57,6 +61,7 @@ func (c *Compiler) Import() error {
 	// Convert []byte to string
 	text := string(content)
 
+	c.statementCount = 0
 	c.t = tokenizer.New(text)
 	for !c.t.AtEnd() {
 		err := c.Statement()
@@ -69,6 +74,6 @@ func (c *Compiler) Import() error {
 	c.t = savedTokenizer
 	c.PackageName = savedPackageName
 	c.blockDepth = savedBlockDepth
-
+	c.statementCount = savedStatementCount
 	return nil
 }

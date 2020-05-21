@@ -25,13 +25,14 @@ type Loop struct {
 // Compiler is a structure defining what we know about the
 // compilation
 type Compiler struct {
-	PackageName string
-	b           *bytecode.ByteCode
-	t           *tokenizer.Tokenizer
-	s           *symbols.SymbolTable
-	loops       *Loop
-	constants   []string
-	blockDepth  int
+	PackageName    string
+	b              *bytecode.ByteCode
+	t              *tokenizer.Tokenizer
+	s              *symbols.SymbolTable
+	loops          *Loop
+	constants      []string
+	blockDepth     int
+	statementCount int
 }
 
 // Compile starts a compilation unit, and returns a bytecode

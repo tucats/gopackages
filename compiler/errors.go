@@ -8,6 +8,7 @@ import (
 // Error contains an error generated from the compiler
 type Error struct {
 	text   string
+	pkg    string
 	line   int
 	column int
 	token  string
@@ -28,6 +29,7 @@ func (c *Compiler) NewError(msg string) *Error {
 		line:   c.t.Line[p],
 		column: c.t.Pos[p],
 		token:  "",
+		pkg:    c.PackageName,
 	}
 }
 
@@ -47,6 +49,7 @@ func (c *Compiler) NewTokenError(msg string) *Error {
 		line:   c.t.Line[p],
 		column: c.t.Pos[p],
 		token:  c.t.Tokens[p],
+		pkg:    c.PackageName,
 	}
 }
 
@@ -56,6 +59,11 @@ func (e Error) Error() string {
 	var b strings.Builder
 
 	b.WriteString("compile error, ")
+	if e.pkg != "" {
+		b.WriteString("package ")
+		b.WriteString(e.pkg)
+		b.WriteString(", ")
+	}
 	if e.line > 0 {
 		b.WriteString(fmt.Sprintf("at line %d, column %d, ", e.line, e.column))
 	}
