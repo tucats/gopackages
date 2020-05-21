@@ -334,3 +334,9 @@ All three of these have the same effect. The first assumes a file named
 "factor.solve" is found in the current directory. The second and third
 examples assume the quoted string contains a file path. If the suffix
 ".solve" is not included it is assumed.
+
+If the import name cannot be found in the current directory, then the
+compiler uses the environment variables SOLVE_PATH to form a directory
+path, and adds the "lib" directory to that path to locate the import.
+So the above statement could resolve to `/Users/cole/solve/lib/factor.solve`
+if the SOLVE_PATH was set to "~/solve"

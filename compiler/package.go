@@ -2,6 +2,8 @@ package compiler
 
 import (
 	"io/ioutil"
+	"os"
+	"path/filepath"
 
 	"github.com/tucats/gopackages/tokenizer"
 )
@@ -17,8 +19,8 @@ func (c *Compiler) Package() error {
 		return c.NewTokenError("invalid package name")
 	}
 
-	if c.PackageName != "" {
-		return c.NewError("package already defined")
+	if (c.PackageName != "") && (c.PackageName != name) {
+		return c.NewError("cannot redefine package name")
 	}
 	c.PackageName = name
 
@@ -34,6 +36,9 @@ func (c *Compiler) Import() error {
 	if c.blockDepth > 0 {
 		return c.NewError("cannot import inside a block")
 	}
+	if c.loops != nil {
+		return c.NewError("cannot import inside a loop")
+	}
 
 	name := c.t.Next()
 	if len(name) > 2 && name[:1] == "\"" {
@@ -41,6 +46,13 @@ func (c *Compiler) Import() error {
 	}
 	if c.loops != nil {
 		return c.NewError("cannot import inside a loop")
+	}
+
+	// Get the package name from the given string. If this is
+	// a file system name, remove the extension if present.
+	pName := filepath.Base(name)
+	if filepath.Ext(pName) != "" {
+		pName = pName[:len(filepath.Ext(pName))]
 	}
 
 	// Save some state
@@ -55,9 +67,16 @@ func (c *Compiler) Import() error {
 	if err != nil {
 		content, err = ioutil.ReadFile(name + ".solve")
 		if err != nil {
-			return c.NewTokenError("unable to read file")
+			r := os.Getenv("SOLVE_PATH")
+			fn := filepath.Join(r, "lib", name+".solve")
+			content, err = ioutil.ReadFile(fn)
+			if err != nil {
+				c.t.Advance(-1)
+				return c.NewStringError("unable to read import file", err.Error())
+			}
 		}
 	}
+
 	// Convert []byte to string
 	text := string(content)
 
