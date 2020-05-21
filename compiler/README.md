@@ -302,3 +302,35 @@ This loop run run only all ten times, but will only print the values
 at the top of the loop with the next index value.
 
 The `continue` statement cannot be used outside of a `for` loop.
+
+## package
+Use the `package` statement to define a set of related functions in 
+a package in the current source file. A give source file can only
+contain one package statement and it must be the first statement.
+
+    package factor
+
+This defines that all the functions and constants in this module will
+be defined in the `factor` package, and must be referenced with the 
+`factor` prefix, as in
+
+    y := factor.intfact(55)
+
+This calls the function `intfact()` defined in the `factor` package.
+
+## import
+Use the `import` statement to include other files in the compilation
+of this program. The `import` statement cannot appear within any other
+block or function definition. Logically, the statement stops the
+current compilation, compiles the named object (adding any function
+and constant definitions to the named package) and then resuming the
+in-progress compilation.
+
+    import factor
+    import "factor"
+    import "factor.solve"
+
+All three of these have the same effect. The first assumes a file named
+"factor.solve" is found in the current directory. The second and third
+examples assume the quoted string contains a file path. If the suffix
+".solve" is not included it is assumed.

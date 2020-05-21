@@ -8,6 +8,7 @@ func (c *Compiler) Block() error {
 
 	parsing := true
 	c.b.Emit1(bytecode.PushScope)
+	c.blockDepth = c.blockDepth + 1
 	for parsing {
 
 		if c.t.IsNext("}") {
@@ -28,5 +29,6 @@ func (c *Compiler) Block() error {
 		}
 	}
 	c.b.Emit1(bytecode.PopScope)
+	c.blockDepth = c.blockDepth - 1
 	return nil
 }

@@ -57,8 +57,28 @@ func (c *Compiler) Function() error {
 		return err
 	}
 
-	// Store the compiled code is the compiler's symbol table
-	c.s.SetAlways(fname, b)
+	// Store anchor to the function, either in the current
+	// table or package.
+
+	if c.PackageName == "" {
+		c.s.SetAlways(fname, b)
+	} else {
+		v, found := c.s.Get(fname)
+		if !found {
+			v := map[string]interface{}{}
+			v[fname] = b
+			v["__readonly"] = true
+			c.s.SetAlways(c.PackageName, v)
+		} else {
+			switch a := v.(type) {
+			case map[string]interface{}:
+				a[fname] = b
+				c.s.SetAlways(c.PackageName, a)
+			default:
+				return c.NewError("invalid package object")
+			}
+		}
+	}
 
 	if ui.DebugMode {
 		b.Disasm()

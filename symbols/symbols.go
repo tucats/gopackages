@@ -79,7 +79,7 @@ func (s *SymbolTable) SetAlways(name string, v interface{}) error {
 
 	// See if it's in the current constants table.
 	if s.IsConstant(name) {
-		return errors.New("attempt to write to constant")
+		return errors.New("attempt to change constant")
 	}
 
 	s.Symbols[name] = v

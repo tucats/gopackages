@@ -39,6 +39,12 @@ func (c *Compiler) Statement() error {
 	// which compiler unit to call.
 	switch c.t.Next() {
 
+	case "package":
+		return c.Package()
+
+	case "import":
+		return c.Import()
+
 	case "const":
 		return c.Constant()
 
