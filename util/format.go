@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"github.com/tucats/gopackages/app-cli/ui"
 )
 
 // FormatUnquoted formats a value but does not
@@ -86,6 +88,9 @@ func Format(arg interface{}) string {
 		return "\"" + v + "\""
 
 	default:
+		if ui.DebugMode {
+			return fmt.Sprintf("<%#v>", v)
+		}
 		return "<function>"
 	}
 }

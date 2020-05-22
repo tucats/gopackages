@@ -39,6 +39,9 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"sort":      FunctionDefinition{Min: 1, Max: 1, F: FunctionSort, Pkg: "_util"},
 	"exit":      FunctionDefinition{Min: 0, Max: 1, F: FunctionExit, Pkg: "_util"},
 	"symbols":   FunctionDefinition{Min: 0, Max: 1, F: FunctionSymbols, Pkg: "_util"},
+	"readfile":  FunctionDefinition{Min: 1, Max: 1, F: FunctionReadFile, Pkg: "_io"},
+	"split":     FunctionDefinition{Min: 1, Max: 1, F: FunctionSplit, Pkg: "_io"},
+	"tokenize":  FunctionDefinition{Min: 1, Max: 1, F: FunctionTokenize, Pkg: "_io"},
 }
 
 // AddBuiltins adds or overrides the default function library in the symbol map.
