@@ -151,6 +151,29 @@ func (s *SymbolTable) Delete(name string) error {
 	return nil
 }
 
+// DeleteAlways removes a symbol from the table. Search from the local symbol
+// up the parent tree until you find the symbol to delete.
+func (s *SymbolTable) DeleteAlways(name string) error {
+
+	if len(name) == 0 {
+		return errors.New("invalid symbol")
+	}
+
+	if s.Symbols == nil {
+		return errors.New("SymbolDelete of " + name + " when there are no symbols")
+	}
+
+	_, f := s.Symbols[name]
+	if !f {
+		if s.Parent == nil {
+			return errors.New("symbol " + name + " not found")
+		}
+		return s.Parent.DeleteAlways(name)
+	}
+	delete(s.Symbols, name)
+	return nil
+}
+
 // Create creates a symbol name in the table
 func (s *SymbolTable) Create(name string) error {
 

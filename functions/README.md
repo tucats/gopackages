@@ -160,6 +160,56 @@ same as a boolean "and" operation being performed on all values.
 For a string, it concatenates all the string values together into a single
 long string.
 
+## IO Functions
+These functions handle general input and output to files.
+
+### _io.readfile(name)
+This reads the entire contents of the named file as a single large string,
+and returns that string as the function result.
+
+### _io.writefile(name, text)
+This writes the string text to the output file, which is created if it
+does not already exist. The text becomes the contents of the file; any
+previous contents are lost.
+
+### _io.split(text)
+This will split a single string (typically read using the `_io.readfile()`
+function) into an array of strings on line boundaries.
+
+    buffer := _io.readfile("test.txt")
+    lines := _io.split(buffer)
+
+The result of this is that lines is an array of strings, each of which
+represents a line of text. Note that this function can be used on any
+string, but resides in the `_io` package because it is most commonly
+used in support of IO operations.
+
+### _io.open(name [, createFlag ]) 
+This opens a new file of the given name. If the optional second parameter
+is given and it is true, then the file is created. Otherwise, the file
+must already exist. The return value is an identifier for this instance
+of the open file. This identifier must be used in `_io` package calls
+to read or write from that file.
+
+     f := _io.open("file.txt", true)
+
+This creates a new file named "file.txt" in the current directory, and
+returns the identifier for the file as the variable `f`.
+
+### _io.readstring(f)
+This reads the next line of text from the input file and returns it as
+a string value. The file identifier f must have previously been returned
+by an `_io.open()` function call.
+
+### _io.writestring(f, text)
+This writes a line of text to the output file `f`. The line of text is
+always followed by a newline character.
+
+### _io.close(f)
+This closes the file, and releases the resources for the file. After the
+`close()` call, the identifier cannot be used in a file function until it
+is reset using a call to `_io.open()`.
+
 
 ## Utility Functions
 
