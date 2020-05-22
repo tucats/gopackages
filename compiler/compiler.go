@@ -35,6 +35,14 @@ type Compiler struct {
 	statementCount int
 }
 
+// CompileString turns a string into a compilation unit. This is a helper function
+// around the Compile() operation that removes the need for the caller
+// to provide a tokenizer.
+func CompileString(source string) (*bytecode.ByteCode, error) {
+	t := tokenizer.New(source)
+	return Compile(t)
+}
+
 // Compile starts a compilation unit, and returns a bytecode
 // of the compiled material.
 func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {

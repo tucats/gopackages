@@ -19,6 +19,44 @@ runs in its own scope; it can access variables from outer scopes but cannot
 set them. Functions defined within another function only exist as long as
 that function is running.
 
+## Example
+Here is a trivial example of compiling and running some _Solve_ code in your
+Go program.
+
+    // String containing arbitrary _Solve_ statements.
+    src := "..."
+
+    bc, err := compiler.CompileString(src)
+    if err != nil {
+        // Handle compile-time errors
+    }
+
+    syms := symbols.NewSymbolTable("test program")
+    ctx := bytecode.NewContext(syms, bc)
+    err := ctx.Run(syms)
+    if err != nil {
+        // Handle run-time errors
+    }
+
+The general pattern is to pass a string containing the program text
+ to the compiler. The compiler generates a bytecode object containing
+the pseudocode for the program and any predefined symbols (constants or
+functions) from the compilation.
+
+The caller then creates a new symbol table (or can re-use an existing one
+if symbols are meant to be persistent between compilation units). A new
+runtime context is created (which contains the program counter, stack,
+error handling stack, etc.) and uses the existing symbol table and 
+bytecode. This allows bytecode to be persisted or re-used and can be
+executed multiple times on multiple threads, each with it's own context.
+
+Finally, the context is run, which executes the bytecode instructions.
+If the instructions are meant to return a value, that value is left on
+the stack for the context, and you can use `ctx.Pop()` to remove items
+from the stack. The return values are opaque `interface{}` objects, and
+you can use the util.Get*() functions to extract the integer, float,
+string, or bool object.
+
 ## Data types
 _Solve_ support six data types, plus limited support for function pointers
 as values.
