@@ -62,6 +62,8 @@ const (
 	Constant
 	PushScope
 	PopScope
+	Try
+	TryPop
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction

@@ -77,6 +77,9 @@ func (c *Compiler) Statement() error {
 	case "array":
 		return c.Array()
 
+	case "try":
+		return c.Try()
+
 	}
 
 	// Unknown statement, return an error

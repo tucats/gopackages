@@ -15,7 +15,7 @@ func (c *Compiler) Array() error {
 		return c.NewTokenError("invalid array name")
 	}
 	// See  if it's on a reserved word.
-	if tokenizer.InList(name, []string{"print", "for", "array", "if", "call", "return"}) {
+	if tokenizer.IsReserved(name) {
 		c.t.Advance(-1)
 		return c.NewTokenError("invalid array name")
 	}

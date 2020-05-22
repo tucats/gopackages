@@ -59,6 +59,8 @@ func initializeDispatch() {
 			PushScope:          PushScopeOpcode,
 			PopScope:           PopScopeOpcode,
 			Constant:           ConstantOpcode,
+			Try:                TryOpcode,
+			TryPop:             TryPopOpcode,
 		}
 	}
 }
@@ -117,7 +119,22 @@ func (c *Context) RunFromAddress(addr int) error {
 		}
 		err = imp(c, i.Operand)
 		if err != nil {
-			return err
+
+			text := err.Error()
+
+			// See if we are in a try/catch block.
+			if len(c.try) > 0 {
+				c.pc = c.try[len(c.try)-1]
+				c.symbols.SetAlways("_error", text)
+				if c.Tracing {
+					ui.Debug("*** Branch to %d on error: %s", c.pc, text)
+				}
+			} else {
+				if c.Tracing {
+					ui.Debug("*** Return error: %s", text)
+				}
+				return err
+			}
 		}
 	}
 	if c.Tracing {

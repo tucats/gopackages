@@ -303,6 +303,29 @@ at the top of the loop with the next index value.
 
 The `continue` statement cannot be used outside of a `for` loop.
 
+## Error handling
+You can use the `try` statement to run a block of code (in the same
+scope as the enclosing statement) and catch any runtime errors that
+occur during the execution of that block. The error causes the code
+to execute the code in the `catch` block of the statement.
+If there are no errors,  execution continues after the catch block.
+
+    x := 0
+    try {
+        x = pay / hours
+    } catch {
+        print "Hours were zero!"
+    }
+    print "The result is ", x
+
+If the value of `hours` is non-zero, the assignment statement will assign
+the dividend to `x`. However, if hours is zero it will trigger a runtime
+divide-by-zero error. When this happens, the remainder of the statements
+(if any) in the `try` block are skipped, and the `catch` block is executed.
+Within this block, there is a variable `_error_` that is set to the
+value of the error that was signalled. This can be used in the `catch`
+block if it needs handle more than one possible error, for example.
+
 ## package
 Use the `package` statement to define a set of related functions in 
 a package in the current source file. A give source file can only

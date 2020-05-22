@@ -47,6 +47,13 @@ func PrintOpcode(c *Context, i interface{}) error {
 		}
 		fmt.Printf("%s", util.FormatUnquoted(v))
 	}
+
+	// If we are instruction tracing, print out a newline anyway so the trace
+	// display isn't made illegible.
+	if c.Tracing {
+		fmt.Println()
+	}
+
 	return nil
 }
 
@@ -1026,5 +1033,27 @@ func NegateOpcode(c *Context, i interface{}) error {
 	default:
 		return c.NewError("invalid data type for negation")
 	}
+	return nil
+}
+
+// TryOpcode implementation
+func TryOpcode(c *Context, i interface{}) error {
+	addr := util.GetInt(i)
+	c.try = append(c.try, addr)
+	return nil
+}
+
+// TryPopOpcode implementation
+func TryPopOpcode(c *Context, i interface{}) error {
+	if len(c.try) == 0 {
+		return c.NewError("try/catch mismatch")
+	}
+	if len(c.try) == 1 {
+		c.try = make([]int, 0)
+	} else {
+		c.try = c.try[:len(c.try)-1]
+	}
+
+	c.symbols.DeleteAlways("_error")
 	return nil
 }
