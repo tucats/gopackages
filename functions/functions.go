@@ -3,6 +3,7 @@ package functions
 import (
 	"reflect"
 
+	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
 )
 
@@ -55,6 +56,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 // suffix for the key.
 func AddBuiltins(symbols *symbols.SymbolTable) {
 
+	ui.Debug("+++ Adding in builtin functions to symbol table %s", symbols.Name)
 	for n, d := range FunctionDictionary {
 
 		if d.Pkg == "" {
@@ -67,9 +69,11 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 			if !found {
 				p = map[string]interface{}{}
 				p.(map[string]interface{})["__readonly"] = true
+				ui.Debug("    AddBuiltins creating new package %s", d.Pkg)
 			}
 
 			p.(map[string]interface{})[n] = d.F
+			ui.Debug("    adding builtin %s to %s", n, d.Pkg)
 			symbols.SetAlways(d.Pkg, p)
 		}
 	}

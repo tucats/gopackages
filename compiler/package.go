@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -24,8 +25,12 @@ func (c *Compiler) Package() error {
 	}
 	c.PackageName = name
 
-	// Create a named struct that can be initialized with the symbol names
-	c.s.Set(name, map[string]interface{}{})
+	// Create a named struct that can be initialized with the symbol names.
+	// This is done by creating a source table and then merging it with the
+	// active table.
+	tmp := symbols.NewSymbolTable("")
+	tmp.Set(name, map[string]interface{}{})
+	c.s.Merge(tmp)
 
 	return nil
 }

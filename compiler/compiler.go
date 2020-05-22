@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
@@ -59,14 +60,8 @@ func Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
 			return nil, err
 		}
 	}
-
-	// Append any symbols created to the bytecode's table
-	st := c.Symbols()
-
-	for k, v := range st.Symbols {
-		c.b.Symbols.SetAlways(k, v)
-
-	}
+	ui.Debug("+++ Merging newly-compiled symbols into static bytecode symbols")
+	c.b.Symbols.Merge(c.Symbols())
 	return c.b, nil
 }
 
