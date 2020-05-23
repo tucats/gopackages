@@ -9,10 +9,11 @@ import (
 
 // FunctionDefinition is an element in the function dictionary
 type FunctionDefinition struct {
-	Pkg string
-	Min int
-	Max int
-	F   interface{}
+	Name string
+	Pkg  string
+	Min  int
+	Max  int
+	F    interface{}
 }
 
 // FunctionDictionary is the dictionary of functions
@@ -71,7 +72,6 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 				p.(map[string]interface{})["__readonly"] = true
 				ui.Debug("    AddBuiltins creating new package %s", d.Pkg)
 			}
-
 			p.(map[string]interface{})[n] = d.F
 			ui.Debug("    adding builtin %s to %s", n, d.Pkg)
 			symbols.SetAlways(d.Pkg, p)

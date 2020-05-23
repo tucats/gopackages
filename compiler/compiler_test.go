@@ -115,7 +115,8 @@ func TestCompile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tokens := tokenizer.New(tt.arg)
-			bc, err := Compile(tokens)
+			c := New()
+			bc, err := c.Compile(tokens)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Compile() error = %v, wantErr %v", err, tt.wantErr)
 				return

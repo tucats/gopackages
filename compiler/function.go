@@ -48,10 +48,11 @@ func (c *Compiler) Function() error {
 		b.Emit2(bytecode.Store, name)
 	}
 
-	// Now compile a statement or block into the function body.
-	cInstance := Compiler{b: b, t: c.t, s: c.s}
-	cx := &cInstance
-
+	// Now compile a statement or block into the function body. We'll use the
+	// current token stream in progress, and the current bytecode.
+	cx := New()
+	cx.t = c.t
+	cx.b = b
 	err := cx.Statement()
 	if err != nil {
 		return err
@@ -63,21 +64,7 @@ func (c *Compiler) Function() error {
 	if c.PackageName == "" {
 		c.s.SetAlways(fname, b)
 	} else {
-		v, found := c.s.Get(fname)
-		if !found {
-			v := map[string]interface{}{}
-			v[fname] = b
-			v["__readonly"] = true
-			c.s.SetAlways(c.PackageName, v)
-		} else {
-			switch a := v.(type) {
-			case map[string]interface{}:
-				a[fname] = b
-				c.s.SetAlways(c.PackageName, a)
-			default:
-				return c.NewError("invalid package object")
-			}
-		}
+		c.AddPackageFunction(c.PackageName, fname, b)
 	}
 
 	if ui.DebugMode {

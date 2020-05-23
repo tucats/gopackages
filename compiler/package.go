@@ -60,6 +60,8 @@ func (c *Compiler) Import() error {
 		packageName = packageName[:len(filepath.Ext(packageName))]
 	}
 
+	builtinsAdded := c.AddBuiltins(packageName)
+
 	// Save some state
 	savedPackageName := c.PackageName
 	savedTokenizer := c.t
@@ -69,6 +71,15 @@ func (c *Compiler) Import() error {
 	// Read the imported object as a file path
 	text, err := c.ReadFile(fileName)
 	if err != nil {
+
+		// If it wasn't found but we did add some builtins, good enough.
+		// Skip past the filename that was rejected by c.Readfile()...
+		if builtinsAdded {
+			c.t.Advance(1)
+			return nil
+		}
+
+		// Nope, import had no effect.
 		return err
 	}
 
