@@ -11,11 +11,14 @@ func (c *Compiler) Print() error {
 
 	newline := true
 	for !c.StatementEnd() {
-		newline = true
+		if c.t.IsNext(",") {
+			return c.NewTokenError("unexpected comma")
+		}
 		bc, err := expressions.Compile(c.t)
 		if err != nil {
 			return err
 		}
+		newline = true
 		c.b.Append(bc)
 		c.b.Emit1(bytecode.Print)
 
