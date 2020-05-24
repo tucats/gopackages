@@ -29,6 +29,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"index":       FunctionDefinition{Min: 2, Max: 2, F: FunctionIndex},
 	"upper":       FunctionDefinition{Min: 1, Max: 1, F: FunctionUpper, Pkg: "_strings"},
 	"lower":       FunctionDefinition{Min: 1, Max: 1, F: FunctionLower, Pkg: "_strings"},
+	"format":      FunctionDefinition{Min: 0, Max: 99999, F: FunctionFormat, Pkg: "_strings"},
 	"min":         FunctionDefinition{Min: 1, Max: 99999, F: FunctionMin},
 	"max":         FunctionDefinition{Min: 1, Max: 99999, F: FunctionMax},
 	"sum":         FunctionDefinition{Min: 1, Max: 99999, F: FunctionSum},

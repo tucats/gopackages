@@ -46,6 +46,9 @@ Thsi returns the float64 value 3.1415.
 These functions act on string values, and usually return a string values as the
 result.
 
+### _strings.format(fmtstring, values...)
+This returns a `string` containing the formatted value of the values array, using
+the Go-style `fmtstring` value. This supports any Go-style formatting.
 
 ### _strings.left(string, count)
 This returns `count` characters from the left side of the string.

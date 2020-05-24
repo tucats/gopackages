@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -91,4 +92,18 @@ func FunctionSubstring(symbols *symbols.SymbolTable, args []interface{}) (interf
 
 	s := v[p1-1 : p1+p2-1]
 	return s, nil
+}
+
+// FunctionFormat impelments the _strings.format() fucntion
+func FunctionFormat(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	if len(args) == 0 {
+		return "", nil
+	}
+
+	if len(args) == 1 {
+		return util.GetString(args[0]), nil
+	}
+
+	return fmt.Sprintf(util.GetString(args[0]), args[1:]...), nil
 }
