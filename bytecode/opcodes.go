@@ -675,6 +675,9 @@ func EqualOpcode(c *Context, i interface{}) error {
 
 	switch v1.(type) {
 
+	case map[string]interface{}:
+		r = reflect.DeepEqual(v1, v2)
+
 	case []interface{}:
 		r = reflect.DeepEqual(v1, v2)
 
@@ -715,6 +718,9 @@ func NotEqualOpcode(c *Context, i interface{}) error {
 	var r bool
 
 	switch v1.(type) {
+
+	case map[string]interface{}:
+		r = !reflect.DeepEqual(v1, v2)
 
 	case []interface{}:
 		r = !reflect.DeepEqual(v1, v2)
