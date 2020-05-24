@@ -57,8 +57,9 @@ func (e *Expression) expressionAtom() error {
 	runeValue := t[0:1]
 	if runeValue == "\"" {
 		e.t.Advance(1)
-		e.b.Emit2(bc.Push, t[1:len(t)-1])
-		return nil
+		s, err := strconv.Unquote(t)
+		e.b.Emit2(bc.Push, s)
+		return err
 	}
 
 	if tokenizer.IsSymbol(t) {
