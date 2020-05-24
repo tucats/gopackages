@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
 )
@@ -45,61 +46,84 @@ func (c *Compiler) Import() error {
 		return c.NewError("cannot import inside a loop")
 	}
 
-	fileName := c.t.Next()
-	if len(fileName) > 2 && fileName[:1] == "\"" {
-		fileName = fileName[1 : len(fileName)-1]
-	}
-	if c.loops != nil {
-		return c.NewError("cannot import inside a loop")
+	isList := false
+	if c.t.IsNext("(") {
+		isList = true
 	}
 
-	// Get the package name from the given string. If this is
-	// a file system name, remove the extension if present.
-	packageName := filepath.Base(fileName)
-	if filepath.Ext(packageName) != "" {
-		packageName = packageName[:len(filepath.Ext(packageName))]
-	}
-
-	builtinsAdded := c.AddBuiltins(packageName)
-
-	// Save some state
-	savedPackageName := c.PackageName
-	savedTokenizer := c.t
-	savedBlockDepth := c.blockDepth
-	savedStatementCount := c.statementCount
-
-	// Read the imported object as a file path
-	text, err := c.ReadFile(fileName)
-	if err != nil {
-
-		// If it wasn't found but we did add some builtins, good enough.
-		// Skip past the filename that was rejected by c.Readfile()...
-		if builtinsAdded {
-			c.t.Advance(1)
-			return nil
+	for true {
+		fileName := c.t.Next()
+		if len(fileName) > 2 && fileName[:1] == "\"" {
+			fileName = fileName[1 : len(fileName)-1]
+		}
+		if c.loops != nil {
+			return c.NewError("cannot import inside a loop")
 		}
 
-		// Nope, import had no effect.
-		return err
-	}
+		// Get the package name from the given string. If this is
+		// a file system name, remove the extension if present.
+		packageName := filepath.Base(fileName)
+		if filepath.Ext(packageName) != "" {
+			packageName = packageName[:len(filepath.Ext(packageName))]
+		}
 
-	// Set up the new compiler settings
-	c.statementCount = 0
-	c.t = tokenizer.New(text)
-	c.PackageName = packageName
+		builtinsAdded := c.AddBuiltins(packageName)
+		if builtinsAdded {
+			ui.Debug("+++ Adding builtins for package " + packageName)
+		} else {
+			ui.Debug("+++ No builtins for package " + packageName)
+		}
 
-	for !c.t.AtEnd() {
-		err := c.Statement()
+		// Save some state
+		savedPackageName := c.PackageName
+		savedTokenizer := c.t
+		savedBlockDepth := c.blockDepth
+		savedStatementCount := c.statementCount
+
+		// Read the imported object as a file path
+		text, err := c.ReadFile(fileName)
 		if err != nil {
+
+			// If it wasn't found but we did add some builtins, good enough.
+			// Skip past the filename that was rejected by c.Readfile()...
+			if builtinsAdded {
+				c.t.Advance(1)
+
+				if !isList || c.t.IsNext(")") {
+					break
+				}
+				continue
+			}
+
+			// Nope, import had no effect.
 			return err
 		}
-	}
 
-	// Reset the token stream we were working on
-	c.t = savedTokenizer
-	c.PackageName = savedPackageName
-	c.blockDepth = savedBlockDepth
-	c.statementCount = savedStatementCount
+		ui.Debug("+++ Adding source for package " + packageName)
+		// Set up the new compiler settings
+		c.statementCount = 0
+		c.t = tokenizer.New(text)
+		c.PackageName = packageName
+
+		for !c.t.AtEnd() {
+			err := c.Statement()
+			if err != nil {
+				return err
+			}
+		}
+
+		// Reset the token stream we were working on
+		c.t = savedTokenizer
+		c.PackageName = savedPackageName
+		c.blockDepth = savedBlockDepth
+		c.statementCount = savedStatementCount
+		if !isList {
+			break
+		}
+		if isList && c.t.Next() == ")" {
+			break
+		}
+	}
 	return nil
 }
 
