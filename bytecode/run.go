@@ -122,9 +122,14 @@ func (c *Context) RunFromAddress(addr int) error {
 
 			text := err.Error()
 
-			// See if we are in a try/catch block.
-			if len(c.try) > 0 {
+			// See if we are in a try/catch block. IF there is a Try/Catch stack
+			// and the jump point on top is non-zero, then we can transfer control.
+			if len(c.try) > 0 && c.try[len(c.try)-1] > 0 {
 				c.pc = c.try[len(c.try)-1]
+
+				// Zero out the jump point for this try/catch block so recursive
+				// errors don't occur.
+				c.try[len(c.try)-1] = 0
 				c.symbols.SetAlways("_error", text)
 				if c.Tracing {
 					ui.Debug("*** Branch to %d on error: %s", c.pc, text)
