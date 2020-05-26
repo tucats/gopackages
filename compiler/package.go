@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
@@ -13,9 +14,6 @@ import (
 // Package compiles a package statement
 func (c *Compiler) Package() error {
 
-	if c.statementCount > 1 {
-		return c.NewError("package statement must be first")
-	}
 	name := c.t.Next()
 	if !tokenizer.IsSymbol(name) {
 		return c.NewTokenError("invalid package name")
@@ -67,6 +65,10 @@ func (c *Compiler) Import() error {
 			packageName = packageName[:len(filepath.Ext(packageName))]
 		}
 
+		// If this is an import of the package we're already importing, now work to do.
+		if packageName == c.PackageName {
+			continue
+		}
 		builtinsAdded := c.AddBuiltins(packageName)
 		if builtinsAdded {
 			ui.Debug("+++ Adding builtins for package " + packageName)
@@ -130,6 +132,12 @@ func (c *Compiler) Import() error {
 // ReadFile reads the text from a file into a string
 func (c *Compiler) ReadFile(name string) (string, error) {
 
+	s, err := c.ReadDirectory(name)
+	if err == nil {
+		return s, nil
+	}
+	ui.Debug("+++ Reading package file %s", name)
+	// Not a directory, try to read the file
 	content, err := ioutil.ReadFile(name)
 	if err != nil {
 		content, err = ioutil.ReadFile(name + ".solve")
@@ -146,4 +154,33 @@ func (c *Compiler) ReadFile(name string) (string, error) {
 
 	// Convert []byte to string
 	return string(content), nil
+}
+
+// ReadDirectory reads all the files in a directory into a single string.
+func (c *Compiler) ReadDirectory(name string) (string, error) {
+
+	var b strings.Builder
+	r := os.Getenv("SOLVE_PATH")
+	dirname := filepath.Join(r, "lib", name)
+
+	fi, err := ioutil.ReadDir(dirname)
+	if err != nil {
+		return "", err
+	}
+
+	ui.Debug("+++ Reading package directory %s", dirname)
+	for _, f := range fi {
+		if !f.IsDir() {
+
+			fname := filepath.Join(dirname, f.Name())
+			t, err := c.ReadFile(fname)
+			if err != nil {
+				return "", err
+			}
+			b.WriteString(t)
+			b.WriteString("\n")
+		}
+	}
+
+	return b.String(), nil
 }

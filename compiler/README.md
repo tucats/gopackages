@@ -400,4 +400,10 @@ If the import name cannot be found in the current directory, then the
 compiler uses the environment variables SOLVE_PATH to form a directory
 path, and adds the "lib" directory to that path to locate the import.
 So the above statement could resolve to `/Users/cole/solve/lib/factor.solve`
-if the SOLVE_PATH was set to "~/solve"
+if the SOLVE_PATH was set to "~/solve".
+
+Finally, the `import` statement can read an entire directory of source
+files that all contribute to the same package. If the target of the
+import is a directory in the $SOLVE_PATH/lib location, then all the
+source files within that directory area read and processed as part
+of one package. 
