@@ -74,8 +74,7 @@ func (e *Expression) expressionAtom() error {
 
 	}
 
-	e.b.Emit2(bc.Push, t)
-	return nil
+	return e.NewTokenError("unrecognized or unexpected token")
 }
 
 func (e *Expression) parseArray() error {
