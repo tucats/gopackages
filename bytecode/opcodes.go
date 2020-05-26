@@ -366,7 +366,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		}
 
 	default:
-		c.NewError("invalid target of function call")
+		return c.NewError("invalid target of function call")
 	}
 
 	if err != nil {
