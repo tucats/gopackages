@@ -264,3 +264,20 @@ The typical use is to simply print the string:
 
 This will print the symbols for the nested basic block as well as the
 symbols for the main program.
+
+## JSON Support
+You can formalize the parsing of JSON strings into Solve variables using
+the `_json` package. This converts a string containing a JSON represetnation
+into a Solve object, or converts a Solve object into the corresponding JSON
+string.
+
+### _json.encode()
+Returns a string containing the JSON representation of the arguments. If only
+one argument is given, the result is the JSON for that specific argument. If
+more than one argument is given, the result is always encoded as a JSON array
+where each element matches a parameter to the call.
+
+### _json.decode()
+This accepts a string that must contain a syntactically valid JSON expression,
+which is then converted to the matching `Solve` data types. Supported types
+are int, float, bool, string, array, and struct elements.
