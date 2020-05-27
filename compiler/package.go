@@ -65,10 +65,17 @@ func (c *Compiler) Import() error {
 			packageName = packageName[:len(filepath.Ext(packageName))]
 		}
 
-		// If this is an import of the package we're already importing, now work to do.
+		// If this is an import of a package already processed, no work to do.
+		if _, found := c.s.Get(packageName); found {
+			ui.Debug("+++ Previously imported %s, skipping", packageName)
+			continue
+		}
+
+		// If this is an import of the package we're currently importing, no work to do.
 		if packageName == c.PackageName {
 			continue
 		}
+
 		builtinsAdded := c.AddBuiltins(packageName)
 		if builtinsAdded {
 			ui.Debug("+++ Adding builtins for package " + packageName)
