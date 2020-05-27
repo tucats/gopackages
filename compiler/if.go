@@ -14,8 +14,8 @@ func (c *Compiler) If() error {
 	if err != nil {
 		return err
 	}
+	c.b.Emit2(bytecode.Load, "bool")
 	c.b.Append(bc)
-	c.b.Emit2(bytecode.Push, "bool")
 	c.b.Emit2(bytecode.Call, 1)
 
 	b1 := c.b.Mark()
