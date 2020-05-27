@@ -101,6 +101,11 @@ value is not a string, it is first coerced to a string type.
 
 This results in the string value "JEFFREY".
 
+### _strings.tokenize(string)
+This converts a string into an array of strings, tokenized using the same
+syntax rules that the `Solve` language uses itself. An empty string results
+in an empty token array.
+
 ## General Functions
 
 These functions work generally with any type of value, and perform coercsions
