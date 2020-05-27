@@ -42,6 +42,7 @@ func (c *Compiler) Array() error {
 	} else {
 		c.b.Emit2(bytecode.MakeArray, 1)
 	}
+	c.b.Emit2(bytecode.SymbolCreate, name)
 	c.b.Emit2(bytecode.Store, name)
 	return nil
 }
