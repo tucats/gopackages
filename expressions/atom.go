@@ -119,6 +119,7 @@ func (e *Expression) parseArray() error {
 func (e *Expression) parseStruct() error {
 
 	var listTerminator = "}"
+	var err error
 
 	e.t.Advance(1)
 	count := 0
@@ -128,8 +129,16 @@ func (e *Expression) parseStruct() error {
 		// First element: name
 
 		name := e.t.Next()
-		if !tokenizer.IsSymbol(name) {
-			return e.NewTokenError("invalid member name")
+
+		if len(name) > 2 && name[0:1] == "\"" {
+			name, err = strconv.Unquote(name)
+			if err != nil {
+				return err
+			}
+		} else {
+			if !tokenizer.IsSymbol(name) {
+				return e.NewTokenError("invalid member name")
+			}
 		}
 
 		// Second element: colon
@@ -160,5 +169,5 @@ func (e *Expression) parseStruct() error {
 
 	e.b.Emit2(bc.Struct, count)
 	e.t.Advance(1)
-	return nil
+	return err
 }
