@@ -57,7 +57,8 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"_io.writefile":      FunctionDefinition{Min: 2, Max: 2, F: FunctionWriteFile},
 	"_io.delete":         FunctionDefinition{Min: 1, Max: 1, F: FunctionDeleteFile},
 	"_json.decode":       FunctionDefinition{Min: 1, Max: 1, F: FunctionDecode},
-	"_json.encode":       FunctionDefinition{Min: 1, Max: 99999, F: FunctionEncode},
+	"_json.encode":       FunctionDefinition{Min: 1, Max: Any, F: FunctionEncode},
+	"_json.format":       FunctionDefinition{Min: 1, Max: Any, F: FunctionEncodeFormatted},
 }
 
 // AddBuiltins adds or overrides the default function library in the symbol map.
