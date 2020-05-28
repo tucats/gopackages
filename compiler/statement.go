@@ -80,6 +80,9 @@ func (c *Compiler) Statement() error {
 	case "try":
 		return c.Try()
 
+	case "switch":
+		return c.Switch()
+
 	}
 
 	// Unknown statement, return an error

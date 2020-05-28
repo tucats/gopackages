@@ -15,7 +15,7 @@ func MakeSymbol() string {
 	var i int
 
 	indexMux.Lock()
-	index := index + 1
+	index = index + 1
 	i = index
 	indexMux.Unlock()
 
