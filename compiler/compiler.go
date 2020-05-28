@@ -3,7 +3,6 @@ package compiler
 import (
 	"strings"
 
-	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
@@ -103,7 +102,6 @@ func (c *Compiler) AddBuiltins(pkgname string) bool {
 		if dot := strings.Index(name, "."); dot >= 0 {
 			f.Pkg = name[:dot]
 			name = name[dot+1:]
-			ui.Debug("=== n=%s, p=%s\n", name, f.Pkg)
 		}
 
 		if f.Pkg == pkgname {
