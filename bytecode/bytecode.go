@@ -43,6 +43,7 @@ const (
 	Stop   = 0
 	AtLine = iota + BuiltinInstructions
 	Call
+	ArgCheck
 	Push
 	Drop
 	Add

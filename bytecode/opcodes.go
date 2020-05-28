@@ -376,6 +376,51 @@ func CallOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
+// ArgCheckOpcode implementation
+func ArgCheckOpcode(c *Context, i interface{}) error {
+
+	min := 0
+	max := 0
+
+	switch v := i.(type) {
+	case []interface{}:
+		if len(v) != 2 {
+			return c.NewError("invalid ArgCheck array size")
+		}
+		min = v[0].(int)
+		max = v[1].(int)
+
+	case int:
+		if v >= 0 {
+			min = v
+			max = v
+		} else {
+			min = 0
+			max = -v
+		}
+
+	case []int:
+		if len(v) != 2 {
+			return c.NewError("invalid ArgCheck array size")
+		}
+		min = v[0]
+		max = v[1]
+
+	default:
+		return c.NewError("invalid ArgCheck operand")
+	}
+
+	v, found := c.Get("_args")
+	if !found {
+		return c.NewError("ArgCheck cannot read _args")
+	}
+	va := v.([]interface{})
+	if len(va) < min || len(va) > max {
+		return c.NewError("incorrect number of arguments passed")
+	}
+	return nil
+}
+
 // PushOpcode bytecode implementation
 func PushOpcode(c *Context, i interface{}) error {
 	return c.Push(i)

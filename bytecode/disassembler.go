@@ -48,6 +48,7 @@ var opcodeNames = map[int]string{
 	Try:                "Try",
 	TryPop:             "TryPop",
 	Coerce:             "Coerce",
+	ArgCheck:           "ArgCheck",
 }
 
 // Disasm prints out a representation of the bytecode for debugging purposes

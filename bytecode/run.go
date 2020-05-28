@@ -62,6 +62,7 @@ func initializeDispatch() {
 			Try:                TryOpcode,
 			TryPop:             TryPopOpcode,
 			Coerce:             CoerceOpcode,
+			ArgCheck:           ArgCheckOpcode,
 		}
 	}
 }

@@ -16,11 +16,17 @@ func (c *Compiler) Function() error {
 		return c.NewTokenError("invalid function name")
 	}
 
+	varargs := false
 	// Process parameter names
 	if c.t.IsNext("(") {
 		for !c.t.IsNext(")") {
 			if c.t.AtEnd() {
 				break
+			}
+			if c.t.Peek(1) == "." && c.t.Peek(2) == "." && c.t.Peek(3) == "." {
+				c.t.Advance(3)
+				varargs = true
+				continue
 			}
 			name := c.t.Next()
 			if tokenizer.IsSymbol(name) {
@@ -36,6 +42,17 @@ func (c *Compiler) Function() error {
 
 	b := bytecode.New(fname)
 
+	// Generate the argument check
+
+	if varargs {
+		p := make([]int, 2)
+		p[0] = len(parameters)
+		p[1] = 999999
+		b.Emit2(bytecode.ArgCheck, p)
+
+	} else {
+		b.Emit2(bytecode.ArgCheck, len(parameters))
+	}
 	// Generate the parameter assignments. These are extracted
 	// from the automatic array named _args which is generated
 	// as part of the function call during bytecode exectuion.
