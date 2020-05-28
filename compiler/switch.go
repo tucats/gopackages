@@ -5,7 +5,7 @@ import (
 	"github.com/tucats/gopackages/expressions"
 )
 
-// Switch compiles a switch statement
+// Switch compiles a switch statement.
 func (c *Compiler) Switch() error {
 
 	fixups := make([]int, 0)
@@ -93,5 +93,6 @@ func (c *Compiler) Switch() error {
 	for _, n := range fixups {
 		c.b.SetAddressHere(n)
 	}
+	c.b.Emit2(bytecode.SymbolDelete, t)
 	return nil
 }
