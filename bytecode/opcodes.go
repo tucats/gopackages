@@ -1063,3 +1063,50 @@ func TryPopOpcode(c *Context, i interface{}) error {
 	c.symbols.DeleteAlways("_error")
 	return nil
 }
+
+// CoerceOpcode implementation
+func CoerceOpcode(c *Context, i interface{}) error {
+	t := util.GetInt(i)
+	v, err := c.Pop()
+	if err != nil {
+		return err
+	}
+	switch t {
+	case IntType:
+		v = util.GetInt(v)
+	case FloatType:
+		v = util.GetFloat(v)
+	case StringType:
+		v = util.GetString(v)
+	case BoolType:
+		v = util.GetBool(v)
+	case ArrayType:
+
+		switch v.(type) {
+		case []interface{}:
+			// Do nothing, we're already an array
+
+			// Not an array, so wrap it in one
+		default:
+			v = []interface{}{v}
+		}
+
+	case StructType:
+		switch v.(type) {
+		case map[string]interface{}:
+			// Do nothing, we're already a struct
+
+		default:
+			return c.NewError("value is not a struct")
+		}
+
+	case UndefinedType:
+		// No work at all to do here.
+
+	default:
+		return c.NewError("invalid coercion type")
+	}
+
+	c.Push(v)
+	return nil
+}

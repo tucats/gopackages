@@ -27,6 +27,17 @@ const BranchInstruction = 65536
 // are added between 1 and this value.
 const BuiltinInstructions = BranchInstruction - 2048
 
+// Define data types as abstract identifiers
+const (
+	UndefinedType = iota
+	IntType
+	FloatType
+	StringType
+	BoolType
+	ArrayType
+	StructType
+)
+
 // Constant describing instruction opcodes
 const (
 	Stop   = 0
@@ -64,6 +75,7 @@ const (
 	PopScope
 	Try
 	TryPop
+	Coerce
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction

@@ -48,11 +48,52 @@ func (c *Compiler) Function() error {
 		b.Emit2(bytecode.Store, name)
 	}
 
+	// Look for return type definition. If found, compile the appropriate
+	// coercion code which will be stored in the comipler block for use
+	// by a return statement
+
+	coercion := bytecode.New(fname + " return")
+
+	if c.t.Peek(1) == "[" && c.t.Peek(2) == "]" {
+		coercion.Emit2(bytecode.Coerce, bytecode.ArrayType)
+		c.t.Advance(2)
+	} else {
+		if c.t.Peek(1) == "{" && c.t.Peek(2) == "}" {
+			coercion.Emit2(bytecode.Coerce, bytecode.StructType)
+			c.t.Advance(2)
+		} else {
+			switch c.t.Peek(1) {
+			case "int":
+				coercion.Emit2(bytecode.Coerce, bytecode.IntType)
+				c.t.Advance(1)
+			case "float":
+				coercion.Emit2(bytecode.Coerce, bytecode.FloatType)
+				c.t.Advance(1)
+			case "string":
+				coercion.Emit2(bytecode.Coerce, bytecode.StringType)
+				c.t.Advance(1)
+			case "bool":
+				coercion.Emit2(bytecode.Coerce, bytecode.BoolType)
+				c.t.Advance(1)
+
+			case "any":
+				coercion.Emit2(bytecode.Coerce, bytecode.UndefinedType)
+				c.t.Advance(1)
+
+			case "void":
+				// Do nothing, there is no result.
+
+			default:
+				return c.NewError("missing function return type")
+			}
+		}
+	}
 	// Now compile a statement or block into the function body. We'll use the
 	// current token stream in progress, and the current bytecode.
 	cx := New()
 	cx.t = c.t
 	cx.b = b
+	cx.coerce = coercion
 	err := cx.Statement()
 	if err != nil {
 		return err

@@ -40,6 +40,7 @@ type Compiler struct {
 	t              *tokenizer.Tokenizer
 	s              *symbols.SymbolTable
 	loops          *Loop
+	coerce         *bytecode.ByteCode
 	constants      []string
 	packages       PackageDictionary
 	blockDepth     int

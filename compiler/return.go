@@ -13,8 +13,16 @@ func (c *Compiler) Return() error {
 		if err != nil {
 			return err
 		}
+		if c.coerce.Mark() == 0 {
+			return c.NewTokenError("return value from void function")
+		}
 		c.b.Append(bc)
 	}
+
+	// IS there a coerce to set to the required type?
+	c.b.Append(c.coerce)
+
+	// Stop execution of this stream
 	c.b.Emit1(bytecode.Stop)
 
 	return nil

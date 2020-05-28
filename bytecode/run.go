@@ -61,6 +61,7 @@ func initializeDispatch() {
 			Constant:           ConstantOpcode,
 			Try:                TryOpcode,
 			TryPop:             TryPopOpcode,
+			Coerce:             CoerceOpcode,
 		}
 	}
 }

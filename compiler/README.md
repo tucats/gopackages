@@ -223,22 +223,32 @@ Where the "x" is the name of an ignored value.
 The `function` statement defines a function. This must have a name
 which is a valid symbol, and an argument list. The argument list is
 a list of names which become local variables in the running function
-containing the arguments from the caller. This is then followed by
+containing the arguments from the caller. After the (possibly empty) 
+argument list you must specify the type. This can be one of the base
+types (`int`, `float`, `string`, or `bool`). It can also be `[]` which
+denotes a return of an array type, or `{}` which denotes the return
+of a `struct` type. Finally, the type can be `any` which means any
+type can be returned, or `void` which means no value is returned from
+this function (it is intended to be invoked as a `call` statement).
+
+The type declaration is then followed by
 a statement or block defining the code to execute when the function
 is used in an expression or in a `call` statement. For example,
 
-    function double(x) {
+    function double(x) float {
         return x * 2
     }
 
 This accepts a single value, named `x` when the function is running.
-The function returns that value multiplied by 2. The function can
+The function returns that value multiplied by 2. The type of the result
+is coerced to be a float value. The function can
 then be used in an expression, such as:
 
     fun := 2
     moreFun := double(fun)
 
-After this code executes, `moreFun` will contain the value 4.
+After this code executes, `moreFun` will contain the value 4.0 as a
+float value.
 
 ## return
 The `return` statement contains an expression that is identified as
