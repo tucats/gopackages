@@ -48,6 +48,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"_util.sort":         FunctionDefinition{Min: 1, Max: 1, F: FunctionSort},
 	"_util.exit":         FunctionDefinition{Min: 0, Max: 1, F: FunctionExit},
 	"_util.symbols":      FunctionDefinition{Min: 0, Max: 1, F: FunctionSymbols},
+	"_util.type":         FunctionDefinition{Min: 1, Max: 1, F: FunctionType},
 	"_io.open":           FunctionDefinition{Min: 1, Max: 2, F: FunctionOpen},
 	"_io.close":          FunctionDefinition{Min: 1, Max: 1, F: FunctionClose},
 	"_io.readfile":       FunctionDefinition{Min: 1, Max: 1, F: FunctionReadFile},

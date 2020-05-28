@@ -234,3 +234,23 @@ func FunctionExit(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 func FunctionSymbols(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return syms.Format(false), nil
 }
+
+// FunctionType implements the _util.type() function
+func FunctionType(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	switch args[0].(type) {
+	case int:
+		return "int", nil
+	case float64:
+		return "float", nil
+	case string:
+		return "string", nil
+	case bool:
+		return "bool", nil
+	case []interface{}:
+		return "array", nil
+	case map[string]interface{}:
+		return "struct", nil
+	}
+	return "unknown", nil
+}
