@@ -20,12 +20,12 @@ const InitialStackSize = 100
 
 // BranchInstruction is the mininum value for a branch instruction, which has
 // special meaning during relocation and linking
-const BranchInstruction = 65536
+const BranchInstruction = 2000
 
 // BuiltinInstructions defines the lowest number (other than Stop) of the
 // builtin instructions provided by the bytecode package. User instructions
 // are added between 1 and this value.
-const BuiltinInstructions = BranchInstruction - 2048
+const BuiltinInstructions = BranchInstruction - 1000
 
 // Define data types as abstract identifiers
 const (
@@ -49,6 +49,7 @@ const (
 	Sub
 	Div
 	Mul
+	Exp
 	And
 	Or
 	Negate

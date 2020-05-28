@@ -16,6 +16,7 @@ var opcodeNames = map[int]string{
 	Sub:                "Sub",
 	Div:                "Div",
 	Mul:                "Mul",
+	Exp:                "Exp",
 	And:                "And",
 	Or:                 "Or",
 	Negate:             "Negate",
