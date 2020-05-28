@@ -3,6 +3,7 @@ package bytecode
 import (
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -445,9 +446,6 @@ func DropOpcode(c *Context, i interface{}) error {
 // AddOpcode bytecode implementation
 func AddOpcode(c *Context, i interface{}) error {
 
-	if c.sp < 1 {
-		return c.NewError("stack underflow")
-	}
 	v2, err := c.Pop()
 	if err != nil {
 		return err
@@ -509,9 +507,6 @@ func AddOpcode(c *Context, i interface{}) error {
 // AndOpcode bytecode implementation
 func AndOpcode(c *Context, i interface{}) error {
 
-	if c.sp < 1 {
-		return c.NewError("stack underflow")
-	}
 	v1, err := c.Pop()
 	if err != nil {
 		return err
@@ -528,9 +523,6 @@ func AndOpcode(c *Context, i interface{}) error {
 // OrOpcode bytecode implementation
 func OrOpcode(c *Context, i interface{}) error {
 
-	if c.sp < 1 {
-		return c.NewError("stack underflow")
-	}
 	v1, err := c.Pop()
 	if err != nil {
 		return err
@@ -546,10 +538,6 @@ func OrOpcode(c *Context, i interface{}) error {
 
 // SubOpcode bytecode implementation
 func SubOpcode(c *Context, i interface{}) error {
-
-	if c.sp < 1 {
-		return c.NewError("stack underflow")
-	}
 	v2, err := c.Pop()
 	if err != nil {
 		return err
@@ -591,9 +579,6 @@ func SubOpcode(c *Context, i interface{}) error {
 // MulOpcode bytecode implementation
 func MulOpcode(c *Context, i interface{}) error {
 
-	if c.sp < 1 {
-		return c.NewError("stack underflow")
-	}
 	v2, err := c.Pop()
 	if err != nil {
 		return err
@@ -611,6 +596,40 @@ func MulOpcode(c *Context, i interface{}) error {
 		return c.Push(v1.(float64) * v2.(float64))
 	case bool:
 		return c.Push(v1.(bool) || v2.(bool))
+	default:
+		return c.NewError("unsupported datatype")
+	}
+}
+
+// ExpOpcode bytecode implementation
+func ExpOpcode(c *Context, i interface{}) error {
+
+	v2, err := c.Pop()
+	if err != nil {
+		return err
+	}
+	v1, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	v1, v2 = util.Normalize(v1, v2)
+	switch v1.(type) {
+	case int:
+		if v2.(int) == 0 {
+			return c.Push(0)
+		}
+		if v2.(int) == 1 {
+			return c.Push(v1)
+		}
+		prod := v1.(int)
+		for n := 2; n <= v2.(int); n = n + 1 {
+			prod = prod * v1.(int)
+		}
+		return c.Push(prod)
+
+	case float64:
+		return c.Push(math.Pow(v1.(float64), v2.(float64)))
 	default:
 		return c.NewError("unsupported datatype")
 	}

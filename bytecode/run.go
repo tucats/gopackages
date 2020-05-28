@@ -35,6 +35,7 @@ func initializeDispatch() {
 			Sub:                SubOpcode,
 			Mul:                MulOpcode,
 			Div:                DivOpcode,
+			Exp:                ExpOpcode,
 			And:                AndOpcode,
 			Or:                 OrOpcode,
 			Negate:             NegateOpcode,

@@ -20,7 +20,7 @@ func (e *Expression) multDivide() error {
 			break
 		}
 		op := e.t.Peek(1)
-		if e.t.IsAnyNext([]string{"*", "/", "|"}) {
+		if e.t.IsAnyNext([]string{"^", "*", "/", "|"}) {
 
 			if e.t.IsNext(tokenizer.EndOfTokens) {
 				return e.NewError("missing term")
@@ -32,6 +32,9 @@ func (e *Expression) multDivide() error {
 			}
 
 			switch op {
+
+			case "^":
+				e.b.Emit1(bc.Exp)
 
 			case "*":
 				e.b.Emit1(bc.Mul)
