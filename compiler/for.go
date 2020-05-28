@@ -3,6 +3,7 @@ package compiler
 import (
 	"errors"
 
+	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/expressions"
 	"github.com/tucats/gopackages/tokenizer"
@@ -186,7 +187,7 @@ func (c *Compiler) For() error {
 		c.b.SetAddressHere(fixAddr)
 	}
 	c.b.Emit1(bytecode.PopScope)
-
+	c.PopLoop()
 	return nil
 }
 
@@ -224,7 +225,7 @@ func (c *Compiler) PushLoop(loopType int) {
 		continues: make([]int, 0),
 		Parent:    c.loops,
 	}
-
+	ui.Debug("=== Push loop scope")
 	c.loops = &loop
 }
 
@@ -232,5 +233,8 @@ func (c *Compiler) PushLoop(loopType int) {
 func (c *Compiler) PopLoop() {
 	if c.loops != nil {
 		c.loops = c.loops.Parent
+		ui.Debug("=== Pop loop scope")
+	} else {
+		ui.Debug("=== loop stack empty")
 	}
 }
