@@ -19,6 +19,8 @@ func (c *Compiler) Package() error {
 		return c.NewTokenError("invalid package name")
 	}
 
+	name = strings.ToLower(name)
+
 	if (c.PackageName != "") && (c.PackageName != name) {
 		return c.NewError("cannot redefine package name")
 	}
@@ -64,6 +66,7 @@ func (c *Compiler) Import() error {
 		if filepath.Ext(packageName) != "" {
 			packageName = packageName[:len(filepath.Ext(packageName))]
 		}
+		packageName = strings.ToLower(packageName)
 
 		// If this is an import of a package already processed, no work to do.
 		if _, found := c.s.Get(packageName); found {
