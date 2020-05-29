@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -106,4 +107,66 @@ func FunctionFormat(s *symbols.SymbolTable, args []interface{}) (interface{}, er
 	}
 
 	return fmt.Sprintf(util.GetString(args[0]), args[1:]...), nil
+}
+
+// FunctionChars implements the _strings.chars() function. This accepts a string
+// value and converts it to an array of characters.
+func FunctionChars(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	v := util.GetString(args[0])
+	r := make([]interface{}, 0)
+
+	for n := 0; n < len(v); n = n + 1 {
+		r = append(r, v[n:n+1])
+	}
+	return r, nil
+}
+
+// FunctionInts implements the _strings.ints() function. This accepts a string
+// value and converts it to an array of integer rune values.
+func FunctionInts(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	v := util.GetString(args[0])
+	r := make([]interface{}, 0)
+	i := []rune(v)
+
+	for n := 0; n < len(i); n = n + 1 {
+		r = append(r, int(i[n]))
+	}
+	return r, nil
+}
+
+// FunctionToString implements the _strings.string() function, which accepts an array
+// of items and converts it to a single long string of each item. Normally , this is
+// an array of characters.
+func FunctionToString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	var b strings.Builder
+
+	for _, v := range args {
+
+		switch a := v.(type) {
+		case string:
+			b.WriteString(a)
+
+		case int:
+			b.WriteRune(rune(a))
+
+		case []interface{}:
+			for _, c := range a {
+				switch k := c.(type) {
+				case int:
+					b.WriteRune(rune(k))
+				case string:
+					b.WriteString(util.GetString(c))
+				default:
+					return nil, errors.New("incorrect argument type")
+				}
+			}
+		default:
+			return nil, errors.New("incorrect argument type")
+		}
+	}
+	return b.String(), nil
+
 }

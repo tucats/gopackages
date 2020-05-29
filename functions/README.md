@@ -286,3 +286,28 @@ where each element matches a parameter to the call.
 This accepts a string that must contain a syntactically valid JSON expression,
 which is then converted to the matching `Solve` data types. Supported types
 are int, float, bool, string, array, and struct elements.
+
+
+## Strings
+This collection of functions support string operations.
+
+### _strings.string(v...)
+
+The function accepts one or more arguments, which are processed and concatenated
+into a single string value.
+
+|Type|Example|Description|
+|--|--|--|
+| int | 65 | Character with matching unicode value |
+| string | "test" | String value |
+| []string | ["a", "b", "c"] | Array of string values |
+| []int ] [ 65, 66, 67 ] | Array of runes expressed as integer unicode value |
+
+### _strings.ints(string)
+Given a string value, returns an array containing all the runes of the string
+expressed as integers containing the unicode values. If this array was passed
+to _strings.string() it would return the original string.
+
+### _strings.chars(string)
+Given a string value, return an array containing all the characters of the
+string as individual string array elements. So "test" becomes ["t", "e", "s", "t"]
