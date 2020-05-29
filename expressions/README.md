@@ -43,6 +43,24 @@ specific types from the opaque value, performing type conversions as needed:
 * GetBool()
 * GetString()
 
+## Constants
+You can specify any base constant type, array, or struct directly:
+
+|Type|Example|Description|
+|:----:|-------|-----------|
+|int | 42 | Signed integer value |
+|float | 3.14 | Signed floating point value, requires the "." |
+|bool| false | The boolean values `true` or `false` |
+|string | "hello" | Characters enclosed in quotes. Supports escapes like `\n` |
+|array | ["Tom", 55] | Comma-separated list of values in `[]` |
+| struct | {name:"Tom", age:55} | Comma-separated list of name/value pairs in `{}` |
+
+You can specify a constant array of integer values by specifying a range as well. For example,
+the expression `[1:10]` is identical to `[1,2,3,4,5,6,7,8,9,10]`. You can omit the first value
+if it is one; i.e. `[:3]` is the same as `[1,2,3]`. If the range is expressed as a high value
+to a low value, the values are in reverse order; i.e. `[7:5]` is `[7,6,5]`.
+
+
 ## Symbols
 As shown in the simple example above, you can provide a map of symbols available to the
 expression evaluator. All symbol names should be stored as lower-case names as the symbol

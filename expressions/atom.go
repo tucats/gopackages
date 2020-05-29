@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/tucats/gopackages/bytecode"
 	bc "github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
 )
@@ -91,7 +92,47 @@ func (e *Expression) parseArray() error {
 	}
 	e.t.Advance(1)
 	count := 0
+	t1 := 1
+	var err error
 
+	// Let's experimenally see if this is a range constant expression. This can be
+	// of the form [start:end] which creates an array of integers between the start
+	// and end values (inclusive). It can also be of the form [:end] which assumes
+	// a start number of 1.
+
+	if e.t.Peek(1) == ":" {
+		err = nil
+		e.t.Advance(-1)
+	} else {
+		t1, err = strconv.Atoi(e.t.Peek(1))
+	}
+	if err == nil {
+		if e.t.Peek(2) == ":" {
+			t2, err := strconv.Atoi(e.t.Peek(3))
+			if err == nil {
+				e.t.Advance(3)
+				count := t2 - t1 + 1
+
+				if count < 0 {
+					count = (-count) + 2
+
+					for n := t1; n >= t2; n = n - 1 {
+						e.b.Emit2(bytecode.Push, n)
+					}
+
+				} else {
+					for n := t1; n <= t2; n = n + 1 {
+						e.b.Emit2(bytecode.Push, n)
+					}
+				}
+				e.b.Emit2(bytecode.Array, count)
+				if !e.t.IsNext("]") {
+					return e.NewError("invalid array range constant")
+				}
+				return nil
+			}
+		}
+	}
 	for e.t.Peek(1) != listTerminator {
 		err := e.conditional()
 		if err != nil {
