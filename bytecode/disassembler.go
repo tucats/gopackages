@@ -33,6 +33,7 @@ var opcodeNames = map[int]string{
 	Store:              "Store",
 	Array:              "Array",
 	LoadIndex:          "LoadIndex",
+	LoadSlice:          "LoadSlice",
 	StoreIndex:         "StoreIndex",
 	Struct:             "Struct",
 	Member:             "Member",

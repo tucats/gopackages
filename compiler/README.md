@@ -72,7 +72,9 @@ as values.
 
 An array is a list of zero or more values. The array values can be of any
 type, including other arrays. The array elements are always indexed starting
-at a value of 1. You cannot reference a subscript that has not been allocated.
+at a value of 1. You can also reference a range (slice) of an array by using
+the notation `a[b:e]` which returns an array containing elements from `b` to
+`e` from array `a`. You cannot reference a subscript that has not been allocated.
 You can use the `array` statement to initialize an array, and the `array()`
 function to change the size of an existing array.
 

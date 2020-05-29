@@ -28,6 +28,7 @@ func initializeDispatch() {
 			Push:               PushOpcode,
 			Array:              ArrayOpcode,
 			LoadIndex:          LoadIndexOpcode,
+			LoadSlice:          LoadSliceOpcode,
 			StoreIndex:         StoreIndexOpcode,
 			Struct:             StructOpcode,
 			Member:             MemberOpcode,

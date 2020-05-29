@@ -66,6 +66,7 @@ const (
 	MakeArray
 	LoadIndex
 	StoreIndex
+	LoadSlice
 	Struct
 	Member
 	Print

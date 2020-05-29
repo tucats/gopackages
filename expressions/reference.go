@@ -33,10 +33,24 @@ func (e *Expression) reference() error {
 			if err != nil {
 				return err
 			}
-			if e.t.Next() != "]" {
-				return e.NewError("missing ] in array reference")
+
+			// is it a slice instead of an index?
+			if e.t.IsNext(":") {
+				err := e.conditional()
+				if err != nil {
+					return err
+				}
+				e.b.Emit1(bc.LoadSlice)
+				if e.t.Next() != "]" {
+					return e.NewError("missing ] in slice reference")
+				}
+			} else {
+				// Nope, singular index
+				if e.t.Next() != "]" {
+					return e.NewError("missing ] in index reference")
+				}
+				e.b.Emit1(bc.LoadIndex)
 			}
-			e.b.Emit1(bc.LoadIndex)
 
 		// Nothing else, term is complete
 		default:

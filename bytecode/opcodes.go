@@ -1005,6 +1005,46 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
+// LoadSliceOpcode implementation
+func LoadSliceOpcode(c *Context, i interface{}) error {
+
+	index2, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	index1, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	array, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	switch a := array.(type) {
+
+	// Array of objects means we retrieve a slice.
+	case []interface{}:
+		subscript1 := util.GetInt(index1)
+		if subscript1 < 1 || subscript1 > len(a) {
+			return c.NewIntError("invalid slice start index", subscript1)
+		}
+		subscript2 := util.GetInt(index2)
+		if subscript2 < subscript1 || subscript2 > len(a) {
+			return c.NewIntError("invalid slice end index", subscript2)
+		}
+		v := a[subscript1-1 : subscript2]
+		c.Push(v)
+
+	default:
+		return c.NewError("invalid type for slice operation")
+	}
+
+	return nil
+}
+
 // StoreIndexOpcode implementation
 func StoreIndexOpcode(c *Context, i interface{}) error {
 
