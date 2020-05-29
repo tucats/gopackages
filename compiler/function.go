@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
 )
@@ -125,8 +124,5 @@ func (c *Compiler) Function() error {
 		c.AddPackageFunction(c.PackageName, fname, b)
 	}
 
-	if ui.DebugMode {
-		b.Disasm()
-	}
 	return nil
 }
