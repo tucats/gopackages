@@ -46,12 +46,17 @@ func PrintOpcode(c *Context, i interface{}) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%s", util.FormatUnquoted(v))
+		s := fmt.Sprintf("%s", util.FormatUnquoted(v))
+		if c.output == nil {
+			fmt.Printf("%s", s)
+		} else {
+			c.output.WriteString(s)
+		}
 	}
 
 	// If we are instruction tracing, print out a newline anyway so the trace
 	// display isn't made illegible.
-	if c.Tracing {
+	if c.output == nil && c.Tracing {
 		fmt.Println()
 	}
 
@@ -60,7 +65,12 @@ func PrintOpcode(c *Context, i interface{}) error {
 
 // NewlineOpcode implementation.
 func NewlineOpcode(c *Context, i interface{}) error {
-	fmt.Printf("\n")
+
+	if c.output == nil {
+		fmt.Printf("\n")
+	} else {
+		c.output.WriteString("\n")
+	}
 	return nil
 }
 

@@ -3,6 +3,7 @@ package bytecode
 import (
 	"strings"
 
+	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
 	sym "github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
@@ -23,6 +24,7 @@ type Context struct {
 	Tracing   bool
 	tokenizer *tokenizer.Tokenizer
 	try       []int
+	output    *strings.Builder
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode
@@ -60,6 +62,27 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 	}
 
 	return ctxp
+}
+
+// EnableConsoleOutput tells the context to begin capturing all output normally generated
+// from Print and Newline into a buffer instead of going to stdout
+func (c *Context) EnableConsoleOutput(flag bool) {
+
+	ui.Debug(">>> Console output set to %v", flag)
+	if !flag {
+		var b strings.Builder
+		c.output = &b
+	} else {
+		c.output = nil
+	}
+}
+
+// GetOutput retrieves the output buffer
+func (c *Context) GetOutput() string {
+	if c.output != nil {
+		return c.output.String()
+	}
+	return ""
 }
 
 // SetTokenizer sets a tokenizer in the current context for tracing and debugging.
