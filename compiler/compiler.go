@@ -3,6 +3,7 @@ package compiler
 import (
 	"strings"
 
+	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
@@ -168,4 +169,41 @@ func (c *Compiler) StatementEnd() bool {
 // Symbols returns the symbol table map from compilation
 func (c *Compiler) Symbols() *symbols.SymbolTable {
 	return c.s
+}
+
+// AutoImport arranges for the import all of the built-in
+// packages.
+func (c *Compiler) AutoImport() error {
+
+	// Start by making a list of the packages by scanning all the built-in
+	// function names for package names. We ignore functions that don't have
+	// package names as those are always available already.
+	m := map[string]bool{}
+	for fn := range functions.FunctionDictionary {
+		dot := strings.Index(fn, ".")
+		if dot > 0 {
+			fn = fn[:dot]
+			m[fn] = true
+		}
+	}
+
+	// Now use this list of unique package names for form an import statement.
+	var b strings.Builder
+	for pkg := range m {
+		b.WriteString(" import ")
+		b.WriteString(pkg)
+	}
+
+	// Compile the statement, which causes the compiler to bind in the imported
+	// packages.
+	savedBC := c.b
+	savedT := c.t
+
+	text := b.String()
+	ui.Debug("+++ Autoimport: %s", text)
+	_, err := c.CompileString(text)
+
+	c.b = savedBC
+	c.t = savedT
+	return err
 }
