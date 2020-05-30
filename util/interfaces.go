@@ -38,7 +38,7 @@ func GetBool(v interface{}) bool {
 func GetString(v interface{}) string {
 	switch v.(type) {
 	case map[string]interface{}:
-		return ""
+		return Format(v)
 
 	case []interface{}:
 		return ""
