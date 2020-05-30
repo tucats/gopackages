@@ -44,6 +44,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"_strings.chars":     FunctionDefinition{Min: 1, Max: 1, F: FunctionChars},
 	"_strings.ints":      FunctionDefinition{Min: 1, Max: 1, F: FunctionInts},
 	"_strings.string":    FunctionDefinition{Min: 1, Max: Any, F: FunctionToString},
+	"_strings.index":     FunctionDefinition{Min: 2, Max: 2, F: FunctionIndex},
 	"_util.uuid":         FunctionDefinition{Min: 0, Max: 0, F: FunctionUUID},
 	"_util.profile":      FunctionDefinition{Min: 1, Max: 2, F: FunctionProfile},
 	"_util.getenv":       FunctionDefinition{Min: 1, Max: 1, F: FunctionGetEnv},

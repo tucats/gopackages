@@ -164,6 +164,9 @@ func (b *ByteCode) SetAddress(mark int, address int) error {
 func (b *ByteCode) Append(a *ByteCode) {
 
 	base := b.emitPos
+	if a == nil {
+		return
+	}
 
 	for _, i := range a.opcodes[:a.emitPos] {
 		if i.Opcode > BranchInstructions {
