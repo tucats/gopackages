@@ -63,6 +63,9 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"_json.decode":       FunctionDefinition{Min: 1, Max: 1, F: FunctionDecode},
 	"_json.encode":       FunctionDefinition{Min: 1, Max: Any, F: FunctionEncode},
 	"_json.format":       FunctionDefinition{Min: 1, Max: Any, F: FunctionEncodeFormatted},
+	"_cipher.hash":       FunctionDefinition{Min: 1, Max: 1, F: FunctionHash},
+	"_cipher.encrypt":    FunctionDefinition{Min: 2, Max: 2, F: FunctionEncrypt},
+	"_cipher.decrypt":    FunctionDefinition{Min: 2, Max: 2, F: FunctionDecrypt},
 }
 
 // AddBuiltins adds or overrides the default function library in the symbol map.
