@@ -311,3 +311,17 @@ to _strings.string() it would return the original string.
 ### _strings.chars(string)
 Given a string value, return an array containing all the characters of the
 string as individual string array elements. So "test" becomes ["t", "e", "s", "t"]
+
+## _time
+The `_time` package supports basic time calculations.
+
+### _time.now()
+This returns the current time as a formatted string. Time values are generally always
+expressed as strings.
+
+### _time.add(t, d)
+Adds a given duration ("1s", "-5h3m", etc) to the time and return a new time string.
+
+### _time.subtract(t1, t2)
+Subtract t2 from t1 and return the duration ("-5s", etc). The sign will be "-" if t2
+is greater than t1.
