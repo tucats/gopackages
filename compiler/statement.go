@@ -74,6 +74,9 @@ func (c *Compiler) Statement() error {
 	case "return":
 		return c.Return()
 
+	case "type":
+		return c.Type()
+
 	case "array":
 		return c.Array()
 

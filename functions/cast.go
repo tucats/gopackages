@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/tucats/gopackages/symbols"
@@ -37,4 +38,23 @@ func FunctionBool(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 		return nil, errors.New("invalid value to coerce to bool type")
 	}
 	return v.(bool), nil
+}
+
+// FunctionNew implements the new() function
+func FunctionNew(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	var r interface{}
+	// Use JSON as a reflection-based cloner
+	byt, _ := json.Marshal(args[0])
+	json.Unmarshal(byt, &r)
+
+	// IF there was a type in the source, make the clone point back to it
+
+	switch v := r.(type) {
+	case map[string]interface{}:
+		if _, found := v["__type"]; found {
+			r.(map[string]interface{})["__type"] = args[0]
+		}
+	}
+	return r, nil
 }

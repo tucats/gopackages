@@ -245,6 +245,9 @@ func MemberOpcode(c *Context, i interface{}) error {
 					c.Push(v)
 					return nil
 
+				case string:
+					return c.NewStringError("no such type member", name)
+
 				default:
 					return c.NewError("__type linkage is not a map")
 				}
