@@ -25,6 +25,7 @@ type Context struct {
 	tokenizer *tokenizer.Tokenizer
 	try       []int
 	output    *strings.Builder
+	this      string
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode
@@ -44,6 +45,7 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 		line:    0,
 		symbols: s,
 		Tracing: false,
+		this:    "",
 		try:     make([]int, 0),
 	}
 	ctxp := &ctx

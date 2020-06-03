@@ -57,6 +57,7 @@ const (
 	Try
 	TryPop
 	Coerce
+	This
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction
@@ -114,6 +115,7 @@ var opcodeNames = map[int]string{
 	TryPop:             "TryPop",
 	Coerce:             "Coerce",
 	ArgCheck:           "ArgCheck",
+	This:               "This",
 }
 
 func initializeDispatch() {
@@ -161,6 +163,7 @@ func initializeDispatch() {
 			TryPop:             TryPopOpcode,
 			Coerce:             CoerceOpcode,
 			ArgCheck:           ArgCheckOpcode,
+			This:               ThisOpcode,
 		}
 	}
 }

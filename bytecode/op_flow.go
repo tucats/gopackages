@@ -212,6 +212,18 @@ func ArgCheckOpcode(c *Context, i interface{}) error {
 	if !found {
 		return c.NewError("ArgCheck cannot read _args")
 	}
+
+	// Was there a "This" done just before this? If so, set
+	// the stack value accordingly.
+	if c.this != "" {
+		this, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		c.SetAlways(c.this, this)
+		c.this = ""
+	}
+
 	va := v.([]interface{})
 	if len(va) < min || len(va) > max {
 		return c.NewError("incorrect number of arguments passed")

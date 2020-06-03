@@ -409,3 +409,9 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 
 	return nil
 }
+
+// ThisOpcode implements the This opcode
+func ThisOpcode(c *Context, i interface{}) error {
+	c.this = util.GetString(i)
+	return nil
+}
