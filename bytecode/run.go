@@ -20,55 +20,6 @@ var dispatchMux sync.Mutex
 // it runs out of space.
 const GrowStackBy = 50
 
-func initializeDispatch() {
-	if dispatch == nil {
-		dispatch = DispatchMap{
-			Stop:               StopOpcode,
-			AtLine:             AtLineOpcode,
-			Push:               PushOpcode,
-			Array:              ArrayOpcode,
-			LoadIndex:          LoadIndexOpcode,
-			LoadSlice:          LoadSliceOpcode,
-			StoreIndex:         StoreIndexOpcode,
-			Struct:             StructOpcode,
-			Member:             MemberOpcode,
-			Add:                AddOpcode,
-			Sub:                SubOpcode,
-			Mul:                MulOpcode,
-			Div:                DivOpcode,
-			Exp:                ExpOpcode,
-			And:                AndOpcode,
-			Or:                 OrOpcode,
-			Negate:             NegateOpcode,
-			Call:               CallOpcode,
-			Load:               LoadOpcode,
-			Store:              StoreOpcode,
-			Branch:             BranchOpcode,
-			BranchTrue:         BranchTrueOpcode,
-			BranchFalse:        BranchFalseOpcode,
-			Equal:              EqualOpcode,
-			NotEqual:           NotEqualOpcode,
-			LessThan:           LessThanOpcode,
-			LessThanOrEqual:    LessThanOrEqualOpcode,
-			GreaterThan:        GreaterThanOpcode,
-			GreaterThanOrEqual: GreaterThanOrEqualOpcode,
-			Print:              PrintOpcode,
-			Newline:            NewlineOpcode,
-			Drop:               DropOpcode,
-			MakeArray:          MakeArrayOpcode,
-			SymbolDelete:       SymbolDeleteOpcode,
-			SymbolCreate:       SymbolCreateOpcode,
-			PushScope:          PushScopeOpcode,
-			PopScope:           PopScopeOpcode,
-			Constant:           ConstantOpcode,
-			Try:                TryOpcode,
-			TryPop:             TryPopOpcode,
-			Coerce:             CoerceOpcode,
-			ArgCheck:           ArgCheckOpcode,
-		}
-	}
-}
-
 // Run executes a bytecode context
 func (c *Context) Run() error {
 	return c.RunFromAddress(0)

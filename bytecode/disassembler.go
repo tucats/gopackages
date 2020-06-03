@@ -8,51 +8,6 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
-var opcodeNames = map[int]string{
-	Stop:               "Stop",
-	Call:               "Call",
-	Push:               "Push",
-	Add:                "Add",
-	Sub:                "Sub",
-	Div:                "Div",
-	Mul:                "Mul",
-	Exp:                "Exp",
-	And:                "And",
-	Or:                 "Or",
-	Negate:             "Negate",
-	Branch:             "Branch",
-	BranchTrue:         "BranchTrue",
-	BranchFalse:        "BranchFalse",
-	Equal:              "Equal",
-	NotEqual:           "NotEqual",
-	GreaterThan:        "GreaterThan",
-	LessThan:           "LessThan",
-	GreaterThanOrEqual: "GreaterThanOrEqual",
-	LessThanOrEqual:    "LessThanOrEqual",
-	Load:               "Load",
-	Store:              "Store",
-	Array:              "Array",
-	LoadIndex:          "LoadIndex",
-	LoadSlice:          "LoadSlice",
-	StoreIndex:         "StoreIndex",
-	Struct:             "Struct",
-	Member:             "Member",
-	Print:              "Print",
-	Newline:            "Newline",
-	Drop:               "Drop",
-	AtLine:             "AtLine",
-	MakeArray:          "MakeArray",
-	SymbolDelete:       "SymbolDelete",
-	SymbolCreate:       "SymbolCreate",
-	PushScope:          "PushScope",
-	PopScope:           "PopScope",
-	Constant:           "Constant",
-	Try:                "Try",
-	TryPop:             "TryPop",
-	Coerce:             "Coerce",
-	ArgCheck:           "ArgCheck",
-}
-
 // Disasm prints out a representation of the bytecode for debugging purposes
 func (b *ByteCode) Disasm() {
 

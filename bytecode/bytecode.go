@@ -38,61 +38,6 @@ const (
 	StructType
 )
 
-// Constant describing instruction opcodes
-const (
-	Stop   = 0
-	AtLine = iota + BuiltinInstructions
-	Call
-	ArgCheck
-	Push
-	Drop
-	Add
-	Sub
-	Div
-	Mul
-	Exp
-	And
-	Or
-	Negate
-	Equal
-	NotEqual
-	GreaterThan
-	LessThan
-	GreaterThanOrEqual
-	LessThanOrEqual
-	Load
-	Store
-	Array
-	MakeArray
-	LoadIndex
-	StoreIndex
-	LoadSlice
-	Struct
-	Member
-	Print
-	Newline
-	SymbolDelete
-	SymbolCreate
-	Constant
-	PushScope
-	PopScope
-	Try
-	TryPop
-	Coerce
-
-	// Everything from here on is a branch instruction, whose
-	// operand must be present and is an integer instruction
-	// address in the bytecode array
-	BranchInstructions = iota + BranchInstruction
-	Branch
-	BranchTrue
-	BranchFalse
-
-	// After this value, additional user branch instructions are
-	// can be defined.
-	UserBranchInstructions
-)
-
 // I contains the information about a single bytecode instruction.
 type I struct {
 	Opcode  int
