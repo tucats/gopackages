@@ -205,6 +205,11 @@ func LoadOpcode(c *Context, i interface{}) error {
 // the stack (the first must be a string and the second a
 // map) and indexes into the map to get the matching value
 // and puts back on the stack.
+//
+// If the member does not exist, but there is a __type
+// member in the structure, we also search the __type field
+// for the value. This supports calling packages based on
+// a given object value.
 func MemberOpcode(c *Context, i interface{}) error {
 
 	var name string
@@ -228,12 +233,28 @@ func MemberOpcode(c *Context, i interface{}) error {
 	case map[string]interface{}:
 		v, found := mv[name]
 		if !found {
+
+			// Is there a parent we should check?
+			if t, found := mv["__type"]; found {
+				switch tv := t.(type) {
+				case map[string]interface{}:
+					v, found = tv[name]
+					if !found {
+						return c.NewStringError("no such type member", name)
+					}
+					c.Push(v)
+					return nil
+
+				default:
+					return c.NewError("__type linkage is not a map")
+				}
+			}
 			return c.NewStringError("no such member", name)
 		}
 		c.Push(v)
 
 	default:
-		return c.NewError("not a map")
+		return c.NewError("not a struct")
 	}
 	return nil
 }
