@@ -19,6 +19,14 @@ func (e *Expression) reference() error {
 		op := e.t.Peek(1)
 		switch op {
 
+		// Struct reference
+		case "->":
+			e.t.Advance(1)
+			name := e.t.Next()
+			e.b.Emit1(bc.Dup)
+			e.b.Emit2(bc.Push, name)
+			e.b.Emit1(bc.Member)
+
 		// Map member reference
 		case ".":
 			e.t.Advance(1)

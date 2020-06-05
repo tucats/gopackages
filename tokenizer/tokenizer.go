@@ -45,6 +45,14 @@ func New(src string) *Tokenizer {
 			}
 		}
 
+		if nextToken == ">" {
+			if previousToken == "-" {
+				t.Tokens[len(t.Tokens)-1] = previousToken + nextToken
+				previousToken = ""
+				continue
+			}
+		}
+
 		previousToken = nextToken
 		t.Tokens = append(t.Tokens, nextToken)
 		t.Line = append(t.Line, s.Line)

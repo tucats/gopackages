@@ -24,6 +24,9 @@ const (
 	ArgCheck
 	Push
 	Drop
+	Dup
+	Copy
+	Swap
 	Add
 	Sub
 	Div
@@ -116,6 +119,9 @@ var opcodeNames = map[int]string{
 	Coerce:             "Coerce",
 	ArgCheck:           "ArgCheck",
 	This:               "This",
+	Dup:                "Dup",
+	Copy:               "Copy",
+	Swap:               "Swap",
 }
 
 func initializeDispatch() {
@@ -164,6 +170,9 @@ func initializeDispatch() {
 			Coerce:             CoerceOpcode,
 			ArgCheck:           ArgCheckOpcode,
 			This:               ThisOpcode,
+			Dup:                DupOpcode,
+			Copy:               CopyOpcode,
+			Swap:               SwapOpcode,
 		}
 	}
 }

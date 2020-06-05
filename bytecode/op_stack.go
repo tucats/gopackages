@@ -1,6 +1,10 @@
 package bytecode
 
-import "github.com/tucats/gopackages/util"
+import (
+	"encoding/json"
+
+	"github.com/tucats/gopackages/util"
+)
 
 /******************************************\
 *                                         *
@@ -26,5 +30,48 @@ func DropOpcode(c *Context, i interface{}) error {
 			return nil
 		}
 	}
+	return nil
+}
+
+// DupOpcode implementation
+func DupOpcode(c *Context, i interface{}) error {
+	v, err := c.Pop()
+	if err != nil {
+		return err
+	}
+	c.Push(v)
+	c.Push(v)
+	return nil
+}
+
+// SwapOpcode implementation
+func SwapOpcode(c *Context, i interface{}) error {
+	v1, err := c.Pop()
+	if err != nil {
+		return err
+	}
+	v2, err := c.Pop()
+	if err != nil {
+		return err
+	}
+	c.Push(v1)
+	c.Push(v2)
+	return nil
+}
+
+// CopyOpcode implementation
+func CopyOpcode(c *Context, i interface{}) error {
+	v, err := c.Pop()
+	if err != nil {
+		return err
+	}
+	c.Push(v)
+
+	// Use JSON as a reflection-based cloner
+	var v2 interface{}
+	byt, _ := json.Marshal(v)
+	json.Unmarshal(byt, &v2)
+
+	c.Push(2)
 	return nil
 }
