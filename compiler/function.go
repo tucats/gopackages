@@ -9,10 +9,21 @@ import (
 func (c *Compiler) Function() error {
 
 	parameters := []string{}
+	this := ""
 
 	fname := c.t.Next()
 	if !tokenizer.IsSymbol(fname) {
 		return c.NewTokenError("invalid function name")
+	}
+
+	// Was it really the function name, or the "this" name?
+	if c.t.Peek(1) == "->" {
+		c.t.Advance(1)
+		this = fname
+		fname = c.t.Next()
+		if !tokenizer.IsSymbol(fname) {
+			return c.NewTokenError("invalid function name")
+		}
 	}
 
 	varargs := false
@@ -52,6 +63,12 @@ func (c *Compiler) Function() error {
 	} else {
 		b.Emit2(bytecode.ArgCheck, len(parameters))
 	}
+
+	// If there was a "this" variable defined, process it now.
+	if this != "" {
+		b.Emit2(bytecode.This, this)
+	}
+
 	// Generate the parameter assignments. These are extracted
 	// from the automatic array named _args which is generated
 	// as part of the function call during bytecode exectuion.
@@ -98,6 +115,7 @@ func (c *Compiler) Function() error {
 
 			case "void":
 				// Do nothing, there is no result.
+				c.t.Advance(1)
 
 			default:
 				return c.NewError("missing function return type")
