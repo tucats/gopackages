@@ -205,12 +205,51 @@ func LoadOpcode(c *Context, i interface{}) error {
 // the stack (the first must be a string and the second a
 // map) and indexes into the map to get the matching value
 // and puts back on the stack.
+func MemberOpcode(c *Context, i interface{}) error {
+
+	var name string
+	if i != nil {
+		name = util.GetString(i)
+	} else {
+		v, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		name = util.GetString(v)
+	}
+
+	m, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	// The only the type that is supported is a map
+	var v interface{}
+	found := false
+
+	switch mv := m.(type) {
+	case map[string]interface{}:
+		v, found = mv[name]
+		if !found {
+			return c.NewStringError("no such type member", name)
+		}
+	default:
+		return c.NewError("not a struct")
+	}
+	c.Push(v)
+	return nil
+}
+
+// ClassMemberOpcode implementation. This pops two values from
+// the stack (the first must be a string and the second a
+// map) and indexes into the map to get the matching value
+// and puts back on the stack.
 //
 // If the member does not exist, but there is a __type
 // member in the structure, we also search the __type field
 // for the value. This supports calling packages based on
 // a given object value.
-func MemberOpcode(c *Context, i interface{}) error {
+func ClassMemberOpcode(c *Context, i interface{}) error {
 
 	var name string
 	if i != nil {
@@ -231,26 +270,16 @@ func MemberOpcode(c *Context, i interface{}) error {
 	// The only the type that is supported is a map
 	switch mv := m.(type) {
 	case map[string]interface{}:
+
+		if _, found := mv["__type"]; !found {
+			return c.NewError("not a typed value")
+		}
 		v, found := mv[name]
 		if !found {
 
-			// Is there a parent we should check?
-			if t, found := mv["__type"]; found {
-				switch tv := t.(type) {
-				case map[string]interface{}:
-					v, found = tv[name]
-					if !found {
-						return c.NewStringError("no such type member", name)
-					}
-					c.Push(v)
-					return nil
-
-				case string:
-					return c.NewStringError("no such type member", name)
-
-				default:
-					return c.NewError("__type linkage is not a map")
-				}
+			v, found := searchParents(mv, name)
+			if found {
+				return c.Push(v)
 			}
 			return c.NewStringError("no such member", name)
 		}
@@ -260,6 +289,28 @@ func MemberOpcode(c *Context, i interface{}) error {
 		return c.NewError("not a struct")
 	}
 	return nil
+}
+
+func searchParents(mv map[string]interface{}, name string) (interface{}, bool) {
+
+	// Is there a parent we should check?
+	if t, found := mv["__type"]; found {
+		switch tv := t.(type) {
+		case map[string]interface{}:
+			v, found := tv[name]
+			if !found {
+				return searchParents(tv, name)
+			}
+			return v, true
+
+		case string:
+			return nil, false
+
+		default:
+			return nil, false
+		}
+	}
+	return nil, false
 }
 
 // LoadIndexOpcode implementation

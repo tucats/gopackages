@@ -25,7 +25,7 @@ func (e *Expression) reference() error {
 			name := e.t.Next()
 			e.b.Emit1(bc.Dup)
 			e.b.Emit2(bc.Push, name)
-			e.b.Emit1(bc.Member)
+			e.b.Emit1(bc.ClassMember)
 
 		// Map member reference
 		case ".":

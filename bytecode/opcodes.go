@@ -50,6 +50,7 @@ const (
 	LoadSlice
 	Struct
 	Member
+	ClassMember
 	Print
 	Newline
 	SymbolDelete
@@ -122,6 +123,7 @@ var opcodeNames = map[int]string{
 	Dup:                "Dup",
 	Copy:               "Copy",
 	Swap:               "Swap",
+	ClassMember:        "ClassMember",
 }
 
 func initializeDispatch() {
@@ -173,6 +175,7 @@ func initializeDispatch() {
 			Dup:                DupOpcode,
 			Copy:               CopyOpcode,
 			Swap:               SwapOpcode,
+			ClassMember:        ClassMemberOpcode,
 		}
 	}
 }
