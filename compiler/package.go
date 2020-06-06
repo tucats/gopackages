@@ -30,7 +30,7 @@ func (c *Compiler) Package() error {
 	// This is done by creating a source table and then merging it with the
 	// active table.
 	tmp := symbols.NewSymbolTable("")
-	tmp.Set(name, map[string]interface{}{})
+	tmp.SetAlways(name, map[string]interface{}{"__type": name})
 	c.s.Merge(tmp)
 
 	return nil
