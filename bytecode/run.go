@@ -39,7 +39,6 @@ func (c *Context) RunFromAddress(addr int) error {
 	// Reset the runtime context
 	c.pc = addr
 	c.running = true
-	c.sp = 0
 
 	// Make sure the opcode array ends in a Stop operation
 	if c.bc.emitPos == 0 || c.bc.opcodes[c.bc.emitPos-1].Opcode != Stop {
@@ -64,7 +63,7 @@ func (c *Context) RunFromAddress(addr int) error {
 			if len(s2) > 50 {
 				s2 = s2[:50]
 			}
-			ui.Debug("%5d: %-30s stack: %s", c.pc, s, s2)
+			ui.Debug("%5d: %-30s stack[%2d]: %s", c.pc, s, c.sp, s2)
 		}
 		c.pc = c.pc + 1
 

@@ -126,6 +126,10 @@ func CallOpcode(c *Context, i interface{}) error {
 		cx.Tracing = c.Tracing
 		cx.SetTokenizer(c.GetTokenizer())
 
+		// Make the caller's stack our stack
+		cx.stack = c.stack
+		cx.sp = c.sp
+
 		sf.SetAlways("_args", args)
 
 		// Run the function. If it doesn't get an error, then

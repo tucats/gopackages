@@ -464,5 +464,10 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 // ThisOpcode implements the This opcode
 func ThisOpcode(c *Context, i interface{}) error {
 	c.this = util.GetString(i)
-	return nil
+	v, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	return c.SetAlways(c.this, v)
 }
