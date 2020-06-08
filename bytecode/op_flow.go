@@ -164,7 +164,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		}
 
 	default:
-		return c.NewError("invalid target of function call")
+		return c.NewStringError("invalid target of function call", fmt.Sprintf("%#v", af))
 	}
 
 	if err != nil {

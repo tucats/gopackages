@@ -91,6 +91,6 @@ func Format(arg interface{}) string {
 		if ui.DebugMode {
 			return fmt.Sprintf("<%#v>", v)
 		}
-		return "<function>"
+		return fmt.Sprintf("<%v>", v)
 	}
 }
