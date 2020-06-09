@@ -106,6 +106,23 @@ new fields to a structure simply by naming them in an assignment, such as
 If there isn't already a field named `weekly` in the structure, it is
 created automatically. The field is then set to the value of `pay`.
 
+Note that structures and arrays are always passed around by reference.
+That is, if you create a structure `a`, assign it to `b`, and then change
+a field in `b`, it will also be changed in `a`. To make an exact duplicate
+of an existing structure, use the `new()` function which creates a new
+instance of the existing type. For example,
+
+     a := { age: 55, name: "Timmy"}
+     b := a
+     b.age = 4
+     print a.age    // Prints the value 4
+
+     c := { age: 55, name: "Timmy"}
+     d := new(c)
+     d.age = 4
+     print c.age    // Prints the value 55
+
+
 ## Scope
 The console input (when `solve` is run with no arguments or parameters) or
 the source file named when `solve run` is used creates the main symbol table,
