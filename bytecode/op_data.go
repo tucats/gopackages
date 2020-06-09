@@ -245,8 +245,8 @@ func MemberOpcode(c *Context, i interface{}) error {
 // map) and indexes into the map to get the matching value
 // and puts back on the stack.
 //
-// If the member does not exist, but there is a __type
-// member in the structure, we also search the __type field
+// If the member does not exist, but there is a __parent
+// member in the structure, we also search the __parent field
 // for the value. This supports calling packages based on
 // a given object value.
 func ClassMemberOpcode(c *Context, i interface{}) error {
@@ -271,7 +271,7 @@ func ClassMemberOpcode(c *Context, i interface{}) error {
 	switch mv := m.(type) {
 	case map[string]interface{}:
 
-		if _, found := mv["__type"]; !found {
+		if _, found := mv["__parent"]; !found {
 			return c.NewError("not a typed value")
 		}
 		v, found := mv[name]
@@ -294,7 +294,7 @@ func ClassMemberOpcode(c *Context, i interface{}) error {
 func searchParents(mv map[string]interface{}, name string) (interface{}, bool) {
 
 	// Is there a parent we should check?
-	if t, found := mv["__type"]; found {
+	if t, found := mv["__parent"]; found {
 		switch tv := t.(type) {
 		case map[string]interface{}:
 			v, found := tv[name]

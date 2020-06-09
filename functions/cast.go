@@ -65,8 +65,8 @@ func FunctionNew(syms *symbols.SymbolTable, args []interface{}) (interface{}, er
 	case []interface{}:
 
 	case map[string]interface{}:
-		if _, found := v["__type"]; found {
-			r.(map[string]interface{})["__type"] = args[0]
+		if _, found := v["__parent"]; found {
+			r.(map[string]interface{})["__parent"] = args[0]
 		}
 
 	default:
