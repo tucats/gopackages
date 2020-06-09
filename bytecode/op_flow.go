@@ -136,7 +136,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		// extract the stop stack item as the result
 		err = cx.Run()
 		if err == nil {
-			result, err = cx.Pop()
+			result, _ = cx.Pop()
 		}
 
 	case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
