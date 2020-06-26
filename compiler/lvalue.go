@@ -97,7 +97,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		if !c.t.IsNext("]") {
 			return c.NewError("missing ] on array index")
 		}
-		bc.Emit1(bytecode.StoreIndex)
+		bc.Emit1(bytecode.LoadIndex)
 		return nil
 	}
 
