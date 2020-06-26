@@ -25,7 +25,7 @@ func (c *Compiler) Type() error {
 		return c.NewTokenError("expected {, found ")
 	}
 
-	// IF there is not parent, seal the chain by making the link point to a string of ourselves.
+	// If there is not parent, seal the chain by making the link point to a string of our own name.
 	// If there is a parent, load it so it can be linked after type creation.
 	if parent == name {
 		c.b.Emit2(bytecode.Push, parent)

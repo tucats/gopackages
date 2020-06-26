@@ -22,7 +22,6 @@ func (c *Compiler) If() error {
 	c.b.Emit2(bytecode.BranchFalse, 0)
 
 	// Compile the statement to be executed if true
-
 	err = c.Statement()
 	if err != nil {
 		return err

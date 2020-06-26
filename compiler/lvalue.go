@@ -83,6 +83,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 	return bc, nil
 }
 
+// lvalueTerm parses secondary lvalue operations (array indexes, or struct member dereferences)
 func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 
 	term := c.t.Peek(1)

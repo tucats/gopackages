@@ -19,7 +19,7 @@ func (c *Compiler) Return() error {
 		c.b.Append(bc)
 	}
 
-	// IS there a coerce to set to the required type?
+	// Is there a coerce to set to the required type?
 	c.b.Append(c.coerce)
 
 	// Stop execution of this stream

@@ -9,19 +9,25 @@ import (
 	"github.com/tucats/gopackages/tokenizer"
 )
 
-// For compiles the loop statement. This has three clauses
-// which are separated by ";", followed by a statement or
-// block that is run as described by the loop conditions.
+// For compiles the loop statement. This has two syntax types that
+// can be specified.
+// 1. There are three clauses which are separated by ";", followed
+//    by a statement or block that is run as described by the loop
+//    index variable conditions.
+//
+// 2. There can be a range operation which creates an implied loop
+//    using each member of the array or struct.
 func (c *Compiler) For() error {
 
 	c.b.Emit1(bytecode.PushScope)
 
-	indexName := ""
 	// Is this the two-value range thing?
+	indexName := ""
 	if tokenizer.IsSymbol(c.t.Peek(1)) && (c.t.Peek(2) == ",") {
 		indexName = c.t.Next()
 		c.t.Advance(1)
 	}
+
 	// Must be a valid lvalue
 	if !c.IsLValue() {
 		return c.NewError("loop initialization not found")
@@ -41,14 +47,12 @@ func (c *Compiler) For() error {
 		// This is wierd, but the LValue compiler will have inserted a "SymbolCreate" in the
 		// lValue due to the syntax, but we don't really want to create it as it will have already
 		// been generated once. So use it once to create a value, and then remove the store.
-
 		c.b.Emit2(bytecode.Push, 0)
 		c.b.Append(indexStore)
 		indexStore.Remove(0)
 
 		// Make a new scope and get the array we will range over
 		c.PushLoop(rangeLoopType)
-
 		arrayCode, err := expressions.Compile(c.t)
 		if err != nil {
 			return err
@@ -111,8 +115,8 @@ func (c *Compiler) For() error {
 		return nil
 	}
 
-	// Nope, normal numeric loop ocnditions. IF so, it cannot
-	// have an index variable defined.
+	// Nope, normal numeric loop conditions. At this point there should not
+	// be an index variable defined.
 	if indexName != "" {
 		c.NewError("invalid index variable")
 	}
@@ -142,7 +146,7 @@ func (c *Compiler) For() error {
 	}
 
 	// Finally, get the clause that updates something
-	// (nominally the index) to eventuall trigger the
+	// (nominally the index) to eventually trigger the
 	// loop condition.
 	incrementStore, err := c.LValue()
 	if err != nil {
@@ -158,10 +162,10 @@ func (c *Compiler) For() error {
 		return err
 	}
 
-	// Top of loop starts here
+	// Top of loop body starts here
 	b1 := c.b.Mark()
 
-	// Test condition
+	// Emit the test condition
 	c.b.Append(condition)
 	b2 := c.b.Mark()
 	c.b.Emit2(bytecode.BranchFalse, 0)
@@ -191,9 +195,8 @@ func (c *Compiler) For() error {
 	return nil
 }
 
-// Break processes a break statement
+// Break compiles a break statement
 func (c *Compiler) Break() error {
-
 	if c.loops == nil {
 		return c.NewError("break outside of loop")
 	}
@@ -203,9 +206,8 @@ func (c *Compiler) Break() error {
 	return nil
 }
 
-// Continue processes a continue statement
+// Continue compiles a continue statement
 func (c *Compiler) Continue() error {
-
 	if c.loops == nil {
 		return c.NewError("continue outside of loop")
 	}
@@ -229,7 +231,7 @@ func (c *Compiler) PushLoop(loopType int) {
 	c.loops = &loop
 }
 
-// PopLoop discards the topmost loop on the loop stack.
+// PopLoop discards the top-most loop on the loop stack.
 func (c *Compiler) PopLoop() {
 	if c.loops != nil {
 		c.loops = c.loops.Parent

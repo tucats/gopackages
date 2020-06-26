@@ -5,7 +5,7 @@ import (
 	"github.com/tucats/gopackages/tokenizer"
 )
 
-// Statement parses a single statement
+// Statement compiles a single statement
 func (c *Compiler) Statement() error {
 
 	// We just eat statement separators and we also terminate
@@ -38,7 +38,8 @@ func (c *Compiler) Statement() error {
 	}
 
 	// Remaining statement types all have a starting term that defines
-	// which compiler unit to call.
+	// which compiler unit to call. For each term, call the appropriate
+	// handler (which assumes the leading verb has already been consumed)
 	switch c.t.Next() {
 
 	case "package":

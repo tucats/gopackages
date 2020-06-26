@@ -5,8 +5,8 @@ import (
 	"github.com/tucats/gopackages/expressions"
 )
 
-// Print compiles a print statement. The verb
-// is already removed from the token stream
+// Print compiles a print statement. The verb is already removed
+// from the token stream
 func (c *Compiler) Print() error {
 
 	newline := true

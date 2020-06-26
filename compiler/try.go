@@ -2,7 +2,8 @@ package compiler
 
 import "github.com/tucats/gopackages/bytecode"
 
-// Try comiples the try statement
+// Try compiles the try statement which allows the program to catch error
+// conditions instead of stopping execution on an error.
 func (c *Compiler) Try() error {
 
 	// Generate start of a try block.

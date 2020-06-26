@@ -3,7 +3,7 @@ package compiler
 import "github.com/tucats/gopackages/bytecode"
 
 // Block compiles a statement block. The leading { has already
-// been parse.
+// been parsed.
 func (c *Compiler) Block() error {
 
 	parsing := true

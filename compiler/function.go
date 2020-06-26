@@ -16,7 +16,7 @@ func (c *Compiler) Function() error {
 		return c.NewTokenError("invalid function name")
 	}
 
-	// Was it really the function name, or the "this" name?
+	// Was it really the function name, or the "this" variable name?
 	if c.t.Peek(1) == "->" {
 		c.t.Advance(1)
 		this = fname
@@ -26,8 +26,8 @@ func (c *Compiler) Function() error {
 		}
 	}
 
-	varargs := false
 	// Process parameter names
+	varargs := false
 	if c.t.IsNext("(") {
 		for !c.t.IsNext(")") {
 			if c.t.AtEnd() {
@@ -53,7 +53,6 @@ func (c *Compiler) Function() error {
 	b := bytecode.New(fname)
 
 	// Generate the argument check
-
 	if varargs {
 		p := make([]int, 2)
 		p[0] = len(parameters)

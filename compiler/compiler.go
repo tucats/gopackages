@@ -21,7 +21,7 @@ type Loop struct {
 	Type   int
 	// Fixup locations for break or continue statements in a
 	// loop. These are the addresses that must be fixed up with
-	// the target address.
+	// a target address pointing to exit point or start of the loop.
 	breaks    []int
 	continues []int
 }
@@ -32,8 +32,7 @@ type FunctionDictionary map[string]interface{}
 // PackageDictionary is a list of packages each with a FunctionDictionary
 type PackageDictionary map[string]FunctionDictionary
 
-// Compiler is a structure defining what we know about the
-// compilation
+// Compiler is a structure defining what we know about the compilation
 type Compiler struct {
 	PackageName    string
 	b              *bytecode.ByteCode
