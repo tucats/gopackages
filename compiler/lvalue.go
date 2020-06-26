@@ -68,7 +68,17 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 		if c.t.Peek(1) == ":=" {
 			bc.Emit2(bytecode.SymbolCreate, name)
 		}
-		bc.Emit2(bytecode.Store, name)
+
+		// Is the last operation in the stack referecing
+		// a parent object? If so, convert the last one to
+		// a store operation.
+		ops := bc.Opcodes()
+		opsPos := bc.Mark() - 1
+		if opsPos > 0 && ops[opsPos].Opcode == bytecode.LoadIndex {
+			ops[opsPos].Opcode = bytecode.StoreIndex
+		} else {
+			bc.Emit2(bytecode.Store, name)
+		}
 	}
 	return bc, nil
 }
@@ -98,7 +108,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 			return c.NewTokenError("invalid member name")
 		}
 		bc.Emit2(bytecode.Push, member)
-		bc.Emit1(bytecode.StoreIndex)
+		bc.Emit1(bytecode.LoadIndex)
 		return nil
 	}
 
