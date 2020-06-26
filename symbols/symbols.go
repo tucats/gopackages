@@ -19,6 +19,7 @@ var RootSymbolTable = SymbolTable{
 	Symbols: map[string]interface{}{
 		"_author":    "Tom Cole",
 		"_copyright": "(c) Copyright 2020",
+		"_config":    map[string]interface{}{"disassemble": false, "trace": false},
 	},
 }
 
