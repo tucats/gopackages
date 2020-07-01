@@ -15,7 +15,9 @@ import (
 // returned as a string.
 func Prompt(p string) string {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Printf(p)
+	if !IsConsolePipe() {
+		fmt.Printf(p)
+	}
 	buffer, _ := reader.ReadString('\n')
 
 	//Remove any extra line endings (CRLF or LF)
@@ -30,11 +32,24 @@ func Prompt(p string) string {
 // without it being echoed on the terminal. The value entered is returned
 // as a string.
 func PromptPassword(p string) string {
-	fmt.Print(p)
+	if !IsConsolePipe() {
+		fmt.Print(p)
+	}
 	bytePassword, _ := terminal.ReadPassword(int(syscall.Stdin))
 
 	password := string(bytePassword)
 	fmt.Println() // it's necessary to add a new line after user's input
 
 	return password
+}
+
+// IsConsolePipe detects if the console (stdin) is a pipe versus a real device. This
+// is used to manage prompts, etc.
+func IsConsolePipe() bool {
+	fi, _ := os.Stdin.Stat() // get the FileInfo struct describing the standard input.
+
+	if (fi.Mode() & os.ModeCharDevice) == 0 {
+		return true
+	}
+	return false
 }
