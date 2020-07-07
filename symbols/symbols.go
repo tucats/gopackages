@@ -66,6 +66,9 @@ func (s *SymbolTable) Get(name string) (interface{}, bool) {
 
 // SetConstant stores a constant for readonly use in the symbol table.
 func (s *SymbolTable) SetConstant(name string, v interface{}) error {
+	if s.Constants == nil {
+		s.Constants = map[string]interface{}{}
+	}
 	s.Constants[name] = v
 	return nil
 }

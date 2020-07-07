@@ -51,8 +51,19 @@ func (c *Compiler) Import() error {
 		isList = true
 	}
 
-	for true {
+	parsing := true
+	for parsing {
+
+		// Make sure that if this isn't the list format of an import, we only do this once.
+		if !isList {
+			parsing = false
+		}
 		fileName := c.t.Next()
+
+		// End of the list? If so, break out
+		if isList && fileName == ")" {
+			break
+		}
 		if len(fileName) > 2 && fileName[:1] == "\"" {
 			fileName = fileName[1 : len(fileName)-1]
 		}

@@ -112,6 +112,11 @@ func (c *Compiler) AddBuiltins(pkgname string) bool {
 	return added
 }
 
+// Get retrieves a compile-time symbol value.
+func (c *Compiler) Get(name string) (interface{}, bool) {
+	return c.s.Get(name)
+}
+
 // AddPackageFunction adds a new package function to the compiler's package dictionary. If the
 // package name does not yet exist, it is created. The function name and interface are then used
 // to add an entry for that package.
@@ -188,10 +193,12 @@ func (c *Compiler) AutoImport() error {
 
 	// Now use this list of unique package names for form an import statement.
 	var b strings.Builder
+	b.WriteString(" import ( ")
 	for pkg := range m {
-		b.WriteString(" import ")
 		b.WriteString(pkg)
+		b.WriteRune(' ')
 	}
+	b.WriteString(");")
 
 	// Compile the statement, which causes the compiler to bind in the imported
 	// packages.
