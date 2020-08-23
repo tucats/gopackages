@@ -62,7 +62,12 @@ func (e *Expression) expressionAtom() error {
 		e.b.Emit2(bc.Push, s)
 		return err
 	}
-
+	if runeValue == "`" {
+		e.t.Advance(1)
+		s, err := e.unLit(t)
+		e.b.Emit2(bc.Push, s)
+		return err
+	}
 	if tokenizer.IsSymbol(t) {
 
 		e.t.Advance(1)
@@ -211,4 +216,12 @@ func (e *Expression) parseStruct() error {
 	e.b.Emit2(bc.Struct, count)
 	e.t.Advance(1)
 	return err
+}
+
+func (e *Expression) unLit(s string) (string, error) {
+	quote := s[0:1]
+	if s[len(s)-1:len(s)] != quote {
+		return s[1:], e.NewError("missing quote character: " + quote)
+	}
+	return s[1 : len(s)-1], nil
 }

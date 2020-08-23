@@ -24,6 +24,11 @@ func TestNew(t *testing.T) {
 			want: "tom",
 		},
 		{
+			name: "long quote",
+			expr: "`test \"string\" of text`",
+			want: "test \"string\" of text",
+		},
+		{
 			name: "Cast bool to string",
 			expr: "string(b) + string(!b)",
 			want: "truefalse",
