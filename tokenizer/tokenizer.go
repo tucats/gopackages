@@ -130,10 +130,10 @@ func (t *Tokenizer) IsNext(test string) bool {
 	return false
 }
 
-// IsAnyNext tests to see if the next token is in the given  list
+// AnyNext tests to see if the next token is in the given  list
 // of tokens, and if so  advances and returns true, else does not
 // advance and returns false.
-func (t *Tokenizer) IsAnyNext(test []string) bool {
+func (t *Tokenizer) AnyNext(test []string) bool {
 
 	n := t.Peek(1)
 	for _, v := range test {

@@ -20,7 +20,7 @@ func (e *Expression) multDivide() error {
 			break
 		}
 		op := e.t.Peek(1)
-		if e.t.IsAnyNext([]string{"^", "*", "/", "|"}) {
+		if e.t.AnyNext([]string{"^", "*", "/", "|"}) {
 
 			if e.t.IsNext(tokenizer.EndOfTokens) {
 				return e.NewError("missing term")

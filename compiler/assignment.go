@@ -13,7 +13,7 @@ func (c *Compiler) Assignment() error {
 	if err != nil {
 		return err
 	}
-	if !c.t.IsAnyNext([]string{":=", "="}) {
+	if !c.t.AnyNext([]string{":=", "="}) {
 		return errors.New("expected = or := not found")
 	}
 
