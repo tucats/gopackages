@@ -228,7 +228,13 @@ func ArgCheckOpcode(c *Context, i interface{}) error {
 		c.this = ""
 	}
 
+	// Do the actual compare. Note that if we ended up with a negative
+	// max, that means variable argument list size, and we just assume
+	// what we found in the max...
 	va := v.([]interface{})
+	if max < 0 {
+		max = len(va)
+	}
 	if len(va) < min || len(va) > max {
 		return c.NewError("incorrect number of arguments passed")
 	}

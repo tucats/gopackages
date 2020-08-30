@@ -54,11 +54,11 @@ func (c *Compiler) Function() error {
 
 	// Generate the argument check
 	if varargs {
-		p := make([]int, 2)
-		p[0] = len(parameters)
-		p[1] = 999999
+		p := []int{
+			len(parameters),
+			-1,
+		}
 		b.Emit2(bytecode.ArgCheck, p)
-
 	} else {
 		b.Emit2(bytecode.ArgCheck, len(parameters))
 	}
@@ -70,7 +70,7 @@ func (c *Compiler) Function() error {
 
 	// Generate the parameter assignments. These are extracted
 	// from the automatic array named _args which is generated
-	// as part of the function call during bytecode exectuion.
+	// as part of the function call during bytecode execution.
 	// Note that the array is 1-based.
 	for n, name := range parameters {
 		b.Emit2(bytecode.Load, "_args")
@@ -81,9 +81,8 @@ func (c *Compiler) Function() error {
 	}
 
 	// Look for return type definition. If found, compile the appropriate
-	// coercion code which will be stored in the comipler block for use
+	// coercion code which will be stored in the compiler block for use
 	// by a return statement
-
 	coercion := bytecode.New(fname + " return")
 
 	if c.t.Peek(1) == "[" && c.t.Peek(2) == "]" {
@@ -132,9 +131,8 @@ func (c *Compiler) Function() error {
 		return err
 	}
 
-	// Store anchor to the function, either in the current
-	// table or package.
-
+	// Store address of the function, either in the current
+	// compiler's symbol table or active package.
 	if c.PackageName == "" {
 		c.s.SetAlways(fname, b)
 	} else {
