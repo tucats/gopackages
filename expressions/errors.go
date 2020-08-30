@@ -5,17 +5,47 @@ import (
 	"strings"
 )
 
+// Error message codes
+const (
+	GeneralExpressionErr = iota
+	BlockQuoteErr
+)
+
+// ErrorMessageMap is used to map an error code to a message.
+var ErrorMessageMap map[int]string = map[int]string{
+	GeneralExpressionErr: "general expression error",
+	BlockQuoteErr:        "mismatched quote character",
+}
+
 // Error contains an error generated from the compiler
 type Error struct {
+	code   int
 	text   string
 	line   int
 	column int
 	token  string
 }
 
+// NewErrorCode creates an error object using a numeric code
+// rather than a message text
+func (e *Expression) NewErrorCode(code int, parm string) *Error {
+	text, found := ErrorMessageMap[code]
+	if !found {
+		text = ErrorMessageMap[GeneralExpressionErr]
+	}
+	if len(parm) > 0 {
+		text = text + ": "
+	}
+	err := e.NewStringError(text, parm)
+	err.code = code
+	return err
+}
+
 // NewError generates a new error
 func (e *Expression) NewError(msg string) *Error {
-	return e.NewStringError(msg, "")
+	err := e.NewStringError(msg, "")
+	err.code = GeneralExpressionErr
+	return err
 }
 
 // NewStringError generates a new error with a string parameter
@@ -70,4 +100,9 @@ func (e *Error) Error() string {
 		b.WriteString(e.token)
 	}
 	return b.String()
+}
+
+// Code returns the numeric code for the error
+func (e *Error) Code() int {
+	return e.code
 }

@@ -26,7 +26,9 @@ func New(src string) *Tokenizer {
 	t.Tokens = make([]string, 0)
 
 	var s scanner.Scanner
+
 	s.Init(strings.NewReader(src))
+	s.Error = func(s *scanner.Scanner, msg string) { /* suppress messaging */ }
 	s.Filename = "Input"
 
 	previousToken := ""

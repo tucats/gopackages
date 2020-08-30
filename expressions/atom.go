@@ -221,7 +221,7 @@ func (e *Expression) parseStruct() error {
 func (e *Expression) unLit(s string) (string, error) {
 	quote := s[0:1]
 	if s[len(s)-1:len(s)] != quote {
-		return s[1:], e.NewError("missing quote character: " + quote)
+		return s[1:], e.NewErrorCode(BlockQuoteErr, quote)
 	}
 	return s[1 : len(s)-1], nil
 }
