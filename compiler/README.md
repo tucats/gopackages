@@ -5,10 +5,10 @@ bytecode that can be executed using the `bytecode` package. This allows for
 compiled scripts to be integrated into the application, and run repeatedly
 without incurring the overhead of parsing and semantic analysis each time.
 
-The _Solve_ language is loosely based on _C_ and it's derivative languages.
-Some important attributes of _Solve_ programs are:
+The _Solve_ language is loosely based on _Go_ but with some important
+differences. Some important attributes of _Solve_ programs are:
 
-* There are currently no pointer types, and no dynamic memory allocation.
+* There are no pointer types, and no dynamic memory allocation.
 * All objects are passed by value in function calls.
 * Variables are untyped, but can be cast explicitly or will be type converted
 automatically when possible.
@@ -186,7 +186,7 @@ tested; if it is true then the following statement (or statement block)
 is execued. By convention, even if the conditional code is a single
 statement, it is enclosed in a statement block. For example,
 
-    if age > 50 {
+    if age >= 50 {
         call aarp(name)
     }
 
@@ -240,10 +240,11 @@ Where the "x" is the name of an ignored value.
 
 ## function
 The `function` statement defines a function. This must have a name
-which is a valid symbol, and an argument list. The argument list is
-a list of names which become local variables in the running function
-containing the arguments from the caller. After the (possibly empty) 
-argument list you must specify the type. This can be one of the base
+which is a valid symbol, followed by an argument list. The argument 
+list is a list of names which become local variables in the running
+function, containing the arguments from the caller. After the 
+(possibly empty)  argument list you must specify the type of the
+function's return value. This can be one of the base
 types (`int`, `float`, `string`, or `bool`). It can also be `[]` which
 denotes a return of an array type, or `{}` which denotes the return
 of a `struct` type. Finally, the type can be `any` which means any
@@ -260,7 +261,10 @@ is used in an expression or in a `call` statement. For example,
 
 This accepts a single value, named `x` when the function is running.
 The function returns that value multiplied by 2. The type of the result
-is coerced to be a float value. The function can
+is coerced to be a float value. Note that the braces are not required
+in the above example since the function consists of a single `return`
+statement, but by convention braces are always used to indicate the
+body fo the fucntion. The function just created can
 then be used in an expression, such as:
 
     fun := 2
@@ -275,7 +279,6 @@ the result of the function value. The generated code adds the value
 to the runtime stack, and then exits the function. The caller can
 then retrieve the value from the stack to use in an expression or
 statement.
-
     
     return salary/12.0
 
@@ -354,8 +357,8 @@ loops continue to run.
 The `break` statement cannot be used outside of a `for` loop.
 
 ## continue
-The `continue` statement exits from the currently running loop, as if the
-loop had restarted with the next iteration.
+The `continue` statement exits from the current iteration of the loop, 
+as if the loop had restarted with the next iteration.
 
     for i := 0; i < 10; i = i + 1 {
         if i == 5 {
