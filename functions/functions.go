@@ -50,7 +50,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"util.profile":      FunctionDefinition{Min: 1, Max: 2, F: FunctionProfile},
 	"util.getenv":       FunctionDefinition{Min: 1, Max: 1, F: FunctionGetEnv},
 	"members":           FunctionDefinition{Min: 1, Max: 1, F: FunctionMembers},
-	"sort":              FunctionDefinition{Min: 1, Max: 1, F: FunctionSort},
+	"sort":              FunctionDefinition{Min: 1, Max: Any, F: FunctionSort},
 	"util.exit":         FunctionDefinition{Min: 0, Max: 1, F: FunctionExit},
 	"util.symbols":      FunctionDefinition{Min: 0, Max: 1, F: FunctionSymbols},
 	"type":              FunctionDefinition{Min: 1, Max: 1, F: FunctionType},

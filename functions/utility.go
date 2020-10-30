@@ -153,57 +153,64 @@ func FunctionMembers(symbols *symbols.SymbolTable, args []interface{}) (interfac
 // FunctionSort implements the sort() function.
 func FunctionSort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
-	switch array := args[0].(type) {
-
-	case []interface{}:
-		if len(array) == 0 {
-			return array, nil
-		}
-
-		v1 := array[0]
-		switch v1.(type) {
-
-		case int:
-			intArray := make([]int, 0)
-			for _, i := range array {
-				intArray = append(intArray, util.GetInt(i))
+	// Make a master array of the values presented
+	var array []interface{}
+	for _, a := range args {
+		switch v := a.(type) {
+		case []interface{}:
+			for _, vv := range v {
+				array = append(array, vv)
 			}
-			sort.Ints(intArray)
-			resultArray := make([]interface{}, len(array))
-			for n, i := range intArray {
-				resultArray[n] = i
-			}
-			return resultArray, nil
-
-		case float64:
-			floatArray := make([]float64, 0)
-			for _, i := range array {
-				floatArray = append(floatArray, util.GetFloat(i))
-			}
-			sort.Float64s(floatArray)
-			resultArray := make([]interface{}, len(array))
-			for n, i := range floatArray {
-				resultArray[n] = i
-			}
-			return resultArray, nil
-
-		case string:
-			stringArray := make([]string, 0)
-			for _, i := range array {
-				stringArray = append(stringArray, util.GetString(i))
-			}
-			sort.Strings(stringArray)
-			resultArray := make([]interface{}, len(array))
-			for n, i := range stringArray {
-				resultArray[n] = i
-			}
-			return resultArray, nil
-
 		default:
-			return nil, errors.New("unsupported data type")
+			array = append(array, v)
 		}
+	}
+
+	if len(array) == 0 {
+		return array, nil
+	}
+
+	v1 := array[0]
+	switch v1.(type) {
+
+	case int:
+		intArray := make([]int, 0)
+		for _, i := range array {
+			intArray = append(intArray, util.GetInt(i))
+		}
+		sort.Ints(intArray)
+		resultArray := make([]interface{}, len(array))
+		for n, i := range intArray {
+			resultArray[n] = i
+		}
+		return resultArray, nil
+
+	case float64:
+		floatArray := make([]float64, 0)
+		for _, i := range array {
+			floatArray = append(floatArray, util.GetFloat(i))
+		}
+		sort.Float64s(floatArray)
+		resultArray := make([]interface{}, len(array))
+		for n, i := range floatArray {
+			resultArray[n] = i
+		}
+		return resultArray, nil
+
+	case string:
+		stringArray := make([]string, 0)
+		for _, i := range array {
+			stringArray = append(stringArray, util.GetString(i))
+		}
+		sort.Strings(stringArray)
+		resultArray := make([]interface{}, len(array))
+		for n, i := range stringArray {
+			resultArray[n] = i
+		}
+		return resultArray, nil
+
 	default:
-		return nil, errors.New("not an array type")
+		return nil, errors.New("unsupported data type")
 	}
 }
 

@@ -223,15 +223,16 @@ is reset using a call to `io.open()`.
 
 These are miscellaneous funcctions to support writing programs in Ego.
 
-### sort(array)
-This sorts an array into ascending order. The type of the first element in the
+### sort(v...)
+This sorts list of values into ascending order. The elements can be scalar
+values or an array; they are all concatenated into a single array for the 
+purposes of sorting the data. The type of the first element in the
 array determines the type used to sort all the data; the second and following
 array elements are cast to the same type as the first element for the purposes
 of sorting the data.
 
 It is an error to call this function with an array that contains elements that
-are arrays or structures. It is also an error to call this function with a data
-type other than an array.
+are arrays or structures. 
 
 ### util.uuid()
 This generates a UUID (universal unique identifier) and returns it formatted
