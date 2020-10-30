@@ -240,7 +240,7 @@ func TestByteCode_Run(t *testing.T) {
 			fields: fields{
 				opcodes: []I{
 					// Arguments are pushed in the order parsed
-					I{Opcode: Load, Operand: "_strings"},
+					I{Opcode: Load, Operand: "strings"},
 					I{Opcode: Push, Operand: "left"},
 					I{Opcode: Member},
 					I{Opcode: Push, Operand: "fruitcake"},

@@ -85,7 +85,7 @@ from the table column names) so the expression can be re-evaluated with each row
 The expression evaluator can process function calls as part of it's processing. The function call
 is directed back to code that is either built-in to the expression package, or is supplied by the
 user. A function may exist globally (for example, `len()`) or may be part of a package that requires
-the package name be include (such as `_strings.lower()`). In each case below, the function name
+the package name be include (such as `strings.lower()`). In each case below, the function name
 is given with the package name where it exists.
 
 See the README.md file in the `functions` package for a description of each function.

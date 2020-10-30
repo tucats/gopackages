@@ -95,7 +95,7 @@ func FunctionSubstring(symbols *symbols.SymbolTable, args []interface{}) (interf
 	return s, nil
 }
 
-// FunctionFormat impelments the _strings.format() fucntion
+// FunctionFormat implements the strings.format() function
 func FunctionFormat(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) == 0 {
@@ -109,7 +109,7 @@ func FunctionFormat(s *symbols.SymbolTable, args []interface{}) (interface{}, er
 	return fmt.Sprintf(util.GetString(args[0]), args[1:]...), nil
 }
 
-// FunctionChars implements the _strings.chars() function. This accepts a string
+// FunctionChars implements the strings.chars() function. This accepts a string
 // value and converts it to an array of characters.
 func FunctionChars(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
@@ -122,7 +122,7 @@ func FunctionChars(s *symbols.SymbolTable, args []interface{}) (interface{}, err
 	return r, nil
 }
 
-// FunctionInts implements the _strings.ints() function. This accepts a string
+// FunctionInts implements the strings.ints() function. This accepts a string
 // value and converts it to an array of integer rune values.
 func FunctionInts(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
@@ -136,7 +136,7 @@ func FunctionInts(s *symbols.SymbolTable, args []interface{}) (interface{}, erro
 	return r, nil
 }
 
-// FunctionToString implements the _strings.string() function, which accepts an array
+// FunctionToString implements the strings.string() function, which accepts an array
 // of items and converts it to a single long string of each item. Normally , this is
 // an array of characters.
 func FunctionToString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {

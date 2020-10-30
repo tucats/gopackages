@@ -146,14 +146,17 @@ func (c *Compiler) AddPackageToSymbols(s *symbols.SymbolTable) {
 
 			// If the package name is empty, we add the individual items
 			if pkgname == "" {
-				s.SetAlways(k, v)
+				s.SetConstant(k, v)
 			} else {
 				// Otherwise, copy the entire map
 				m[k] = v
 			}
 		}
+		// Make sure the package is marked as readonly so the user can't modify
+		// any function definitions, etc. that are built in.
+		m["__readonly"] = true
 		if pkgname != "" {
-			s.SetAlways(pkgname, m)
+			s.SetConstant(pkgname, m)
 		}
 	}
 }
