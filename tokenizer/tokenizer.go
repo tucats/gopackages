@@ -231,3 +231,32 @@ func splitLines(src string) []string {
 	// Otherwise, simple split by new-line works fine.
 	return strings.Split(src, "\n")
 }
+
+// GetTokens returns a string representing the tokens
+// within the given range of tokens.
+func (t *Tokenizer) GetTokens(pos1, pos2 int, spacing bool) string {
+	p1 := pos1
+	if p1 < 0 {
+		p1 = 0
+	} else {
+		if p1 > len(t.Tokens) {
+			p1 = len(t.Tokens)
+		}
+	}
+	p2 := pos2
+	if p2 < p1 {
+		p2 = p1
+	} else {
+		if p2 > len(t.Tokens) {
+			p2 = len(t.Tokens)
+		}
+	}
+	var s strings.Builder
+	for _, t := range t.Tokens[p1:p2] {
+		s.WriteString(t)
+		if spacing {
+			s.WriteRune(' ')
+		}
+	}
+	return s.String()
+}

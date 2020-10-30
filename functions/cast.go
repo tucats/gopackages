@@ -76,7 +76,7 @@ func FunctionNew(syms *symbols.SymbolTable, args []interface{}) (interface{}, er
 	return r, nil
 }
 
-// DeepCopy makes a deep copy of a Solve data type
+// DeepCopy makes a deep copy of an Ego data type
 func DeepCopy(source interface{}) interface{} {
 
 	switch v := source.(type) {

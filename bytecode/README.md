@@ -5,7 +5,7 @@ repeated) to be compiled into an expression of the semantics of the operation, w
 parsed and lexically analyized repeatedly.
 
 Bytecode can be generated explicitly (as in the first example below) or by using the compiler package which accepts
-text in a Go-like language called _Solve_ and generates bytecode. Once the bytecode is generated, a runtime `Context`
+text in a Go-like language called _Ego_ and generates bytecode. Once the bytecode is generated, a runtime `Context`
 object is created which is used to manage the execution of a bytecode stream. This includes it's active symbol table,
 program counter, stack, etc. A `Context` is separate from the bytecode because the same bytecode could be executed 
 on multiple threads, each with it's own `Context`.
@@ -83,6 +83,6 @@ This table enumerates the bytecode values in the `bytecode` package, and what th
 | Branch  <addr>      | Transfer control to the instruction at the given location in the bytecode array. |
 | BranchTrue <addr>   | Remove the top item. If it is true, transfer control to the instruction at the given location in the bytecode array. |
 | BranchFalse <addr>  | Remove the top item. If it is false, transfer control to the instruction at the given location in the bytecode array. |
-| Call <int>          | Remove the given number of items from the stack to form a parameter list. The remove the pointer to the function. This can be a pointer to a native function or a pointer to a `bytecode` structure containing a function written in the _Solve_ language. |
+| Call <int>          | Remove the given number of items from the stack to form a parameter list. The remove the pointer to the function. This can be a pointer to a native function or a pointer to a `bytecode` structure containing a function written in the _Ego_ language. |
 | SymbolCreate <string> | Create a new symbol in the most-local table of the given name |
 | SymbolDelete <string> | Delete the symbol from the nearest scope in which it exists |

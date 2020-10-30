@@ -161,10 +161,10 @@ func (c *Compiler) ReadFile(name string) (string, error) {
 	// Not a directory, try to read the file
 	content, err := ioutil.ReadFile(name)
 	if err != nil {
-		content, err = ioutil.ReadFile(name + ".solve")
+		content, err = ioutil.ReadFile(name + ".ego")
 		if err != nil {
-			r := os.Getenv("SOLVE_PATH")
-			fn := filepath.Join(r, "lib", name+".solve")
+			r := os.Getenv("EGO_PATH")
+			fn := filepath.Join(r, "lib", name+".ego")
 			content, err = ioutil.ReadFile(fn)
 			if err != nil {
 				c.t.Advance(-1)
@@ -181,7 +181,7 @@ func (c *Compiler) ReadFile(name string) (string, error) {
 func (c *Compiler) ReadDirectory(name string) (string, error) {
 
 	var b strings.Builder
-	r := os.Getenv("SOLVE_PATH")
+	r := os.Getenv("EGO_PATH")
 	dirname := filepath.Join(r, "lib", name)
 
 	fi, err := ioutil.ReadDir(dirname)

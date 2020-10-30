@@ -56,6 +56,9 @@ func (c *Compiler) Statement() error {
 	// handler (which assumes the leading verb has already been consumed)
 	switch c.t.Next() {
 
+	case "assert":
+		return c.Assert()
+
 	case "package":
 		return c.Package()
 

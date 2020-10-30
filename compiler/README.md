@@ -1,12 +1,12 @@
 # compiler
 
-The `compiler` package is used to compile text in the _Solve_ language into
+The `compiler` package is used to compile text in the _Ego_ language into
 bytecode that can be executed using the `bytecode` package. This allows for
 compiled scripts to be integrated into the application, and run repeatedly
 without incurring the overhead of parsing and semantic analysis each time.
 
-The _Solve_ language is loosely based on _Go_ but with some important
-differences. Some important attributes of _Solve_ programs are:
+The _Ego_ language is loosely based on _Go_ but with some important
+differences. Some important attributes of _Ego_ programs are:
 
 * There are no pointer types, and no dynamic memory allocation.
 * All objects are passed by value in function calls.
@@ -20,10 +20,10 @@ set them. Functions defined within another function only exist as long as
 that function is running.
 
 ## Example
-Here is a trivial example of compiling and running some _Solve_ code in your
+Here is a trivial example of compiling and running some _Ego_ code in your
 Go program.
 
-    // String containing arbitrary _Solve_ statements.
+    // String containing arbitrary _Ego_ statements.
     src := "..."
 
     bc, err := compiler.CompileString(src)
@@ -58,7 +58,7 @@ you can use the util.Get*() functions to extract the integer, float,
 string, or bool object.
 
 ## Data types
-_Solve_ support six data types, plus limited support for function pointers
+_Ego_ support six data types, plus limited support for function pointers
 as values.
 
 | type | description |
@@ -124,8 +124,8 @@ instance of the existing type. For example,
 
 
 ## Scope
-The console input (when `solve` is run with no arguments or parameters) or
-the source file named when `solve run` is used creates the main symbol table,
+The console input (when `ego` is run with no arguments or parameters) or
+the source file named when `ego run` is used creates the main symbol table,
 available to any statement entered by the user or in the source file.
 
 The first time a symbol is created, you must use the := notation to create
@@ -162,6 +162,18 @@ The first example creates an array of 5 elements, but the elements are
 must have a value stored in them before they can be used in an expression.
 The second example assigns an initial value to each element of the array,
 so the second statement is really identical to `y := [10,10]`.
+
+## assert
+The `assert` statement is used to provide consistency checks, mostly in
+testing programs. The statement is followed by an expression, which must
+evaluate to `true` or the statement stops the program with an error.
+
+If only the expression is given, then the error message includes the text
+of the failing expression. If the assert statement includes an error message
+string, that is output as the error text.
+
+    assert x=3
+    assert x=3, "Count was not 3"
 
 ## const
 The `const` statement can define constant values in the current scope. These
@@ -421,21 +433,21 @@ in-progress compilation.
 
     import factor
     import "factor"
-    import "factor.solve"
+    import "factor.ego"
 
 All three of these have the same effect. The first assumes a file named
-"factor.solve" is found in the current directory. The second and third
+"factor.ego" is found in the current directory. The second and third
 examples assume the quoted string contains a file path. If the suffix
-".solve" is not included it is assumed.
+".ego" is not included it is assumed.
 
 If the import name cannot be found in the current directory, then the
-compiler uses the environment variables SOLVE_PATH to form a directory
+compiler uses the environment variables EGO_PATH to form a directory
 path, and adds the "lib" directory to that path to locate the import.
-So the above statement could resolve to `/Users/cole/solve/lib/factor.solve`
-if the SOLVE_PATH was set to "~/solve".
+So the above statement could resolve to `/Users/cole/ego/lib/factor.ego`
+if the EGO_PATH was set to "~/ego".
 
 Finally, the `import` statement can read an entire directory of source
 files that all contribute to the same package. If the target of the
-import is a directory in the $SOLVE_PATH/lib location, then all the
+import is a directory in the $EGO_PATH/lib location, then all the
 source files within that directory area read and processed as part
 of one package. 

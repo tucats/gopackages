@@ -1,6 +1,6 @@
 package tokenizer
 
-//ReservedWords is the list of reserved words in the _Solve_ language
+//ReservedWords is the list of reserved words in the _Ego_ language
 var ReservedWords []string = []string{
 	"array",
 	"break",

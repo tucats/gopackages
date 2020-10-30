@@ -21,6 +21,20 @@ func StopOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
+// PanicOpcode bytecode implementation
+func PanicOpcode(c *Context, i interface{}) error {
+	c.running = false
+	msg := "assertion failure"
+	if util.GetBool(i) {
+		strValue, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		msg = util.GetString(strValue)
+	}
+	return c.NewError(msg)
+}
+
 // AtLineOpcode implementation. This identifies the
 // start of a new statement, and tags the line number
 // from the source where this was found. This is used

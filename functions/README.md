@@ -46,64 +46,64 @@ Thsi returns the float64 value 3.1415.
 These functions act on string values, and usually return a string values as the
 result.
 
-### _strings.format(fmtstring, values...)
+### strings.format(fmtstring, values...)
 This returns a `string` containing the formatted value of the values array, using
 the Go-style `fmtstring` value. This supports any Go-style formatting.
 
-### _strings.left(string, count)
+### strings.left(string, count)
 This returns `count` characters from the left side of the string.
     
-    _strings.left("abraham", 3)
+    strings.left("abraham", 3)
 
 This returns the value "abr".
 
 
-### _strings.right(string, count)
+### strings.right(string, count)
 This returns `count` characters from the right side of the string.
     
-    _strings.right("abraham", 4)
+    strings.right("abraham", 4)
 
 This returns the value "aham".
 
-### _strings.substring(string, start, count)
+### strings.substring(string, start, count)
 This extracts a substring from the string argument. The substring
 starts at the `start` character position, and includes `count` characters
 in the result.
     
-    _strings.substring("Thomas Jefferson", 8, 4)
+    strings.substring("Thomas Jefferson", 8, 4)
 
 This returns the string "Jeff".
 
-### _strings.index(string, substring)
+### strings.index(string, substring)
 This searches the `string` parameter for the first instance of the
 `substring` parameter. If it is found, the function returns the
 character position where it starts. If it was not found, it returns
 an integer zero.
     
-    _strings.index("Scores of fun", "ore")
+    strings.index("Scores of fun", "ore")
 
 This returns the value 3, indicating that the string "ore" starts
 at the third character of the string.
 
-### _strings.lower(string)
+### strings.lower(string)
 This converts the string value given to lower-case letters. If the
 value is not a string, it is first coerced to a string type.
     
-    _strings.lower("Tom")
+    strings.lower("Tom")
 
 This results in the string value "tom".
 
-### _strings.upper(string)
+### strings.upper(string)
 This converts the string value given to uooer-case letters. If the
 value is not a string, it is first coerced to a string type.
     
-    _strings.upper("Jeffrey")
+    strings.upper("Jeffrey")
 
 This results in the string value "JEFFREY".
 
-### _strings.tokenize(string)
+### strings.tokenize(string)
 This converts a string into an array of strings, tokenized using the same
-syntax rules that the `Solve` language uses itself. An empty string results
+syntax rules that the `Ego` language uses itself. An empty string results
 in an empty token array.
 
 ## General Functions
@@ -114,7 +114,7 @@ the remaining items will be coerced to.
 
 
 ### len(string)
-Return the length of the argument. The meaning of _length_ depends on the 
+Return the length of the argument. The meaning of length depends on the 
 type of the argument. For a string, this returns the number of characters
 in the string. For an int, float, or bool value, it returns the number of
 characters when the value is formatted for output.
@@ -154,7 +154,7 @@ result is the numerically largest value.
 This returns the string value "whistle".
 
 ### sum(v1, v2...)
-This function returns the sum of the arguments. The meaning of _sum_ depends
+This function returns the sum of the arguments. The meaning of sum depends
 on the arguments. The values must not be arrays or structures.
 
 For a numeric value (int or float), the function returns the mathematical
@@ -171,59 +171,59 @@ long string.
 ## IO Functions
 These functions handle general input and output to files.
 
-### _io.readfile(name)
+### io.readfile(name)
 This reads the entire contents of the named file as a single large string,
 and returns that string as the function result.
 
-### _io.writefile(name, text)
+### io.writefile(name, text)
 This writes the string text to the output file, which is created if it
 does not already exist. The text becomes the contents of the file; any
 previous contents are lost.
 
-### _io.split(text)
-This will split a single string (typically read using the `_io.readfile()`
+### io.split(text)
+This will split a single string (typically read using the `io.readfile()`
 function) into an array of strings on line boundaries.
 
-    buffer := _io.readfile("test.txt")
-    lines := _io.split(buffer)
+    buffer := io.readfile("test.txt")
+    lines := io.split(buffer)
 
 The result of this is that lines is an array of strings, each of which
 represents a line of text. Note that this function can be used on any
-string, but resides in the `_io` package because it is most commonly
+string, but resides in the `io` package because it is most commonly
 used in support of IO operations.
 
-### _io.open(name [, createFlag ]) 
+### io.open(name [, createFlag ]) 
 This opens a new file of the given name. If the optional second parameter
 is given and it is true, then the file is created. Otherwise, the file
 must already exist. The return value is an identifier for this instance
-of the open file. This identifier must be used in `_io` package calls
+of the open file. This identifier must be used in `io` package calls
 to read or write from that file.
 
-     f := _io.open("file.txt", true)
+     f := io.open("file.txt", true)
 
 This creates a new file named "file.txt" in the current directory, and
 returns the identifier for the file as the variable `f`.
 
-### _io.readstring(f)
+### io.readstring(f)
 This reads the next line of text from the input file and returns it as
 a string value. The file identifier f must have previously been returned
-by an `_io.open()` function call.
+by an `io.open()` function call.
 
-### _io.writestring(f, text)
+### io.writestring(f, text)
 This writes a line of text to the output file `f`. The line of text is
 always followed by a newline character.
 
-### _io.close(f)
+### io.close(f)
 This closes the file, and releases the resources for the file. After the
 `close()` call, the identifier cannot be used in a file function until it
-is reset using a call to `_io.open()`.
+is reset using a call to `io.open()`.
 
 
 ## Utility Functions
 
-These are miscellaneous funcctions to support writing programs in _Solve_.
+These are miscellaneous funcctions to support writing programs in Ego.
 
-### _util.sort(array)
+### sort(array)
 This sorts an array into ascending order. The type of the first element in the
 array determines the type used to sort all the data; the second and following
 array elements are cast to the same type as the first element for the purposes
@@ -233,12 +233,12 @@ It is an error to call this function with an array that contains elements that
 are arrays or structures. It is also an error to call this function with a data
 type other than an array.
 
-### _util.uuid()
+### util.uuid()
 This generates a UUID (universal unique identifier) and returns it formatted
 as a string value. Every call to this function will result in a new unique
 value.
 
-### _util.members(st)
+### members(st)
 
 Returns an array of strings containing the names of each member of the 
 structure passed as an argument. If the value passed is not a structure
@@ -246,16 +246,16 @@ it causes an error. Note that the resulting array elements can be used
 to reference fields in a structure using array index notation.
 
     e := { name: "Dave", age: 33 }
-    m := _utils.members(e)
+    m := utils.members(e)
 
     e[m[1]] := 55
 
-The `_util.members()` function returns an array [ "age", "name" ]. These are
+The `util.members()` function returns an array [ "age", "name" ]. These are
 the fields of the structure, and they are always returned in alphabetical
 order. The assignment statement uses the first array element ("age") to access
 the value of e.age.
 
-### _util.symbols()
+### util.symbols()
 Returns a string containing a formatted expression of the symbol table at
 the moment the function is called, including all nested levels of scope.
 The typical use is to simply print the string:
@@ -264,34 +264,34 @@ The typical use is to simply print the string:
     {
         x = 42
         y := "test"
-        print _util.symbols()
+        print util.symbols()
     }
 
 This will print the symbols for the nested basic block as well as the
 symbols for the main program.
 
 ## JSON Support
-You can formalize the parsing of JSON strings into Solve variables using
-the `_json` package. This converts a string containing a JSON represetnation
-into a Solve object, or converts a Solve object into the corresponding JSON
+You can formalize the parsing of JSON strings into Ego variables using
+the `json` package. This converts a string containing a JSON represetnation
+into an Ego object, or converts an Ego object into the corresponding JSON
 string.
 
-### _json.encode()
+### json.encode()
 Returns a string containing the JSON representation of the arguments. If only
 one argument is given, the result is the JSON for that specific argument. If
 more than one argument is given, the result is always encoded as a JSON array
 where each element matches a parameter to the call.
 
-### _json.decode()
+### json.decode()
 This accepts a string that must contain a syntactically valid JSON expression,
-which is then converted to the matching `Solve` data types. Supported types
+which is then converted to the matching `Ego` data types. Supported types
 are int, float, bool, string, array, and struct elements.
 
 
 ## Strings
 This collection of functions support string operations.
 
-### _strings.string(v...)
+### strings.string(v...)
 
 The function accepts one or more arguments, which are processed and concatenated
 into a single string value.
@@ -303,25 +303,25 @@ into a single string value.
 | []string | ["a", "b", "c"] | Array of string values |
 | []int ] [ 65, 66, 67 ] | Array of runes expressed as integer unicode value |
 
-### _strings.ints(string)
+### strings.ints(string)
 Given a string value, returns an array containing all the runes of the string
 expressed as integers containing the unicode values. If this array was passed
-to _strings.string() it would return the original string.
+to strings.string() it would return the original string.
 
-### _strings.chars(string)
+### strings.chars(string)
 Given a string value, return an array containing all the characters of the
 string as individual string array elements. So "test" becomes ["t", "e", "s", "t"]
 
-## _time
-The `_time` package supports basic time calculations.
+## time
+The `time` package supports basic time calculations.
 
-### _time.now()
+### time.now()
 This returns the current time as a formatted string. Time values are generally always
 expressed as strings.
 
-### _time.add(t, d)
+### time.add(t, d)
 Adds a given duration ("1s", "-5h3m", etc) to the time and return a new time string.
 
-### _time.subtract(t1, t2)
+### time.subtract(t1, t2)
 Subtract t2 from t1 and return the duration ("-5s", etc). The sign will be "-" if t2
 is greater than t1.

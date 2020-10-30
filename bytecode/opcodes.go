@@ -62,6 +62,7 @@ const (
 	TryPop
 	Coerce
 	This
+	Panic
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction
@@ -124,11 +125,13 @@ var opcodeNames = map[int]string{
 	Copy:               "Copy",
 	Swap:               "Swap",
 	ClassMember:        "ClassMember",
+	Panic:              "Panic",
 }
 
 func initializeDispatch() {
 	if dispatch == nil {
 		dispatch = DispatchMap{
+			Panic:              PanicOpcode,
 			Stop:               StopOpcode,
 			AtLine:             AtLineOpcode,
 			Push:               PushOpcode,

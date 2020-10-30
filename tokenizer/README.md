@@ -1,7 +1,7 @@
 # tokenizer
 
 The `tokenizer` package uses the `strings.Scan()` package to tokenize a string buffer according
-to the _Solve_ language rules. These extensions to the default `Scan()` behavior involve special
+to the _Ego_ language rules. These extensions to the default `Scan()` behavior involve special
 tokens, such as ">=" which would normally scan as two tokens but are grouped together as a single
 token.
 

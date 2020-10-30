@@ -47,7 +47,7 @@ func FunctionSplit(s *symbols.SymbolTable, args []interface{}) (interface{}, err
 	// Otherwise, simple split by new-line works fine.
 	v := strings.Split(src, "\n")
 
-	// We must recopy this into an array of interfaces to adopt Solve typelessness.
+	// We must recopy this into an array of interfaces to adopt Ego typelessness.
 	r := make([]interface{}, 0)
 	for _, n := range v {
 		r = append(r, n)
@@ -61,7 +61,7 @@ func FunctionTokenize(s *symbols.SymbolTable, args []interface{}) (interface{}, 
 	src := util.GetString(args[0])
 	t := tokenizer.New(src)
 
-	// We must recopy this into an array of interfaces to adopt Solve typelessness.
+	// We must recopy this into an array of interfaces to adopt Ego typelessness.
 	r := make([]interface{}, 0)
 	for _, n := range t.Tokens {
 		r = append(r, n)

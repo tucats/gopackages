@@ -160,7 +160,7 @@ func (b *ByteCode) Opcodes() []I {
 }
 
 // Remove removes an instruction from the bytecode. The position is either
-// >= 0 in which case it is absolvete, else if it is < 0 it is the offset
+// >= 0 in which case it is absent, else if it is < 0 it is the offset
 // from the end of the bytecode.
 func (b *ByteCode) Remove(n int) {
 
