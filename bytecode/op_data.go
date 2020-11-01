@@ -118,25 +118,15 @@ func CoerceOpcode(c *Context, i interface{}) error {
 	case BoolType:
 		v = util.GetBool(v)
 	case ArrayType:
-
-		switch v.(type) {
-		case []interface{}:
-			// Do nothing, we're already an array
-
-			// Not an array, so wrap it in one
-		default:
+		// If it's  not already an array, wrap it in one.
+		if _, ok := v.([]interface{}); !ok {
 			v = []interface{}{v}
 		}
-
 	case StructType:
-		switch v.(type) {
-		case map[string]interface{}:
-			// Do nothing, we're already a struct
-
-		default:
+		// If it's not a struct, we can't do anything so fail
+		if _, ok := v.(map[string]interface{}); !ok {
 			return c.NewError("value is not a struct")
 		}
-
 	case UndefinedType:
 		// No work at all to do here.
 
@@ -227,13 +217,13 @@ func MemberOpcode(c *Context, i interface{}) error {
 	var v interface{}
 	found := false
 
-	switch mv := m.(type) {
-	case map[string]interface{}:
+	mv, ok := m.(map[string]interface{})
+	if ok {
 		v, found = mv[name]
 		if !found {
 			return c.NewStringError("no such type member", name)
 		}
-	default:
+	} else {
 		return c.NewError("not a struct")
 	}
 	c.Push(v)

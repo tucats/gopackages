@@ -109,10 +109,16 @@ func TestFunctionSort(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "bad arg type",
-			args:    args{[]interface{}{55}},
-			want:    nil,
-			wantErr: true,
+			name:    "scalar args",
+			args:    args{[]interface{}{66, 55}},
+			want:    []interface{}{55, 66},
+			wantErr: false,
+		},
+		{
+			name:    "mixed scalar args",
+			args:    args{[]interface{}{"tom", 3}},
+			want:    []interface{}{"3", "tom"},
+			wantErr: false,
 		},
 		{
 			name: "integer sort",

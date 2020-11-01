@@ -40,8 +40,7 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 		case map[string]interface{}:
 			skip := false
 			for _, k2 := range actual {
-				switch k2.(type) {
-				case func(*SymbolTable, []interface{}) (interface{}, error):
+				if _, ok := k2.(func(*SymbolTable, []interface{}) (interface{}, error)); ok {
 					skip = true
 					break
 				}
