@@ -2,7 +2,9 @@ package functions
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"reflect"
 	"sort"
 
 	"github.com/google/uuid"
@@ -214,7 +216,7 @@ func FunctionSort(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 	}
 }
 
-// FunctionExit implements the _util.exit() function
+// FunctionExit implements the util.exit() function
 func FunctionExit(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	// If no arguments, just do a simple exit
@@ -237,15 +239,15 @@ func FunctionExit(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 	return nil, nil
 }
 
-// FunctionSymbols implements the _util.symbols() function
+// FunctionSymbols implements the util.symbols() function
 func FunctionSymbols(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return syms.Format(false), nil
 }
 
-// FunctionType implements the _util.type() function
+// FunctionType implements the util.type() function
 func FunctionType(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
-	switch args[0].(type) {
+	switch v := args[0].(type) {
 	case int:
 		return "int", nil
 	case float64:
@@ -258,6 +260,19 @@ func FunctionType(syms *symbols.SymbolTable, args []interface{}) (interface{}, e
 		return "array", nil
 	case map[string]interface{}:
 		return "struct", nil
+
+	default:
+		vv := reflect.ValueOf(v)
+		if vv.Kind() == reflect.Func {
+			return "builtin", nil
+		}
+		if vv.Kind() == reflect.Ptr {
+			ts := vv.String()
+			if ts == "<*bytecode.ByteCode Value>" {
+				return "func", nil
+			}
+			return fmt.Sprintf("ptr %s", ts), nil
+		}
+		return "unknown", nil
 	}
-	return "unknown", nil
 }

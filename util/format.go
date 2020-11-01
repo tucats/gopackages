@@ -91,12 +91,12 @@ func Format(arg interface{}) string {
 	default:
 		vv := reflect.ValueOf(v)
 		if vv.Kind() == reflect.Func {
-			return fmt.Sprintf("builtin func")
+			return "builtin"
 		}
 		if vv.Kind() == reflect.Ptr {
 			ts := vv.String()
 			if ts == "<*bytecode.ByteCode Value>" {
-				return fmt.Sprintf("user func")
+				return "func"
 			}
 			return fmt.Sprintf("ptr %s", ts)
 		}
