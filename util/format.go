@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -88,9 +89,20 @@ func Format(arg interface{}) string {
 		return "\"" + v + "\""
 
 	default:
-		if ui.DebugMode {
-			return fmt.Sprintf("<%#v>", v)
+		vv := reflect.ValueOf(v)
+		if vv.Kind() == reflect.Func {
+			return fmt.Sprintf("builtin func")
 		}
-		return fmt.Sprintf("<%v>", v)
+		if vv.Kind() == reflect.Ptr {
+			ts := vv.String()
+			if ts == "<*bytecode.ByteCode Value>" {
+				return fmt.Sprintf("user func")
+			}
+			return fmt.Sprintf("ptr %s", ts)
+		}
+		if ui.DebugMode {
+			return fmt.Sprintf("kind %v <%#v>", vv.Kind(), v)
+		}
+		return fmt.Sprintf("kind %v <%v>", vv.Kind(), v)
 	}
 }
