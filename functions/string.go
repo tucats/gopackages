@@ -1,10 +1,13 @@
 package functions
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"reflect"
 	"strings"
+	"text/template"
+	tparse "text/template/parse"
 
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
@@ -169,4 +172,42 @@ func FunctionToString(s *symbols.SymbolTable, args []interface{}) (interface{}, 
 	}
 	return b.String(), nil
 
+}
+
+// FunctionTemplate implements the strings.template() function
+func FunctionTemplate(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	var err error
+	if len(args) == 0 {
+		return nil, errors.New("insufficient arguemnts")
+	}
+	tree, ok := args[0].(*template.Template)
+	if !ok {
+		return nil, errors.New("not a template")
+	}
+
+	root := tree.Tree.Root
+	for _, n := range root.Nodes {
+		//fmt.Printf("Node[%2d]: %#v\n", i, n)
+		if n.Type() == tparse.NodeTemplate {
+			templateNode := n.(*tparse.TemplateNode)
+			// Get the named template and add it's tree here
+			tv, ok := s.Get(templateNode.Name)
+			if !ok {
+				return nil, fmt.Errorf("unknown subtemplate name %s", templateNode.Name)
+			}
+			t, ok := tv.(*template.Template)
+			if !ok {
+				return nil, fmt.Errorf("template is of wrong type: %s", templateNode.Name)
+			}
+			tree.AddParseTree(templateNode.Name, t.Tree)
+		}
+	}
+
+	var r bytes.Buffer
+	if len(args) == 1 {
+		err = tree.Execute(&r, nil)
+	} else {
+		err = tree.Execute(&r, args[1])
+	}
+	return r.String(), err
 }

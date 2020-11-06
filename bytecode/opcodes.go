@@ -63,6 +63,7 @@ const (
 	Coerce
 	This
 	Panic
+	Template
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction
@@ -126,6 +127,7 @@ var opcodeNames = map[int]string{
 	Swap:               "Swap",
 	ClassMember:        "ClassMember",
 	Panic:              "Panic",
+	Template:           "Template",
 }
 
 func initializeDispatch() {
@@ -179,6 +181,7 @@ func initializeDispatch() {
 			Copy:               CopyOpcode,
 			Swap:               SwapOpcode,
 			ClassMember:        ClassMemberOpcode,
+			Template:           TemplateOpcode,
 		}
 	}
 }

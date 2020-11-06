@@ -2,6 +2,7 @@ package bytecode
 
 import (
 	"strings"
+	"text/template"
 
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
@@ -26,6 +27,7 @@ type Context struct {
 	try       []int
 	output    *strings.Builder
 	this      string
+	templates map[string]*template.Template
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode

@@ -2,6 +2,7 @@ package bytecode
 
 import (
 	"fmt"
+	"text/template"
 
 	"github.com/tucats/gopackages/util"
 )
@@ -53,4 +54,26 @@ func NewlineOpcode(c *Context, i interface{}) error {
 		c.output.WriteString("\n")
 	}
 	return nil
+}
+
+/******************************************\
+*                                         *
+*           T E M P L A T E S             *
+*                                         *
+\******************************************/
+
+// TemplateOpcode compiles a template string from the
+// stack and stores it in the template manager for the
+// context.
+func TemplateOpcode(c *Context, i interface{}) error {
+
+	name := util.GetString(i)
+	t, err := c.Pop()
+	if err == nil {
+		t, err := template.New(name).Parse(util.GetString(t))
+		if err == nil {
+			err = c.Push(t)
+		}
+	}
+	return err
 }
