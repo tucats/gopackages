@@ -128,7 +128,6 @@ func CallOpcode(c *Context, i interface{}) error {
 	}
 
 	// Depends on the type here as to what we call...
-
 	switch af := result.(type) {
 	case *ByteCode:
 
@@ -145,6 +144,10 @@ func CallOpcode(c *Context, i interface{}) error {
 		cx.sp = c.sp
 
 		sf.SetAlways("_args", args)
+		if c.this != nil {
+			sf.SetAlways("_this", c.this)
+			c.this = nil
+		}
 
 		// Run the function. If it doesn't get an error, then
 		// extract the stop stack item as the result
@@ -169,6 +172,11 @@ func CallOpcode(c *Context, i interface{}) error {
 				return c.NewError("too many arguments" + name)
 			}
 		}
+		if c.this != nil {
+			c.symbols.SetAlways("_this", c.this)
+			c.this = nil
+		}
+
 		result, err = af(c.symbols, args)
 
 		// Functions implemented natively cannot wrap them up as runtime
@@ -233,13 +241,13 @@ func ArgCheckOpcode(c *Context, i interface{}) error {
 
 	// Was there a "This" done just before this? If so, set
 	// the stack value accordingly.
-	if c.this != "" {
+	if thisName, ok := c.this.(string); ok && thisName != "" {
 		this, err := c.Pop()
 		if err != nil {
 			return err
 		}
-		c.SetAlways(c.this, this)
-		c.this = ""
+		c.SetAlways(thisName, this)
+		c.this = nil
 	}
 
 	// Do the actual compare. Note that if we ended up with a negative

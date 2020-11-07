@@ -9,9 +9,9 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "/Users/tom/Go/src/github.com/tucats/solve/",
+            "program": "/Users/tom/Go/src/github.com/tucats/ego/",
             "env": {},
-            "args": ["-d", "run","test.solve"]
+            "args": ["-d", "run","tests/gremlin.ego"]
         }
     ]
 }

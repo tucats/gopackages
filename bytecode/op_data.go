@@ -223,6 +223,7 @@ func MemberOpcode(c *Context, i interface{}) error {
 		if !found {
 			return c.NewStringError("no such type member", name)
 		}
+		c.this = m // Remember where we loaded this from
 	} else {
 		return c.NewError("not a struct")
 	}
@@ -326,6 +327,7 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 			return c.NewStringError("member not found", subscript)
 		}
 		c.Push(v)
+		c.this = a
 
 	// Index into array is integer index (1-based)
 	case []interface{}:
@@ -458,6 +460,8 @@ func ThisOpcode(c *Context, i interface{}) error {
 	if err != nil {
 		return err
 	}
-
-	return c.SetAlways(c.this, v)
+	if this, ok := c.this.(string); ok {
+		return c.SetAlways(this, v)
+	}
+	return c.NewError("'this' not a string")
 }
