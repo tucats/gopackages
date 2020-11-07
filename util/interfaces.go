@@ -5,6 +5,21 @@ import (
 	"strconv"
 )
 
+// GetInt64 takes a generic interface and returns the integer value, using
+// type coercion if needed.
+func GetInt64(v interface{}) int64 {
+
+	switch v.(type) {
+	case map[string]interface{}:
+		return 0
+
+	case []interface{}:
+		return 0
+	}
+
+	return Coerce(v, int64(1)).(int64)
+}
+
 // GetInt takes a generic interface and returns the integer value, using
 // type coercion if needed.
 func GetInt(v interface{}) int {
@@ -66,6 +81,30 @@ func Coerce(v interface{}, model interface{}) interface{} {
 
 	switch model.(type) {
 
+	case int64:
+		switch value := v.(type) {
+		case bool:
+			if value {
+				return int64(1)
+			}
+			return int64(0)
+
+		case int:
+			return int64(value)
+		case int64:
+			return value
+
+		case float64:
+			return int64(value)
+
+		case string:
+			st, err := strconv.Atoi(value)
+			if err != nil {
+				return nil
+			}
+			return int64(st)
+		}
+
 	case int:
 		switch value := v.(type) {
 		case bool:
@@ -73,6 +112,9 @@ func Coerce(v interface{}, model interface{}) interface{} {
 				return 1
 			}
 			return 0
+
+		case int64:
+			return int(value)
 
 		case int:
 			return value
@@ -99,6 +141,9 @@ func Coerce(v interface{}, model interface{}) interface{} {
 		case int:
 			return float64(value)
 
+		case int64:
+			return float64(value)
+
 		case float64:
 			return value
 
@@ -118,6 +163,9 @@ func Coerce(v interface{}, model interface{}) interface{} {
 		case int:
 			return strconv.Itoa(value)
 
+		case int64:
+			return fmt.Sprintf("%v", value)
+
 		case float64:
 			return fmt.Sprintf("%v", value)
 
@@ -133,6 +181,9 @@ func Coerce(v interface{}, model interface{}) interface{} {
 
 		case int:
 			return (v.(int) != 0)
+
+		case int64:
+			return (v.(int64) != int64(0))
 
 		case float64:
 			return v.(float64) != 0.0
@@ -198,6 +249,23 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 			return v1, v2
 		case float64:
 			return float64(v1.(int)), v2
+		case bool:
+			if v2.(bool) {
+				return v1, 1
+			}
+			return v1, 0
+		}
+
+	case int64:
+		switch v2.(type) {
+		case string:
+			return fmt.Sprintf("%v", v1.(int64)), v2
+		case int:
+			return int64(v1.(int64)), int64(v2.(int))
+		case int64:
+			return v1, v2
+		case float64:
+			return float64(v1.(int64)), v2
 		case bool:
 			if v2.(bool) {
 				return v1, 1
