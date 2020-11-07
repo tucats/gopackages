@@ -3,6 +3,8 @@ package functions
 import (
 	"errors"
 	"fmt"
+	"reflect"
+	"strings"
 
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
@@ -41,9 +43,57 @@ func FunctionBool(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 	return v.(bool), nil
 }
 
+// FunctionCoerce coerces a value to match the type of a model value
+func FunctionCoerce(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	return util.Coerce(args[0], args[1]), nil
+}
+
+// FunctionNormalize coerces a value to match the type of a model value
+func FunctionNormalize(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	v1, v2 := util.Normalize(args[0], args[1])
+	return []interface{}{v1, v2}, nil
+}
+
 // FunctionNew implements the new() function
 func FunctionNew(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
+	// Is the type an integer? If so it's a type
+	if typeValue, ok := args[0].(int); ok {
+		switch reflect.Kind(typeValue) {
+		case reflect.Int:
+			return 0, nil
+		case reflect.String:
+			return "", nil
+		case reflect.Bool:
+			return false, nil
+		case reflect.Float32:
+			return float32(0), nil
+		case reflect.Float64:
+			return float64(0), nil
+		default:
+			return nil, fmt.Errorf("unsupported new() type %d", typeValue)
+		}
+	}
+
+	// Is the type an string? If so it's a type name
+	if typeValue, ok := args[0].(string); ok {
+		switch strings.ToLower(typeValue) {
+		case "int":
+			return 0, nil
+		case "string":
+			return "", nil
+		case "bool":
+			return false, nil
+		case "float32":
+			return float32(0), nil
+		case "float", "float64":
+			return float64(0), nil
+		default:
+			return nil, fmt.Errorf("unsupported new() type %s", typeValue)
+		}
+	}
+
+	// Otherwise, make a deep copy of the item.
 	r := DeepCopy(args[0])
 
 	// IF there was a type in the source, make the clone point back to it
