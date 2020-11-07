@@ -5,6 +5,24 @@ import (
 	"strconv"
 )
 
+// GetMap extracts a struct from an abstract interface. Returns nil
+// if the interface did not contain a struct/map
+func GetMap(v interface{}) map[string]interface{} {
+	if m, ok := v.(map[string]interface{}); ok {
+		return m
+	}
+	return nil
+}
+
+// GetArray extracts a struct from an abstract interface. Returns nil
+// if the interface did not contain a struct/map
+func GetArray(v interface{}) []interface{} {
+	if m, ok := v.([]interface{}); ok {
+		return m
+	}
+	return nil
+}
+
 // GetInt64 takes a generic interface and returns the integer value, using
 // type coercion if needed.
 func GetInt64(v interface{}) int64 {
@@ -298,4 +316,24 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 		}
 	}
 	return v1, v2
+}
+
+// CoerceType will coerce an interface to a given type by name
+func CoerceType(v interface{}, typeName string) interface{} {
+	switch typeName {
+	case "int":
+		return Coerce(v, int(0))
+	case "int64":
+		return Coerce(v, int64(0))
+	case "float32":
+		return Coerce(v, float32(0))
+	case "float64":
+		return Coerce(v, float64(0))
+	case "string":
+		return Coerce(v, "")
+	case "bool":
+		return Coerce(v, true)
+	default:
+		return nil
+	}
 }
