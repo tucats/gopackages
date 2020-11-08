@@ -89,6 +89,9 @@ func Coerce(v interface{}, model interface{}) interface{} {
 
 	case int64:
 		switch value := v.(type) {
+		case nil:
+			return int64(0)
+
 		case bool:
 			if value {
 				return int64(1)
@@ -113,6 +116,9 @@ func Coerce(v interface{}, model interface{}) interface{} {
 
 	case int:
 		switch value := v.(type) {
+		case nil:
+			return 0
+
 		case bool:
 			if value {
 				return 1
@@ -138,11 +144,13 @@ func Coerce(v interface{}, model interface{}) interface{} {
 
 	case float64:
 		switch value := v.(type) {
+		case nil:
+			return float64(0.0)
 		case bool:
 			if value {
-				return 1.0
+				return float64(1.0)
 			}
-			return 0.0
+			return float64(0.0)
 
 		case int:
 			return float64(value)
@@ -177,11 +185,17 @@ func Coerce(v interface{}, model interface{}) interface{} {
 
 		case string:
 			return value
+
+		case nil:
+			return ""
 		}
 
 	case bool:
 
 		switch v.(type) {
+		case nil:
+			return false
+
 		case bool:
 			return v
 
