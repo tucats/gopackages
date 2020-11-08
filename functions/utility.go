@@ -75,6 +75,9 @@ func FunctionLen(symbols *symbols.SymbolTable, args []interface{}) (interface{},
 
 	default:
 		v := util.Coerce(args[0], "")
+		if v == nil {
+			return 0, nil
+		}
 		return len(v.(string)), nil
 	}
 }

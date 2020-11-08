@@ -190,6 +190,17 @@ func LessThanOpcode(c *Context, i interface{}) error {
 		return err
 	}
 
+	// Handle nil cases
+	if v1 == nil && v2 == nil {
+		c.Push(true)
+		return nil
+	}
+	if v1 == nil || v2 == nil {
+		c.Push(false)
+		return nil
+	}
+
+	// Nope, going to have to do type-sensitive compares.
 	var r bool
 
 	switch v1.(type) {

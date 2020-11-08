@@ -28,11 +28,8 @@ func GetArray(v interface{}) []interface{} {
 func GetInt64(v interface{}) int64 {
 
 	switch v.(type) {
-	case map[string]interface{}:
-		return 0
-
-	case []interface{}:
-		return 0
+	case map[string]interface{}, []interface{}, nil:
+		return int64(0)
 	}
 
 	return Coerce(v, int64(1)).(int64)
@@ -43,10 +40,7 @@ func GetInt64(v interface{}) int64 {
 func GetInt(v interface{}) int {
 
 	switch v.(type) {
-	case map[string]interface{}:
-		return 0
-
-	case []interface{}:
+	case map[string]interface{}, []interface{}, nil:
 		return 0
 	}
 
@@ -57,10 +51,7 @@ func GetInt(v interface{}) int {
 // type coercion if needed.
 func GetBool(v interface{}) bool {
 	switch v.(type) {
-	case map[string]interface{}:
-		return false
-
-	case []interface{}:
+	case map[string]interface{}, []interface{}, nil:
 		return false
 	}
 	return Coerce(v, true).(bool)
@@ -73,7 +64,7 @@ func GetString(v interface{}) string {
 	case map[string]interface{}:
 		return Format(v)
 
-	case []interface{}:
+	case []interface{}, nil:
 		return ""
 	}
 	return Coerce(v, "").(string)
@@ -83,10 +74,7 @@ func GetString(v interface{}) string {
 // type coercion if needed.
 func GetFloat(v interface{}) float64 {
 	switch v.(type) {
-	case map[string]interface{}:
-		return 0.0
-
-	case []interface{}:
+	case map[string]interface{}, []interface{}, nil:
 		return 0.0
 	}
 
@@ -228,6 +216,25 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 	// Same type? we're done here
 
 	switch v1.(type) {
+	case nil:
+		switch v2.(type) {
+		case string:
+			return "", v2
+		case bool:
+			return false, v2
+		case int:
+			return 0, v2
+		case int64:
+			return int64(0), v2
+		case float32:
+			return float32(0), v2
+		case float64:
+			return float64(0), v2
+		case []interface{}:
+			return []interface{}{}, v2
+		case map[string]interface{}:
+			return map[string]interface{}{}, v2
+		}
 
 	case string:
 		switch v2.(type) {
