@@ -31,6 +31,29 @@ func FunctionFloat(symbols *symbols.SymbolTable, args []interface{}) (interface{
 
 // FunctionString implements the string() function
 func FunctionString(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	// Special case. Is the argument an array of strings? If so, restructure as a single
+	// string with line breaks.
+
+	if array, ok := args[0].([]interface{}); ok {
+		isString := true
+		for _, v := range array {
+			if _, ok := v.(string); !ok {
+				isString = false
+				break
+			}
+		}
+		if isString {
+			var b strings.Builder
+			for i, v := range array {
+				if i > 0 {
+					b.WriteString("\n")
+				}
+				b.WriteString(v.(string))
+			}
+			return b.String(), nil
+		}
+	}
 	return util.GetString(args[0]), nil
 }
 
