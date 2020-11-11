@@ -138,10 +138,15 @@ func (c *Compiler) Import() error {
 			}
 		}
 
+		// If after the import we ended with mismatched block markers, complain
+		if c.blockDepth != savedBlockDepth {
+			return c.NewStringError("incomplete block after import", packageName)
+		}
+
 		// Reset the token stream we were working on
 		c.t = savedTokenizer
 		c.PackageName = savedPackageName
-		c.blockDepth = savedBlockDepth
+		//	c.blockDepth = savedBlockDepth
 		c.statementCount = savedStatementCount
 		if !isList {
 			break
