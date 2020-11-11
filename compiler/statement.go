@@ -29,7 +29,6 @@ func (c *Compiler) Statement() error {
 	if c.t.IsNext("@") {
 		return c.Directive()
 	}
-
 	c.statementCount = c.statementCount + 1
 
 	// Is it a function definition? These aren't compiled inline,
@@ -54,55 +53,40 @@ func (c *Compiler) Statement() error {
 	// which compiler unit to call. For each term, call the appropriate
 	// handler (which assumes the leading verb has already been consumed)
 	switch c.t.Next() {
-
-	case "assert":
-		return c.Assert()
-
-	case "package":
-		return c.Package()
-
-	case "import":
-		return c.Import()
-
-	case "const":
-		return c.Constant()
-
 	case "{":
 		return c.Block()
-
-	case "if":
-		return c.If()
-
-	case "for":
-		return c.For()
-
-	case "break":
-		return c.Break()
-
-	case "continue":
-		return c.Continue()
-
-	case "print":
-		return c.Print()
-
-	case "call":
-		return c.Call()
-
-	case "return":
-		return c.Return()
-
-	case "type":
-		return c.Type()
-
 	case "array":
 		return c.Array()
-
-	case "try":
-		return c.Try()
-
+	case "assert":
+		return c.Assert()
+	case "break":
+		return c.Break()
+	case "call":
+		return c.Call()
+	case "const":
+		return c.Constant()
+	case "continue":
+		return c.Continue()
+	case "exit":
+		return c.Exit()
+	case "for":
+		return c.For()
+	case "if":
+		return c.If()
+	case "import":
+		return c.Import()
+	case "package":
+		return c.Package()
+	case "print":
+		return c.Print()
+	case "return":
+		return c.Return()
 	case "switch":
 		return c.Switch()
-
+	case "try":
+		return c.Try()
+	case "type":
+		return c.Type()
 	}
 
 	// Unknown statement, return an error

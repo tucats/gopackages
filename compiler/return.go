@@ -27,3 +27,24 @@ func (c *Compiler) Return() error {
 
 	return nil
 }
+
+// Exit handles the exit statment compilation
+func (c *Compiler) Exit() error {
+
+	c.b.Emit2(bytecode.Load, "util")
+	c.b.Emit2(bytecode.Member, "exit")
+
+	argCount := 0
+	if !c.StatementEnd() {
+		bc, err := expressions.Compile(c.t)
+		if err != nil {
+			return err
+		}
+		c.b.Append(bc)
+		argCount = 1
+	}
+
+	c.b.Emit2(bytecode.Call, argCount)
+
+	return nil
+}
