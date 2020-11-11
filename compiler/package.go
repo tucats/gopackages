@@ -1,11 +1,13 @@
 package compiler
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
@@ -50,6 +52,7 @@ func (c *Compiler) Import() error {
 	if c.t.IsNext("(") {
 		isList = true
 	}
+	ui.Debug("*** Processing import list")
 
 	parsing := true
 	for parsing {
@@ -59,7 +62,7 @@ func (c *Compiler) Import() error {
 			parsing = false
 		}
 		fileName := c.t.Next()
-
+		ui.Debug("*** Next package is %s", fileName)
 		// End of the list? If so, break out
 		if isList && fileName == ")" {
 			break
@@ -182,17 +185,43 @@ func (c *Compiler) ReadDirectory(name string) (string, error) {
 
 	var b strings.Builder
 	r := os.Getenv("EGO_PATH")
-	dirname := filepath.Join(r, "lib", name)
+	if r == "" {
+		r = persistence.Get("ego-path")
+	}
+	r = filepath.Join(r, "lib")
+	ui.Debug("+++ Directory read attempt for \"%s\"", name)
 
+	dirname := name
+	if !strings.HasPrefix(dirname, r) {
+		dirname = filepath.Join(r, name)
+		ui.Debug("+++ Applying EGO_PATH, %s", dirname)
+	}
 	fi, err := ioutil.ReadDir(dirname)
 	if err != nil {
+		if _, ok := err.(*os.PathError); ok {
+			ui.Debug("+++ No such directory")
+		} else {
+			if errors.Is(err, &os.SyscallError{Syscall: "fdopendir", Err: os.ErrInvalid}) {
+				ui.Debug("+++ Not a directory")
+			} else {
+				ui.Debug("--- error reading dirinfo, %#v", err)
+			}
+		}
 		return "", err
 	}
 
-	ui.Debug("+++ Reading package directory %s", dirname)
-	for _, f := range fi {
-		if !f.IsDir() {
+	if len(fi) == 0 {
+		ui.Debug("+++ Directory is empty")
+	} else {
+		ui.Debug("+++ Reading package directory %s", dirname)
+	}
 
+	// For all the items that aren't directories themselves, and
+	// for file names ending in ".ego", read them into the master
+	// result string. Note that recursive directory reading is
+	// not supported.
+	for _, f := range fi {
+		if !f.IsDir() && strings.HasSuffix(f.Name(), ".ego") {
 			fname := filepath.Join(dirname, f.Name())
 			t, err := c.ReadFile(fname)
 			if err != nil {

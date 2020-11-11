@@ -35,6 +35,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"array":             FunctionDefinition{Min: 1, Max: 2, F: FunctionArray},
 	"new":               FunctionDefinition{Min: 1, Max: 1, F: FunctionNew},
 	"math.sqrt":         FunctionDefinition{Min: 1, Max: 1, F: FunctionSqrt},
+	"math.abs":          FunctionDefinition{Min: 1, Max: 1, F: FunctionAbs},
 	"strings.left":      FunctionDefinition{Min: 2, Max: 2, F: FunctionLeft},
 	"strings.right":     FunctionDefinition{Min: 2, Max: 2, F: FunctionRight},
 	"strings.substring": FunctionDefinition{Min: 3, Max: 3, F: FunctionSubstring},

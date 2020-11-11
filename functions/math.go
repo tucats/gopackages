@@ -124,3 +124,9 @@ func FunctionSqrt(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 	f := util.GetFloat(args[0])
 	return math.Sqrt(f), nil
 }
+
+// FunctionAbs implements the abs() function
+func FunctionAbs(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	f := util.GetFloat(args[0])
+	return math.Abs(f), nil
+}

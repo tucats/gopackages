@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/ui"
@@ -185,22 +186,32 @@ func (c *Compiler) AutoImport() error {
 	// Start by making a list of the packages by scanning all the built-in
 	// function names for package names. We ignore functions that don't have
 	// package names as those are always available already.
-	m := map[string]bool{}
+	uniqueNames := map[string]bool{}
 	for fn := range functions.FunctionDictionary {
 		dot := strings.Index(fn, ".")
 		if dot > 0 {
 			fn = fn[:dot]
-			m[fn] = true
+			uniqueNames[fn] = true
 		}
 	}
+	// Make the order stable
+	m := []string{}
+	for k := range uniqueNames {
+		m = append(m, k)
+	}
+	sort.Strings(m)
 
 	// Now use this list of unique package names for form an import statement.
 	var b strings.Builder
 	b.WriteString(" import ( ")
-	for pkg := range m {
-		b.WriteString(pkg)
-		b.WriteRune(' ')
+	b.WriteString("strings ")
+	for _, pkg := range m {
+		if pkg != "strings" && pkg != "math" {
+			b.WriteString(pkg)
+			b.WriteRune(' ')
+		}
 	}
+	b.WriteString("math ")
 	b.WriteString(");")
 
 	// Compile the statement, which causes the compiler to bind in the imported
