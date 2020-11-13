@@ -9,7 +9,7 @@ var ReservedWords []string = []string{
 	"const",
 	"else",
 	"for",
-	"function",
+	"func",
 	"if",
 	"import",
 	"package",

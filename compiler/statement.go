@@ -34,7 +34,7 @@ func (c *Compiler) Statement() error {
 	// Is it a function definition? These aren't compiled inline,
 	// so we call a special compile unit that will compile the
 	// function and store it in the bytecode symbol table.
-	if c.t.IsNext("function") {
+	if c.t.IsNext("func") {
 		return c.Function()
 	}
 

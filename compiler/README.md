@@ -250,8 +250,8 @@ discards the result.  This is the same as using the statement:
 Where the "x" is the name of an ignored value.
 
 
-## function
-The `function` statement defines a function. This must have a name
+## func
+The `func` statement defines a function. This must have a name
 which is a valid symbol, followed by an argument list. The argument 
 list is a list of names which become local variables in the running
 function, containing the arguments from the caller. After the 
@@ -267,7 +267,7 @@ The type declaration is then followed by
 a statement or block defining the code to execute when the function
 is used in an expression or in a `call` statement. For example,
 
-    function double(x) float {
+    func double(x) float {
         return x * 2
     }
 
@@ -276,7 +276,7 @@ The function returns that value multiplied by 2. The type of the result
 is coerced to be a float value. Note that the braces are not required
 in the above example since the function consists of a single `return`
 statement, but by convention braces are always used to indicate the
-body fo the fucntion. The function just created can
+body fo the function. The function just created can
 then be used in an expression, such as:
 
     fun := 2

@@ -32,6 +32,9 @@ func Format(arg interface{}) string {
 
 	switch v := arg.(type) {
 
+	case error:
+		return fmt.Sprintf("%v", v)
+
 	case int:
 		return fmt.Sprintf("%d", v)
 

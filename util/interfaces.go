@@ -30,6 +30,8 @@ func GetInt64(v interface{}) int64 {
 	switch v.(type) {
 	case map[string]interface{}, []interface{}, nil:
 		return int64(0)
+	case error:
+		return 0
 	}
 
 	return Coerce(v, int64(1)).(int64)
@@ -40,6 +42,8 @@ func GetInt64(v interface{}) int64 {
 func GetInt(v interface{}) int {
 
 	switch v.(type) {
+	case error:
+		return 0
 	case map[string]interface{}, []interface{}, nil:
 		return 0
 	}
@@ -51,6 +55,8 @@ func GetInt(v interface{}) int {
 // type coercion if needed.
 func GetBool(v interface{}) bool {
 	switch v.(type) {
+	case error:
+		return false
 	case map[string]interface{}, []interface{}, nil:
 		return false
 	}
@@ -61,6 +67,9 @@ func GetBool(v interface{}) bool {
 // type coercion if needed.
 func GetString(v interface{}) string {
 	switch v.(type) {
+	case error:
+		return ""
+
 	case map[string]interface{}:
 		return Format(v)
 
@@ -74,6 +83,8 @@ func GetString(v interface{}) string {
 // type coercion if needed.
 func GetFloat(v interface{}) float64 {
 	switch v.(type) {
+	case error:
+		return 0.0
 	case map[string]interface{}, []interface{}, nil:
 		return 0.0
 	}
@@ -84,6 +95,10 @@ func GetFloat(v interface{}) float64 {
 // Coerce returns the value after it has been converted to the type of the
 // model value.
 func Coerce(v interface{}, model interface{}) interface{} {
+
+	if e, ok := v.(error); ok {
+		return e
+	}
 
 	switch model.(type) {
 

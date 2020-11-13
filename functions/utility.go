@@ -251,6 +251,8 @@ func FunctionSymbols(syms *symbols.SymbolTable, args []interface{}) (interface{}
 func FunctionType(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	switch v := args[0].(type) {
+	case error:
+		return "error", nil
 	case int:
 		return "int", nil
 	case float64:
@@ -278,4 +280,10 @@ func FunctionType(syms *symbols.SymbolTable, args []interface{}) (interface{}, e
 		}
 		return "unknown", nil
 	}
+}
+
+// FunctionError creates an error object based on the
+// parameters
+func FunctionError(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	return errors.New(util.GetString(args[0])), nil
 }

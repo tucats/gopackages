@@ -23,6 +23,7 @@ const Any = 999999
 
 // FunctionDictionary is the dictionary of functions
 var FunctionDictionary = map[string]FunctionDefinition{
+	"error":             FunctionDefinition{Min: 1, Max: 1, F: FunctionError},
 	"int":               FunctionDefinition{Min: 1, Max: 1, F: FunctionInt},
 	"bool":              FunctionDefinition{Min: 1, Max: 1, F: FunctionBool},
 	"float":             FunctionDefinition{Min: 1, Max: 1, F: FunctionFloat},
