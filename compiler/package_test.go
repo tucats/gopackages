@@ -2,6 +2,8 @@ package compiler
 
 import (
 	"testing"
+
+	"github.com/tucats/gopackages/app-cli/persistence"
 )
 
 func TestCompiler_ReadDirectory(t *testing.T) {
@@ -26,6 +28,9 @@ func TestCompiler_ReadDirectory(t *testing.T) {
 		},
 		// TODO: Add test cases.
 	}
+
+	persistence.Load("ego", "")
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Compiler{}
