@@ -44,7 +44,7 @@ func (c *Compiler) Type() error {
 	// happens that includes a __parent, the __parent object is also checked for the
 	// member if it is NOT a string.
 	c.b.Emit2(bytecode.Push, "__parent")
-	c.b.Emit1(bytecode.StoreIndex)
+	c.b.Emit2(bytecode.StoreIndex, true)
 	c.b.Emit2(bytecode.SymbolCreate, name)
 	c.b.Emit2(bytecode.Store, name)
 

@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/util"
 )
 
 // OpcodeHandler defines a function that implements an opcode
@@ -49,6 +50,9 @@ func (c *Context) RunFromAddress(addr int) error {
 	if c.Tracing {
 		ui.Debug("*** Tracing " + c.Name)
 	}
+
+	fullStackListing := util.GetBool(c.GetConfig("full_stack_listing"))
+
 	// Loop over the bytecodes and run.
 	for c.running {
 
@@ -59,8 +63,8 @@ func (c *Context) RunFromAddress(addr int) error {
 		i := c.bc.opcodes[c.pc]
 		if c.Tracing {
 			s := FormatInstruction(i)
-			s2 := FormatStack(c.stack[:c.sp])
-			if len(s2) > 50 {
+			s2 := FormatStack(c.stack[:c.sp], fullStackListing)
+			if !fullStackListing && len(s2) > 50 {
 				s2 = s2[:50]
 			}
 			ui.Debug("%5d: %-30s stack[%2d]: %s", c.pc, s, c.sp, s2)

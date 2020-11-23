@@ -13,19 +13,21 @@ import (
 // Context holds the runtime information about an instance of bytecode being
 // executed.
 type Context struct {
-	Name      string
-	bc        *ByteCode
-	pc        int
-	stack     []interface{}
-	sp        int
-	running   bool
-	line      int
-	symbols   *sym.SymbolTable
-	Tracing   bool
-	tokenizer *tokenizer.Tokenizer
-	try       []int
-	output    *strings.Builder
-	this      interface{}
+	Name        string
+	bc          *ByteCode
+	pc          int
+	stack       []interface{}
+	sp          int
+	running     bool
+	line        int
+	symbols     *sym.SymbolTable
+	Tracing     bool
+	tokenizer   *tokenizer.Tokenizer
+	try         []int
+	output      *strings.Builder
+	stackMarker []int
+	this        interface{}
+	result      interface{}
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode
@@ -174,23 +176,45 @@ func (c *Context) Push(v interface{}) error {
 }
 
 // FormatStack formats the stack for tracing output
-func FormatStack(s []interface{}) string {
+func FormatStack(s []interface{}, newlines bool) string {
 
 	if len(s) == 0 {
 		return "<empty>"
 	}
 	var b strings.Builder
+	if newlines {
+		b.WriteString("\n")
+	}
 
 	for n := len(s) - 1; n >= 0; n = n - 1 {
 
 		if n < len(s)-1 {
 			b.WriteString(", ")
+			if newlines {
+				b.WriteString("\n")
+			}
 		}
 
 		b.WriteString(util.Format(s[n]))
-		if b.Len() > 50 {
+		if !newlines && b.Len() > 50 {
 			return b.String()[:50] + "..."
 		}
 	}
 	return b.String()
+}
+
+// GetConfig retrieves a runtime configuration item from the
+// __config data structure. If not found, it also queries
+// the persistence layer.
+func (c *Context) GetConfig(name string) interface{} {
+	var i interface{}
+
+	if config, ok := c.Get("_config"); ok {
+		if cfgMap, ok := config.(map[string]interface{}); ok {
+			if cfgValue, ok := cfgMap[name]; ok {
+				i = cfgValue
+			}
+		}
+	}
+	return i
 }

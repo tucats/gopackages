@@ -8,6 +8,7 @@ import (
 // Return handles the return statment compilation
 func (c *Compiler) Return() error {
 
+	hasReturnValue := false
 	if !c.StatementEnd() {
 		bc, err := expressions.Compile(c.t)
 		if err != nil {
@@ -17,14 +18,12 @@ func (c *Compiler) Return() error {
 			return c.NewTokenError("return value from void function")
 		}
 		c.b.Append(bc)
+		c.b.Append(c.coerce)
+		hasReturnValue = true
 	}
 
-	// Is there a coerce to set to the required type?
-	c.b.Append(c.coerce)
-
 	// Stop execution of this stream
-	c.b.Emit1(bytecode.Stop)
-
+	c.b.Emit2(bytecode.Return, hasReturnValue)
 	return nil
 }
 

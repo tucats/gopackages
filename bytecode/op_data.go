@@ -435,7 +435,11 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 		}
 
 		a[subscript] = v
-		c.Push(a)
+		// If we got a true argument, push the result back on the stack also. This
+		// is needed to create TYPE definitions.
+		if util.GetBool(i) {
+			c.Push(a)
+		}
 
 	// Index into array is integer index (1-based)
 	case []interface{}:

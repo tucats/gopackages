@@ -106,7 +106,7 @@ func BranchTrueOpcode(c *Context, i interface{}) error {
 func CallOpcode(c *Context, i interface{}) error {
 
 	var err error
-	var result interface{}
+	var funcPointer interface{}
 
 	// Argument count is in operand
 	argc := i.(int)
@@ -122,13 +122,14 @@ func CallOpcode(c *Context, i interface{}) error {
 	}
 
 	// Function value is last item on stack
-	result, err = c.Pop()
+	funcPointer, err = c.Pop()
 	if err != nil {
 		return err
 	}
+	var result interface{}
 
 	// Depends on the type here as to what we call...
-	switch af := result.(type) {
+	switch af := funcPointer.(type) {
 	case *ByteCode:
 
 		// Make a new symbol table for the fucntion to run with,
@@ -138,6 +139,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		cx := NewContext(sf, af)
 		cx.Tracing = c.Tracing
 		cx.SetTokenizer(c.GetTokenizer())
+		cx.result = nil
 
 		// Make the caller's stack our stack
 		cx.stack = c.stack
@@ -150,11 +152,15 @@ func CallOpcode(c *Context, i interface{}) error {
 		}
 
 		// Run the function. If it doesn't get an error, then
-		// extract the stop stack item as the result
+		// extract the top stack item as the result
 		err = cx.Run()
 		if err == nil {
-			result, _ = cx.Pop()
+			result = cx.result
 		}
+
+		// Because we share a stack with our caller, make sure the
+		// caller's stack pointer is updated to match our value.
+		c.sp = cx.sp
 
 	case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
 
@@ -196,8 +202,23 @@ func CallOpcode(c *Context, i interface{}) error {
 	if err != nil {
 		return err
 	}
-	c.Push(result)
+	if result != nil {
+		c.Push(result)
+	}
 	return nil
+}
+
+// ReturnOpcode implements the return opcode which returns
+// from a called function.
+func ReturnOpcode(c *Context, i interface{}) error {
+	var err error
+	// Do we have a return value?
+	if b, ok := i.(bool); ok && b {
+		c.result, err = c.Pop()
+	}
+	// Stop running this context
+	c.running = false
+	return err
 }
 
 // ArgCheckOpcode implementation
