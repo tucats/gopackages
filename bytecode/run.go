@@ -41,9 +41,9 @@ func (c *Context) RunFromAddress(addr int) error {
 	c.pc = addr
 	c.running = true
 
-	// Make sure the opcode array ends in a Stop operation
+	// Make sure the opcode array ends in a Stop operation so we can never
+	// shoot off the end of the bytecode.
 	if c.bc.emitPos == 0 || c.bc.opcodes[c.bc.emitPos-1].Opcode != Stop {
-		ui.Debug("Adding trailing Stop opcode")
 		c.bc.Emit1(Stop)
 	}
 

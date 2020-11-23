@@ -84,5 +84,8 @@ This table enumerates the bytecode values in the `bytecode` package, and what th
 | BranchTrue <addr>   | Remove the top item. If it is true, transfer control to the instruction at the given location in the bytecode array. |
 | BranchFalse <addr>  | Remove the top item. If it is false, transfer control to the instruction at the given location in the bytecode array. |
 | Call <int>          | Remove the given number of items from the stack to form a parameter list. The remove the pointer to the function. This can be a pointer to a native function or a pointer to a `bytecode` structure containing a function written in the _Ego_ language. |
+| Return <bool>       | Return from a function. If the boolean value is true, then a return code is also popped from the stack and
+passed to the caller's context. |
 | SymbolCreate <string> | Create a new symbol in the most-local table of the given name |
 | SymbolDelete <string> | Delete the symbol from the nearest scope in which it exists |
+| Template <string> | Compile the template on top of the stack, and store in the persisted template store under the <string> name. |

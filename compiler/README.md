@@ -451,3 +451,22 @@ files that all contribute to the same package. If the target of the
 import is a directory in the $EGO_PATH/lib location, then all the
 source files within that directory area read and processed as part
 of one package. 
+
+## @template
+You can store away a named Go template as inline code. The template
+can reference any other templates defined. 
+
+    @template hello "Greetings, {{.Name}}"
+
+The resulting templates are available to the template() function,
+ whose first parameter is the template name and the second optional
+ parameter is a record containing all the named values that might
+ be substituted into the template.  For example,
+
+     print strings.template(hello, { Name: "Tom"})
+
+This results in the string "Greetings, Tom" being printed on the
+stdout console. Note that `hello` becomes a global variable in the program, and
+is a pointer to the template that was previously compiled. This
+global value can only be used with template functions.
+

@@ -130,3 +130,8 @@ func FunctionAbs(symbols *symbols.SymbolTable, args []interface{}) (interface{},
 	f := util.GetFloat(args[0])
 	return math.Abs(f), nil
 }
+
+// FunctionLog is the log() function
+func FunctionLog(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	return math.Log(util.GetFloat(args[0])), nil
+}
