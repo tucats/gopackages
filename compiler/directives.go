@@ -90,7 +90,7 @@ func (c *Compiler) Test() error {
 	}
 
 	test := map[string]interface{}{}
-	test["__readonly"] = true
+	//test["__readonly"] = true
 	test["assert"] = TestAssert
 	test["fail"] = TestFail
 	test["isType"] = TestIsType
@@ -98,9 +98,17 @@ func (c *Compiler) Test() error {
 
 	c.s.SetAlways("testing", test)
 
+	// Generate code to update the description (this is required for the
+	// cases of the ego test command running multiple tests as a single
+	// stream)
+	c.b.Emit2(bytecode.Push, s)
+	c.b.Emit2(bytecode.Load, "testing")
+	c.b.Emit2(bytecode.Push, "description")
+	c.b.Emit1(bytecode.StoreIndex)
+
+	// Generate code to report that the test is starting.
 	c.b.Emit2(bytecode.Push, "TEST: ")
 	c.b.Emit1(bytecode.Print)
-
 	c.b.Emit2(bytecode.Load, "testing")
 	c.b.Emit2(bytecode.Push, "description")
 	c.b.Emit1(bytecode.Member)
