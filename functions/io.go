@@ -222,6 +222,10 @@ func ExpandPath(path, ext string) ([]string, error) {
 		if err != nil {
 			return names, err
 		}
+		// If we have a default suffix, make sure the pattern matches
+		if ext != "" && !strings.HasSuffix(fn, ext) {
+			return names, nil
+		}
 		names = append(names, fn)
 		return names, nil
 	}
