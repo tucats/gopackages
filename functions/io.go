@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/google/uuid"
@@ -182,4 +183,57 @@ func FunctionDeleteFile(s *symbols.SymbolTable, args []interface{}) (interface{}
 
 	err := os.Remove(fname)
 	return err == nil, err
+}
+
+// FunctionExpand expands a list of file or path names into a list of files.
+func FunctionExpand(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	path := util.GetString(args[0])
+	ext := ""
+	if len(args) > 1 {
+		ext = util.GetString(args[1])
+	}
+	list, err := ExpandPath(path, ext)
+
+	// Rewrap as an interface array
+	result := []interface{}{}
+	for _, item := range list {
+		result = append(result, item)
+	}
+	return result, err
+}
+
+// ExpandPath is used to expand a path into a list of fie names
+func ExpandPath(path, ext string) ([]string, error) {
+
+	names := []string{}
+
+	ui.Debug("+++ Directory read attempt for \"%s\"", path)
+
+	// Can we read this as a directory?
+	fi, err := ioutil.ReadDir(path)
+	if err != nil {
+		ui.Debug("+++ Not a directory")
+		fn := path
+		_, err := ioutil.ReadFile(fn)
+		if err != nil {
+			fn = path + ext
+			_, err = ioutil.ReadFile(fn)
+		}
+		if err != nil {
+			return names, err
+		}
+		names = append(names, fn)
+		return names, nil
+	}
+
+	// Read as a directory
+	for _, f := range fi {
+		fn := filepath.Join(path, f.Name())
+		list, err := ExpandPath(fn, ext)
+		if err != nil {
+			return names, err
+		}
+		names = append(names, list...)
+	}
+	return names, nil
 }

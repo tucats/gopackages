@@ -43,6 +43,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"cipher.hash":       FunctionDefinition{Min: 1, Max: 1, F: FunctionHash},
 	"io.close":          FunctionDefinition{Min: 1, Max: 1, F: FunctionClose},
 	"io.delete":         FunctionDefinition{Min: 1, Max: 1, F: FunctionDeleteFile},
+	"io.expand":         FunctionDefinition{Min: 1, Max: 2, F: FunctionExpand},
 	"io.open":           FunctionDefinition{Min: 1, Max: 2, F: FunctionOpen},
 	"io.readfile":       FunctionDefinition{Min: 1, Max: 1, F: FunctionReadFile},
 	"io.readstring":     FunctionDefinition{Min: 1, Max: 1, F: FunctionReadString},
