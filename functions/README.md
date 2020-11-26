@@ -171,6 +171,12 @@ long string.
 ## IO Functions
 These functions handle general input and output to files.
 
+### io.readdir(path)
+This reads the contents of a directory, specified as a string path. The result
+is an array of structures, one structure for each file. The information in the
+structure contains the name, mode, size, modification date, and a flag indicating
+if this entry is a directory or not.
+
 ### io.readfile(name)
 This reads the entire contents of the named file as a single large string,
 and returns that string as the function result.

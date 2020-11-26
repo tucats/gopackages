@@ -241,3 +241,26 @@ func ExpandPath(path, ext string) ([]string, error) {
 	}
 	return names, nil
 }
+
+// FunctionReadDir implmeents the io.readdir() function
+func FunctionReadDir(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	path := util.GetString(args[0])
+	result := []interface{}{}
+
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		return result, err
+	}
+
+	for _, file := range files {
+		entry := map[string]interface{}{}
+		entry["name"] = file.Name()
+		entry["directory"] = file.IsDir()
+		entry["mode"] = file.Mode().String()
+		entry["size"] = int(file.Size())
+		entry["modified"] = file.ModTime().String()
+		result = append(result, entry)
+	}
+	return result, nil
+}

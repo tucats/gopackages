@@ -45,6 +45,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"io.delete":         FunctionDefinition{Min: 1, Max: 1, F: FunctionDeleteFile},
 	"io.expand":         FunctionDefinition{Min: 1, Max: 2, F: FunctionExpand},
 	"io.open":           FunctionDefinition{Min: 1, Max: 2, F: FunctionOpen},
+	"io.readdir":        FunctionDefinition{Min: 1, Max: 1, F: FunctionReadDir},
 	"io.readfile":       FunctionDefinition{Min: 1, Max: 1, F: FunctionReadFile},
 	"io.readstring":     FunctionDefinition{Min: 1, Max: 1, F: FunctionReadString},
 	"io.split":          FunctionDefinition{Min: 1, Max: 1, F: FunctionSplit},
