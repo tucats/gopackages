@@ -54,7 +54,8 @@ func (c *Compiler) NewTokenError(msg string) *Error {
 }
 
 // NewStringError generates a new error that includes the
-// current token as part of the error information.
+// string argument as part of the error information. The
+// token string value is not used.
 func (c *Compiler) NewStringError(msg string, s string) *Error {
 
 	p := c.t.TokenP
@@ -68,7 +69,6 @@ func (c *Compiler) NewStringError(msg string, s string) *Error {
 		text:   fmt.Sprintf("%s: %v", msg, s),
 		line:   c.t.Line[p],
 		column: c.t.Pos[p],
-		token:  c.t.Tokens[p],
 		pkg:    c.PackageName,
 	}
 }

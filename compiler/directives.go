@@ -16,47 +16,27 @@ import (
 // at compile time that are copied to the compiler's symbol table for processing
 // elsewhere.
 func (c *Compiler) Directive() error {
-
-	var err error
-
 	name := c.t.Next()
 	if !tokenizer.IsSymbol(name) {
 		return c.NewStringError("invalid directive name", name)
 	}
 
 	switch name {
-
+	case "error":
+		return c.Error()
 	case "template":
 		return c.Template()
-
 	case "pass":
 		return c.TestPass()
-
 	case "assert":
 		return c.Assert()
-
 	case "fail":
 		return c.Fail()
-
 	case "test":
 		return c.Test()
-
 	default:
-		// Assume it is to be stored in the global directives structure
-
-		value, err := expressions.NewWithTokenizer(c.t).Eval(c.s)
-		if err == nil {
-
-			v, f := c.s.Get(DirectiveStructureName)
-			if !f {
-				v = map[string]interface{}{}
-			}
-			m := v.(map[string]interface{})
-			m[name] = value
-			c.s.SetAlways(DirectiveStructureName, m)
-		}
+		return c.NewStringError("unknown directive", name)
 	}
-	return err
 }
 
 // Template implements the template compiler directive
@@ -263,4 +243,14 @@ func (c *Compiler) TestPass() error {
 	c.b.Emit1(bytecode.Print)
 	c.b.Emit1(bytecode.Newline)
 	return nil
+}
+
+// Error implements the @error directive
+func (c *Compiler) Error() error {
+	errCode, err := expressions.Compile(c.t)
+	if err == nil {
+		c.b.Append(errCode)
+		c.b.Emit2(bytecode.Panic, true)
+	}
+	return err
 }

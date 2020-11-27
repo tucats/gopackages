@@ -452,6 +452,18 @@ import is a directory in the $EGO_PATH/lib location, then all the
 source files within that directory area read and processed as part
 of one package. 
 
+## @error
+You can generate a runtime error by adding in a `@error` directive, 
+which is followed by a string expression that is used to formulate
+the error message text. 
+
+    v = "unknonwn"
+    @error "unrecognized value: " + v
+
+This will result in a runtime error being generated with the error text
+"unrecognized value: unknown". This error can be intercepted in a try/catch
+block if desired.
+
 ## @template
 You can store away a named Go template as inline code. The template
 can reference any other templates defined. 
