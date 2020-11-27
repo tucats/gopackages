@@ -82,7 +82,10 @@ func (c *Context) RunFromAddress(addr int) error {
 
 			// See if we are in a try/catch block. IF there is a Try/Catch stack
 			// and the jump point on top is non-zero, then we can transfer control.
-			if len(c.try) > 0 && c.try[len(c.try)-1] > 0 {
+			// Note that if the error was fatal, the running flag is turned off, which
+			// prevents the try block from being honored (i.e. you cannot catch a fatal
+			// error)
+			if len(c.try) > 0 && c.try[len(c.try)-1] > 0 && c.running {
 				c.pc = c.try[len(c.try)-1]
 
 				// Zero out the jump point for this try/catch block so recursive

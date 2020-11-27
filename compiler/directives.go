@@ -155,7 +155,8 @@ func TestIsType(s *symbols.SymbolTable, args []interface{}) (interface{}, error)
 	return true, nil
 }
 
-// TestFail implements the testing.fail() function
+// TestFail implements the testing.fail() function which generates a fatal
+// error.
 func TestFail(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	msg := "testing.fail()"
 	if len(args) == 1 {
@@ -207,15 +208,8 @@ func (c *Compiler) Assert() error {
 	return nil
 }
 
-// Fail implements the @assert directive
+// Fail implements the @fail directive
 func (c *Compiler) Fail() error {
-
-	c.b.Emit2(bytecode.Load, "testing")
-	c.b.Emit2(bytecode.Push, "assert")
-	c.b.Emit1(bytecode.Member)
-	c.b.Emit2(bytecode.Push, false)
-
-	argCount := 1
 	next := c.t.Peek(1)
 	if next != "@" && next != ";" && next != tokenizer.EndOfTokens {
 		stringCode, err := expressions.Compile(c.t)
@@ -223,11 +217,10 @@ func (c *Compiler) Fail() error {
 			return err
 		}
 		c.b.Append(stringCode)
-		argCount = 2
+	} else {
+		c.b.Emit2(bytecode.Push, "@fail error signal")
 	}
-
-	c.b.Emit2(bytecode.Call, argCount)
-
+	c.b.Emit2(bytecode.Panic, true)
 	return nil
 }
 
@@ -249,8 +242,9 @@ func (c *Compiler) TestPass() error {
 func (c *Compiler) Error() error {
 	errCode, err := expressions.Compile(c.t)
 	if err == nil {
+		c.b.Emit2(bytecode.AtLine, c.t.Line[c.t.TokenP])
 		c.b.Append(errCode)
-		c.b.Emit2(bytecode.Panic, true)
+		c.b.Emit2(bytecode.Panic, false) // Does not cause fatal error
 	}
 	return err
 }
