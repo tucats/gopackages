@@ -50,12 +50,12 @@ func (e *Expression) reference() error {
 				}
 				e.b.Emit1(bc.LoadSlice)
 				if e.t.Next() != "]" {
-					return e.NewError("missing ] in slice reference")
+					return e.NewError(MissingBracketError)
 				}
 			} else {
 				// Nope, singular index
 				if e.t.Next() != "]" {
-					return e.NewError("missing ] in index reference")
+					return e.NewError(MissingBracketError)
 				}
 				e.b.Emit1(bc.LoadIndex)
 			}

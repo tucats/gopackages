@@ -2,7 +2,6 @@ package bytecode
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
@@ -57,7 +56,7 @@ func BranchFalseOpcode(c *Context, i interface{}) error {
 	// Get destination
 	address := util.GetInt(i)
 	if address < 0 || address > c.bc.emitPos {
-		return c.NewError("invalid destination address: " + strconv.Itoa(address))
+		return c.NewError(InvalidBytecodeAddress)
 	}
 
 	if !util.GetBool(v) {
@@ -72,7 +71,7 @@ func BranchOpcode(c *Context, i interface{}) error {
 	// Get destination
 	address := util.GetInt(i)
 	if address < 0 || address > c.bc.emitPos {
-		return c.NewError("invalid destination address: " + strconv.Itoa(address))
+		return c.NewError(InvalidBytecodeAddress)
 	}
 
 	c.pc = address
@@ -91,7 +90,7 @@ func BranchTrueOpcode(c *Context, i interface{}) error {
 	// Get destination
 	address := util.GetInt(i)
 	if address < 0 || address > c.bc.emitPos {
-		return c.NewError("invalid destination address: " + strconv.Itoa(address))
+		return c.NewError(InvalidBytecodeAddress)
 	}
 
 	if util.GetBool(v) {
@@ -170,10 +169,7 @@ func CallOpcode(c *Context, i interface{}) error {
 				if name > "" {
 					name = ": " + name
 				}
-				if len(args) < df.Min {
-					return c.NewError("insufficient arguments" + name)
-				}
-				return c.NewError("too many arguments" + name)
+				return c.NewError(ArgumentCountError)
 			}
 		}
 		if c.this != nil {
@@ -194,7 +190,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		}
 
 	default:
-		return c.NewStringError("invalid target of function call", fmt.Sprintf("%#v", af))
+		return c.NewStringError(InvalidFunctionCallError, fmt.Sprintf("%#v", af))
 	}
 
 	if err != nil {
@@ -228,7 +224,7 @@ func ArgCheckOpcode(c *Context, i interface{}) error {
 	switch v := i.(type) {
 	case []interface{}:
 		if len(v) != 2 {
-			return c.NewError("invalid ArgCheck array size")
+			return c.NewError(InvalidArgCheckError)
 		}
 		min = v[0].(int)
 		max = v[1].(int)
@@ -244,18 +240,18 @@ func ArgCheckOpcode(c *Context, i interface{}) error {
 
 	case []int:
 		if len(v) != 2 {
-			return c.NewError("invalid ArgCheck array size")
+			return c.NewError(InvalidArgCheckError)
 		}
 		min = v[0]
 		max = v[1]
 
 	default:
-		return c.NewError("invalid ArgCheck operand")
+		return c.NewError(InvalidArgCheckError)
 	}
 
 	v, found := c.Get("_args")
 	if !found {
-		return c.NewError("ArgCheck cannot read _args")
+		return c.NewError(InvalidArgCheckError)
 	}
 
 	// Was there a "This" done just before this? If so, set
@@ -277,7 +273,7 @@ func ArgCheckOpcode(c *Context, i interface{}) error {
 		max = len(va)
 	}
 	if len(va) < min || len(va) > max {
-		return c.NewError("incorrect number of arguments passed")
+		return c.NewError(ArgumentCountError)
 	}
 	return nil
 }
@@ -292,7 +288,7 @@ func TryOpcode(c *Context, i interface{}) error {
 // TryPopOpcode implementation
 func TryPopOpcode(c *Context, i interface{}) error {
 	if len(c.try) == 0 {
-		return c.NewError("try/catch mismatch")
+		return c.NewError(TryCatchMismatchError)
 	}
 	if len(c.try) == 1 {
 		c.try = make([]int, 0)

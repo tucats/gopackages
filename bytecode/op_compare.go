@@ -117,7 +117,7 @@ func GreaterThanOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 
 	case []interface{}:
-		return c.NewError("unsupported array operation")
+		return c.NewError(InvalidTypeError)
 
 	default:
 		v1, v2 = util.Normalize(v1, v2)
@@ -130,7 +130,7 @@ func GreaterThanOpcode(c *Context, i interface{}) error {
 			r = v1.(string) > v2.(string)
 
 		default:
-			return c.NewError("unsupported type for operation")
+			return c.NewError(InvalidTypeError)
 
 		}
 	}
@@ -156,7 +156,7 @@ func GreaterThanOrEqualOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 
 	case []interface{}:
-		return c.NewError("unsupported array operation")
+		return c.NewError(InvalidTypeError)
 
 	default:
 		v1, v2 = util.Normalize(v1, v2)
@@ -169,7 +169,7 @@ func GreaterThanOrEqualOpcode(c *Context, i interface{}) error {
 			r = v1.(string) >= v2.(string)
 
 		default:
-			return c.NewError("unsupported type for operation")
+			return c.NewError(InvalidTypeError)
 
 		}
 	}
@@ -206,7 +206,7 @@ func LessThanOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 
 	case []interface{}:
-		return c.NewError("unsupported array operation")
+		return c.NewError(InvalidTypeError)
 
 	default:
 		v1, v2 = util.Normalize(v1, v2)
@@ -219,7 +219,7 @@ func LessThanOpcode(c *Context, i interface{}) error {
 			r = v1.(string) < v2.(string)
 
 		default:
-			return c.NewError("unsupported type for operation")
+			return c.NewError(InvalidTypeError)
 
 		}
 	}
@@ -245,7 +245,7 @@ func LessThanOrEqualOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 
 	case []interface{}:
-		return c.NewError("unsupported array operation")
+		return c.NewError(InvalidTypeError)
 
 	default:
 		v1, v2 = util.Normalize(v1, v2)
@@ -258,7 +258,7 @@ func LessThanOrEqualOpcode(c *Context, i interface{}) error {
 			r = v1.(string) <= v2.(string)
 
 		default:
-			return c.NewError("unsupported type for operation")
+			return c.NewError(InvalidTypeError)
 
 		}
 	}

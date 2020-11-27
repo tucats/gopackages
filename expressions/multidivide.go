@@ -23,7 +23,7 @@ func (e *Expression) multDivide() error {
 		if e.t.AnyNext([]string{"^", "*", "/", "|"}) {
 
 			if e.t.IsNext(tokenizer.EndOfTokens) {
-				return e.NewError("missing term")
+				return e.NewError(MissingTermError)
 			}
 
 			err := e.unary()

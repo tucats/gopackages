@@ -22,7 +22,7 @@ func (e *Expression) addSubtract() error {
 			e.t.Advance(1)
 
 			if e.t.IsNext(tokenizer.EndOfTokens) {
-				return e.NewError("missing term")
+				return e.NewError(MissingTermError)
 			}
 
 			err := e.multDivide()

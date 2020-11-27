@@ -14,7 +14,7 @@ func (c *Compiler) Assignment() error {
 		return err
 	}
 	if !c.t.AnyNext([]string{":=", "="}) {
-		return errors.New("expected = or := not found")
+		return errors.New(MissingAssignmentError)
 	}
 
 	expressionCode, err := expressions.Compile(c.t)

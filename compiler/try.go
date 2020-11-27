@@ -20,7 +20,7 @@ func (c *Compiler) Try() error {
 	c.b.SetAddressHere(b1)
 
 	if !c.t.IsNext("catch") {
-		return c.NewTokenError("expected catch not found")
+		return c.NewTokenError(MissingCatchError)
 	}
 
 	err = c.Statement()

@@ -156,7 +156,7 @@ func (c *Context) Create(name string) error {
 // Pop removes the top-most item from the stack
 func (c *Context) Pop() (interface{}, error) {
 	if c.sp <= 0 || len(c.stack) < c.sp {
-		return nil, c.NewError("stack underflow")
+		return nil, c.NewError(StackUnderflowError)
 	}
 
 	c.sp = c.sp - 1

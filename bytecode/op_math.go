@@ -42,7 +42,7 @@ func NegateOpcode(c *Context, i interface{}) error {
 		c.Push(r)
 
 	default:
-		return c.NewError("invalid data type for negation")
+		return c.NewError(InvalidTypeError)
 	}
 	return nil
 }
@@ -87,7 +87,7 @@ func AddOpcode(c *Context, i interface{}) error {
 			return c.Push(vx)
 
 		default:
-			return c.NewError("unsupported datatype")
+			return c.NewError(InvalidTypeError)
 		}
 
 		// All other types are scalar math
@@ -103,7 +103,7 @@ func AddOpcode(c *Context, i interface{}) error {
 		case bool:
 			return c.Push(v1.(bool) && v2.(bool))
 		default:
-			return c.NewError("unsupported datatype")
+			return c.NewError(InvalidTypeError)
 		}
 	}
 }
@@ -175,7 +175,7 @@ func SubOpcode(c *Context, i interface{}) error {
 			s := strings.ReplaceAll(v1.(string), v2.(string), "")
 			return c.Push(s)
 		default:
-			return c.NewError("unsupported datatype")
+			return c.NewError(InvalidTypeError)
 		}
 	}
 }
@@ -201,7 +201,7 @@ func MulOpcode(c *Context, i interface{}) error {
 	case bool:
 		return c.Push(v1.(bool) || v2.(bool))
 	default:
-		return c.NewError("unsupported datatype")
+		return c.NewError(InvalidTypeError)
 	}
 }
 
@@ -235,7 +235,7 @@ func ExpOpcode(c *Context, i interface{}) error {
 	case float64:
 		return c.Push(math.Pow(v1.(float64), v2.(float64)))
 	default:
-		return c.NewError("unsupported datatype")
+		return c.NewError(InvalidTypeError)
 	}
 }
 
@@ -243,7 +243,7 @@ func ExpOpcode(c *Context, i interface{}) error {
 func DivOpcode(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
-		return c.NewError("stack underflow")
+		return c.NewError(StackUnderflowError)
 	}
 	v2, err := c.Pop()
 	if err != nil {
@@ -258,15 +258,15 @@ func DivOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 	case int:
 		if v2.(int) == 0 {
-			return c.NewError("divide by zero")
+			return c.NewError(DivisionByZeroError)
 		}
 		return c.Push(v1.(int) / v2.(int))
 	case float64:
 		if v2.(float64) == 0 {
-			return c.NewError("divide by zero")
+			return c.NewError(DivisionByZeroError)
 		}
 		return c.Push(v1.(float64) / v2.(float64))
 	default:
-		return c.NewError("unsupported datatype")
+		return c.NewError(InvalidTypeError)
 	}
 }

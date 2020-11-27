@@ -125,13 +125,13 @@ func CoerceOpcode(c *Context, i interface{}) error {
 	case StructType:
 		// If it's not a struct, we can't do anything so fail
 		if _, ok := v.(map[string]interface{}); !ok {
-			return c.NewError("value is not a struct")
+			return c.NewError(InvalidTypeError)
 		}
 	case UndefinedType:
 		// No work at all to do here.
 
 	default:
-		return c.NewError("invalid coercion type")
+		return c.NewError(InvalidTypeError)
 	}
 
 	c.Push(v)
@@ -180,11 +180,11 @@ func LoadOpcode(c *Context, i interface{}) error {
 
 	name := util.GetString(i)
 	if len(name) == 0 {
-		return c.NewStringError("invalid symbol name", name)
+		return c.NewStringError(InvalidIdentifierError, name)
 	}
 	v, found := c.Get(util.GetString(i))
 	if !found {
-		return c.NewStringError("unknown symbol", name)
+		return c.NewStringError(UnknownIdentifierError, name)
 	}
 
 	c.Push(v)
@@ -221,11 +221,11 @@ func MemberOpcode(c *Context, i interface{}) error {
 	if ok {
 		v, found = mv[name]
 		if !found {
-			return c.NewStringError("no such type member", name)
+			return c.NewStringError(UnknownMemberError, name)
 		}
 		c.this = m // Remember where we loaded this from
 	} else {
-		return c.NewError("not a struct")
+		return c.NewError(InvalidTypeError)
 	}
 	c.Push(v)
 	return nil
@@ -263,7 +263,7 @@ func ClassMemberOpcode(c *Context, i interface{}) error {
 	case map[string]interface{}:
 
 		if _, found := mv["__parent"]; !found {
-			return c.NewError("not a typed value")
+			return c.NewError(NotATypeError)
 		}
 		v, found := mv[name]
 		if !found {
@@ -272,12 +272,12 @@ func ClassMemberOpcode(c *Context, i interface{}) error {
 			if found {
 				return c.Push(v)
 			}
-			return c.NewStringError("no such member", name)
+			return c.NewStringError(UnknownMemberError, name)
 		}
 		c.Push(v)
 
 	default:
-		return c.NewError("not a struct")
+		return c.NewError(InvalidTypeError)
 	}
 	return nil
 }
@@ -324,7 +324,7 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 		subscript := util.GetString(index)
 		v, f := a[subscript]
 		if !f {
-			return c.NewStringError("member not found", subscript)
+			return c.NewStringError(UnknownMemberError, subscript)
 		}
 		c.Push(v)
 		c.this = a
@@ -333,13 +333,13 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 	case []interface{}:
 		subscript := util.GetInt(index)
 		if subscript < 1 || subscript > len(a) {
-			return c.NewIntError("invalid array index", subscript)
+			return c.NewIntError(InvalidArrayIndexError, subscript)
 		}
 		v := a[subscript-1]
 		c.Push(v)
 
 	default:
-		return c.NewError("invalid type for index operation")
+		return c.NewError(InvalidTypeError)
 	}
 
 	return nil
@@ -369,17 +369,17 @@ func LoadSliceOpcode(c *Context, i interface{}) error {
 	case []interface{}:
 		subscript1 := util.GetInt(index1)
 		if subscript1 < 1 || subscript1 > len(a) {
-			return c.NewIntError("invalid slice start index", subscript1)
+			return c.NewIntError(InvalidSliceIndexError, subscript1)
 		}
 		subscript2 := util.GetInt(index2)
 		if subscript2 < subscript1 || subscript2 > len(a) {
-			return c.NewIntError("invalid slice end index", subscript2)
+			return c.NewIntError(InvalidSliceIndexError, subscript2)
 		}
 		v := a[subscript1-1 : subscript2]
 		c.Push(v)
 
 	default:
-		return c.NewError("invalid type for slice operation")
+		return c.NewError(InvalidTypeError)
 	}
 
 	return nil
@@ -414,14 +414,14 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 		old, found := a["__readonly"]
 		if found {
 			if util.GetBool(old) {
-				return c.NewError("readonly structure")
+				return c.NewError(ReadOnlyError)
 			}
 		}
 		// Does this item already exist and is readonly?
 		old, found = a[subscript]
 		if found {
 			if subscript[0:1] == "_" {
-				return c.NewError("readonly symbol")
+				return c.NewError(ReadOnlyError)
 			}
 
 			// Check to be sure this isn't a restricted (function code) type
@@ -429,7 +429,7 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 			switch old.(type) {
 
 			case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
-				return errors.New("readonly builtin symbol")
+				return errors.New(ReadOnlyError)
 
 			}
 		}
@@ -445,13 +445,13 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 	case []interface{}:
 		subscript := util.GetInt(index)
 		if subscript < 1 || subscript > len(a) {
-			return c.NewIntError("invalid array index", subscript)
+			return c.NewIntError(InvalidArrayIndexError, subscript)
 		}
 		a[subscript-1] = v
 		c.Push(a)
 
 	default:
-		return c.NewError("invalid type for index operation")
+		return c.NewError(InvalidTypeError)
 	}
 
 	return nil
@@ -467,5 +467,5 @@ func ThisOpcode(c *Context, i interface{}) error {
 	if this, ok := c.this.(string); ok {
 		return c.SetAlways(this, v)
 	}
-	return c.NewError("'this' not a string")
+	return c.NewError(InvalidThisError)
 }

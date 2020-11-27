@@ -30,7 +30,7 @@ func (c *Compiler) For() error {
 
 	// Must be a valid lvalue
 	if !c.IsLValue() {
-		return c.NewError("loop initialization not found")
+		return c.NewError(MissingForLoopInitializerError)
 	}
 
 	indexStore, err := c.LValue()
@@ -38,7 +38,7 @@ func (c *Compiler) For() error {
 		return err
 	}
 	if !c.t.IsNext(":=") {
-		return errors.New("expected := not found")
+		return errors.New(MissingLoopAssignmentError)
 	}
 
 	// Do we compile a range?
@@ -118,7 +118,7 @@ func (c *Compiler) For() error {
 	// Nope, normal numeric loop conditions. At this point there should not
 	// be an index variable defined.
 	if indexName != "" {
-		c.NewError("invalid index variable")
+		c.NewError(InvalidLoopIndexError)
 	}
 	c.PushLoop(indexLoopType)
 
@@ -131,7 +131,7 @@ func (c *Compiler) For() error {
 	c.b.Append(indexStore)
 
 	if !c.t.IsNext(";") {
-		c.NewError("missing ; in loop definition")
+		c.NewError(MissingSemicolonError)
 	}
 
 	// Now get the condition clause that tells us if the loop
@@ -142,7 +142,7 @@ func (c *Compiler) For() error {
 	}
 
 	if !c.t.IsNext(";") {
-		c.NewError("missing ; in loop definition")
+		c.NewError(MissingSemicolonError)
 	}
 
 	// Finally, get the clause that updates something
@@ -154,7 +154,7 @@ func (c *Compiler) For() error {
 	}
 
 	if !c.t.IsNext("=") {
-		return errors.New("expected = not found")
+		return errors.New(MissingEqualError)
 	}
 
 	incrementCode, err := expressions.Compile(c.t)
@@ -198,7 +198,7 @@ func (c *Compiler) For() error {
 // Break compiles a break statement
 func (c *Compiler) Break() error {
 	if c.loops == nil {
-		return c.NewError("break outside of loop")
+		return c.NewError(InvalidLoopControlError)
 	}
 	fixAddr := c.b.Mark()
 	c.b.Emit2(bytecode.Branch, 0)
@@ -209,7 +209,7 @@ func (c *Compiler) Break() error {
 // Continue compiles a continue statement
 func (c *Compiler) Continue() error {
 	if c.loops == nil {
-		return c.NewError("continue outside of loop")
+		return c.NewError(InvalidLoopControlError)
 	}
 	fixAddr := c.b.Mark()
 	c.b.Emit2(bytecode.Branch, 0)

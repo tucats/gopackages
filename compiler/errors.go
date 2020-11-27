@@ -14,6 +14,38 @@ type Error struct {
 	token  string
 }
 
+// Compiler errors. Currently these are the string values. They will eventually
+// be converted to identifiers for localized assets.
+const (
+	FunctionAlreadyExistsError     = "function already defined"
+	InvalidConstantError           = "invalid constant expression"
+	InvalidDirectiveError          = "invalid directive name"
+	InvalidFunctionArgument        = "invalid function argument"
+	InvalidFunctionCall            = "invalid function call"
+	InvalidFunctionName            = "invalid function name"
+	InvalidImportError             = "import not permitted inside a block or loop"
+	InvalidLoopControlError        = "loop control statement outside of for-loop"
+	InvalidLoopIndexError          = "invalid loop index variable"
+	InvalidReturnValueError        = "invalid return value for void function"
+	InvalidSymbolError             = "invalid symbol name"
+	InvalidTypeNameError           = "invalid type name"
+	MissingAssignmentError         = "missing '=' or ':='"
+	MissingBracketError            = "missing array bracket"
+	MissingBlockError              = "missing '{'"
+	MissingCaseError               = "missing 'case'"
+	MissingCatchError              = "missing 'catch' clause"
+	MissingColonError              = "missing ':'"
+	MissingEndOfBlockError         = "missing '}'"
+	MissingEqualError              = "missing '='"
+	MissingForLoopInitializerError = "missing for-loop initializer"
+	MissingFunctionTypeError       = "missing function return type"
+	MissingLoopAssignmentError     = "missing ':='"
+	MissingSemicolonError          = "missing ';'"
+	PackageRedefinitionError       = "cannot redefine existing package"
+	TestingAssertError             = "testing @assert failure"
+	UnexpectedTokenError           = "unexpected token"
+)
+
 // NewError generates a new error
 func (c *Compiler) NewError(msg string) *Error {
 

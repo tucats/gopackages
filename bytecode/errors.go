@@ -6,6 +6,29 @@ import (
 	"strings"
 )
 
+// Runtime error messages
+const (
+	ArgumentCountError            = "incorrect function argument count"
+	ArgumentTypeError             = "incorrect function argument type"
+	DivisionByZeroError           = "division by zero"
+	InvalidArgCheckError          = "invalid ArgCheck array"
+	InvalidArrayIndexError        = "invalid array index"
+	InvalidBytecodeAddress        = "invalid bytecode address"
+	InvalidFunctionCallError      = "invalid function call"
+	InvalidIdentifierError        = "invalid identifier"
+	InvalidSliceIndexError        = "invalid slice index"
+	InvalidThisError              = "invalid _this_ identifier"
+	InvalidTypeError              = "invalid or unsupported data type for this operation"
+	NotATypeError                 = "not a type"
+	OpcodeAlreadyDefinedError     = "opcode already defined: %d"
+	ReadOnlyError                 = "invalid write to read-only item"
+	StackUnderflowError           = "stack underflow"
+	TryCatchMismatchError         = "try/catch stack error"
+	UnimplementedInstructionError = "unimplemented bytecode instruction"
+	UnknownIdentifierError        = "unknown identifier"
+	UnknownMemberError            = "unknown structure member"
+)
+
 // Error contains an error generated from the execution context
 type Error struct {
 	text   string

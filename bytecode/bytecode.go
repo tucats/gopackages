@@ -96,7 +96,7 @@ func (b *ByteCode) SetAddressHere(mark int) error {
 func (b *ByteCode) SetAddress(mark int, address int) error {
 
 	if mark > b.emitPos || mark < 0 {
-		return errors.New("invalid marked position")
+		return errors.New(InvalidBytecodeAddress)
 	}
 	i := b.opcodes[mark]
 	i.Operand = address
@@ -127,7 +127,7 @@ func DefineInstruction(opcode int, name string, implementation OpcodeHandler) er
 
 	// First, make sure this isn't a duplicate
 	if _, found := dispatch[opcode]; found {
-		return fmt.Errorf("opcode already defined: %d", opcode)
+		return fmt.Errorf(OpcodeAlreadyDefinedError, opcode)
 	}
 
 	opcodeNames[opcode] = name

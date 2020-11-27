@@ -40,7 +40,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 	name := c.t.Next()
 
 	if !tokenizer.IsSymbol(name) {
-		return nil, c.NewTokenError("invalid symbol name")
+		return nil, c.NewTokenError(InvalidSymbolError)
 	}
 
 	needLoad := true
@@ -96,7 +96,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		}
 		bc.Append(ix)
 		if !c.t.IsNext("]") {
-			return c.NewError("missing ] on array index")
+			return c.NewError(MissingBracketError)
 		}
 		bc.Emit1(bytecode.LoadIndex)
 		return nil
@@ -106,7 +106,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		c.t.Advance(1)
 		member := c.t.Next()
 		if !tokenizer.IsSymbol(member) {
-			return c.NewTokenError("invalid member name")
+			return c.NewTokenError(InvalidSymbolError)
 		}
 		bc.Emit2(bytecode.Push, member)
 		bc.Emit1(bytecode.LoadIndex)

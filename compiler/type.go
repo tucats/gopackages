@@ -10,7 +10,7 @@ func (c *Compiler) Type() error {
 
 	name := c.t.Next()
 	if !tokenizer.IsSymbol(name) {
-		return c.NewError("invalid type name")
+		return c.NewError(InvalidSymbolError)
 	}
 
 	parent := name
@@ -18,11 +18,11 @@ func (c *Compiler) Type() error {
 		c.t.Advance(1)
 		parent = c.t.Next()
 		if !tokenizer.IsSymbol(parent) {
-			return c.NewError("invalid parent name")
+			return c.NewError(InvalidSymbolError)
 		}
 	}
 	if c.t.Peek(1) != "{" {
-		return c.NewTokenError("expected {, found ")
+		return c.NewTokenError(MissingBracketError)
 	}
 
 	// If there is not parent, seal the chain by making the link point to a string of our own name.
@@ -55,14 +55,14 @@ func (c *Compiler) compileType() error {
 
 	// Must start with {
 	if !c.t.IsNext("{") {
-		return c.NewError("expected { not found")
+		return c.NewError(MissingBlockError)
 	}
 
 	count := 0
 	for true {
 		name := c.t.Next()
 		if !tokenizer.IsSymbol(name) {
-			return c.NewStringError("invalid member name", name)
+			return c.NewStringError(InvalidSymbolError, name)
 		}
 		count = count + 1
 		if c.t.Peek(1) == "{" {
@@ -81,7 +81,7 @@ func (c *Compiler) compileType() error {
 			case "string":
 				c.b.Emit2(bytecode.Push, "")
 			default:
-				return c.NewTokenError("invalid type")
+				return c.NewTokenError(InvalidTypeNameError)
 			}
 		}
 
@@ -92,7 +92,7 @@ func (c *Compiler) compileType() error {
 			return nil
 		}
 		if c.t.AtEnd() {
-			return c.NewError("incomplete type definition")
+			return c.NewError(MissingEndOfBlockError)
 		}
 	}
 	return nil

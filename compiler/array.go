@@ -12,16 +12,16 @@ func (c *Compiler) Array() error {
 	name := c.t.Next()
 	if !tokenizer.IsSymbol(name) {
 		c.t.Advance(-1)
-		return c.NewTokenError("invalid array name")
+		return c.NewTokenError(InvalidSymbolError)
 	}
 	// See if it's a reserved word.
 	if tokenizer.IsReserved(name) {
 		c.t.Advance(-1)
-		return c.NewTokenError("invalid array name")
+		return c.NewTokenError(InvalidSymbolError)
 	}
 
 	if !c.t.IsNext("[") {
-		return c.NewError("missing [ in array")
+		return c.NewError(MissingBracketError)
 	}
 
 	bc, err := expressions.Compile(c.t)
@@ -30,7 +30,7 @@ func (c *Compiler) Array() error {
 	}
 	c.b.Append(bc)
 	if !c.t.IsNext("]") {
-		return c.NewError("missing ] in array")
+		return c.NewError(MissingBracketError)
 	}
 	if c.t.IsNext("=") {
 		bc, err = expressions.Compile(c.t)

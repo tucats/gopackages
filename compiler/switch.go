@@ -21,7 +21,7 @@ func (c *Compiler) Switch() error {
 	c.b.Emit2(bytecode.Store, t)
 
 	if !c.t.IsNext("{") {
-		return c.NewError("expected { not found")
+		return c.NewError(MissingBlockError)
 	}
 
 	var defaultBlock *bytecode.ByteCode
@@ -35,7 +35,7 @@ func (c *Compiler) Switch() error {
 		// Could be a default statement:
 		if c.t.IsNext("default") {
 			if !c.t.IsNext(":") {
-				return c.NewError("expected : not found")
+				return c.NewError(MissingColonError)
 			}
 			savedBC := c.b
 			c.b = bytecode.New("default switch")
@@ -51,7 +51,7 @@ func (c *Compiler) Switch() error {
 		} else {
 			// Must be a "case" statement:
 			if !c.t.IsNext("case") {
-				return c.NewError("expected case not found")
+				return c.NewError(MissingCaseError)
 			}
 			cx, err := expressions.Compile(c.t)
 			if err != nil {
@@ -63,7 +63,7 @@ func (c *Compiler) Switch() error {
 			next = c.b.Mark()
 			c.b.Emit2(bytecode.BranchFalse, 0)
 			if !c.t.IsNext(":") {
-				return c.NewError("expected : not found")
+				return c.NewError(MissingColonError)
 			}
 
 			for c.t.Peek(1) != "case" && c.t.Peek(1) != "default" && c.t.Peek(1) != "}" {

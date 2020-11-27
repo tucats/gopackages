@@ -24,7 +24,7 @@ func (c *Compiler) Package() error {
 	name = strings.ToLower(name)
 
 	if (c.PackageName != "") && (c.PackageName != name) {
-		return c.NewError("cannot redefine package name")
+		return c.NewError(PackageRedefinitionError)
 	}
 	c.PackageName = name
 
@@ -42,10 +42,10 @@ func (c *Compiler) Package() error {
 func (c *Compiler) Import() error {
 
 	if c.blockDepth > 0 {
-		return c.NewError("cannot import inside a block")
+		return c.NewError(InvalidImportError)
 	}
 	if c.loops != nil {
-		return c.NewError("cannot import inside a loop")
+		return c.NewError(InvalidImportError)
 	}
 
 	isList := false
@@ -71,7 +71,7 @@ func (c *Compiler) Import() error {
 			fileName = fileName[1 : len(fileName)-1]
 		}
 		if c.loops != nil {
-			return c.NewError("cannot import inside a loop")
+			return c.NewError(InvalidImportError)
 		}
 
 		// Get the package name from the given string. If this is
@@ -140,7 +140,7 @@ func (c *Compiler) Import() error {
 
 		// If after the import we ended with mismatched block markers, complain
 		if c.blockDepth != savedBlockDepth {
-			return c.NewStringError("incomplete block after import", packageName)
+			return c.NewStringError(MissingEndOfBlockError, packageName)
 		}
 
 		// Reset the token stream we were working on

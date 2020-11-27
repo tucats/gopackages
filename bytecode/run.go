@@ -57,7 +57,7 @@ func (c *Context) RunFromAddress(addr int) error {
 	for c.running {
 
 		if c.pc > len(c.bc.opcodes) {
-			return c.NewError("ran off end of incomplete bytecode")
+			break
 		}
 
 		i := c.bc.opcodes[c.pc]
@@ -73,7 +73,7 @@ func (c *Context) RunFromAddress(addr int) error {
 
 		imp, found := dispatch[i.Opcode]
 		if !found {
-			return c.NewStringError("unimplemented instruction", strconv.Itoa(i.Opcode))
+			return c.NewStringError(UnimplementedInstructionError, strconv.Itoa(i.Opcode))
 		}
 		err = imp(c, i.Operand)
 		if err != nil {

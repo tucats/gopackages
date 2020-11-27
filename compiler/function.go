@@ -13,7 +13,7 @@ func (c *Compiler) Function() error {
 
 	fname := c.t.Next()
 	if !tokenizer.IsSymbol(fname) {
-		return c.NewTokenError("invalid function name")
+		return c.NewTokenError(InvalidFunctionName)
 	}
 
 	// Was it really the function name, or the "this" variable name?
@@ -22,7 +22,7 @@ func (c *Compiler) Function() error {
 		this = fname
 		fname = c.t.Next()
 		if !tokenizer.IsSymbol(fname) {
-			return c.NewTokenError("invalid function name")
+			return c.NewTokenError(InvalidFunctionName)
 		}
 	}
 
@@ -42,7 +42,7 @@ func (c *Compiler) Function() error {
 			if tokenizer.IsSymbol(name) {
 				parameters = append(parameters, name)
 			} else {
-				return c.NewTokenError("invalid parameter")
+				return c.NewTokenError(InvalidFunctionArgument)
 			}
 			if c.t.IsNext(",") {
 				// No action
@@ -116,7 +116,7 @@ func (c *Compiler) Function() error {
 				c.t.Advance(1)
 
 			default:
-				return c.NewError("missing function return type")
+				return c.NewError(MissingFunctionTypeError)
 			}
 		}
 	}

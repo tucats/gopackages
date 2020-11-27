@@ -19,11 +19,11 @@ func (c *Compiler) Constant() error {
 	for terminator == "" || !c.t.IsNext(terminator) {
 		name := c.t.Next()
 		if !tokenizer.IsSymbol(name) {
-			return c.NewTokenError("invalid constant name")
+			return c.NewTokenError(InvalidSymbolError)
 		}
 
 		if !c.t.IsNext("=") {
-			return c.NewTokenError("expected '=' not found")
+			return c.NewTokenError(MissingEqualError)
 		}
 		vx, err := expressions.Compile(c.t)
 		if err != nil {
@@ -35,7 +35,7 @@ func (c *Compiler) Constant() error {
 
 		for _, i := range vx.Opcodes() {
 			if i.Opcode == bytecode.Load && !tokenizer.InList(util.GetString(i.Operand), c.constants) {
-				return c.NewError("invalid non-constant expression")
+				return c.NewError(InvalidConstantError)
 			}
 		}
 		c.constants = append(c.constants, name)

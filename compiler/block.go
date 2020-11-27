@@ -25,7 +25,7 @@ func (c *Compiler) Block() error {
 		}
 
 		if c.t.AtEnd() {
-			return c.NewError("unclosed statement block")
+			return c.NewError(MissingEndOfBlockError)
 		}
 	}
 	c.b.Emit1(bytecode.PopScope)

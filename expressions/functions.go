@@ -22,14 +22,14 @@ func (e *Expression) functionCall() error {
 			break
 		}
 		if e.t.Peek(1) != "," {
-			return e.NewError("invalid argument list")
+			return e.NewError(InvalidListError)
 		}
 		e.t.Advance(1)
 	}
 
 	// Ensure trailing parenthesis
 	if e.t.AtEnd() || e.t.Peek(1) != ")" {
-		return e.NewError("mismatched parenthesis in argument list")
+		return e.NewError(MissingParenthesisError)
 	}
 	e.t.Advance(1)
 

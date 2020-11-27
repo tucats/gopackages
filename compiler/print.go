@@ -12,7 +12,7 @@ func (c *Compiler) Print() error {
 	newline := true
 	for !c.StatementEnd() {
 		if c.t.IsNext(",") {
-			return c.NewTokenError("unexpected comma")
+			return c.NewTokenError(UnexpectedTokenError)
 		}
 		bc, err := expressions.Compile(c.t)
 		if err != nil {

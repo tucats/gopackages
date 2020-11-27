@@ -83,7 +83,7 @@ func (s *SymbolTable) SetAlways(name string, v interface{}) error {
 
 	// See if it's in the current constants table.
 	if s.IsConstant(name) {
-		return errors.New("attempt to change constant")
+		return errors.New(ReadOnlyValueError)
 	}
 
 	s.Symbols[name] = v
@@ -98,14 +98,14 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 
 	// See if it's in the current constants table.
 	if s.IsConstant(name) {
-		return errors.New("attempt to write to constant")
+		return errors.New(ReadOnlyValueError)
 	}
 
 	old, found := s.Symbols[name]
 
 	if found {
 		if name[0:1] == "_" {
-			return errors.New("readonly symbol")
+			return errors.New(ReadOnlyValueError)
 		}
 
 		// Check to be sure this isn't a restricted (function code) type
@@ -113,14 +113,14 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 		switch old.(type) {
 
 		case func(*SymbolTable, []interface{}) (interface{}, error):
-			return errors.New("readonly builtin symbol")
+			return errors.New(ReadOnlyValueError)
 
 		}
 	} else {
 
 		// If there are no more tables, we have an error.
 		if s.Parent == nil {
-			return errors.New("unknown symbol")
+			return errors.New(UnknownSymbolError)
 		}
 		// Otherwise, ask the parent to try to set the value.
 		return s.Parent.Set(name, v)
@@ -135,19 +135,19 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 func (s *SymbolTable) Delete(name string) error {
 
 	if len(name) == 0 {
-		return errors.New("invalid symbol")
+		return errors.New(InvalidSymbolError)
 	}
 	if name[:1] == "_" {
-		return errors.New("readonly symbol")
+		return errors.New(ReadOnlyValueError)
 	}
 	if s.Symbols == nil {
-		return errors.New("SymbolDelete of " + name + " when there are no symbols")
+		return errors.New(UnknownSymbolError)
 	}
 
 	_, f := s.Symbols[name]
 	if !f {
 		if s.Parent == nil {
-			return errors.New("symbol " + name + " not found")
+			return errors.New(UnknownSymbolError)
 		}
 		return s.Parent.Delete(name)
 	}
@@ -160,17 +160,17 @@ func (s *SymbolTable) Delete(name string) error {
 func (s *SymbolTable) DeleteAlways(name string) error {
 
 	if len(name) == 0 {
-		return errors.New("invalid symbol")
+		return errors.New(InvalidSymbolError)
 	}
 
 	if s.Symbols == nil {
-		return errors.New("SymbolDelete of " + name + " when there are no symbols")
+		return errors.New(UnknownSymbolError)
 	}
 
 	_, f := s.Symbols[name]
 	if !f {
 		if s.Parent == nil {
-			return errors.New("symbol " + name + " not found")
+			return errors.New(UnknownSymbolError)
 		}
 		return s.Parent.DeleteAlways(name)
 	}
@@ -182,12 +182,12 @@ func (s *SymbolTable) DeleteAlways(name string) error {
 func (s *SymbolTable) Create(name string) error {
 
 	if len(name) == 0 {
-		return errors.New("invalid symbol")
+		return errors.New(InvalidSymbolError)
 	}
 
 	_, found := s.Symbols[name]
 	if found {
-		return errors.New("symbol already exists")
+		return errors.New(SymbolExistsError)
 	}
 	s.Symbols[name] = nil
 	return nil

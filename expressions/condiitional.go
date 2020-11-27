@@ -31,7 +31,7 @@ func (e *Expression) conditional() error {
 		return err
 	}
 	if e.t.AtEnd() || e.t.Peek(1) != ":" {
-		return e.NewError("missing colon in conditional")
+		return e.NewError(MissingColonError)
 	}
 	m2 := e.b.Mark()
 	e.b.Emit2(bc.Branch, 0)

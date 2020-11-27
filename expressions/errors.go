@@ -11,6 +11,19 @@ const (
 	BlockQuoteErr
 )
 
+// Error message strings
+const (
+	GeneralExpressionError  = "general expression error"
+	InvalidListError        = "invalid list"
+	InvalidRangeError       = "invalid array range"
+	InvalidSymbolError      = "invalid symbol name"
+	MismatchedQuoteError    = "mismatched quote error"
+	MissingBracketError     = "missing or invalid '[]'"
+	MissingColonError       = "missing ':'"
+	MissingParenthesisError = "missing parenthesis"
+	MissingTermError        = "missing term"
+)
+
 // ErrorMessageMap is used to map an error code to a message.
 var ErrorMessageMap map[int]string = map[int]string{
 	GeneralExpressionErr: "general expression error",

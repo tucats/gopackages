@@ -129,7 +129,7 @@ func (c *Compiler) AddPackageFunction(pkgname string, name string, function inte
 	}
 
 	if _, found := fd[name]; found {
-		return c.NewError("Duplicate function definition")
+		return c.NewError(FunctionAlreadyExistsError)
 	}
 	fd[name] = function
 	c.packages[pkgname] = fd

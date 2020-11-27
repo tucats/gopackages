@@ -90,5 +90,5 @@ func (c *Compiler) Statement() error {
 	}
 
 	// Unknown statement, return an error
-	return c.NewTokenError("unrecognized or unexpected token")
+	return c.NewTokenError(UnexpectedTokenError)
 }
