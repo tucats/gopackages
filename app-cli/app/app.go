@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/cli"
+	"github.com/tucats/gopackages/symbols"
 )
 
 // App is the wrapper type for information needed for a command line application.
@@ -33,18 +34,22 @@ func New(appName string) App {
 		appName = strings.TrimSpace(appName[:i])
 	}
 	app := App{Name: appName, Description: appDescription}
+
 	return app
 }
 
 // SetVersion sets the version number for the application.
 func (app *App) SetVersion(major, minor, delta int) {
 	app.Version = fmt.Sprintf("%d.%d-%d", major, minor, delta)
+	symbols.RootSymbolTable.Symbols["_version"] = app.Version
 }
 
 // SetCopyright sets the copy right string (if any) used in the
 // help output.
 func (app *App) SetCopyright(s string) {
 	app.Copyright = s
+	symbols.RootSymbolTable.Symbols["_copyright"] = app.Copyright
+
 }
 
 // Parse runs a grammar, and then calls the provided action routine. It is typically

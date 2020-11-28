@@ -2,6 +2,8 @@ package symbols
 
 import (
 	"errors"
+
+	"github.com/google/uuid"
 )
 
 // SymbolTable contains an abstract symbol table
@@ -19,7 +21,11 @@ var RootSymbolTable = SymbolTable{
 	Symbols: map[string]interface{}{
 		"_author":    "Tom Cole",
 		"_copyright": "(c) Copyright 2020",
-		"_config":    map[string]interface{}{"disassemble": false, "trace": false},
+		"_session":   uuid.New().String(),
+		"_config": map[string]interface{}{
+			"disassemble": false,
+			"trace":       false,
+		},
 	},
 }
 
