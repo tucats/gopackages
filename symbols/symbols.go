@@ -102,25 +102,18 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 		s.Symbols = map[string]interface{}{}
 	}
 
-	// See if it's in the current constants table.
-	if s.IsConstant(name) {
-		return errors.New(ReadOnlyValueError)
-	}
-
 	old, found := s.Symbols[name]
 
+	// If it was already there, we hae some additional checks to do
+	// to be sure it's writable.
 	if found {
-		if name[0:1] == "_" {
+		if old != nil && name[0:1] == "_" {
 			return errors.New(ReadOnlyValueError)
 		}
 
 		// Check to be sure this isn't a restricted (function code) type
-
-		switch old.(type) {
-
-		case func(*SymbolTable, []interface{}) (interface{}, error):
+		if _, ok := old.(func(*SymbolTable, []interface{}) (interface{}, error)); ok {
 			return errors.New(ReadOnlyValueError)
-
 		}
 	} else {
 
