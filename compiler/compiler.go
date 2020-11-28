@@ -205,13 +205,10 @@ func (c *Compiler) AutoImport() error {
 	savedT := c.t
 	var firstError error
 
+	ui.Debug("+++ Autoimporting %d packages", len(sortedPackageNames))
+
 	for _, packageName := range sortedPackageNames {
 		text := "import " + packageName
-
-		// Compile the statement, which causes the compiler to bind in the imported
-		// packages.
-
-		ui.Debug("+++ Autoimport: %s", text)
 		_, err := c.CompileString(text)
 		if err == nil {
 			firstError = err

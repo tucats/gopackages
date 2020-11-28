@@ -50,8 +50,8 @@ func (c *Compiler) Import() error {
 	isList := false
 	if c.t.IsNext("(") {
 		isList = true
+		ui.Debug("*** Processing import list")
 	}
-	ui.Debug("*** Processing import list")
 
 	parsing := true
 	for parsing {
@@ -61,7 +61,7 @@ func (c *Compiler) Import() error {
 			parsing = false
 		}
 		fileName := c.t.Next()
-		ui.Debug("*** Next package is %s", fileName)
+		ui.Debug("*** Importing package \"%s\"", fileName)
 		// End of the list? If so, break out
 		if isList && fileName == ")" {
 			break
@@ -83,7 +83,7 @@ func (c *Compiler) Import() error {
 
 		// If this is an import of a package already processed, no work to do.
 		if _, found := c.s.Get(packageName); found {
-			ui.Debug("+++ Previously imported %s, skipping", packageName)
+			ui.Debug("+++ Previously imported \"%s\", skipping", packageName)
 			continue
 		}
 
