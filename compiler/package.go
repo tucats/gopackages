@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -194,7 +193,6 @@ func (c *Compiler) ReadDirectory(name string) (string, error) {
 		r = persistence.Get("ego-path")
 	}
 	r = filepath.Join(r, "lib")
-	ui.Debug("+++ Directory read attempt for \"%s\"", name)
 
 	dirname := name
 	if !strings.HasPrefix(dirname, r) {
@@ -205,16 +203,11 @@ func (c *Compiler) ReadDirectory(name string) (string, error) {
 	if err != nil {
 		if _, ok := err.(*os.PathError); ok {
 			ui.Debug("+++ No such directory")
-		} else {
-			if errors.Is(err, &os.SyscallError{Syscall: "fdopendir", Err: os.ErrInvalid}) {
-				ui.Debug("+++ Not a directory")
-			} else {
-				ui.Debug("--- error reading dirinfo, %#v", err)
-			}
 		}
 		return "", err
 	}
 
+	ui.Debug("+++ Directory read attempt for \"%s\"", name)
 	if len(fi) == 0 {
 		ui.Debug("+++ Directory is empty")
 	} else {

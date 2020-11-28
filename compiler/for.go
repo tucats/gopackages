@@ -227,7 +227,7 @@ func (c *Compiler) PushLoop(loopType int) {
 		continues: make([]int, 0),
 		Parent:    c.loops,
 	}
-	ui.Debug("=== Push loop scope")
+	// ui.Debug("=== Push loop scope")
 	c.loops = &loop
 }
 
@@ -235,7 +235,7 @@ func (c *Compiler) PushLoop(loopType int) {
 func (c *Compiler) PopLoop() {
 	if c.loops != nil {
 		c.loops = c.loops.Parent
-		ui.Debug("=== Pop loop scope")
+		// ui.Debug("=== Pop loop scope")
 	} else {
 		ui.Debug("=== loop stack empty")
 	}

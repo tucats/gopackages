@@ -24,22 +24,22 @@ func (s *SymbolTable) Merge(st *SymbolTable) {
 					// Copy the values into the existing map
 					for newkeyword, newvalue := range vv {
 						oldmap[newkeyword] = newvalue
-						ui.Debug("    adding %v to old map at %s", newvalue, newkeyword)
+						ui.Debug("    adding %v as \"%s\"", newvalue, newkeyword)
 					}
 					// Rewrite the map back to the bytecode.
 					s.SetAlways(k, oldmap)
 
 				default:
-					ui.Debug("    overwriting duplicate key %s with %v", k, old)
+					ui.Debug("    overwriting duplicate key \"%s\" with %v", k, old)
 					s.SetAlways(k, v)
 				}
 
 			} else {
-				ui.Debug("    creating new map %s with %v", k, v)
+				ui.Debug("    creating new map \"%s\" with %v", k, v)
 				s.SetAlways(k, v)
 			}
 		default:
-			ui.Debug("    copying entry %s with %v", k, v)
+			//ui.Debug("    copying entry %s with %v", k, v)
 			s.SetAlways(k, vv)
 		}
 	}
