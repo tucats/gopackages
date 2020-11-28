@@ -195,35 +195,30 @@ func (c *Compiler) AutoImport() error {
 		}
 	}
 	// Make the order stable
-	m := []string{}
+	sortedPackageNames := []string{}
 	for k := range uniqueNames {
-		m = append(m, k)
+		sortedPackageNames = append(sortedPackageNames, k)
 	}
-	sort.Strings(m)
+	sort.Strings(sortedPackageNames)
 
-	// Now use this list of unique package names for form an import statement.
-	var b strings.Builder
-	b.WriteString(" import ( ")
-	b.WriteString("strings ")
-	for _, pkg := range m {
-		if pkg != "strings" && pkg != "math" {
-			b.WriteString(pkg)
-			b.WriteRune(' ')
-		}
-	}
-	b.WriteString("math ")
-	b.WriteString(");")
-
-	// Compile the statement, which causes the compiler to bind in the imported
-	// packages.
 	savedBC := c.b
 	savedT := c.t
+	var firstError error
 
-	text := b.String()
-	ui.Debug("+++ Autoimport: %s", text)
-	_, err := c.CompileString(text)
+	for _, packageName := range sortedPackageNames {
+		text := "import " + packageName
 
+		// Compile the statement, which causes the compiler to bind in the imported
+		// packages.
+
+		ui.Debug("+++ Autoimport: %s", text)
+		_, err := c.CompileString(text)
+		if err == nil {
+			firstError = err
+		}
+
+	}
 	c.b = savedBC
 	c.t = savedT
-	return err
+	return firstError
 }
