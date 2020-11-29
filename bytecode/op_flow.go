@@ -166,10 +166,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		if df != nil {
 			if len(args) < df.Min || len(args) > df.Max {
 				name := functions.FindName(af)
-				if name > "" {
-					name = ": " + name
-				}
-				return c.NewError(ArgumentCountError)
+				return functions.NewError(name, ArgumentCountError)
 			}
 		}
 		if c.this != nil {
@@ -190,7 +187,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		}
 
 	default:
-		return c.NewStringError(InvalidFunctionCallError, fmt.Sprintf("%#v", af))
+		return c.NewError(InvalidFunctionCallError, fmt.Sprintf("%#v", af))
 	}
 
 	if err != nil {
@@ -220,15 +217,18 @@ func ArgCheckOpcode(c *Context, i interface{}) error {
 
 	min := 0
 	max := 0
+	name := "function call"
 
 	switch v := i.(type) {
 	case []interface{}:
-		if len(v) != 2 {
+		if len(v) < 2 || len(v) > 3 {
 			return c.NewError(InvalidArgCheckError)
 		}
-		min = v[0].(int)
-		max = v[1].(int)
-
+		min = util.GetInt(v[0])
+		max = util.GetInt(v[1])
+		if len(v) == 3 {
+			name = util.GetString(v[2])
+		}
 	case int:
 		if v >= 0 {
 			min = v
@@ -273,7 +273,7 @@ func ArgCheckOpcode(c *Context, i interface{}) error {
 		max = len(va)
 	}
 	if len(va) < min || len(va) > max {
-		return c.NewError(ArgumentCountError)
+		return functions.NewError(name, ArgumentCountError)
 	}
 	return nil
 }

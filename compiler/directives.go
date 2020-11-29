@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/tucats/gopackages/bytecode"
@@ -18,7 +17,7 @@ import (
 func (c *Compiler) Directive() error {
 	name := c.t.Next()
 	if !tokenizer.IsSymbol(name) {
-		return c.NewStringError(InvalidDirectiveError, name)
+		return c.NewError(InvalidDirectiveError, name)
 	}
 
 	switch name {
@@ -35,7 +34,7 @@ func (c *Compiler) Directive() error {
 	case "test":
 		return c.Test()
 	default:
-		return c.NewStringError(InvalidDirectiveError, name)
+		return c.NewError(InvalidDirectiveError, name)
 	}
 }
 
@@ -45,7 +44,7 @@ func (c *Compiler) Template() error {
 	// Get the template name
 	name := c.t.Next()
 	if !tokenizer.IsSymbol(name) {
-		return c.NewStringError(InvalidSymbolError, name)
+		return c.NewError(InvalidSymbolError, name)
 	}
 
 	// Get the template string definition
@@ -101,7 +100,7 @@ func (c *Compiler) Test() error {
 // TestAssert implements the testing.assert() function
 func TestAssert(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	if len(args) < 1 || len(args) > 2 {
-		return nil, errors.New(bytecode.ArgumentCountError)
+		return nil, functions.NewError("assert", functions.ArgumentCountError)
 	}
 
 	// Figure out the test name. If not found, use "test"
@@ -128,7 +127,7 @@ func TestAssert(s *symbols.SymbolTable, args []interface{}) (interface{}, error)
 // TestIsType implements the testing.assert() function
 func TestIsType(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	if len(args) < 2 || len(args) > 3 {
-		return nil, errors.New(bytecode.ArgumentCountError)
+		return nil, functions.NewError("istype", functions.ArgumentCountError)
 	}
 
 	// Figure out the test name. If not found, use "test"

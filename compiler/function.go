@@ -13,7 +13,7 @@ func (c *Compiler) Function() error {
 
 	fname := c.t.Next()
 	if !tokenizer.IsSymbol(fname) {
-		return c.NewTokenError(InvalidFunctionName)
+		return c.NewError(InvalidFunctionName, fname)
 	}
 
 	// Was it really the function name, or the "this" variable name?
@@ -22,7 +22,7 @@ func (c *Compiler) Function() error {
 		this = fname
 		fname = c.t.Next()
 		if !tokenizer.IsSymbol(fname) {
-			return c.NewTokenError(InvalidFunctionName)
+			return c.NewError(InvalidFunctionName, fname)
 		}
 	}
 
@@ -42,7 +42,7 @@ func (c *Compiler) Function() error {
 			if tokenizer.IsSymbol(name) {
 				parameters = append(parameters, name)
 			} else {
-				return c.NewTokenError(InvalidFunctionArgument)
+				return c.NewError(InvalidFunctionArgument)
 			}
 			if c.t.IsNext(",") {
 				// No action
@@ -53,15 +53,15 @@ func (c *Compiler) Function() error {
 	b := bytecode.New(fname)
 
 	// Generate the argument check
-	if varargs {
-		p := []int{
-			len(parameters),
-			-1,
-		}
-		b.Emit2(bytecode.ArgCheck, p)
-	} else {
-		b.Emit2(bytecode.ArgCheck, len(parameters))
+	p := []interface{}{
+		len(parameters),
+		len(parameters),
+		fname,
 	}
+	if varargs {
+		p[1] = -1
+	}
+	b.Emit2(bytecode.ArgCheck, p)
 
 	// If there was a "this" variable defined, process it now.
 	if this != "" {

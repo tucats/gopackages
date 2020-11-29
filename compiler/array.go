@@ -12,12 +12,12 @@ func (c *Compiler) Array() error {
 	name := c.t.Next()
 	if !tokenizer.IsSymbol(name) {
 		c.t.Advance(-1)
-		return c.NewTokenError(InvalidSymbolError)
+		return c.NewError(InvalidSymbolError, name)
 	}
 	// See if it's a reserved word.
 	if tokenizer.IsReserved(name) {
 		c.t.Advance(-1)
-		return c.NewTokenError(InvalidSymbolError)
+		return c.NewError(InvalidSymbolError, name)
 	}
 
 	if !c.t.IsNext("[") {

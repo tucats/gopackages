@@ -1,8 +1,6 @@
 package symbols
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
 )
 
@@ -89,7 +87,7 @@ func (s *SymbolTable) SetAlways(name string, v interface{}) error {
 
 	// See if it's in the current constants table.
 	if s.IsConstant(name) {
-		return errors.New(ReadOnlyValueError)
+		return s.NewError(ReadOnlyValueError, name)
 	}
 
 	s.Symbols[name] = v
@@ -108,18 +106,18 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 	// to be sure it's writable.
 	if found {
 		if old != nil && name[0:1] == "_" {
-			return errors.New(ReadOnlyValueError)
+			return s.NewError(ReadOnlyValueError, name)
 		}
 
 		// Check to be sure this isn't a restricted (function code) type
 		if _, ok := old.(func(*SymbolTable, []interface{}) (interface{}, error)); ok {
-			return errors.New(ReadOnlyValueError)
+			return s.NewError(ReadOnlyValueError, name)
 		}
 	} else {
 
 		// If there are no more tables, we have an error.
 		if s.Parent == nil {
-			return errors.New(UnknownSymbolError)
+			return s.NewError(UnknownSymbolError, name)
 		}
 		// Otherwise, ask the parent to try to set the value.
 		return s.Parent.Set(name, v)
@@ -134,19 +132,19 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 func (s *SymbolTable) Delete(name string) error {
 
 	if len(name) == 0 {
-		return errors.New(InvalidSymbolError)
+		return s.NewError(InvalidSymbolError)
 	}
 	if name[:1] == "_" {
-		return errors.New(ReadOnlyValueError)
+		return s.NewError(ReadOnlyValueError, name)
 	}
 	if s.Symbols == nil {
-		return errors.New(UnknownSymbolError)
+		return s.NewError(UnknownSymbolError, name)
 	}
 
 	_, f := s.Symbols[name]
 	if !f {
 		if s.Parent == nil {
-			return errors.New(UnknownSymbolError)
+			return s.NewError(UnknownSymbolError, name)
 		}
 		return s.Parent.Delete(name)
 	}
@@ -159,17 +157,17 @@ func (s *SymbolTable) Delete(name string) error {
 func (s *SymbolTable) DeleteAlways(name string) error {
 
 	if len(name) == 0 {
-		return errors.New(InvalidSymbolError)
+		return s.NewError(InvalidSymbolError)
 	}
 
 	if s.Symbols == nil {
-		return errors.New(UnknownSymbolError)
+		return s.NewError(UnknownSymbolError, name)
 	}
 
 	_, f := s.Symbols[name]
 	if !f {
 		if s.Parent == nil {
-			return errors.New(UnknownSymbolError)
+			return s.NewError(UnknownSymbolError, name)
 		}
 		return s.Parent.DeleteAlways(name)
 	}
@@ -181,12 +179,12 @@ func (s *SymbolTable) DeleteAlways(name string) error {
 func (s *SymbolTable) Create(name string) error {
 
 	if len(name) == 0 {
-		return errors.New(InvalidSymbolError)
+		return s.NewError(InvalidSymbolError)
 	}
 
 	_, found := s.Symbols[name]
 	if found {
-		return errors.New(SymbolExistsError)
+		return s.NewError(SymbolExistsError, name)
 	}
 	s.Symbols[name] = nil
 	return nil

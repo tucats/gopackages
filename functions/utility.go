@@ -15,11 +15,6 @@ import (
 
 // FunctionProfile implements the profile() function
 func FunctionProfile(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
-	if len(args) < 1 || len(args) > 2 {
-		return nil, errors.New("incorrect number of function arguments")
-	}
-
 	key := util.GetString(args[0])
 
 	if len(args) == 1 {
@@ -39,19 +34,12 @@ func FunctionProfile(symbols *symbols.SymbolTable, args []interface{}) (interfac
 
 // FunctionUUID implements the uuid() function
 func FunctionUUID(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	if len(args) != 0 {
-		return nil, errors.New("incorrect number of function arguments")
-	}
 	u := uuid.New()
 	return u.String(), nil
 }
 
 // FunctionLen implements the len() function
 func FunctionLen(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	if len(args) != 1 {
-		return nil, errors.New("incorrect number of function arguments")
-	}
-
 	if args[0] == nil {
 		return 0, nil
 	}
@@ -87,11 +75,6 @@ func FunctionLen(symbols *symbols.SymbolTable, args []interface{}) (interface{},
 // the first must be an existing array which is resized to match
 // the new array
 func FunctionArray(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
-	if len(args) < 1 || len(args) > 2 {
-		return nil, errors.New("incorrect number of function arguments")
-	}
-
 	var array []interface{}
 	count := 0
 
@@ -107,7 +90,7 @@ func FunctionArray(symbols *symbols.SymbolTable, args []interface{}) (interface{
 				array = append(v, make([]interface{}, count-len(v))...)
 			}
 		default:
-			return nil, errors.New("first argument must be array")
+			return nil, NewError("array", InvalidTypeError)
 		}
 	} else {
 		count = util.GetInt(args[0])
@@ -120,20 +103,12 @@ func FunctionArray(symbols *symbols.SymbolTable, args []interface{}) (interface{
 // FunctionGetEnv implementes the util.getenv() function which reads
 // an environment variable from the os.
 func FunctionGetEnv(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	if len(args) != 1 {
-		return nil, errors.New("incorrect number of function arguments")
-	}
-
 	return os.Getenv(util.GetString(args[0])), nil
 }
 
 // FunctionMembers gets an array of the names of the fields in a structure
 func FunctionMembers(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	if len(args) != 1 {
-		return nil, errors.New("incorrect number of function arguments")
-	}
 	switch v := args[0].(type) {
-
 	case map[string]interface{}:
 
 		keys := make([]string, 0)
@@ -151,13 +126,12 @@ func FunctionMembers(symbols *symbols.SymbolTable, args []interface{}) (interfac
 		return a, nil
 
 	default:
-		return nil, errors.New("incorrect data type")
+		return nil, NewError("members", InvalidTypeError)
 	}
 }
 
 // FunctionSort implements the sort() function.
 func FunctionSort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
 	// Make a master array of the values presented
 	var array []interface{}
 	for _, a := range args {
@@ -215,7 +189,7 @@ func FunctionSort(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 		return resultArray, nil
 
 	default:
-		return nil, errors.New("unsupported data type")
+		return nil, NewError("sort", InvalidTypeError)
 	}
 }
 
@@ -236,7 +210,7 @@ func FunctionExit(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 		return nil, errors.New(v)
 
 	default:
-		return nil, errors.New("unsupported exit() type")
+		return nil, NewError("exit", InvalidTypeError)
 	}
 
 	return nil, nil
@@ -285,5 +259,5 @@ func FunctionType(syms *symbols.SymbolTable, args []interface{}) (interface{}, e
 // FunctionError creates an error object based on the
 // parameters
 func FunctionError(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	return errors.New(util.GetString(args[0])), nil
+	return NewError("error", util.GetString(args[0]), args[1:]...), nil
 }

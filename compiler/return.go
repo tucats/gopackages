@@ -15,7 +15,7 @@ func (c *Compiler) Return() error {
 			return err
 		}
 		if c.coerce.Mark() == 0 {
-			return c.NewTokenError(InvalidReturnValueError)
+			return c.NewError(InvalidReturnValueError)
 		}
 		c.b.Append(bc)
 		c.b.Append(c.coerce)

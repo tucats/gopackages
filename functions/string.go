@@ -2,7 +2,6 @@ package functions
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -163,11 +162,11 @@ func FunctionToString(s *symbols.SymbolTable, args []interface{}) (interface{}, 
 				case string:
 					b.WriteString(util.GetString(c))
 				default:
-					return nil, errors.New("incorrect argument type")
+					return nil, NewError("string", InvalidTypeError)
 				}
 			}
 		default:
-			return nil, errors.New("incorrect argument type")
+			return nil, NewError("string", ArgumentCountError)
 		}
 	}
 	return b.String(), nil
@@ -178,11 +177,11 @@ func FunctionToString(s *symbols.SymbolTable, args []interface{}) (interface{}, 
 func FunctionTemplate(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	var err error
 	if len(args) == 0 {
-		return nil, errors.New("insufficient arguemnts")
+		return nil, NewError("template", ArgumentCountError)
 	}
 	tree, ok := args[0].(*template.Template)
 	if !ok {
-		return nil, errors.New("not a template")
+		return nil, NewError("string", InvalidTypeError)
 	}
 
 	root := tree.Tree.Root
@@ -193,11 +192,11 @@ func FunctionTemplate(s *symbols.SymbolTable, args []interface{}) (interface{}, 
 			// Get the named template and add it's tree here
 			tv, ok := s.Get(templateNode.Name)
 			if !ok {
-				return nil, fmt.Errorf("unknown subtemplate name %s", templateNode.Name)
+				return nil, NewError("template", InvalidTemplateNameError, templateNode.Name)
 			}
 			t, ok := tv.(*template.Template)
 			if !ok {
-				return nil, fmt.Errorf("template is of wrong type: %s", templateNode.Name)
+				return nil, NewError("template", InvalidTypeError, templateNode.Name)
 			}
 			tree.AddParseTree(templateNode.Name, t.Tree)
 		}

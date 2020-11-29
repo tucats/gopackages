@@ -1,7 +1,6 @@
 package functions
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -15,7 +14,7 @@ import (
 func FunctionInt(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], 1)
 	if v == nil {
-		return nil, errors.New("invalid value to coerce to integer type")
+		return nil, NewError("int", InvalidTypeError)
 	}
 	return v.(int), nil
 }
@@ -24,7 +23,7 @@ func FunctionInt(symbols *symbols.SymbolTable, args []interface{}) (interface{},
 func FunctionFloat(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], 1.0)
 	if v == nil {
-		return nil, errors.New("invalid value to coerce to float type")
+		return nil, NewError("float", InvalidValueError, args[0])
 	}
 	return v.(float64), nil
 }
@@ -61,7 +60,7 @@ func FunctionString(symbols *symbols.SymbolTable, args []interface{}) (interface
 func FunctionBool(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], true)
 	if v == nil {
-		return nil, errors.New("invalid value to coerce to bool type")
+		return nil, NewError("bool", InvalidValueError, args[0])
 	}
 	return v.(bool), nil
 }
@@ -124,13 +123,13 @@ func FunctionNew(syms *symbols.SymbolTable, args []interface{}) (interface{}, er
 	switch v := r.(type) {
 
 	case nil:
-		return nil, errors.New("cannot use nil as arg to new()")
+		return nil, NewError("new", InvalidNewValueError)
 
 	case symbols.SymbolTable:
-		return nil, errors.New("cannot new() a symbol table")
+		return nil, NewError("new", InvalidNewValueError)
 
 	case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
-		return nil, errors.New("cannot new() a native function")
+		return nil, NewError("new", InvalidNewValueError)
 
 	case int:
 	case string:
@@ -143,7 +142,7 @@ func FunctionNew(syms *symbols.SymbolTable, args []interface{}) (interface{}, er
 		}
 
 	default:
-		return nil, errors.New("unsupported new() type " + fmt.Sprintf("%#v", v))
+		return nil, NewError("new", InvalidTypeError)
 	}
 
 	return r, nil

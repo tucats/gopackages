@@ -12,7 +12,7 @@ func (c *Compiler) Print() error {
 	newline := true
 	for !c.StatementEnd() {
 		if c.t.IsNext(",") {
-			return c.NewTokenError(UnexpectedTokenError)
+			return c.NewError(UnexpectedTokenError, c.t.Peek(0))
 		}
 		bc, err := expressions.Compile(c.t)
 		if err != nil {

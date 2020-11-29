@@ -180,11 +180,11 @@ func LoadOpcode(c *Context, i interface{}) error {
 
 	name := util.GetString(i)
 	if len(name) == 0 {
-		return c.NewStringError(InvalidIdentifierError, name)
+		return c.NewError(InvalidIdentifierError, name)
 	}
 	v, found := c.Get(util.GetString(i))
 	if !found {
-		return c.NewStringError(UnknownIdentifierError, name)
+		return c.NewError(UnknownIdentifierError, name)
 	}
 
 	c.Push(v)
@@ -221,7 +221,7 @@ func MemberOpcode(c *Context, i interface{}) error {
 	if ok {
 		v, found = mv[name]
 		if !found {
-			return c.NewStringError(UnknownMemberError, name)
+			return c.NewError(UnknownMemberError, name)
 		}
 		c.this = m // Remember where we loaded this from
 	} else {
@@ -272,7 +272,7 @@ func ClassMemberOpcode(c *Context, i interface{}) error {
 			if found {
 				return c.Push(v)
 			}
-			return c.NewStringError(UnknownMemberError, name)
+			return c.NewError(UnknownMemberError, name)
 		}
 		c.Push(v)
 
@@ -324,7 +324,7 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 		subscript := util.GetString(index)
 		v, f := a[subscript]
 		if !f {
-			return c.NewStringError(UnknownMemberError, subscript)
+			return c.NewError(UnknownMemberError, subscript)
 		}
 		c.Push(v)
 		c.this = a
@@ -333,7 +333,7 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 	case []interface{}:
 		subscript := util.GetInt(index)
 		if subscript < 1 || subscript > len(a) {
-			return c.NewIntError(InvalidArrayIndexError, subscript)
+			return c.NewError(InvalidArrayIndexError, subscript)
 		}
 		v := a[subscript-1]
 		c.Push(v)
@@ -369,11 +369,11 @@ func LoadSliceOpcode(c *Context, i interface{}) error {
 	case []interface{}:
 		subscript1 := util.GetInt(index1)
 		if subscript1 < 1 || subscript1 > len(a) {
-			return c.NewIntError(InvalidSliceIndexError, subscript1)
+			return c.NewError(InvalidSliceIndexError, subscript1)
 		}
 		subscript2 := util.GetInt(index2)
 		if subscript2 < subscript1 || subscript2 > len(a) {
-			return c.NewIntError(InvalidSliceIndexError, subscript2)
+			return c.NewError(InvalidSliceIndexError, subscript2)
 		}
 		v := a[subscript1-1 : subscript2]
 		c.Push(v)
@@ -445,7 +445,7 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 	case []interface{}:
 		subscript := util.GetInt(index)
 		if subscript < 1 || subscript > len(a) {
-			return c.NewIntError(InvalidArrayIndexError, subscript)
+			return c.NewError(InvalidArrayIndexError, subscript)
 		}
 		a[subscript-1] = v
 		c.Push(a)

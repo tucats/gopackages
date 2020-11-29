@@ -80,7 +80,7 @@ func (e *Expression) expressionAtom() error {
 
 	}
 
-	return e.NewTokenError("unrecognized or unexpected token")
+	return e.NewError(UnexpectedTokenError, t)
 }
 
 func (e *Expression) parseArray() error {
@@ -183,7 +183,7 @@ func (e *Expression) parseStruct() error {
 			}
 		} else {
 			if !tokenizer.IsSymbol(name) {
-				return e.NewTokenError(InvalidSymbolError)
+				return e.NewError(InvalidSymbolError, name)
 			}
 		}
 
@@ -221,7 +221,7 @@ func (e *Expression) parseStruct() error {
 func (e *Expression) unLit(s string) (string, error) {
 	quote := s[0:1]
 	if s[len(s)-1:len(s)] != quote {
-		return s[1:], e.NewErrorCode(BlockQuoteErr, quote)
+		return s[1:], e.NewError(BlockQuoteError, quote)
 	}
 	return s[1 : len(s)-1], nil
 }

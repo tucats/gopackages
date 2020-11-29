@@ -40,7 +40,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 	name := c.t.Next()
 
 	if !tokenizer.IsSymbol(name) {
-		return nil, c.NewTokenError(InvalidSymbolError)
+		return nil, c.NewError(InvalidSymbolError, name)
 	}
 
 	needLoad := true
@@ -106,7 +106,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		c.t.Advance(1)
 		member := c.t.Next()
 		if !tokenizer.IsSymbol(member) {
-			return c.NewTokenError(InvalidSymbolError)
+			return c.NewError(InvalidSymbolError, member)
 		}
 		bc.Emit2(bytecode.Push, member)
 		bc.Emit1(bytecode.LoadIndex)

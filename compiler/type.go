@@ -22,7 +22,7 @@ func (c *Compiler) Type() error {
 		}
 	}
 	if c.t.Peek(1) != "{" {
-		return c.NewTokenError(MissingBracketError)
+		return c.NewError(MissingBracketError)
 	}
 
 	// If there is not parent, seal the chain by making the link point to a string of our own name.
@@ -62,7 +62,7 @@ func (c *Compiler) compileType() error {
 	for true {
 		name := c.t.Next()
 		if !tokenizer.IsSymbol(name) {
-			return c.NewStringError(InvalidSymbolError, name)
+			return c.NewError(InvalidSymbolError, name)
 		}
 		count = count + 1
 		if c.t.Peek(1) == "{" {
@@ -81,7 +81,7 @@ func (c *Compiler) compileType() error {
 			case "string":
 				c.b.Emit2(bytecode.Push, "")
 			default:
-				return c.NewTokenError(InvalidTypeNameError)
+				return c.NewError(InvalidTypeNameError)
 			}
 		}
 

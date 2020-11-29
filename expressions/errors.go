@@ -3,16 +3,13 @@ package expressions
 import (
 	"fmt"
 	"strings"
-)
 
-// Error message codes
-const (
-	GeneralExpressionErr = iota
-	BlockQuoteErr
+	"github.com/tucats/gopackages/util"
 )
 
 // Error message strings
 const (
+	BlockQuoteError         = "invalid block quote terminator"
 	GeneralExpressionError  = "general expression error"
 	InvalidListError        = "invalid list"
 	InvalidRangeError       = "invalid array range"
@@ -22,13 +19,8 @@ const (
 	MissingColonError       = "missing ':'"
 	MissingParenthesisError = "missing parenthesis"
 	MissingTermError        = "missing term"
+	UnexpectedTokenError    = "unexpected token"
 )
-
-// ErrorMessageMap is used to map an error code to a message.
-var ErrorMessageMap map[int]string = map[int]string{
-	GeneralExpressionErr: "general expression error",
-	BlockQuoteErr:        "mismatched quote character",
-}
 
 // Error contains an error generated from the compiler
 type Error struct {
@@ -39,30 +31,12 @@ type Error struct {
 	token  string
 }
 
-// NewErrorCode creates an error object using a numeric code
-// rather than a message text
-func (e *Expression) NewErrorCode(code int, parm string) *Error {
-	text, found := ErrorMessageMap[code]
-	if !found {
-		text = ErrorMessageMap[GeneralExpressionErr]
+// NewError creates an error object
+func (e *Expression) NewError(msg string, args ...interface{}) *Error {
+	token := ""
+	if len(args) > 0 {
+		token = util.GetString(args[0])
 	}
-	if len(parm) > 0 {
-		text = text + ": "
-	}
-	err := e.NewStringError(text, parm)
-	err.code = code
-	return err
-}
-
-// NewError generates a new error
-func (e *Expression) NewError(msg string) *Error {
-	err := e.NewStringError(msg, "")
-	err.code = GeneralExpressionErr
-	return err
-}
-
-// NewStringError generates a new error with a string parameter
-func (e *Expression) NewStringError(msg string, parm string) *Error {
 
 	p := e.t.TokenP
 	if p < 0 {
@@ -75,26 +49,7 @@ func (e *Expression) NewStringError(msg string, parm string) *Error {
 		text:   msg,
 		line:   e.t.Line[p],
 		column: e.t.Pos[p],
-		token:  parm,
-	}
-}
-
-// NewTokenError generates a new error that includes the
-// current token as part of the error information.
-func (e *Expression) NewTokenError(msg string) *Error {
-
-	p := e.t.TokenP
-	if p < 0 {
-		p = 0
-	}
-	if p >= len(e.t.Tokens) {
-		p = len(e.t.Tokens) - 1
-	}
-	return &Error{
-		text:   msg,
-		line:   e.t.Line[p],
-		column: e.t.Pos[p],
-		token:  e.t.Tokens[p],
+		token:  token,
 	}
 }
 

@@ -73,7 +73,7 @@ func (c *Context) RunFromAddress(addr int) error {
 
 		imp, found := dispatch[i.Opcode]
 		if !found {
-			return c.NewStringError(UnimplementedInstructionError, strconv.Itoa(i.Opcode))
+			return c.NewError(UnimplementedInstructionError, strconv.Itoa(i.Opcode))
 		}
 		err = imp(c, i.Operand)
 		if err != nil {

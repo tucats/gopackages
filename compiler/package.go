@@ -17,7 +17,7 @@ func (c *Compiler) Package() error {
 
 	name := c.t.Next()
 	if !tokenizer.IsSymbol(name) {
-		return c.NewTokenError("invalid package name")
+		return c.NewError("invalid package name", name)
 	}
 
 	name = strings.ToLower(name)
@@ -139,7 +139,7 @@ func (c *Compiler) Import() error {
 
 		// If after the import we ended with mismatched block markers, complain
 		if c.blockDepth != savedBlockDepth {
-			return c.NewStringError(MissingEndOfBlockError, packageName)
+			return c.NewError(MissingEndOfBlockError, packageName)
 		}
 
 		// Reset the token stream we were working on
@@ -175,7 +175,7 @@ func (c *Compiler) ReadFile(name string) (string, error) {
 			content, err = ioutil.ReadFile(fn)
 			if err != nil {
 				c.t.Advance(-1)
-				return "", c.NewStringError("unable to read import file", err.Error())
+				return "", c.NewError("unable to read import file", err.Error())
 			}
 		}
 	}

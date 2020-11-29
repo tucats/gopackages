@@ -1,7 +1,6 @@
-package bytecode
+package functions
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/tucats/gopackages/util"
@@ -15,11 +14,15 @@ const (
 	InvalidArgCheckError          = "invalid ArgCheck array"
 	InvalidArrayIndexError        = "invalid array index"
 	InvalidBytecodeAddress        = "invalid bytecode address"
+	InvalidFileIdentifierError    = "invalid file identifier"
 	InvalidFunctionCallError      = "invalid function call"
 	InvalidIdentifierError        = "invalid identifier"
+	InvalidNewValueError          = "invalid argument to new()"
 	InvalidSliceIndexError        = "invalid slice index"
+	InvalidTemplateNameError      = "invalid template reference"
 	InvalidThisError              = "invalid _this_ identifier"
 	InvalidTypeError              = "invalid or unsupported data type for this operation"
+	InvalidValueError             = "invalid value for this operation"
 	NotATypeError                 = "not a type"
 	OpcodeAlreadyDefinedError     = "opcode already defined: %d"
 	ReadOnlyError                 = "invalid write to read-only item"
@@ -34,12 +37,11 @@ const (
 type Error struct {
 	text   string
 	module string
-	line   int
 	token  string
 }
 
 // NewError generates a new error
-func (c *Context) NewError(msg string, args ...interface{}) *Error {
+func NewError(fn, msg string, args ...interface{}) *Error {
 
 	token := ""
 	if len(args) > 0 {
@@ -47,9 +49,8 @@ func (c *Context) NewError(msg string, args ...interface{}) *Error {
 	}
 	return &Error{
 		text:   msg,
-		module: c.Name,
-		line:   c.line,
 		token:  token,
+		module: fn,
 	}
 }
 
@@ -58,16 +59,9 @@ func (e Error) Error() string {
 
 	var b strings.Builder
 
-	b.WriteString("execution error, ")
-
-	if len(e.module) > 0 {
-		b.WriteString("in ")
-		b.WriteString(e.module)
-		b.WriteString(", ")
-	}
-	if e.line > 0 {
-		b.WriteString(fmt.Sprintf("at line %d, ", e.line))
-	}
+	b.WriteString("function error, in ")
+	b.WriteString(e.module)
+	b.WriteString("(), ")
 	b.WriteString(e.text)
 	if len(e.token) > 0 {
 		b.WriteString(": ")

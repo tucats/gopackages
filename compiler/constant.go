@@ -19,11 +19,11 @@ func (c *Compiler) Constant() error {
 	for terminator == "" || !c.t.IsNext(terminator) {
 		name := c.t.Next()
 		if !tokenizer.IsSymbol(name) {
-			return c.NewTokenError(InvalidSymbolError)
+			return c.NewError(InvalidSymbolError)
 		}
 
 		if !c.t.IsNext("=") {
-			return c.NewTokenError(MissingEqualError)
+			return c.NewError(MissingEqualError)
 		}
 		vx, err := expressions.Compile(c.t)
 		if err != nil {

@@ -2,7 +2,6 @@ package functions
 
 import (
 	"bufio"
-	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -119,7 +118,7 @@ func FunctionClose(s *symbols.SymbolTable, args []interface{}) (interface{}, err
 	handle, found := s.Get(id)
 
 	if !found {
-		return false, errors.New("invalid file identifier")
+		return false, NewError("close", InvalidFileIdentifierError, args[0])
 	}
 
 	file := handle.(map[string]interface{})
@@ -138,7 +137,7 @@ func FunctionReadString(s *symbols.SymbolTable, args []interface{}) (interface{}
 	handle, found := s.Get(id)
 
 	if !found {
-		return false, errors.New("invalid file identifier")
+		return false, NewError("read", InvalidFileIdentifierError, args[0])
 	}
 
 	file := handle.(map[string]interface{})
@@ -165,7 +164,7 @@ func FunctionWriteString(s *symbols.SymbolTable, args []interface{}) (interface{
 	handle, found := s.Get(id)
 
 	if !found {
-		return false, errors.New("invalid file identifier")
+		return false, NewError("write", InvalidFileIdentifierError, args[0])
 	}
 
 	file := handle.(map[string]interface{})

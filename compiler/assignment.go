@@ -1,8 +1,6 @@
 package compiler
 
 import (
-	"errors"
-
 	"github.com/tucats/gopackages/expressions"
 )
 
@@ -14,7 +12,7 @@ func (c *Compiler) Assignment() error {
 		return err
 	}
 	if !c.t.AnyNext([]string{":=", "="}) {
-		return errors.New(MissingAssignmentError)
+		return c.NewError(MissingAssignmentError)
 	}
 
 	expressionCode, err := expressions.Compile(c.t)

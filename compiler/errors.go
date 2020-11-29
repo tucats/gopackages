@@ -3,6 +3,8 @@ package compiler
 import (
 	"fmt"
 	"strings"
+
+	"github.com/tucats/gopackages/util"
 )
 
 // Error contains an error generated from the compiler
@@ -46,8 +48,8 @@ const (
 	UnexpectedTokenError           = "unexpected token"
 )
 
-// NewError generates a new error
-func (c *Compiler) NewError(msg string) *Error {
+// NewError generates a new compiler error
+func (c *Compiler) NewError(msg string, args ...interface{}) *Error {
 
 	p := c.t.TokenP
 	if p < 0 {
@@ -55,52 +57,16 @@ func (c *Compiler) NewError(msg string) *Error {
 	}
 	if p >= len(c.t.Tokens) {
 		p = len(c.t.Tokens) - 1
+	}
+	token := ""
+	if len(args) > 0 {
+		token = util.GetString(args[0])
 	}
 	return &Error{
 		text:   msg,
 		line:   c.t.Line[p],
 		column: c.t.Pos[p],
-		token:  "",
-		pkg:    c.PackageName,
-	}
-}
-
-// NewTokenError generates a new error that includes the
-// current token as part of the error information.
-func (c *Compiler) NewTokenError(msg string) *Error {
-
-	p := c.t.TokenP
-	if p < 0 {
-		p = 0
-	}
-	if p >= len(c.t.Tokens) {
-		p = len(c.t.Tokens) - 1
-	}
-	return &Error{
-		text:   msg,
-		line:   c.t.Line[p],
-		column: c.t.Pos[p],
-		token:  c.t.Tokens[p],
-		pkg:    c.PackageName,
-	}
-}
-
-// NewStringError generates a new error that includes the
-// string argument as part of the error information. The
-// token string value is not used.
-func (c *Compiler) NewStringError(msg string, s string) *Error {
-
-	p := c.t.TokenP
-	if p < 0 {
-		p = 0
-	}
-	if p >= len(c.t.Tokens) {
-		p = len(c.t.Tokens) - 1
-	}
-	return &Error{
-		text:   fmt.Sprintf("%s: %v", msg, s),
-		line:   c.t.Line[p],
-		column: c.t.Pos[p],
+		token:  token,
 		pkg:    c.PackageName,
 	}
 }
