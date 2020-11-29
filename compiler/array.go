@@ -38,11 +38,11 @@ func (c *Compiler) Array() error {
 			return nil
 		}
 		c.b.Append(bc)
-		c.b.Emit2(bytecode.MakeArray, 2)
+		c.b.Emit(bytecode.MakeArray, 2)
 	} else {
-		c.b.Emit2(bytecode.MakeArray, 1)
+		c.b.Emit(bytecode.MakeArray, 1)
 	}
-	c.b.Emit2(bytecode.SymbolCreate, name)
-	c.b.Emit2(bytecode.Store, name)
+	c.b.Emit(bytecode.SymbolCreate, name)
+	c.b.Emit(bytecode.Store, name)
 	return nil
 }

@@ -17,8 +17,8 @@ func (c *Compiler) Switch() error {
 		return err
 	}
 	c.b.Append(tx)
-	c.b.Emit2(bytecode.SymbolCreate, t)
-	c.b.Emit2(bytecode.Store, t)
+	c.b.Emit(bytecode.SymbolCreate, t)
+	c.b.Emit(bytecode.Store, t)
 
 	if !c.t.IsNext("{") {
 		return c.NewError(MissingBlockError)
@@ -58,10 +58,10 @@ func (c *Compiler) Switch() error {
 				return err
 			}
 			c.b.Append(cx)
-			c.b.Emit2(bytecode.Load, t)
-			c.b.Emit1(bytecode.Equal)
+			c.b.Emit(bytecode.Load, t)
+			c.b.Emit(bytecode.Equal)
 			next = c.b.Mark()
-			c.b.Emit2(bytecode.BranchFalse, 0)
+			c.b.Emit(bytecode.BranchFalse, 0)
 			if !c.t.IsNext(":") {
 				return c.NewError(MissingColonError)
 			}
@@ -75,7 +75,7 @@ func (c *Compiler) Switch() error {
 
 			// Emit the code that will jump to the exit point of the statement
 			fixups = append(fixups, c.b.Mark())
-			c.b.Emit2(bytecode.Branch, 0)
+			c.b.Emit(bytecode.Branch, 0)
 		}
 	}
 
@@ -93,6 +93,6 @@ func (c *Compiler) Switch() error {
 	for _, n := range fixups {
 		c.b.SetAddressHere(n)
 	}
-	c.b.Emit2(bytecode.SymbolDelete, t)
+	c.b.Emit(bytecode.SymbolDelete, t)
 	return nil
 }

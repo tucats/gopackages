@@ -39,19 +39,19 @@ func (e *Expression) expressionAtom() error {
 	// If the token is a number, convert it
 	if i, err := strconv.Atoi(t); err == nil {
 		e.t.Advance(1)
-		e.b.Emit2(bc.Push, i)
+		e.b.Emit(bc.Push, i)
 		return nil
 	}
 
 	if i, err := strconv.ParseFloat(t, 64); err == nil {
 		e.t.Advance(1)
-		e.b.Emit2(bc.Push, i)
+		e.b.Emit(bc.Push, i)
 		return nil
 	}
 
 	if t == "true" || t == "false" {
 		e.t.Advance(1)
-		e.b.Emit2(bc.Push, (t == "true"))
+		e.b.Emit(bc.Push, (t == "true"))
 		return nil
 	}
 
@@ -59,13 +59,13 @@ func (e *Expression) expressionAtom() error {
 	if runeValue == "\"" {
 		e.t.Advance(1)
 		s, err := strconv.Unquote(t)
-		e.b.Emit2(bc.Push, s)
+		e.b.Emit(bc.Push, s)
 		return err
 	}
 	if runeValue == "`" {
 		e.t.Advance(1)
 		s, err := e.unLit(t)
-		e.b.Emit2(bc.Push, s)
+		e.b.Emit(bc.Push, s)
 		return err
 	}
 	if tokenizer.IsSymbol(t) {
@@ -74,7 +74,7 @@ func (e *Expression) expressionAtom() error {
 		t := strings.ToLower(t)
 
 		// Nope, probably name from the symbol table
-		e.b.Emit2(bc.Load, t)
+		e.b.Emit(bc.Load, t)
 
 		return nil
 
@@ -122,15 +122,15 @@ func (e *Expression) parseArray() error {
 					count = (-count) + 2
 
 					for n := t1; n >= t2; n = n - 1 {
-						e.b.Emit2(bytecode.Push, n)
+						e.b.Emit(bytecode.Push, n)
 					}
 
 				} else {
 					for n := t1; n <= t2; n = n + 1 {
-						e.b.Emit2(bytecode.Push, n)
+						e.b.Emit(bytecode.Push, n)
 					}
 				}
-				e.b.Emit2(bytecode.Array, count)
+				e.b.Emit(bytecode.Array, count)
 				if !e.t.IsNext("]") {
 					return e.NewError(InvalidRangeError)
 				}
@@ -156,7 +156,7 @@ func (e *Expression) parseArray() error {
 		e.t.Advance(1)
 	}
 
-	e.b.Emit2(bc.Array, count)
+	e.b.Emit(bc.Array, count)
 
 	e.t.Advance(1)
 	return nil
@@ -198,7 +198,7 @@ func (e *Expression) parseStruct() error {
 			return err
 		}
 		// Now write the name as a string.
-		e.b.Emit2(bc.Push, name)
+		e.b.Emit(bc.Push, name)
 
 		count = count + 1
 		if e.t.AtEnd() {
@@ -213,7 +213,7 @@ func (e *Expression) parseStruct() error {
 		e.t.Advance(1)
 	}
 
-	e.b.Emit2(bc.Struct, count)
+	e.b.Emit(bc.Struct, count)
 	e.t.Advance(1)
 	return err
 }

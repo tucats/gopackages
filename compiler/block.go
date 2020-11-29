@@ -7,7 +7,7 @@ import "github.com/tucats/gopackages/bytecode"
 func (c *Compiler) Block() error {
 
 	parsing := true
-	c.b.Emit1(bytecode.PushScope)
+	c.b.Emit(bytecode.PushScope)
 	c.blockDepth = c.blockDepth + 1
 	for parsing {
 
@@ -28,7 +28,7 @@ func (c *Compiler) Block() error {
 			return c.NewError(MissingEndOfBlockError)
 		}
 	}
-	c.b.Emit1(bytecode.PopScope)
+	c.b.Emit(bytecode.PopScope)
 	c.blockDepth = c.blockDepth - 1
 	return nil
 }

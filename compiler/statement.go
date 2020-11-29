@@ -41,7 +41,7 @@ func (c *Compiler) Statement() error {
 	// At this point, we know we're trying to compile a statement,
 	// so store the current line number in the stream to help us
 	// form runtime error messages as needed.
-	c.b.Emit2(bytecode.AtLine, c.t.Line[c.t.TokenP])
+	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
 
 	// If the next item(s) constitute a value LValue, then this is
 	// an assignment statement.

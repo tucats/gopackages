@@ -14,7 +14,7 @@ func (e *Expression) unary() error {
 		if err != nil {
 			return err
 		}
-		e.b.Emit2(bc.Negate, 0)
+		e.b.Emit(bc.Negate, 0)
 		return nil
 
 	case "!":
@@ -23,7 +23,7 @@ func (e *Expression) unary() error {
 		if err != nil {
 			return err
 		}
-		e.b.Emit2(bc.Negate, 0)
+		e.b.Emit(bc.Negate, 0)
 		return nil
 
 	default:

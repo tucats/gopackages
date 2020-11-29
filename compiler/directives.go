@@ -53,9 +53,9 @@ func (c *Compiler) Template() error {
 		return err
 	}
 	c.b.Append(bc)
-	c.b.Emit2(bytecode.Template, name)
-	c.b.Emit2(bytecode.SymbolCreate, name)
-	c.b.Emit2(bytecode.Store, name)
+	c.b.Emit(bytecode.Template, name)
+	c.b.Emit(bytecode.SymbolCreate, name)
+	c.b.Emit(bytecode.Store, name)
 
 	return nil
 }
@@ -80,19 +80,19 @@ func (c *Compiler) Test() error {
 	// Generate code to update the description (this is required for the
 	// cases of the ego test command running multiple tests as a single
 	// stream)
-	c.b.Emit2(bytecode.Push, s)
-	c.b.Emit2(bytecode.Load, "testing")
-	c.b.Emit2(bytecode.Push, "description")
-	c.b.Emit1(bytecode.StoreIndex)
+	c.b.Emit(bytecode.Push, s)
+	c.b.Emit(bytecode.Load, "testing")
+	c.b.Emit(bytecode.Push, "description")
+	c.b.Emit(bytecode.StoreIndex)
 
 	// Generate code to report that the test is starting.
-	c.b.Emit2(bytecode.Push, "TEST: ")
-	c.b.Emit1(bytecode.Print)
-	c.b.Emit2(bytecode.Load, "testing")
-	c.b.Emit2(bytecode.Push, "description")
-	c.b.Emit1(bytecode.Member)
-	c.b.Emit1(bytecode.Print)
-	c.b.Emit1(bytecode.Newline)
+	c.b.Emit(bytecode.Push, "TEST: ")
+	c.b.Emit(bytecode.Print)
+	c.b.Emit(bytecode.Load, "testing")
+	c.b.Emit(bytecode.Push, "description")
+	c.b.Emit(bytecode.Member)
+	c.b.Emit(bytecode.Print)
+	c.b.Emit(bytecode.Newline)
 
 	return nil
 }
@@ -181,9 +181,9 @@ func TestFail(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 // Assert implements the @assert directive
 func (c *Compiler) Assert() error {
 
-	c.b.Emit2(bytecode.Load, "testing")
-	c.b.Emit2(bytecode.Push, "assert")
-	c.b.Emit1(bytecode.Member)
+	c.b.Emit(bytecode.Load, "testing")
+	c.b.Emit(bytecode.Push, "assert")
+	c.b.Emit(bytecode.Member)
 
 	argCount := 1
 	expressionCode, err := expressions.Compile(c.t)
@@ -202,7 +202,7 @@ func (c *Compiler) Assert() error {
 		argCount = 2
 	}
 
-	c.b.Emit2(bytecode.Call, argCount)
+	c.b.Emit(bytecode.Call, argCount)
 
 	return nil
 }
@@ -217,23 +217,23 @@ func (c *Compiler) Fail() error {
 		}
 		c.b.Append(stringCode)
 	} else {
-		c.b.Emit2(bytecode.Push, "@fail error signal")
+		c.b.Emit(bytecode.Push, "@fail error signal")
 	}
-	c.b.Emit2(bytecode.Panic, true)
+	c.b.Emit(bytecode.Panic, true)
 	return nil
 }
 
 // TestPass implements the @pass directive
 func (c *Compiler) TestPass() error {
 
-	c.b.Emit2(bytecode.Push, "PASS: ")
-	c.b.Emit1(bytecode.Print)
+	c.b.Emit(bytecode.Push, "PASS: ")
+	c.b.Emit(bytecode.Print)
 
-	c.b.Emit2(bytecode.Load, "testing")
-	c.b.Emit2(bytecode.Push, "description")
-	c.b.Emit1(bytecode.Member)
-	c.b.Emit1(bytecode.Print)
-	c.b.Emit1(bytecode.Newline)
+	c.b.Emit(bytecode.Load, "testing")
+	c.b.Emit(bytecode.Push, "description")
+	c.b.Emit(bytecode.Member)
+	c.b.Emit(bytecode.Print)
+	c.b.Emit(bytecode.Newline)
 	return nil
 }
 
@@ -241,9 +241,9 @@ func (c *Compiler) TestPass() error {
 func (c *Compiler) Error() error {
 	errCode, err := expressions.Compile(c.t)
 	if err == nil {
-		c.b.Emit2(bytecode.AtLine, c.t.Line[c.t.TokenP])
+		c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
 		c.b.Append(errCode)
-		c.b.Emit2(bytecode.Panic, false) // Does not cause fatal error
+		c.b.Emit(bytecode.Panic, false) // Does not cause fatal error
 	}
 	return err
 }

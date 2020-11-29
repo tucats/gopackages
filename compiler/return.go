@@ -23,15 +23,15 @@ func (c *Compiler) Return() error {
 	}
 
 	// Stop execution of this stream
-	c.b.Emit2(bytecode.Return, hasReturnValue)
+	c.b.Emit(bytecode.Return, hasReturnValue)
 	return nil
 }
 
 // Exit handles the exit statment compilation
 func (c *Compiler) Exit() error {
 
-	c.b.Emit2(bytecode.Load, "util")
-	c.b.Emit2(bytecode.Member, "exit")
+	c.b.Emit(bytecode.Load, "util")
+	c.b.Emit(bytecode.Member, "exit")
 
 	argCount := 0
 	if !c.StatementEnd() {
@@ -43,7 +43,7 @@ func (c *Compiler) Exit() error {
 		argCount = 1
 	}
 
-	c.b.Emit2(bytecode.Call, argCount)
+	c.b.Emit(bytecode.Call, argCount)
 
 	return nil
 }

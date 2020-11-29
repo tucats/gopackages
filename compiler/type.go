@@ -28,9 +28,9 @@ func (c *Compiler) Type() error {
 	// If there is not parent, seal the chain by making the link point to a string of our own name.
 	// If there is a parent, load it so it can be linked after type creation.
 	if parent == name {
-		c.b.Emit2(bytecode.Push, parent)
+		c.b.Emit(bytecode.Push, parent)
 	} else {
-		c.b.Emit2(bytecode.Load, parent)
+		c.b.Emit(bytecode.Load, parent)
 	}
 
 	// Compile a struct definition
@@ -43,10 +43,10 @@ func (c *Compiler) Type() error {
 	// a string that is the name of the type. When a member dereference on a struct
 	// happens that includes a __parent, the __parent object is also checked for the
 	// member if it is NOT a string.
-	c.b.Emit2(bytecode.Push, "__parent")
-	c.b.Emit2(bytecode.StoreIndex, true)
-	c.b.Emit2(bytecode.SymbolCreate, name)
-	c.b.Emit2(bytecode.Store, name)
+	c.b.Emit(bytecode.Push, "__parent")
+	c.b.Emit(bytecode.StoreIndex, true)
+	c.b.Emit(bytecode.SymbolCreate, name)
+	c.b.Emit(bytecode.Store, name)
 
 	return nil
 }
@@ -73,22 +73,22 @@ func (c *Compiler) compileType() error {
 		} else {
 			switch c.t.Next() {
 			case "int":
-				c.b.Emit2(bytecode.Push, 0)
+				c.b.Emit(bytecode.Push, 0)
 			case "float":
-				c.b.Emit2(bytecode.Push, 0.0)
+				c.b.Emit(bytecode.Push, 0.0)
 			case "bool":
-				c.b.Emit2(bytecode.Push, false)
+				c.b.Emit(bytecode.Push, false)
 			case "string":
-				c.b.Emit2(bytecode.Push, "")
+				c.b.Emit(bytecode.Push, "")
 			default:
 				return c.NewError(InvalidTypeNameError)
 			}
 		}
 
-		c.b.Emit2(bytecode.Push, name)
+		c.b.Emit(bytecode.Push, name)
 
 		if c.t.IsNext("}") {
-			c.b.Emit2(bytecode.Struct, count)
+			c.b.Emit(bytecode.Struct, count)
 			return nil
 		}
 		if c.t.AtEnd() {

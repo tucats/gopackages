@@ -65,17 +65,15 @@ func New(name string) *ByteCode {
 	return &bc
 }
 
-// Emit1 emits an instruction with no operand
-func (b *ByteCode) Emit1(opcode int) {
-	b.Emit2(opcode, nil)
-}
-
-// Emit2 emits a single instruction
-func (b *ByteCode) Emit2(opcode int, operand interface{}) {
+// Emit emits a single instruction
+func (b *ByteCode) Emit(opcode int, operand ...interface{}) {
 	if b.emitPos >= len(b.opcodes) {
 		b.opcodes = append(b.opcodes, make([]I, GrowOpcodesBy)...)
 	}
-	i := I{Opcode: opcode, Operand: operand}
+	i := I{Opcode: opcode}
+	if len(operand) > 0 {
+		i.Operand = operand[0]
+	}
 	b.opcodes[b.emitPos] = i
 	b.emitPos = b.emitPos + 1
 }
@@ -117,7 +115,7 @@ func (b *ByteCode) Append(a *ByteCode) {
 		if i.Opcode > BranchInstructions {
 			i.Operand = util.GetInt(i.Operand) + base
 		}
-		b.Emit2(i.Opcode, i.Operand)
+		b.Emit(i.Opcode, i.Operand)
 	}
 }
 

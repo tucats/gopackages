@@ -88,7 +88,7 @@ func TestByteCode_Emit2(t *testing.T) {
 				emitPos: tt.fields.emitPos,
 			}
 			for _, i := range tt.args.emit {
-				b.Emit2(i.Opcode, i.Operand)
+				b.Emit(i.Opcode, i.Operand)
 			}
 
 			for n, i := range b.opcodes {

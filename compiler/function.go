@@ -61,11 +61,11 @@ func (c *Compiler) Function() error {
 	if varargs {
 		p[1] = -1
 	}
-	b.Emit2(bytecode.ArgCheck, p)
+	b.Emit(bytecode.ArgCheck, p)
 
 	// If there was a "this" variable defined, process it now.
 	if this != "" {
-		b.Emit2(bytecode.This, this)
+		b.Emit(bytecode.This, this)
 	}
 
 	// Generate the parameter assignments. These are extracted
@@ -73,11 +73,11 @@ func (c *Compiler) Function() error {
 	// as part of the function call during bytecode execution.
 	// Note that the array is 1-based.
 	for n, name := range parameters {
-		b.Emit2(bytecode.Load, "_args")
-		b.Emit2(bytecode.Push, n+1)
-		b.Emit1(bytecode.LoadIndex)
-		b.Emit2(bytecode.SymbolCreate, name)
-		b.Emit2(bytecode.Store, name)
+		b.Emit(bytecode.Load, "_args")
+		b.Emit(bytecode.Push, n+1)
+		b.Emit(bytecode.LoadIndex)
+		b.Emit(bytecode.SymbolCreate, name)
+		b.Emit(bytecode.Store, name)
 	}
 
 	// Look for return type definition. If found, compile the appropriate
@@ -86,29 +86,29 @@ func (c *Compiler) Function() error {
 	coercion := bytecode.New(fname + " return")
 
 	if c.t.Peek(1) == "[" && c.t.Peek(2) == "]" {
-		coercion.Emit2(bytecode.Coerce, bytecode.ArrayType)
+		coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
 		c.t.Advance(2)
 	} else {
 		if c.t.Peek(1) == "{" && c.t.Peek(2) == "}" {
-			coercion.Emit2(bytecode.Coerce, bytecode.StructType)
+			coercion.Emit(bytecode.Coerce, bytecode.StructType)
 			c.t.Advance(2)
 		} else {
 			switch c.t.Peek(1) {
 			case "int":
-				coercion.Emit2(bytecode.Coerce, bytecode.IntType)
+				coercion.Emit(bytecode.Coerce, bytecode.IntType)
 				c.t.Advance(1)
 			case "float":
-				coercion.Emit2(bytecode.Coerce, bytecode.FloatType)
+				coercion.Emit(bytecode.Coerce, bytecode.FloatType)
 				c.t.Advance(1)
 			case "string":
-				coercion.Emit2(bytecode.Coerce, bytecode.StringType)
+				coercion.Emit(bytecode.Coerce, bytecode.StringType)
 				c.t.Advance(1)
 			case "bool":
-				coercion.Emit2(bytecode.Coerce, bytecode.BoolType)
+				coercion.Emit(bytecode.Coerce, bytecode.BoolType)
 				c.t.Advance(1)
 
 			case "any":
-				coercion.Emit2(bytecode.Coerce, bytecode.UndefinedType)
+				coercion.Emit(bytecode.Coerce, bytecode.UndefinedType)
 				c.t.Advance(1)
 
 			case "void":

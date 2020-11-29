@@ -19,7 +19,7 @@ import (
 //    using each member of the array or struct.
 func (c *Compiler) For() error {
 
-	c.b.Emit1(bytecode.PushScope)
+	c.b.Emit(bytecode.PushScope)
 
 	// Is this the two-value range thing?
 	indexName := ""
@@ -47,7 +47,7 @@ func (c *Compiler) For() error {
 		// This is wierd, but the LValue compiler will have inserted a "SymbolCreate" in the
 		// lValue due to the syntax, but we don't really want to create it as it will have already
 		// been generated once. So use it once to create a value, and then remove the store.
-		c.b.Emit2(bytecode.Push, 0)
+		c.b.Emit(bytecode.Push, 0)
 		c.b.Append(indexStore)
 		indexStore.Remove(0)
 
@@ -62,27 +62,27 @@ func (c *Compiler) For() error {
 		if indexName == "" {
 			indexName = MakeSymbol()
 		}
-		c.b.Emit2(bytecode.Push, 1)
-		c.b.Emit2(bytecode.SymbolCreate, indexName)
-		c.b.Emit2(bytecode.Store, indexName)
+		c.b.Emit(bytecode.Push, 1)
+		c.b.Emit(bytecode.SymbolCreate, indexName)
+		c.b.Emit(bytecode.Store, indexName)
 
 		// Remember top of loop
 		b1 := c.b.Mark()
 
 		// Is index >= len of array?
-		c.b.Emit2(bytecode.Load, "len")
+		c.b.Emit(bytecode.Load, "len")
 		c.b.Append(arrayCode)
-		c.b.Emit2(bytecode.Call, 1)
-		c.b.Emit2(bytecode.Load, indexName)
-		c.b.Emit1(bytecode.LessThan)
+		c.b.Emit(bytecode.Call, 1)
+		c.b.Emit(bytecode.Load, indexName)
+		c.b.Emit(bytecode.LessThan)
 
 		b2 := c.b.Mark()
-		c.b.Emit2(bytecode.BranchTrue, 0)
+		c.b.Emit(bytecode.BranchTrue, 0)
 
 		// Load element of array
 		c.b.Append(arrayCode)
-		c.b.Emit2(bytecode.Load, indexName)
-		c.b.Emit1(bytecode.LoadIndex)
+		c.b.Emit(bytecode.Load, indexName)
+		c.b.Emit(bytecode.LoadIndex)
 		c.b.Append(indexStore)
 
 		err = c.Statement()
@@ -92,13 +92,13 @@ func (c *Compiler) For() error {
 
 		// Increment the index
 		b3 := c.b.Mark()
-		c.b.Emit2(bytecode.Load, indexName)
-		c.b.Emit2(bytecode.Push, 1)
-		c.b.Emit1(bytecode.Add)
-		c.b.Emit2(bytecode.Store, indexName)
+		c.b.Emit(bytecode.Load, indexName)
+		c.b.Emit(bytecode.Push, 1)
+		c.b.Emit(bytecode.Add)
+		c.b.Emit(bytecode.Store, indexName)
 
 		// Branch back to start of loop
-		c.b.Emit2(bytecode.Branch, b1)
+		c.b.Emit(bytecode.Branch, b1)
 		for _, fixAddr := range c.loops.continues {
 			c.b.SetAddress(fixAddr, b3)
 		}
@@ -109,8 +109,8 @@ func (c *Compiler) For() error {
 			c.b.SetAddressHere(fixAddr)
 		}
 		c.PopLoop()
-		c.b.Emit2(bytecode.SymbolDelete, indexName)
-		c.b.Emit1(bytecode.PopScope)
+		c.b.Emit(bytecode.SymbolDelete, indexName)
+		c.b.Emit(bytecode.PopScope)
 
 		return nil
 	}
@@ -168,7 +168,7 @@ func (c *Compiler) For() error {
 	// Emit the test condition
 	c.b.Append(condition)
 	b2 := c.b.Mark()
-	c.b.Emit2(bytecode.BranchFalse, 0)
+	c.b.Emit(bytecode.BranchFalse, 0)
 
 	// Loop body goes next
 	err = c.Statement()
@@ -180,7 +180,7 @@ func (c *Compiler) For() error {
 	// the condition test for the loop.
 	c.b.Append(incrementCode)
 	c.b.Append(incrementStore)
-	c.b.Emit2(bytecode.Branch, b1)
+	c.b.Emit(bytecode.Branch, b1)
 	c.b.SetAddressHere(b2)
 
 	for _, fixAddr := range c.loops.continues {
@@ -190,7 +190,7 @@ func (c *Compiler) For() error {
 	for _, fixAddr := range c.loops.breaks {
 		c.b.SetAddressHere(fixAddr)
 	}
-	c.b.Emit1(bytecode.PopScope)
+	c.b.Emit(bytecode.PopScope)
 	c.PopLoop()
 	return nil
 }
@@ -201,7 +201,7 @@ func (c *Compiler) Break() error {
 		return c.NewError(InvalidLoopControlError)
 	}
 	fixAddr := c.b.Mark()
-	c.b.Emit2(bytecode.Branch, 0)
+	c.b.Emit(bytecode.Branch, 0)
 	c.loops.breaks = append(c.loops.breaks, fixAddr)
 	return nil
 }
@@ -212,7 +212,7 @@ func (c *Compiler) Continue() error {
 		return c.NewError(InvalidLoopControlError)
 	}
 	fixAddr := c.b.Mark()
-	c.b.Emit2(bytecode.Branch, 0)
+	c.b.Emit(bytecode.Branch, 0)
 	c.loops.continues = append(c.loops.continues, fixAddr)
 	return nil
 }

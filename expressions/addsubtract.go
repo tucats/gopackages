@@ -33,13 +33,13 @@ func (e *Expression) addSubtract() error {
 			switch op {
 
 			case "+":
-				e.b.Emit1(bc.Add)
+				e.b.Emit(bc.Add)
 
 			case "-":
-				e.b.Emit1(bc.Sub)
+				e.b.Emit(bc.Sub)
 
 			case "&":
-				e.b.Emit1(bc.And)
+				e.b.Emit(bc.And)
 			}
 
 		} else {

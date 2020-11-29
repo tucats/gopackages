@@ -22,7 +22,7 @@ func (e *Expression) conditional() error {
 	}
 
 	m1 := e.b.Mark()
-	e.b.Emit2(bc.BranchFalse, 0)
+	e.b.Emit(bc.BranchFalse, 0)
 
 	// Parse both parts of the alternate values
 	e.t.Advance(1)
@@ -34,7 +34,7 @@ func (e *Expression) conditional() error {
 		return e.NewError(MissingColonError)
 	}
 	m2 := e.b.Mark()
-	e.b.Emit2(bc.Branch, 0)
+	e.b.Emit(bc.Branch, 0)
 
 	e.b.SetAddressHere(m1)
 	e.t.Advance(1)

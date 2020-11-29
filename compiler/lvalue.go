@@ -48,7 +48,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 	for c.t.Peek(1) == "." || c.t.Peek(1) == "[" {
 
 		if needLoad {
-			bc.Emit2(bytecode.Load, name)
+			bc.Emit(bytecode.Load, name)
 			needLoad = false
 		}
 		err := c.lvalueTerm(bc)
@@ -62,11 +62,11 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 	// discard and we can shortcircuit that.
 
 	if name == "_" {
-		bc.Emit2(bytecode.Drop, 1)
+		bc.Emit(bytecode.Drop, 1)
 	} else {
 
 		if c.t.Peek(1) == ":=" {
-			bc.Emit2(bytecode.SymbolCreate, name)
+			bc.Emit(bytecode.SymbolCreate, name)
 		}
 
 		// Is the last operation in the stack referecing
@@ -77,7 +77,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 		if opsPos > 0 && ops[opsPos].Opcode == bytecode.LoadIndex {
 			ops[opsPos].Opcode = bytecode.StoreIndex
 		} else {
-			bc.Emit2(bytecode.Store, name)
+			bc.Emit(bytecode.Store, name)
 		}
 	}
 	return bc, nil
@@ -98,7 +98,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		if !c.t.IsNext("]") {
 			return c.NewError(MissingBracketError)
 		}
-		bc.Emit1(bytecode.LoadIndex)
+		bc.Emit(bytecode.LoadIndex)
 		return nil
 	}
 
@@ -108,8 +108,8 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		if !tokenizer.IsSymbol(member) {
 			return c.NewError(InvalidSymbolError, member)
 		}
-		bc.Emit2(bytecode.Push, member)
-		bc.Emit1(bytecode.LoadIndex)
+		bc.Emit(bytecode.Push, member)
+		bc.Emit(bytecode.LoadIndex)
 		return nil
 	}
 

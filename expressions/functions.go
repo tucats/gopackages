@@ -34,7 +34,7 @@ func (e *Expression) functionCall() error {
 	e.t.Advance(1)
 
 	// Call the function
-	e.b.Emit2(bc.Call, argc)
+	e.b.Emit(bc.Call, argc)
 	return nil
 }
 

@@ -41,7 +41,7 @@ func (c *Compiler) Constant() error {
 		c.constants = append(c.constants, name)
 
 		c.b.Append(vx)
-		c.b.Emit2(bytecode.Constant, name)
+		c.b.Emit(bytecode.Constant, name)
 
 		if terminator == "" {
 			break

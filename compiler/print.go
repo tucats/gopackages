@@ -20,7 +20,7 @@ func (c *Compiler) Print() error {
 		}
 		newline = true
 		c.b.Append(bc)
-		c.b.Emit1(bytecode.Print)
+		c.b.Emit(bytecode.Print)
 
 		if !c.t.IsNext(",") {
 			break
@@ -28,7 +28,7 @@ func (c *Compiler) Print() error {
 		newline = false
 	}
 	if newline {
-		c.b.Emit1(bytecode.Newline)
+		c.b.Emit(bytecode.Newline)
 	}
 	return nil
 }

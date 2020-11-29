@@ -23,16 +23,16 @@ func (e *Expression) reference() error {
 		case "->":
 			e.t.Advance(1)
 			name := e.t.Next()
-			e.b.Emit1(bc.Dup)
-			e.b.Emit2(bc.Push, name)
-			e.b.Emit1(bc.ClassMember)
+			e.b.Emit(bc.Dup)
+			e.b.Emit(bc.Push, name)
+			e.b.Emit(bc.ClassMember)
 
 		// Map member reference
 		case ".":
 			e.t.Advance(1)
 			name := e.t.Next()
-			e.b.Emit2(bc.Push, name)
-			e.b.Emit1(bc.Member)
+			e.b.Emit(bc.Push, name)
+			e.b.Emit(bc.Member)
 
 		// Array index reference
 		case "[":
@@ -48,7 +48,7 @@ func (e *Expression) reference() error {
 				if err != nil {
 					return err
 				}
-				e.b.Emit1(bc.LoadSlice)
+				e.b.Emit(bc.LoadSlice)
 				if e.t.Next() != "]" {
 					return e.NewError(MissingBracketError)
 				}
@@ -57,7 +57,7 @@ func (e *Expression) reference() error {
 				if e.t.Next() != "]" {
 					return e.NewError(MissingBracketError)
 				}
-				e.b.Emit1(bc.LoadIndex)
+				e.b.Emit(bc.LoadIndex)
 			}
 
 		// Nothing else, term is complete

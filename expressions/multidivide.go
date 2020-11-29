@@ -34,16 +34,16 @@ func (e *Expression) multDivide() error {
 			switch op {
 
 			case "^":
-				e.b.Emit1(bc.Exp)
+				e.b.Emit(bc.Exp)
 
 			case "*":
-				e.b.Emit1(bc.Mul)
+				e.b.Emit(bc.Mul)
 
 			case "/":
-				e.b.Emit1(bc.Div)
+				e.b.Emit(bc.Div)
 
 			case "|":
-				e.b.Emit1(bc.Or)
+				e.b.Emit(bc.Or)
 
 			}
 
