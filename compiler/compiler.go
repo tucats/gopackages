@@ -166,12 +166,7 @@ func (c *Compiler) AddPackageToSymbols(s *symbols.SymbolTable) {
 // the end-of-statement boundary
 func (c *Compiler) StatementEnd() bool {
 	next := c.t.Peek(1)
-
-	if next == tokenizer.EndOfTokens {
-		return true
-	}
-
-	return (next == ";") || (next == "}")
+	return next == tokenizer.EndOfTokens || (next == ";") || (next == "}")
 }
 
 // Symbols returns the symbol table map from compilation
