@@ -8,7 +8,11 @@ import (
 // Function compiles a function definition
 func (c *Compiler) Function() error {
 
-	parameters := []string{}
+	type parameter struct {
+		name string
+		kind int
+	}
+	parameters := []parameter{}
 	this := ""
 
 	fname := c.t.Next()
@@ -39,11 +43,40 @@ func (c *Compiler) Function() error {
 				continue
 			}
 			name := c.t.Next()
+			p := parameter{kind: bytecode.UndefinedType}
 			if tokenizer.IsSymbol(name) {
-				parameters = append(parameters, name)
+				p.name = name
 			} else {
 				return c.NewError(InvalidFunctionArgument)
 			}
+
+			// Is there a type name that follows it? We have to check for "[]" and "{}"
+			// as two differnt tokens. Also note that you can use the word array or struct
+			// instead if you wish.
+			if c.t.Peek(1) == "[" && c.t.Peek(2) == "]" {
+				p.kind = bytecode.ArrayType
+				c.t.Advance(2)
+			} else if c.t.Peek(1) == "{" && c.t.Peek(2) == "}" {
+				p.kind = bytecode.ArrayType
+				c.t.Advance(2)
+			} else if inList(c.t.Peek(1), []string{"any", "int", "string", "bool", "float", "array", "struct"}) {
+				switch c.t.Next() {
+				case "int":
+					p.kind = bytecode.IntType
+				case "string":
+					p.kind = bytecode.StringType
+				case "bool":
+					p.kind = bytecode.BoolType
+				case "float":
+					p.kind = bytecode.FloatType
+				case "struct":
+					p.kind = bytecode.StructType
+				case "array":
+					p.kind = bytecode.ArrayType
+				}
+			}
+
+			parameters = append(parameters, p)
 			if c.t.IsNext(",") {
 				// No action
 			}
@@ -72,12 +105,15 @@ func (c *Compiler) Function() error {
 	// from the automatic array named _args which is generated
 	// as part of the function call during bytecode execution.
 	// Note that the array is 1-based.
-	for n, name := range parameters {
+	for n, p := range parameters {
 		b.Emit(bytecode.Load, "_args")
 		b.Emit(bytecode.Push, n+1)
 		b.Emit(bytecode.LoadIndex)
-		b.Emit(bytecode.SymbolCreate, name)
-		b.Emit(bytecode.Store, name)
+		if p.kind != bytecode.UndefinedType {
+			b.Emit(bytecode.Coerce, p.kind)
+		}
+		b.Emit(bytecode.SymbolCreate, p.name)
+		b.Emit(bytecode.Store, p.name)
 	}
 
 	// Look for return type definition. If found, compile the appropriate
@@ -106,7 +142,12 @@ func (c *Compiler) Function() error {
 			case "bool":
 				coercion.Emit(bytecode.Coerce, bytecode.BoolType)
 				c.t.Advance(1)
-
+			case "struct":
+				coercion.Emit(bytecode.Coerce, bytecode.StructType)
+				c.t.Advance(1)
+			case "array":
+				coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
+				c.t.Advance(1)
 			case "any":
 				coercion.Emit(bytecode.Coerce, bytecode.UndefinedType)
 				c.t.Advance(1)
@@ -140,4 +181,13 @@ func (c *Compiler) Function() error {
 	}
 
 	return nil
+}
+
+func inList(search string, values []string) bool {
+	for _, item := range values {
+		if search == item {
+			return true
+		}
+	}
+	return false
 }

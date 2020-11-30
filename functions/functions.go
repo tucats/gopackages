@@ -71,6 +71,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"strings.upper":     FunctionDefinition{Min: 1, Max: 1, F: FunctionUpper},
 	"time.add":          FunctionDefinition{Min: 2, Max: 2, F: FunctionTimeAdd},
 	"time.now":          FunctionDefinition{Min: 0, Max: 0, F: FunctionTimeNow},
+	"time.sleep":        FunctionDefinition{Min: 1, Max: 1, F: FunctionSleep},
 	"time.subtract":     FunctionDefinition{Min: 2, Max: 2, F: FunctionTimeSub},
 	"util.coerce":       FunctionDefinition{Min: 2, Max: 2, F: FunctionCoerce},
 	"util.exit":         FunctionDefinition{Min: 0, Max: 1, F: FunctionExit},
