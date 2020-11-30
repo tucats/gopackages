@@ -163,18 +163,6 @@ must have a value stored in them before they can be used in an expression.
 The second example assigns an initial value to each element of the array,
 so the second statement is really identical to `y := [10,10]`.
 
-## assert
-The `assert` statement is used to provide consistency checks, mostly in
-testing programs. The statement is followed by an expression, which must
-evaluate to `true` or the statement stops the program with an error.
-
-If only the expression is given, then the error message includes the text
-of the failing expression. If the assert statement includes an error message
-string, that is output as the error text.
-
-    assert x=3
-    assert x=3, "Count was not 3"
-
 ## const
 The `const` statement can define constant values in the current scope. These
 values are always readonly values and you cannot use a constant name as a
@@ -252,10 +240,15 @@ Where the "x" is the name of an ignored value.
 
 ## func
 The `func` statement defines a function. This must have a name
-which is a valid symbol, followed by an argument list. The argument 
-list is a list of names which become local variables in the running
-function, containing the arguments from the caller. After the 
-(possibly empty)  argument list you must specify the type of the
+which is a valid symbol, followed by an argument list. 
+
+The argument list is a list of names which become local variables in the running
+function, set to the value of the arguments from the caller. After each argument
+name in the `func` statement, you can specify a type of `int`, `string`, `float`, 
+`bool`, `struct`, or `array`, in which case the value is
+coerced to that type regardless of the value passed into the function.
+
+After the  (possibly empty)  argument list you must specify the type of the
 function's return value. This can be one of the base
 types (`int`, `float`, `string`, or `bool`). It can also be `[]` which
 denotes a return of an array type, or `{}` which denotes the return
