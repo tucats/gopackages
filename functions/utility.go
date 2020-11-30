@@ -6,12 +6,22 @@ import (
 	"os"
 	"reflect"
 	"sort"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
+
+// FunctionSleep implements util.sleep()
+func FunctionSleep(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	duration, err := time.ParseDuration(util.GetString(args[0]))
+	if err == nil {
+		time.Sleep(duration)
+	}
+	return true, err
+}
 
 // FunctionProfile implements the profile() function
 func FunctionProfile(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
