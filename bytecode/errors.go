@@ -58,16 +58,17 @@ func (e Error) Error() string {
 
 	var b strings.Builder
 
-	b.WriteString("execution error, ")
+	b.WriteString("execution error")
 
 	if len(e.module) > 0 {
 		b.WriteString("in ")
 		b.WriteString(e.module)
-		b.WriteString(", ")
+		b.WriteString(" ")
 	}
 	if e.line > 0 {
-		b.WriteString(fmt.Sprintf("at line %d, ", e.line))
+		b.WriteString(fmt.Sprintf(util.LineFormat, e.line))
 	}
+	b.WriteString(", ")
 	b.WriteString(e.text)
 	if len(e.token) > 0 {
 		b.WriteString(": ")

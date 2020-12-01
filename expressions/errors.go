@@ -58,19 +58,15 @@ func (e *Error) Error() string {
 
 	var b strings.Builder
 
-	b.WriteString("compile error, ")
+	b.WriteString("compile error ")
 	if e.line > 0 {
-		b.WriteString(fmt.Sprintf("at line %d, column %d, ", e.line, e.column))
+		b.WriteString(fmt.Sprintf(util.LineColumnFormat, e.line, e.column))
 	}
+	b.WriteString(", ")
 	b.WriteString(e.text)
 	if len(e.token) > 0 {
 		b.WriteString(": ")
 		b.WriteString(e.token)
 	}
 	return b.String()
-}
-
-// Code returns the numeric code for the error
-func (e *Error) Code() int {
-	return e.code
 }

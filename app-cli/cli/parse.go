@@ -2,7 +2,6 @@ package cli
 
 import (
 	"errors"
-	"fmt"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -57,7 +56,7 @@ func (c *Context) parseGrammar(args []string) error {
 			globalContext := c.FindGlobal()
 			globalContext.Parameters = append(globalContext.Parameters, option)
 			count := len(globalContext.Parameters)
-			ui.Debug(fmt.Sprintf("added parameter %d", count))
+			ui.Debug("added parameter %d", count)
 			continue
 		}
 
@@ -157,7 +156,7 @@ func (c *Context) parseGrammar(args []string) error {
 			g := c.FindGlobal()
 			g.Parameters = append(g.Parameters, option)
 			count := len(g.Parameters)
-			ui.Debug(fmt.Sprintf("Unclaimed token added parameter %d", count))
+			ui.Debug("Unclaimed token added parameter %d", count)
 
 		} else {
 

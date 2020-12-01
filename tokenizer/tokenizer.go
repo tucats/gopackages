@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"text/scanner"
+
+	"github.com/tucats/gopackages/util"
 )
 
 // Tokenizer is an instance of a tokenized string.
@@ -72,7 +74,7 @@ func (t *Tokenizer) PositionString() string {
 	if p >= len(t.Line) {
 		p = len(t.Line) - 1
 	}
-	return fmt.Sprintf("at line %d, column %d,", t.Line[p], t.Pos[p])
+	return fmt.Sprintf(util.LineColumnFormat, t.Line[p], t.Pos[p])
 }
 
 // Next gets the next token in the tokenizer

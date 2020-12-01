@@ -76,15 +76,16 @@ func (e Error) Error() string {
 
 	var b strings.Builder
 
-	b.WriteString("compile error, ")
+	b.WriteString("compile error ")
 	if e.pkg != "" {
-		b.WriteString("package ")
+		b.WriteString("in package ")
 		b.WriteString(e.pkg)
-		b.WriteString(", ")
+		b.WriteString(" ")
 	}
 	if e.line > 0 {
-		b.WriteString(fmt.Sprintf("at line %d, column %d, ", e.line, e.column))
+		b.WriteString(fmt.Sprintf(util.LineColumnFormat, e.line, e.column))
 	}
+	b.WriteString(", ")
 	b.WriteString(e.text)
 	if len(e.token) > 0 {
 		b.WriteString(": ")
