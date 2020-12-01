@@ -20,7 +20,7 @@ func TestNew(t *testing.T) {
 	}{
 		{
 			name: "Index into array",
-			expr: "a[2]",
+			expr: "a[1]",
 			want: "tom",
 		},
 		{
@@ -255,7 +255,7 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name: "map constant nested array member indexed",
-			expr: "{name:\"Tom\",sizes:[10, 12], age:50}.sizes[2]",
+			expr: "{name:\"Tom\",sizes:[10, 12], age:50}.sizes[1]",
 			want: 12,
 		},
 		{

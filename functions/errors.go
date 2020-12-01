@@ -59,7 +59,7 @@ func (e Error) Error() string {
 
 	var b strings.Builder
 
-	b.WriteString("function error, in ")
+	b.WriteString("function error in ")
 	b.WriteString(e.module)
 	b.WriteString("(), ")
 	b.WriteString(e.text)

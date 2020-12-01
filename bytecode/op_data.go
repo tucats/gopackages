@@ -329,13 +329,12 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 		c.Push(v)
 		c.this = a
 
-	// Index into array is integer index (1-based)
 	case []interface{}:
 		subscript := util.GetInt(index)
-		if subscript < 1 || subscript > len(a) {
+		if subscript < 0 || subscript >= len(a) {
 			return c.NewError(InvalidArrayIndexError, subscript)
 		}
-		v := a[subscript-1]
+		v := a[subscript]
 		c.Push(v)
 
 	default:
@@ -368,14 +367,14 @@ func LoadSliceOpcode(c *Context, i interface{}) error {
 	// Array of objects means we retrieve a slice.
 	case []interface{}:
 		subscript1 := util.GetInt(index1)
-		if subscript1 < 1 || subscript1 > len(a) {
+		if subscript1 < 0 || subscript1 >= len(a) {
 			return c.NewError(InvalidSliceIndexError, subscript1)
 		}
 		subscript2 := util.GetInt(index2)
-		if subscript2 < subscript1 || subscript2 > len(a) {
+		if subscript2 < subscript1 || subscript2 >= len(a) {
 			return c.NewError(InvalidSliceIndexError, subscript2)
 		}
-		v := a[subscript1-1 : subscript2]
+		v := a[subscript1 : subscript2+1]
 		c.Push(v)
 
 	default:
@@ -444,10 +443,10 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 	// Index into array is integer index (1-based)
 	case []interface{}:
 		subscript := util.GetInt(index)
-		if subscript < 1 || subscript > len(a) {
+		if subscript < 0 || subscript >= len(a) {
 			return c.NewError(InvalidArrayIndexError, subscript)
 		}
-		a[subscript-1] = v
+		a[subscript] = v
 		c.Push(a)
 
 	default:

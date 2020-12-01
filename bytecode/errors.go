@@ -58,7 +58,7 @@ func (e Error) Error() string {
 
 	var b strings.Builder
 
-	b.WriteString("execution error")
+	b.WriteString("execution error ")
 
 	if len(e.module) > 0 {
 		b.WriteString("in ")

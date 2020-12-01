@@ -39,25 +39,19 @@ func Format(arg interface{}) string {
 	}
 
 	switch v := arg.(type) {
-
 	case error:
 		return fmt.Sprintf("%v", v)
-
 	case int:
 		return fmt.Sprintf("%d", v)
-
 	case bool:
 		if v {
 			return "true"
 		}
 		return "false"
-
 	case float64:
 		return fmt.Sprintf("%v", v)
-
 	case map[string]interface{}:
 		var b strings.Builder
-
 		// Make a list of the keys, ignoring hidden members whose name
 		// starts with "__"
 		keys := make([]string, 0)
@@ -83,7 +77,6 @@ func Format(arg interface{}) string {
 		return b.String()
 
 	case []interface{}:
-
 		var b strings.Builder
 		b.WriteRune('[')
 
