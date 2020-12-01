@@ -440,7 +440,7 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 			c.Push(a)
 		}
 
-	// Index into array is integer index (1-based)
+	// Index into array is integer index
 	case []interface{}:
 		subscript := util.GetInt(index)
 		if subscript < 0 || subscript >= len(a) {

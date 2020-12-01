@@ -104,10 +104,9 @@ func (c *Compiler) Function() error {
 	// Generate the parameter assignments. These are extracted
 	// from the automatic array named _args which is generated
 	// as part of the function call during bytecode execution.
-	// Note that the array is 1-based.
 	for n, p := range parameters {
 		b.Emit(bytecode.Load, "_args")
-		b.Emit(bytecode.Push, n+1)
+		b.Emit(bytecode.Push, n)
 		b.Emit(bytecode.LoadIndex)
 		if p.kind != bytecode.UndefinedType {
 			b.Emit(bytecode.Coerce, p.kind)

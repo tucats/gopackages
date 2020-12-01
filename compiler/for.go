@@ -62,7 +62,7 @@ func (c *Compiler) For() error {
 		if indexName == "" {
 			indexName = MakeSymbol()
 		}
-		c.b.Emit(bytecode.Push, 1)
+		c.b.Emit(bytecode.Push, 0)
 		c.b.Emit(bytecode.SymbolCreate, indexName)
 		c.b.Emit(bytecode.Store, indexName)
 
@@ -74,7 +74,7 @@ func (c *Compiler) For() error {
 		c.b.Append(arrayCode)
 		c.b.Emit(bytecode.Call, 1)
 		c.b.Emit(bytecode.Load, indexName)
-		c.b.Emit(bytecode.LessThan)
+		c.b.Emit(bytecode.LessThanOrEqual)
 
 		b2 := c.b.Mark()
 		c.b.Emit(bytecode.BranchTrue, 0)
