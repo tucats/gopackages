@@ -231,7 +231,11 @@ func (c *Context) parseGrammar(args []string) error {
 	if err == nil {
 
 		g := c.FindGlobal()
-		ui.Debug("Parameters expected: %d  found %d", g.ExpectedParameterCount, g.GetParameterCount())
+		if g.ExpectedParameterCount == -99 {
+			ui.Debug("Parameters expected: <varying> found %d", g.GetParameterCount())
+		} else {
+			ui.Debug("Parameters expected: %d  found %d", g.ExpectedParameterCount, g.GetParameterCount())
+		}
 		if g.ExpectedParameterCount == 0 && len(g.Parameters) > 0 {
 			return errors.New("unexpected parameters on command line")
 		}
