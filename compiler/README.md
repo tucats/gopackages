@@ -33,7 +33,7 @@ Go program.
 
     syms := symbols.NewSymbolTable("test program")
     ctx := bytecode.NewContext(syms, bc)
-    err := ctx.Run(syms)
+    err := ctx.Run()
     if err != nil {
         // Handle run-time errors
     }
