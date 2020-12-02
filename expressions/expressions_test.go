@@ -379,8 +379,6 @@ func TestNew(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			e := New(tt.expr)
-
 			// Create a common symbol table.
 			s := symbols.NewSymbolTable(tt.name)
 			s.SetAlways("i", 42)
@@ -390,7 +388,9 @@ func TestNew(t *testing.T) {
 			s.SetAlways("roman12", "XII")
 			s.SetAlways("a", []interface{}{1, "tom", 33., false})
 
-			v1, err := e.Eval(s)
+			// Compile the string and evaluate using the symbol table
+			v1, err := Evaluate(tt.expr, s)
+
 			if err != nil && tt.want != nil {
 				t.Errorf("Expression test, unexpected error %v", err)
 			} else {

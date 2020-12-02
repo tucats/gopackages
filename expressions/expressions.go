@@ -6,9 +6,19 @@
 // The general pattern of use is:
 //
 //    e := expressions.New("expression string")
-//    v, err := expressions.eval(symbols.SymbolTableMap)
+//    v, err := e.Eval(symbols.SymbolTable)
+//
+//	If the expression is to be evaluated only once, then you can simplify
+//	the evaluation to:
+//
+//    v, err := expressions.Evaluate("expr string", *symbols.SymbolTable)
+//
+//  The value is returned as an opaque interface{} type. You can use the
+//  following helper functions to retrieve the value from the interface,
+//  and coerce the type if possible.
+//
 //    i := GetInt(v)
-//    f := GetFloag(v)
+//    f := GetFloat(v)
 //    s := GetString(v)
 //    b := GetBool(v)
 //
@@ -17,6 +27,7 @@ package expressions
 import (
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/compiler"
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -87,21 +98,8 @@ func (e *Expression) GetBytecode() *bytecode.ByteCode {
 	return e.b
 }
 
-/*
-// Compile accepts a tokenizer and returns a segment of
-// bytecode and an error state (or nil if no error)
-func Compilex(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
-
-	// Create a new bytecode object, and then use it to create a new
-	// expression object.
-	b := bytecode.New("<tokenized>")
-	e := NewWithBytecode(b)
-
-	// tokenized already, just attach in progress
-	e.t = t
-
-	// compile
-	e.err = e.conditional()
-	return e.GetBytecode(), e.err
+// Evaluate is a helper function for the case where a string is to
+// be evaluated once and the value returned.
+func Evaluate(expr string, s *symbols.SymbolTable) (interface{}, error) {
+	return New(expr).Eval(s)
 }
-*/
