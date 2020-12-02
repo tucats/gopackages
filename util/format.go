@@ -100,7 +100,7 @@ func Format(arg interface{}) string {
 		// function library, show the short form of the name.
 		if vv.Kind() == reflect.Func {
 			name := runtime.FuncForPC(reflect.ValueOf(v).Pointer()).Name()
-			name = strings.ToLower(strings.Replace(name, "github.com/tucats/gopackages/functions.Function", "", 1))
+			name = strings.Replace(name, "github.com/tucats/gopackages/", "", 1)
 			return "builtin <" + name + ">"
 		}
 
