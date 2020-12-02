@@ -12,6 +12,12 @@ func (c *Compiler) expressionAtom() error {
 
 	t := c.t.Peek(1)
 
+	// Is this a function definition?
+	if t == "func" && c.t.Peek(2) == "(" {
+		c.t.Advance(1)
+		return c.Function(true)
+	}
+
 	// Is this a parenthesis expression?
 	if t == "(" {
 		c.t.Advance(1)

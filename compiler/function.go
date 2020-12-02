@@ -5,8 +5,11 @@ import (
 	"github.com/tucats/gopackages/tokenizer"
 )
 
-// Function compiles a function definition
-func (c *Compiler) Function() error {
+// Function compiles a function definition. If the literal flag is
+// set, this generates a function and puts the pointer to it on the
+// stack. IF not set, the function is added to the global or local
+// function dictionary.
+func (c *Compiler) Function(literal bool) error {
 
 	type parameter struct {
 		name string
@@ -14,22 +17,24 @@ func (c *Compiler) Function() error {
 	}
 	parameters := []parameter{}
 	this := ""
+	fname := ""
 
-	fname := c.t.Next()
-	if !tokenizer.IsSymbol(fname) {
-		return c.NewError(InvalidFunctionName, fname)
-	}
-
-	// Was it really the function name, or the "this" variable name?
-	if c.t.Peek(1) == "->" {
-		c.t.Advance(1)
-		this = fname
+	if !literal {
 		fname = c.t.Next()
 		if !tokenizer.IsSymbol(fname) {
 			return c.NewError(InvalidFunctionName, fname)
 		}
-	}
 
+		// Was it really the function name, or the "this" variable name?
+		if c.t.Peek(1) == "->" {
+			c.t.Advance(1)
+			this = fname
+			fname = c.t.Next()
+			if !tokenizer.IsSymbol(fname) {
+				return c.NewError(InvalidFunctionName, fname)
+			}
+		}
+	}
 	// Process parameter names
 	varargs := false
 	if c.t.IsNext("(") {
@@ -171,14 +176,17 @@ func (c *Compiler) Function() error {
 		return err
 	}
 
-	// Store address of the function, either in the current
-	// compiler's symbol table or active package.
-	if c.PackageName == "" {
-		c.s.SetAlways(fname, b)
+	if literal {
+		c.b.Emit(bytecode.Push, b)
 	} else {
-		c.AddPackageFunction(c.PackageName, fname, b)
+		// Store address of the function, either in the current
+		// compiler's symbol table or active package.
+		if c.PackageName == "" {
+			c.s.SetAlways(fname, b)
+		} else {
+			c.AddPackageFunction(c.PackageName, fname, b)
+		}
 	}
-
 	return nil
 }
 

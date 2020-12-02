@@ -35,7 +35,7 @@ func (c *Compiler) Statement() error {
 	// so we call a special compile unit that will compile the
 	// function and store it in the bytecode symbol table.
 	if c.t.IsNext("func") {
-		return c.Function()
+		return c.Function(false)
 	}
 
 	// At this point, we know we're trying to compile a statement,
