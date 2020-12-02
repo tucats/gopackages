@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"reflect"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -94,13 +95,24 @@ func Format(arg interface{}) string {
 
 	default:
 		vv := reflect.ValueOf(v)
+
+		// IF it's an internal function, show it's name. If it is a standard builtin from the
+		// function library, show the short form of the name.
 		if vv.Kind() == reflect.Func {
-			return "builtin"
+			name := runtime.FuncForPC(reflect.ValueOf(v).Pointer()).Name()
+			name = strings.ToLower(strings.Replace(name, "github.com/tucats/gopackages/functions.Function", "", 1))
+			return "builtin <" + name + ">"
 		}
+
+		// If it's a bytecode.Bytecode pointer, use reflection to get the
+		// Name field value and use that with the name. A function literal
+		// will have no name.
 		if vv.Kind() == reflect.Ptr {
 			ts := vv.String()
 			if ts == "<*bytecode.ByteCode Value>" {
-				return "func"
+				e := reflect.ValueOf(v).Elem()
+				name := GetString(e.Field(0).Interface())
+				return "func <" + name + ">"
 			}
 			return fmt.Sprintf("ptr %s", ts)
 		}
