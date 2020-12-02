@@ -19,6 +19,7 @@ type Error struct {
 // Compiler errors. Currently these are the string values. They will eventually
 // be converted to identifiers for localized assets.
 const (
+	BlockQuoteError                = "invalid block quote"
 	FunctionAlreadyExistsError     = "function already defined"
 	InvalidConstantError           = "invalid constant expression"
 	InvalidDirectiveError          = "invalid directive name"
@@ -26,8 +27,10 @@ const (
 	InvalidFunctionCall            = "invalid function call"
 	InvalidFunctionName            = "invalid function name"
 	InvalidImportError             = "import not permitted inside a block or loop"
+	InvalidListError               = "invalid list"
 	InvalidLoopControlError        = "loop control statement outside of for-loop"
 	InvalidLoopIndexError          = "invalid loop index variable"
+	InvalidRangeError              = "invalid range"
 	InvalidReturnValueError        = "invalid return value for void function"
 	InvalidSymbolError             = "invalid symbol name"
 	InvalidTypeNameError           = "invalid type name"
@@ -42,7 +45,9 @@ const (
 	MissingForLoopInitializerError = "missing for-loop initializer"
 	MissingFunctionTypeError       = "missing function return type"
 	MissingLoopAssignmentError     = "missing ':='"
+	MissingParenthesisError        = "missing parenthesis"
 	MissingSemicolonError          = "missing ';'"
+	MissingTermError               = "missing term"
 	PackageRedefinitionError       = "cannot redefine existing package"
 	TestingAssertError             = "testing @assert failure"
 	UnexpectedTokenError           = "unexpected token"

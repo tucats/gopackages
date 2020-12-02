@@ -2,7 +2,6 @@ package compiler
 
 import (
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/expressions"
 )
 
 // If compiles conditional statments. The verb is already
@@ -10,7 +9,7 @@ import (
 func (c *Compiler) If() error {
 
 	// Compile the conditional expression
-	bc, err := expressions.Compile(c.t)
+	bc, err := c.Expression()
 	if err != nil {
 		return err
 	}

@@ -11,7 +11,7 @@
             "mode": "auto",
             "program": "/Users/tom/Go/src/github.com/tucats/ego/",
             "env": {},
-            "args": [ "run","test.ego"]
+            "args": [ "test","tests/cipher/token"]
         }
     ]
 }

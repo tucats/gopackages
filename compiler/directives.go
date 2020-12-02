@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/expressions"
 	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
@@ -48,7 +47,7 @@ func (c *Compiler) Template() error {
 	}
 
 	// Get the template string definition
-	bc, err := expressions.Compile(c.t)
+	bc, err := c.Expression()
 	if err != nil {
 		return err
 	}
@@ -186,19 +185,19 @@ func (c *Compiler) Assert() error {
 	c.b.Emit(bytecode.Member)
 
 	argCount := 1
-	expressionCode, err := expressions.Compile(c.t)
+	code, err := c.Expression()
 	if err != nil {
 		return err
 	}
-	c.b.Append(expressionCode)
+	c.b.Append(code)
 
 	next := c.t.Peek(1)
 	if next != "@" && next != ";" && next != tokenizer.EndOfTokens {
-		stringCode, err := expressions.Compile(c.t)
+		code, err := c.Expression()
 		if err != nil {
 			return err
 		}
-		c.b.Append(stringCode)
+		c.b.Append(code)
 		argCount = 2
 	}
 
@@ -211,11 +210,11 @@ func (c *Compiler) Assert() error {
 func (c *Compiler) Fail() error {
 	next := c.t.Peek(1)
 	if next != "@" && next != ";" && next != tokenizer.EndOfTokens {
-		stringCode, err := expressions.Compile(c.t)
+		code, err := c.Expression()
 		if err != nil {
 			return err
 		}
-		c.b.Append(stringCode)
+		c.b.Append(code)
 	} else {
 		c.b.Emit(bytecode.Push, "@fail error signal")
 	}
@@ -239,10 +238,10 @@ func (c *Compiler) TestPass() error {
 
 // Error implements the @error directive
 func (c *Compiler) Error() error {
-	errCode, err := expressions.Compile(c.t)
+	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
+	code, err := c.Expression()
 	if err == nil {
-		c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
-		c.b.Append(errCode)
+		c.b.Append(code)
 		c.b.Emit(bytecode.Panic, false) // Does not cause fatal error
 	}
 	return err

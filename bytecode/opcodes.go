@@ -52,6 +52,7 @@ const (
 	Member
 	ClassMember
 	Print
+	Say
 	Newline
 	SymbolDelete
 	SymbolCreate
@@ -109,6 +110,7 @@ var opcodeNames = map[int]string{
 	Struct:             "Struct",
 	Member:             "Member",
 	Print:              "Print",
+	Say:                "Say",
 	Newline:            "Newline",
 	Drop:               "Drop",
 	AtLine:             "AtLine",
@@ -166,6 +168,7 @@ func initializeDispatch() {
 			GreaterThan:        GreaterThanOpcode,
 			GreaterThanOrEqual: GreaterThanOrEqualOpcode,
 			Print:              PrintOpcode,
+			Say:                SayOpcode,
 			Newline:            NewlineOpcode,
 			Drop:               DropOpcode,
 			MakeArray:          MakeArrayOpcode,

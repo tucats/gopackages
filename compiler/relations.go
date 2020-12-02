@@ -1,26 +1,26 @@
-package expressions
+package compiler
 
 import (
 	bc "github.com/tucats/gopackages/bytecode"
 )
 
-func (e *Expression) relations() error {
+func (c *Compiler) relations() error {
 
-	err := e.addSubtract()
+	err := c.addSubtract()
 	if err != nil {
 		return err
 	}
 
 	var parsing = true
 	for parsing {
-		if e.t.AtEnd() {
+		if c.t.AtEnd() {
 			break
 		}
-		op := e.t.Peek(1)
+		op := c.t.Peek(1)
 		if op == "==" || op == "!=" || op == "<" || op == "<=" || op == ">" || op == ">=" {
-			e.t.Advance(1)
+			c.t.Advance(1)
 
-			err := e.addSubtract()
+			err := c.addSubtract()
 			if err != nil {
 				return err
 			}
@@ -28,22 +28,22 @@ func (e *Expression) relations() error {
 			switch op {
 
 			case "==":
-				e.b.Emit(bc.Equal)
+				c.b.Emit(bc.Equal)
 
 			case "!=":
-				e.b.Emit(bc.NotEqual)
+				c.b.Emit(bc.NotEqual)
 
 			case "<":
-				e.b.Emit(bc.LessThan)
+				c.b.Emit(bc.LessThan)
 
 			case "<=":
-				e.b.Emit(bc.LessThanOrEqual)
+				c.b.Emit(bc.LessThanOrEqual)
 
 			case ">":
-				e.b.Emit(bc.GreaterThan)
+				c.b.Emit(bc.GreaterThan)
 
 			case ">=":
-				e.b.Emit(bc.GreaterThanOrEqual)
+				c.b.Emit(bc.GreaterThanOrEqual)
 
 			}
 

@@ -1,63 +1,63 @@
-package expressions
+package compiler
 
 import (
 	bc "github.com/tucats/gopackages/bytecode"
 )
 
 // reference parses a structure or array reference
-func (e *Expression) reference() error {
+func (c *Compiler) reference() error {
 
 	// Parse the function call or exprssion atom
-	err := e.expressionAtom()
+	err := c.expressionAtom()
 	if err != nil {
 		return err
 	}
 
 	// is there a trailing structure or array reference?
-	for !e.t.AtEnd() {
+	for !c.t.AtEnd() {
 
-		op := e.t.Peek(1)
+		op := c.t.Peek(1)
 		switch op {
 
 		// Struct reference
 		case "->":
-			e.t.Advance(1)
-			name := e.t.Next()
-			e.b.Emit(bc.Dup)
-			e.b.Emit(bc.Push, name)
-			e.b.Emit(bc.ClassMember)
+			c.t.Advance(1)
+			name := c.t.Next()
+			c.b.Emit(bc.Dup)
+			c.b.Emit(bc.Push, name)
+			c.b.Emit(bc.ClassMember)
 
 		// Map member reference
 		case ".":
-			e.t.Advance(1)
-			name := e.t.Next()
-			e.b.Emit(bc.Push, name)
-			e.b.Emit(bc.Member)
+			c.t.Advance(1)
+			name := c.t.Next()
+			c.b.Emit(bc.Push, name)
+			c.b.Emit(bc.Member)
 
 		// Array index reference
 		case "[":
-			e.t.Advance(1)
-			err := e.conditional()
+			c.t.Advance(1)
+			err := c.conditional()
 			if err != nil {
 				return err
 			}
 
 			// is it a slice instead of an index?
-			if e.t.IsNext(":") {
-				err := e.conditional()
+			if c.t.IsNext(":") {
+				err := c.conditional()
 				if err != nil {
 					return err
 				}
-				e.b.Emit(bc.LoadSlice)
-				if e.t.Next() != "]" {
-					return e.NewError(MissingBracketError)
+				c.b.Emit(bc.LoadSlice)
+				if c.t.Next() != "]" {
+					return c.NewError(MissingBracketError)
 				}
 			} else {
 				// Nope, singular index
-				if e.t.Next() != "]" {
-					return e.NewError(MissingBracketError)
+				if c.t.Next() != "]" {
+					return c.NewError(MissingBracketError)
 				}
-				e.b.Emit(bc.LoadIndex)
+				c.b.Emit(bc.LoadIndex)
 			}
 
 		// Nothing else, term is complete

@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"github.com/tucats/gopackages/expressions"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -17,7 +16,7 @@ func (c *Compiler) Call() error {
 
 	// Parse the function as an expression, which we then ignore the
 	// result of.
-	bc, err := expressions.Compile(c.t)
+	bc, err := c.Expression()
 	if err != nil {
 		return err
 	}

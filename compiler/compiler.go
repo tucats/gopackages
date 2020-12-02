@@ -60,6 +60,14 @@ func New() *Compiler {
 	return c
 }
 
+// NewWithTokens creates a compiler instance and supplies the token
+// buffer to use with it.
+func NewWithTokens(t *tokenizer.Tokenizer) *Compiler {
+	c := New()
+	c.t = t
+	return c
+}
+
 // CompileString turns a string into a compilation unit. This is a helper function
 // around the Compile() operation that removes the need for the caller
 // to provide a tokenizer.

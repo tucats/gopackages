@@ -2,7 +2,6 @@ package compiler
 
 import (
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/expressions"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -90,7 +89,7 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 	if term == "[" {
 
 		c.t.Advance(1)
-		ix, err := expressions.Compile(c.t)
+		ix, err := c.Expression()
 		if err != nil {
 			return err
 		}

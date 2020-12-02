@@ -2,7 +2,6 @@ package compiler
 
 import (
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/expressions"
 )
 
 // Switch compiles a switch statement.
@@ -12,7 +11,7 @@ func (c *Compiler) Switch() error {
 	t := MakeSymbol()
 
 	// Parse the expression to test
-	tx, err := expressions.Compile(c.t)
+	tx, err := c.Expression()
 	if err != nil {
 		return err
 	}
@@ -53,7 +52,7 @@ func (c *Compiler) Switch() error {
 			if !c.t.IsNext("case") {
 				return c.NewError(MissingCaseError)
 			}
-			cx, err := expressions.Compile(c.t)
+			cx, err := c.Expression()
 			if err != nil {
 				return err
 			}

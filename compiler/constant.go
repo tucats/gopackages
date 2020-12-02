@@ -2,7 +2,6 @@ package compiler
 
 import (
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/expressions"
 	"github.com/tucats/gopackages/tokenizer"
 	"github.com/tucats/gopackages/util"
 )
@@ -25,7 +24,7 @@ func (c *Compiler) Constant() error {
 		if !c.t.IsNext("=") {
 			return c.NewError(MissingEqualError)
 		}
-		vx, err := expressions.Compile(c.t)
+		vx, err := c.Expression()
 		if err != nil {
 			return err
 		}

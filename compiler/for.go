@@ -5,7 +5,6 @@ import (
 
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/expressions"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -53,7 +52,7 @@ func (c *Compiler) For() error {
 
 		// Make a new scope and get the array we will range over
 		c.PushLoop(rangeLoopType)
-		arrayCode, err := expressions.Compile(c.t)
+		arrayCode, err := c.Expression()
 		if err != nil {
 			return err
 		}
@@ -123,7 +122,7 @@ func (c *Compiler) For() error {
 	c.PushLoop(indexLoopType)
 
 	// The expression is the initial value of the loop.
-	initializerCode, err := expressions.Compile(c.t)
+	initializerCode, err := c.Expression()
 	if err != nil {
 		return err
 	}
@@ -136,7 +135,7 @@ func (c *Compiler) For() error {
 
 	// Now get the condition clause that tells us if the loop
 	// is still executing.
-	condition, err := expressions.Compile(c.t)
+	condition, err := c.Expression()
 	if err != nil {
 		return err
 	}
@@ -157,7 +156,7 @@ func (c *Compiler) For() error {
 		return errors.New(MissingEqualError)
 	}
 
-	incrementCode, err := expressions.Compile(c.t)
+	incrementCode, err := c.Expression()
 	if err != nil {
 		return err
 	}

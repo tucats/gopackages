@@ -1,101 +1,100 @@
-package expressions
+package compiler
 
 import (
 	"strconv"
 	"strings"
 
 	"github.com/tucats/gopackages/bytecode"
-	bc "github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
-func (e *Expression) expressionAtom() error {
+func (c *Compiler) expressionAtom() error {
 
-	t := e.t.Peek(1)
+	t := c.t.Peek(1)
 
 	// Is this a parenthesis expression?
 	if t == "(" {
-		e.t.Advance(1)
-		err := e.conditional()
+		c.t.Advance(1)
+		err := c.conditional()
 		if err != nil {
 			return err
 		}
 
-		if e.t.Next() != ")" {
-			return e.NewError(MissingParenthesisError)
+		if c.t.Next() != ")" {
+			return c.NewError(MissingParenthesisError)
 		}
 		return nil
 	}
 
 	// Is this an array constant?
 	if t == "[" {
-		return e.parseArray()
+		return c.parseArray()
 	}
 
 	// Is it a map constant?
 	if t == "{" {
-		return e.parseStruct()
+		return c.parseStruct()
 	}
 	// If the token is a number, convert it
 	if i, err := strconv.Atoi(t); err == nil {
-		e.t.Advance(1)
-		e.b.Emit(bc.Push, i)
+		c.t.Advance(1)
+		c.b.Emit(bytecode.Push, i)
 		return nil
 	}
 
 	if i, err := strconv.ParseFloat(t, 64); err == nil {
-		e.t.Advance(1)
-		e.b.Emit(bc.Push, i)
+		c.t.Advance(1)
+		c.b.Emit(bytecode.Push, i)
 		return nil
 	}
 
 	if t == "true" || t == "false" {
-		e.t.Advance(1)
-		e.b.Emit(bc.Push, (t == "true"))
+		c.t.Advance(1)
+		c.b.Emit(bytecode.Push, (t == "true"))
 		return nil
 	}
 
 	runeValue := t[0:1]
 	if runeValue == "\"" {
-		e.t.Advance(1)
+		c.t.Advance(1)
 		s, err := strconv.Unquote(t)
-		e.b.Emit(bc.Push, s)
+		c.b.Emit(bytecode.Push, s)
 		return err
 	}
 	if runeValue == "`" {
-		e.t.Advance(1)
-		s, err := e.unLit(t)
-		e.b.Emit(bc.Push, s)
+		c.t.Advance(1)
+		s, err := c.unLit(t)
+		c.b.Emit(bytecode.Push, s)
 		return err
 	}
 	if tokenizer.IsSymbol(t) {
 
-		e.t.Advance(1)
+		c.t.Advance(1)
 		t := strings.ToLower(t)
 
 		// Nope, probably name from the symbol table
-		e.b.Emit(bc.Load, t)
+		c.b.Emit(bytecode.Load, t)
 
 		return nil
 
 	}
 
-	return e.NewError(UnexpectedTokenError, t)
+	return c.NewError(UnexpectedTokenError, t)
 }
 
-func (e *Expression) parseArray() error {
+func (c *Compiler) parseArray() error {
 
 	var listTerminator = ""
-	if e.t.Peek(1) == "(" {
+	if c.t.Peek(1) == "(" {
 		listTerminator = ")"
 	}
-	if e.t.Peek(1) == "[" {
+	if c.t.Peek(1) == "[" {
 		listTerminator = "]"
 	}
 	if listTerminator == "" {
 		return nil
 	}
-	e.t.Advance(1)
+	c.t.Advance(1)
 	count := 0
 	t1 := 1
 	var err error
@@ -105,76 +104,76 @@ func (e *Expression) parseArray() error {
 	// and end values (inclusive). It can also be of the form [:end] which assumes
 	// a start number of 1.
 
-	if e.t.Peek(1) == ":" {
+	if c.t.Peek(1) == ":" {
 		err = nil
-		e.t.Advance(-1)
+		c.t.Advance(-1)
 	} else {
-		t1, err = strconv.Atoi(e.t.Peek(1))
+		t1, err = strconv.Atoi(c.t.Peek(1))
 	}
 	if err == nil {
-		if e.t.Peek(2) == ":" {
-			t2, err := strconv.Atoi(e.t.Peek(3))
+		if c.t.Peek(2) == ":" {
+			t2, err := strconv.Atoi(c.t.Peek(3))
 			if err == nil {
-				e.t.Advance(3)
+				c.t.Advance(3)
 				count := t2 - t1 + 1
 
 				if count < 0 {
 					count = (-count) + 2
 
 					for n := t1; n >= t2; n = n - 1 {
-						e.b.Emit(bytecode.Push, n)
+						c.b.Emit(bytecode.Push, n)
 					}
 
 				} else {
 					for n := t1; n <= t2; n = n + 1 {
-						e.b.Emit(bytecode.Push, n)
+						c.b.Emit(bytecode.Push, n)
 					}
 				}
-				e.b.Emit(bytecode.Array, count)
-				if !e.t.IsNext("]") {
-					return e.NewError(InvalidRangeError)
+				c.b.Emit(bytecode.Array, count)
+				if !c.t.IsNext("]") {
+					return c.NewError(InvalidRangeError)
 				}
 				return nil
 			}
 		}
 	}
-	for e.t.Peek(1) != listTerminator {
-		err := e.conditional()
+	for c.t.Peek(1) != listTerminator {
+		err := c.conditional()
 		if err != nil {
 			return err
 		}
 		count = count + 1
-		if e.t.AtEnd() {
+		if c.t.AtEnd() {
 			break
 		}
-		if e.t.Peek(1) == listTerminator {
+		if c.t.Peek(1) == listTerminator {
 			break
 		}
-		if e.t.Peek(1) != "," {
-			return e.NewError(InvalidListError)
+		if c.t.Peek(1) != "," {
+			return c.NewError(InvalidListError)
 		}
-		e.t.Advance(1)
+		c.t.Advance(1)
 	}
 
-	e.b.Emit(bc.Array, count)
+	c.b.Emit(bytecode.Array, count)
 
-	e.t.Advance(1)
+	c.t.Advance(1)
 	return nil
 }
 
-func (e *Expression) parseStruct() error {
+func (c *Compiler) parseStruct() error {
 
 	var listTerminator = "}"
 	var err error
 
-	e.t.Advance(1)
+	c.t.Advance(1)
 	count := 0
 
-	for e.t.Peek(1) != listTerminator {
+	for c.t.Peek(1) != listTerminator {
 
 		// First element: name
 
-		name := e.t.Next()
+		name := c.t.Next()
 
 		if len(name) > 2 && name[0:1] == "\"" {
 			name, err = strconv.Unquote(name)
@@ -183,45 +182,45 @@ func (e *Expression) parseStruct() error {
 			}
 		} else {
 			if !tokenizer.IsSymbol(name) {
-				return e.NewError(InvalidSymbolError, name)
+				return c.NewError(InvalidSymbolError, name)
 			}
 		}
 
 		// Second element: colon
-		if e.t.Next() != ":" {
-			return e.NewError(MissingColonError)
+		if c.t.Next() != ":" {
+			return c.NewError(MissingColonError)
 		}
 
 		// Third element: value, which is emitted.
-		err := e.conditional()
+		err := c.conditional()
 		if err != nil {
 			return err
 		}
 		// Now write the name as a string.
-		e.b.Emit(bc.Push, name)
+		c.b.Emit(bytecode.Push, name)
 
 		count = count + 1
-		if e.t.AtEnd() {
+		if c.t.AtEnd() {
 			break
 		}
-		if e.t.Peek(1) == listTerminator {
+		if c.t.Peek(1) == listTerminator {
 			break
 		}
-		if e.t.Peek(1) != "," {
-			return e.NewError(InvalidListError)
+		if c.t.Peek(1) != "," {
+			return c.NewError(InvalidListError)
 		}
-		e.t.Advance(1)
+		c.t.Advance(1)
 	}
 
-	e.b.Emit(bc.Struct, count)
-	e.t.Advance(1)
+	c.b.Emit(bytecode.Struct, count)
+	c.t.Advance(1)
 	return err
 }
 
-func (e *Expression) unLit(s string) (string, error) {
+func (c *Compiler) unLit(s string) (string, error) {
 	quote := s[0:1]
 	if s[len(s)-1:len(s)] != quote {
-		return s[1:], e.NewError(BlockQuoteError, quote)
+		return s[1:], c.NewError(BlockQuoteError, quote)
 	}
 	return s[1 : len(s)-1], nil
 }

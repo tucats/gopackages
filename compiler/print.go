@@ -2,7 +2,6 @@ package compiler
 
 import (
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/expressions"
 )
 
 // Print compiles a print statement. The verb is already removed
@@ -14,7 +13,7 @@ func (c *Compiler) Print() error {
 		if c.t.IsNext(",") {
 			return c.NewError(UnexpectedTokenError, c.t.Peek(1))
 		}
-		bc, err := expressions.Compile(c.t)
+		bc, err := c.Expression()
 		if err != nil {
 			return err
 		}

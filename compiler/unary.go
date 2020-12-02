@@ -1,33 +1,33 @@
-package expressions
+package compiler
 
 import bc "github.com/tucats/gopackages/bytecode"
 
-func (e *Expression) unary() error {
+func (c *Compiler) unary() error {
 
 	// Check for unary negation or not before passing into top-level diadic operators.
 
-	t := e.t.Peek(1)
+	t := c.t.Peek(1)
 	switch t {
 	case "-":
-		e.t.Advance(1)
-		err := e.Function()
+		c.t.Advance(1)
+		err := c.functionOrReference()
 		if err != nil {
 			return err
 		}
-		e.b.Emit(bc.Negate, 0)
+		c.b.Emit(bc.Negate, 0)
 		return nil
 
 	case "!":
-		e.t.Advance(1)
-		err := e.Function()
+		c.t.Advance(1)
+		err := c.functionOrReference()
 		if err != nil {
 			return err
 		}
-		e.b.Emit(bc.Negate, 0)
+		c.b.Emit(bc.Negate, 0)
 		return nil
 
 	default:
-		return e.Function()
+		return c.functionOrReference()
 
 	}
 }

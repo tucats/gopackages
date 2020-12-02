@@ -1,31 +1,31 @@
-package expressions
+package compiler
 
 import (
 	bc "github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
-func (e *Expression) addSubtract() error {
+func (c *Compiler) addSubtract() error {
 
-	err := e.multDivide()
+	err := c.multDivide()
 	if err != nil {
 		return err
 	}
 
 	var parsing = true
 	for parsing {
-		if e.t.AtEnd() {
+		if c.t.AtEnd() {
 			break
 		}
-		op := e.t.Peek(1)
+		op := c.t.Peek(1)
 		if tokenizer.InList(op, []string{"+", "-", "&"}) {
-			e.t.Advance(1)
+			c.t.Advance(1)
 
-			if e.t.IsNext(tokenizer.EndOfTokens) {
-				return e.NewError(MissingTermError)
+			if c.t.IsNext(tokenizer.EndOfTokens) {
+				return c.NewError(MissingTermError)
 			}
 
-			err := e.multDivide()
+			err := c.multDivide()
 			if err != nil {
 				return err
 			}
@@ -33,13 +33,13 @@ func (e *Expression) addSubtract() error {
 			switch op {
 
 			case "+":
-				e.b.Emit(bc.Add)
+				c.b.Emit(bc.Add)
 
 			case "-":
-				e.b.Emit(bc.Sub)
+				c.b.Emit(bc.Sub)
 
 			case "&":
-				e.b.Emit(bc.And)
+				c.b.Emit(bc.And)
 			}
 
 		} else {

@@ -2,7 +2,6 @@ package compiler
 
 import (
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/expressions"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -24,7 +23,7 @@ func (c *Compiler) Array() error {
 		return c.NewError(MissingBracketError)
 	}
 
-	bc, err := expressions.Compile(c.t)
+	bc, err := c.Expression()
 	if err != nil {
 		return err
 	}
@@ -33,7 +32,7 @@ func (c *Compiler) Array() error {
 		return c.NewError(MissingBracketError)
 	}
 	if c.t.IsNext("=") {
-		bc, err = expressions.Compile(c.t)
+		bc, err = c.Expression()
 		if err != nil {
 			return nil
 		}

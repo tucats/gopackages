@@ -1,4 +1,4 @@
-package expressions
+package compiler
 
 import (
 	bc "github.com/tucats/gopackages/bytecode"
@@ -7,26 +7,26 @@ import (
 
 // Eval evaluates the parsed expression. This can be called multiple times
 // with the same scanned string, but with different symbols.
-func (e *Expression) multDivide() error {
+func (c *Compiler) multDivide() error {
 
-	err := e.unary()
+	err := c.unary()
 	if err != nil {
 		return err
 	}
 
 	var parsing = true
 	for parsing {
-		if e.t.AtEnd() {
+		if c.t.AtEnd() {
 			break
 		}
-		op := e.t.Peek(1)
-		if e.t.AnyNext([]string{"^", "*", "/", "|"}) {
+		op := c.t.Peek(1)
+		if c.t.AnyNext([]string{"^", "*", "/", "|"}) {
 
-			if e.t.IsNext(tokenizer.EndOfTokens) {
-				return e.NewError(MissingTermError)
+			if c.t.IsNext(tokenizer.EndOfTokens) {
+				return c.NewError(MissingTermError)
 			}
 
-			err := e.unary()
+			err := c.unary()
 			if err != nil {
 				return err
 			}
@@ -34,16 +34,16 @@ func (e *Expression) multDivide() error {
 			switch op {
 
 			case "^":
-				e.b.Emit(bc.Exp)
+				c.b.Emit(bc.Exp)
 
 			case "*":
-				e.b.Emit(bc.Mul)
+				c.b.Emit(bc.Mul)
 
 			case "/":
-				e.b.Emit(bc.Div)
+				c.b.Emit(bc.Div)
 
 			case "|":
-				e.b.Emit(bc.Or)
+				c.b.Emit(bc.Or)
 
 			}
 

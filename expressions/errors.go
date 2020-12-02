@@ -31,28 +31,6 @@ type Error struct {
 	token  string
 }
 
-// NewError creates an error object
-func (e *Expression) NewError(msg string, args ...interface{}) *Error {
-	token := ""
-	if len(args) > 0 {
-		token = util.GetString(args[0])
-	}
-
-	p := e.t.TokenP
-	if p < 0 {
-		p = 0
-	}
-	if p >= len(e.t.Tokens) {
-		p = len(e.t.Tokens) - 1
-	}
-	return &Error{
-		text:   msg,
-		line:   e.t.Line[p],
-		column: e.t.Pos[p],
-		token:  token,
-	}
-}
-
 // Error produces an error string from this object.
 func (e *Error) Error() string {
 

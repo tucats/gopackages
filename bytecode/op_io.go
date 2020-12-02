@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/util"
 )
 
@@ -42,6 +43,15 @@ func PrintOpcode(c *Context, i interface{}) error {
 		fmt.Println()
 	}
 
+	return nil
+}
+
+// SayOpcode implementation. This can be used in place
+// of NewLine to end buffered output, but the output is
+// only displayed if we are not in --quiet mode.
+func SayOpcode(c *Context, i interface{}) error {
+	ui.Say("%s\n", c.output.String())
+	c.output = nil
 	return nil
 }
 

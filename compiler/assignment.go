@@ -1,9 +1,5 @@
 package compiler
 
-import (
-	"github.com/tucats/gopackages/expressions"
-)
-
 // Assignment compiles an assignment statement.
 func (c *Compiler) Assignment() error {
 
@@ -15,7 +11,7 @@ func (c *Compiler) Assignment() error {
 		return c.NewError(MissingAssignmentError)
 	}
 
-	expressionCode, err := expressions.Compile(c.t)
+	expressionCode, err := c.Expression()
 	if err != nil {
 		return err
 	}
