@@ -8,8 +8,8 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
-// FunctionDecode reads a string as JSON data
-func FunctionDecode(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Decode reads a string as JSON data
+func Decode(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	var v interface{}
 
@@ -19,8 +19,8 @@ func FunctionDecode(s *symbols.SymbolTable, args []interface{}) (interface{}, er
 	return v, err
 }
 
-// FunctionEncode writes a  JSON string from arbitrary data
-func FunctionEncode(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Encode writes a  JSON string from arbitrary data
+func Encode(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) == 1 {
 		jsonBuffer, err := json.Marshal(args[0])
@@ -44,8 +44,8 @@ func FunctionEncode(s *symbols.SymbolTable, args []interface{}) (interface{}, er
 	return b.String(), nil
 }
 
-// FunctionEncodeFormatted writes a  JSON string from arbitrary data
-func FunctionEncodeFormatted(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// EncodeFormatted writes a  JSON string from arbitrary data
+func EncodeFormatted(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) == 1 {
 		jsonBuffer, err := json.MarshalIndent(args[0], "", "  ")

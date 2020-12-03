@@ -9,13 +9,13 @@ import (
 
 const basicLayout = "Mon Jan 2 15:04:05 MST 2006"
 
-// FunctionTimeNow implements _time.now()
-func FunctionTimeNow(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// TimeNow implements _time.now()
+func TimeNow(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return time.Now().Format(basicLayout), nil
 }
 
-// FunctionTimeAdd implements _time.duration()
-func FunctionTimeAdd(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// TimeAdd implements _time.duration()
+func TimeAdd(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	t, err := time.Parse(basicLayout, util.GetString(args[0]))
 	if err != nil {
 		return nil, err
@@ -29,8 +29,8 @@ func FunctionTimeAdd(s *symbols.SymbolTable, args []interface{}) (interface{}, e
 	return t2.Format(basicLayout), nil
 }
 
-// FunctionTimeSub implements _time.duration()
-func FunctionTimeSub(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// TimeSub implements _time.duration()
+func TimeSub(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	t, err := time.Parse(basicLayout, util.GetString(args[0]))
 	if err != nil {
 		return nil, err

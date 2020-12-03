@@ -140,7 +140,7 @@ func TestIsType(s *symbols.SymbolTable, args []interface{}) (interface{}, error)
 	}
 
 	// Use the Type() function to get a string representation of the type
-	got, _ := functions.FunctionType(s, args[0:1])
+	got, _ := functions.Type(s, args[0:1])
 	expected := util.GetString(args[1])
 	b := (expected == got)
 	if !b {

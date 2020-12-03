@@ -12,18 +12,18 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
-// FunctionLower implements the lower() function
-func FunctionLower(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Lower implements the lower() function
+func Lower(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return strings.ToLower(util.GetString(args[0])), nil
 }
 
-// FunctionUpper implements the upper() function
-func FunctionUpper(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Upper implements the upper() function
+func Upper(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return strings.ToUpper(util.GetString(args[0])), nil
 }
 
-// FunctionLeft implements the left() function
-func FunctionLeft(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Left implements the left() function
+func Left(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	v := util.GetString(args[0])
 	p := util.GetInt(args[1])
@@ -37,8 +37,8 @@ func FunctionLeft(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 	return v[:p], nil
 }
 
-// FunctionRight implements the right() function
-func FunctionRight(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Right implements the right() function
+func Right(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	v := util.GetString(args[0])
 	p := util.GetInt(args[1])
@@ -52,8 +52,8 @@ func FunctionRight(symbols *symbols.SymbolTable, args []interface{}) (interface{
 	return v[len(v)-p:], nil
 }
 
-// FunctionIndex implements the index() function
-func FunctionIndex(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Index implements the index() function
+func Index(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	switch arg := args[0].(type) {
 
 	case []interface{}:
@@ -77,8 +77,8 @@ func FunctionIndex(symbols *symbols.SymbolTable, args []interface{}) (interface{
 	}
 }
 
-// FunctionSubstring implements the substring() function
-func FunctionSubstring(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Substring implements the substring() function
+func Substring(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.GetString(args[0])
 	p1 := util.GetInt(args[1])
 	p2 := util.GetInt(args[2])
@@ -97,8 +97,8 @@ func FunctionSubstring(symbols *symbols.SymbolTable, args []interface{}) (interf
 	return s, nil
 }
 
-// FunctionFormat implements the strings.format() function
-func FunctionFormat(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Format implements the strings.format() function
+func Format(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) == 0 {
 		return "", nil
@@ -111,9 +111,9 @@ func FunctionFormat(s *symbols.SymbolTable, args []interface{}) (interface{}, er
 	return fmt.Sprintf(util.GetString(args[0]), args[1:]...), nil
 }
 
-// FunctionChars implements the strings.chars() function. This accepts a string
+// Chars implements the strings.chars() function. This accepts a string
 // value and converts it to an array of characters.
-func FunctionChars(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Chars(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	v := util.GetString(args[0])
 	r := make([]interface{}, 0)
@@ -124,9 +124,9 @@ func FunctionChars(s *symbols.SymbolTable, args []interface{}) (interface{}, err
 	return r, nil
 }
 
-// FunctionInts implements the strings.ints() function. This accepts a string
+// Ints implements the strings.ints() function. This accepts a string
 // value and converts it to an array of integer rune values.
-func FunctionInts(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Ints(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	v := util.GetString(args[0])
 	r := make([]interface{}, 0)
@@ -138,10 +138,10 @@ func FunctionInts(s *symbols.SymbolTable, args []interface{}) (interface{}, erro
 	return r, nil
 }
 
-// FunctionToString implements the strings.string() function, which accepts an array
+// ToString implements the strings.string() function, which accepts an array
 // of items and converts it to a single long string of each item. Normally , this is
 // an array of characters.
-func FunctionToString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func ToString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	var b strings.Builder
 
@@ -173,8 +173,8 @@ func FunctionToString(s *symbols.SymbolTable, args []interface{}) (interface{}, 
 
 }
 
-// FunctionTemplate implements the strings.template() function
-func FunctionTemplate(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Template implements the strings.template() function
+func Template(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	var err error
 	if len(args) == 0 {
 		return nil, NewError("template", ArgumentCountError)

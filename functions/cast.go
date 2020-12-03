@@ -10,8 +10,8 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
-// FunctionInt implements the int() function
-func FunctionInt(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Int implements the int() function
+func Int(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], 1)
 	if v == nil {
 		return nil, NewError("int", InvalidTypeError)
@@ -19,8 +19,8 @@ func FunctionInt(symbols *symbols.SymbolTable, args []interface{}) (interface{},
 	return v.(int), nil
 }
 
-// FunctionFloat implements the float() function
-func FunctionFloat(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Float implements the float() function
+func Float(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], 1.0)
 	if v == nil {
 		return nil, NewError("float", InvalidValueError, args[0])
@@ -28,8 +28,8 @@ func FunctionFloat(symbols *symbols.SymbolTable, args []interface{}) (interface{
 	return v.(float64), nil
 }
 
-// FunctionString implements the string() function
-func FunctionString(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// String implements the string() function
+func String(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	// Special case. Is the argument an array of strings? If so, restructure as a single
 	// string with line breaks.
@@ -56,8 +56,8 @@ func FunctionString(symbols *symbols.SymbolTable, args []interface{}) (interface
 	return util.GetString(args[0]), nil
 }
 
-// FunctionBool implements the bool() function
-func FunctionBool(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Bool implements the bool() function
+func Bool(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], true)
 	if v == nil {
 		return nil, NewError("bool", InvalidValueError, args[0])
@@ -65,19 +65,19 @@ func FunctionBool(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 	return v.(bool), nil
 }
 
-// FunctionCoerce coerces a value to match the type of a model value
-func FunctionCoerce(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Coerce coerces a value to match the type of a model value
+func Coerce(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return util.Coerce(args[0], args[1]), nil
 }
 
-// FunctionNormalize coerces a value to match the type of a model value
-func FunctionNormalize(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Normalize coerces a value to match the type of a model value
+func Normalize(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v1, v2 := util.Normalize(args[0], args[1])
 	return []interface{}{v1, v2}, nil
 }
 
-// FunctionNew implements the new() function
-func FunctionNew(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// New implements the new() function
+func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	// Is the type an integer? If so it's a type
 	if typeValue, ok := args[0].(int); ok {

@@ -44,7 +44,7 @@ func TestFunctionInt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionInt(nil, tt.args.args)
+			got, err := Int(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionInt() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -90,7 +90,7 @@ func TestFunctionFloat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionFloat(nil, tt.args.args)
+			got, err := Float(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionFloat() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -136,7 +136,7 @@ func TestFunctionString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionString(nil, tt.args.args)
+			got, err := String(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionString() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -182,7 +182,7 @@ func TestFunctionBool(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionBool(nil, tt.args.args)
+			got, err := Bool(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionBool() error = %v, wantErr %v", err, tt.wantErr)
 				return

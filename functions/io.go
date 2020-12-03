@@ -14,8 +14,8 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
-// FunctionReadFile reads a file contents into a string value
-func FunctionReadFile(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// ReadFile reads a file contents into a string value
+func ReadFile(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	name := util.GetString(args[0])
 
@@ -32,8 +32,8 @@ func FunctionReadFile(s *symbols.SymbolTable, args []interface{}) (interface{}, 
 	return string(content), nil
 }
 
-// FunctionSplit splits a string into lines
-func FunctionSplit(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Split splits a string into lines
+func Split(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	src := util.GetString(args[0])
 
@@ -55,8 +55,8 @@ func FunctionSplit(s *symbols.SymbolTable, args []interface{}) (interface{}, err
 	return r, nil
 }
 
-// FunctionTokenize splits a string into tokens
-func FunctionTokenize(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Tokenize splits a string into tokens
+func Tokenize(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	src := util.GetString(args[0])
 	t := tokenizer.New(src)
@@ -69,8 +69,8 @@ func FunctionTokenize(s *symbols.SymbolTable, args []interface{}) (interface{}, 
 	return r, nil
 }
 
-// FunctionWriteFile writes a string to a file
-func FunctionWriteFile(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// WriteFile writes a string to a file
+func WriteFile(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	fname := util.GetString(args[0])
 	text := util.GetString(args[1])
@@ -79,8 +79,8 @@ func FunctionWriteFile(s *symbols.SymbolTable, args []interface{}) (interface{},
 	return err == nil, err
 }
 
-// FunctionOpen opens a file
-func FunctionOpen(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Open opens a file
+func Open(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	fname := util.GetString(args[0])
 	outputFile := false
@@ -111,8 +111,8 @@ func FunctionOpen(s *symbols.SymbolTable, args []interface{}) (interface{}, erro
 	return id, nil
 }
 
-// FunctionClose closes a file
-func FunctionClose(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Close closes a file
+func Close(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	id := util.GetString(args[0])
 	handle, found := s.Get(id)
@@ -130,8 +130,8 @@ func FunctionClose(s *symbols.SymbolTable, args []interface{}) (interface{}, err
 	return err == nil, err
 }
 
-// FunctionReadString closes a file
-func FunctionReadString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// ReadString closes a file
+func ReadString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	id := util.GetString(args[0])
 	handle, found := s.Get(id)
@@ -157,8 +157,8 @@ func FunctionReadString(s *symbols.SymbolTable, args []interface{}) (interface{}
 	return scanner.Text(), nil
 }
 
-// FunctionWriteString closes a file
-func FunctionWriteString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// WriteString closes a file
+func WriteString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	id := util.GetString(args[0])
 	handle, found := s.Get(id)
@@ -175,8 +175,8 @@ func FunctionWriteString(s *symbols.SymbolTable, args []interface{}) (interface{
 
 }
 
-// FunctionDeleteFile delete a file
-func FunctionDeleteFile(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// DeleteFile delete a file
+func DeleteFile(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	fname := util.GetString(args[0])
 
@@ -184,8 +184,8 @@ func FunctionDeleteFile(s *symbols.SymbolTable, args []interface{}) (interface{}
 	return err == nil, err
 }
 
-// FunctionExpand expands a list of file or path names into a list of files.
-func FunctionExpand(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Expand expands a list of file or path names into a list of files.
+func Expand(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	path := util.GetString(args[0])
 	ext := ""
 	if len(args) > 1 {
@@ -241,8 +241,8 @@ func ExpandPath(path, ext string) ([]string, error) {
 	return names, nil
 }
 
-// FunctionReadDir implmeents the io.readdir() function
-func FunctionReadDir(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// ReadDir implmeents the io.readdir() function
+func ReadDir(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	path := util.GetString(args[0])
 	result := []interface{}{}

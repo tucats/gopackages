@@ -7,8 +7,8 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
-// FunctionMin implements the min() function
-func FunctionMin(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Min implements the min() function
+func Min(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) == 1 {
 		return args[0], nil
@@ -49,8 +49,8 @@ func FunctionMin(symbols *symbols.SymbolTable, args []interface{}) (interface{},
 	return r, nil
 }
 
-// FunctionMax implements the max() function
-func FunctionMax(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Max implements the max() function
+func Max(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) == 1 {
 		return args[0], nil
@@ -91,8 +91,8 @@ func FunctionMax(symbols *symbols.SymbolTable, args []interface{}) (interface{},
 	return r, nil
 }
 
-// FunctionSum implements the sum() function
-func FunctionSum(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Sum implements the sum() function
+func Sum(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	base := args[0]
 	for _, addend := range args[1:] {
@@ -118,19 +118,19 @@ func FunctionSum(symbols *symbols.SymbolTable, args []interface{}) (interface{},
 	return base, nil
 }
 
-// FunctionSqrt implements the sqrt() function
-func FunctionSqrt(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Sqrt implements the sqrt() function
+func Sqrt(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	f := util.GetFloat(args[0])
 	return math.Sqrt(f), nil
 }
 
-// FunctionAbs implements the abs() function
-func FunctionAbs(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Abs implements the abs() function
+func Abs(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	f := util.GetFloat(args[0])
 	return math.Abs(f), nil
 }
 
-// FunctionLog is the log() function
-func FunctionLog(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Log is the log() function
+func Log(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return math.Log(util.GetFloat(args[0])), nil
 }

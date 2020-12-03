@@ -44,7 +44,7 @@ func TestFunctionLen(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionLen(nil, tt.args.args)
+			got, err := Length(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionLen() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -86,7 +86,7 @@ func TestFunctionProfile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionProfile(nil, tt.args.args)
+			got, err := Profile(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionProfile() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -139,7 +139,7 @@ func TestFunctionSort(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionSort(nil, tt.args.args)
+			got, err := Sort(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionSort() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -181,7 +181,7 @@ func TestFunctionMembers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FunctionMembers(nil, tt.args.args)
+			got, err := Members(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionMembers() error = %v, wantErr %v", err, tt.wantErr)
 				return

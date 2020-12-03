@@ -14,8 +14,8 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
-// FunctionSleep implements util.sleep()
-func FunctionSleep(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Sleep implements util.sleep()
+func Sleep(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	duration, err := time.ParseDuration(util.GetString(args[0]))
 	if err == nil {
 		time.Sleep(duration)
@@ -23,8 +23,8 @@ func FunctionSleep(syms *symbols.SymbolTable, args []interface{}) (interface{}, 
 	return true, err
 }
 
-// FunctionProfile implements the profile() function
-func FunctionProfile(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Profile implements the profile() function
+func Profile(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	key := util.GetString(args[0])
 
 	if len(args) == 1 {
@@ -42,14 +42,14 @@ func FunctionProfile(symbols *symbols.SymbolTable, args []interface{}) (interfac
 	return true, nil
 }
 
-// FunctionUUID implements the uuid() function
-func FunctionUUID(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// UUID implements the uuid() function
+func UUID(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	u := uuid.New()
 	return u.String(), nil
 }
 
-// FunctionLen implements the len() function
-func FunctionLen(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Length implements the len() function
+func Length(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	if args[0] == nil {
 		return 0, nil
 	}
@@ -80,11 +80,11 @@ func FunctionLen(symbols *symbols.SymbolTable, args []interface{}) (interface{},
 	}
 }
 
-// FunctionArray implements the array() function, which creates
+// Array implements the array() function, which creates
 // an empty array of the given size. IF there are two parameters,
 // the first must be an existing array which is resized to match
 // the new array
-func FunctionArray(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Array(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	var array []interface{}
 	count := 0
 
@@ -110,14 +110,14 @@ func FunctionArray(symbols *symbols.SymbolTable, args []interface{}) (interface{
 
 }
 
-// FunctionGetEnv implementes the util.getenv() function which reads
+// GetEnv implementes the util.getenv() function which reads
 // an environment variable from the os.
-func FunctionGetEnv(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func GetEnv(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return os.Getenv(util.GetString(args[0])), nil
 }
 
-// FunctionMembers gets an array of the names of the fields in a structure
-func FunctionMembers(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Members gets an array of the names of the fields in a structure
+func Members(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	switch v := args[0].(type) {
 	case map[string]interface{}:
 
@@ -140,8 +140,8 @@ func FunctionMembers(symbols *symbols.SymbolTable, args []interface{}) (interfac
 	}
 }
 
-// FunctionSort implements the sort() function.
-func FunctionSort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Sort implements the sort() function.
+func Sort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	// Make a master array of the values presented
 	var array []interface{}
 	for _, a := range args {
@@ -203,8 +203,8 @@ func FunctionSort(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 	}
 }
 
-// FunctionExit implements the util.exit() function
-func FunctionExit(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Exit implements the util.exit() function
+func Exit(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	// If no arguments, just do a simple exit
 	if len(args) == 0 {
@@ -226,13 +226,13 @@ func FunctionExit(symbols *symbols.SymbolTable, args []interface{}) (interface{}
 	return nil, nil
 }
 
-// FunctionSymbols implements the util.symbols() function
-func FunctionSymbols(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// FormatSymbols implements the util.symbols() function
+func FormatSymbols(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return syms.Format(false), nil
 }
 
-// FunctionType implements the util.type() function
-func FunctionType(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Type implements the util.type() function
+func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	switch v := args[0].(type) {
 	case error:
@@ -266,8 +266,8 @@ func FunctionType(syms *symbols.SymbolTable, args []interface{}) (interface{}, e
 	}
 }
 
-// FunctionError creates an error object based on the
+// Signal creates an error object based on the
 // parameters
-func FunctionError(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Signal(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return NewError("error", util.GetString(args[0]), args[1:]...), nil
 }

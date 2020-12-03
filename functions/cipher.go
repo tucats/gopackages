@@ -7,13 +7,13 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
-// FunctionHash implements the _cipher.hash() function
-func FunctionHash(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Hash implements the _cipher.hash() function
+func Hash(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return util.Hash(util.GetString(args[0])), nil
 }
 
-// FunctionEncrypt implements the _cipher.hash() function
-func FunctionEncrypt(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Encrypt implements the _cipher.hash() function
+func Encrypt(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	b, err := util.Encrypt(util.GetString(args[0]), util.GetString(args[1]))
 	if err != nil {
 		return b, err
@@ -22,8 +22,8 @@ func FunctionEncrypt(s *symbols.SymbolTable, args []interface{}) (interface{}, e
 
 }
 
-// FunctionDecrypt implements the _cipher.hash() function
-func FunctionDecrypt(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// Decrypt implements the _cipher.hash() function
+func Decrypt(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	b, err := hex.DecodeString(util.GetString(args[0]))
 	if err != nil {
