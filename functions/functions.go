@@ -57,6 +57,10 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"math.abs":          FunctionDefinition{Min: 1, Max: 1, F: Abs},
 	"math.log":          FunctionDefinition{Min: 1, Max: 1, F: Log},
 	"math.sqrt":         FunctionDefinition{Min: 1, Max: 1, F: Sqrt},
+	"profile.delete":    FunctionDefinition{Min: 1, Max: 1, F: ProfileDelete},
+	"profile.get":       FunctionDefinition{Min: 1, Max: 1, F: ProfileGet},
+	"profile.keys":      FunctionDefinition{Min: 0, Max: 0, F: ProfileKeys},
+	"profile.set":       FunctionDefinition{Min: 1, Max: 2, F: ProfileSet},
 	"strings.chars":     FunctionDefinition{Min: 1, Max: 1, F: Chars},
 	"strings.format":    FunctionDefinition{Min: 0, Max: Any, F: Format},
 	"strings.index":     FunctionDefinition{Min: 2, Max: 2, F: Index},
@@ -77,7 +81,6 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"util.exit":         FunctionDefinition{Min: 0, Max: 1, F: Exit},
 	"util.getenv":       FunctionDefinition{Min: 1, Max: 1, F: GetEnv},
 	"util.normalize":    FunctionDefinition{Min: 2, Max: 2, F: Normalize},
-	"util.profile":      FunctionDefinition{Min: 1, Max: 2, F: Profile},
 	"util.symbols":      FunctionDefinition{Min: 0, Max: 1, F: FormatSymbols},
 	"util.uuid":         FunctionDefinition{Min: 0, Max: 0, F: UUID},
 }

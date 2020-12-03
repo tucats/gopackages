@@ -294,6 +294,46 @@ This accepts a string that must contain a syntactically valid JSON expression,
 which is then converted to the matching `Ego` data types. Supported types
 are int, float, bool, string, array, and struct elements.
 
+## Profile
+This collection allows an Ego program to interact with the persistent settings
+profile data.
+
+### profile.keys()
+This returns an array of strings, each of which is a key value in the active
+profile. Each of these values can be used in a `profile.get()` call to read 
+a value.
+
+    keys := profile.keys()
+    for i := range keys {
+        print "profile key is ", i
+    }
+
+### profile.get()
+Use this to read a single key value from the profile. The only parameter is
+the name of the profile key.
+
+     password := profile.get("secret-password")
+
+If the key is not valid, then an empty string is returned as the value.
+
+### profile.set()
+Use this to store a value in the profile. The first parameter is the name of
+the profile key, and the second parameter is coerced to be a string value that
+is stored in the profile. If the key does not already exist, it is created.
+
+    call profile.set("secret-password", "gronzeldabelle")
+
+Note this can only be invoked as a `call` statement; it does not return a value.
+
+### profile.delete()
+This will delete a key from the current profile. If you try to delete a key
+that does not exist, there is no action taken.
+
+    call profile.delete("secret-password")
+
+This must be invoked as a `call` statement; there is no function result value.
+This delete operation cannot be undone; the key value is immediately removed
+from the profile and the profile is rewritten to disk.
 
 ## Strings
 This collection of functions support string operations.

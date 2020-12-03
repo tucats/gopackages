@@ -196,6 +196,17 @@ func Delete(key string) {
 	ui.Debug("Deleting profile key \"%s\"", key)
 }
 
+// Keys returns the list of keys in the profile as an array
+// of strings.
+func Keys() []string {
+	c := getCurrentConfiguration()
+	result := []string{}
+	for key := range c.Items {
+		result = append(result, key)
+	}
+	return result
+}
+
 // Exists test to see if a key value exists or not
 func Exists(key string) bool {
 

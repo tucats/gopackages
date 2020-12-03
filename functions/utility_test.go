@@ -71,7 +71,7 @@ func TestFunctionProfile(t *testing.T) {
 		{
 			name: "crete a key",
 			args: args{[]interface{}{"b306e250-6e07-4a05-abf4-e6a64d64cb72", "cookies"}},
-			want: true,
+			want: nil,
 		},
 		{
 			name: "read a key",
@@ -81,12 +81,19 @@ func TestFunctionProfile(t *testing.T) {
 		{
 			name: "delete a key",
 			args: args{[]interface{}{"b306e250-6e07-4a05-abf4-e6a64d64cb72", ""}},
-			want: true,
+			want: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Profile(nil, tt.args.args)
+
+			var got interface{}
+			var err error
+			if len(tt.args.args) > 1 {
+				got, err = ProfileSet(nil, tt.args.args)
+			} else {
+				got, err = ProfileGet(nil, tt.args.args)
+			}
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionProfile() error = %v, wantErr %v", err, tt.wantErr)
 				return

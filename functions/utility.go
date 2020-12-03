@@ -23,13 +23,16 @@ func Sleep(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return true, err
 }
 
-// Profile implements the profile() function
-func Profile(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+// ProfileGet implements the profile.get() function
+func ProfileGet(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	key := util.GetString(args[0])
+	return persistence.Get(key), nil
 
-	if len(args) == 1 {
-		return persistence.Get(key), nil
-	}
+}
+
+// ProfileSet implements the profile.set() function
+func ProfileSet(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	key := util.GetString(args[0])
 
 	// If the value is an empty string, delete the key else
 	// store the value for the key.
@@ -39,7 +42,24 @@ func Profile(symbols *symbols.SymbolTable, args []interface{}) (interface{}, err
 	} else {
 		persistence.Set(key, value)
 	}
-	return true, nil
+	return nil, nil
+}
+
+// ProfileDelete implements the profile.delete() function
+func ProfileDelete(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	key := util.GetString(args[0])
+	persistence.Delete(key)
+	return nil, nil
+}
+
+// ProfileKeys implements the profile.keys() function
+func ProfileKeys(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	keys := persistence.Keys()
+	result := make([]interface{}, len(keys))
+	for i, key := range keys {
+		result[i] = key
+	}
+	return result, nil
 }
 
 // UUID implements the uuid() function
