@@ -51,6 +51,7 @@ const (
 	PackageRedefinitionError       = "cannot redefine existing package"
 	TestingAssertError             = "testing @assert failure"
 	UnexpectedTokenError           = "unexpected token"
+	UnrecognizedStatementError     = "unrecognized statement"
 )
 
 // NewError generates a new compiler error
