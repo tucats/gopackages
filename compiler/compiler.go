@@ -62,11 +62,16 @@ func New() *Compiler {
 	return c
 }
 
-// NewWithTokens creates a compiler instance and supplies the token
-// buffer to use with it.
-func NewWithTokens(t *tokenizer.Tokenizer) *Compiler {
-	c := New()
+// WithTokens supplies the token stream to a compiler
+func (c *Compiler) WithTokens(t *tokenizer.Tokenizer) *Compiler {
 	c.t = t
+	return c
+}
+
+// IdentifierNormalization sets the normalization flag and can be chained
+// onto a compiler.New...() operation
+func (c *Compiler) IdentifierNormalization(f bool) *Compiler {
+	c.LowercaseIdentifiers = f
 	return c
 }
 

@@ -49,7 +49,7 @@ func (t *Table) FormatJSON() string {
 	var firstRow = true
 
 	if t.where != "" {
-		e = expressions.New(t.where)
+		e = expressions.New().WithText(t.where)
 	}
 
 	buffer.WriteRune('[')
@@ -115,7 +115,7 @@ func (t *Table) FormatText() []string {
 
 	var e *expressions.Expression
 	if t.where != "" {
-		e = expressions.New(t.where)
+		e = expressions.New().WithText(t.where)
 		if ui.DebugMode {
 			e.Disasm()
 		}

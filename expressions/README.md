@@ -18,14 +18,14 @@ Here is a simple example of using the expression handler:
     // Create a symbol table for use during expression
     // evaluation. This is optional, but must be provided
     // if your expression uses variables.
-    symbols := bytecode.Newsymbols.SymbolTable()
+    symbols := symbols.SymbolTable()
     symbols.SetAlways("name", "Tom")
     symbols.SetAlways("age", 54)
 
     // Compile a string as an expression and then evaluate
     // the resulting expression to get its value
-    e := expressions.New("age + 10")
-    v, err := e.eval(symbols)
+    e := expressions.New().WithText("age + 10")
+    v, err := e.Eval(symbols)
   
 The value of the expression is returned as an opaque interface, along with an error object. If the
 error object is nil, no errors occurred during expression evaluation. If the err object is not nil,

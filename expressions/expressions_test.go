@@ -49,11 +49,6 @@ func TestNew(t *testing.T) {
 			want: "te",
 		},
 		{
-			name: "Case insensitive symbol names",
-			expr: "name + NaMe",
-			want: "TomTom",
-		},
-		{
 			name: "Alphanumeric  symbol names",
 			expr: "roman12 + \".\"",
 			want: "XII.",

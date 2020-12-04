@@ -24,6 +24,7 @@ func (c *Compiler) Function(literal bool) error {
 		if !tokenizer.IsSymbol(fname) {
 			return c.NewError(InvalidFunctionName, fname)
 		}
+		fname = c.Normalize(fname)
 
 		// Was it really the function name, or the "this" variable name?
 		if c.t.Peek(1) == "->" {
@@ -33,10 +34,9 @@ func (c *Compiler) Function(literal bool) error {
 			if !tokenizer.IsSymbol(fname) {
 				return c.NewError(InvalidFunctionName, fname)
 			}
+			fname = c.Normalize(fname)
 		}
 	}
-	name = c.Normalize(name)
-	fname = c.Normalize(fname)
 
 	// Process parameter names
 	varargs := false
