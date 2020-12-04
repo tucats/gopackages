@@ -186,6 +186,16 @@ func Get(key string) string {
 	return v
 }
 
+// GetBool returns the boolean value of a profile string. If the string is
+// "Y", "YES", "1", or "TRUE" then the value returns true.
+func GetBool(key string) bool {
+	s := strings.ToLower(Get(key))
+	if s == "y" || s == "yes" || s == "true" || s == "t" || s == "1" {
+		return true
+	}
+	return false
+}
+
 // Delete removes a key from the map entirely. Also removes if from the
 // active defaults.
 func Delete(key string) {

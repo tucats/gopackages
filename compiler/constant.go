@@ -20,6 +20,7 @@ func (c *Compiler) Constant() error {
 		if !tokenizer.IsSymbol(name) {
 			return c.NewError(InvalidSymbolError)
 		}
+		name = c.Normalize(name)
 
 		if !c.t.IsNext("=") {
 			return c.NewError(MissingEqualError)

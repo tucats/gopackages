@@ -35,26 +35,28 @@ type PackageDictionary map[string]FunctionDictionary
 
 // Compiler is a structure defining what we know about the compilation
 type Compiler struct {
-	PackageName    string
-	b              *bytecode.ByteCode
-	t              *tokenizer.Tokenizer
-	s              *symbols.SymbolTable
-	loops          *Loop
-	coerce         *bytecode.ByteCode
-	constants      []string
-	packages       PackageDictionary
-	blockDepth     int
-	statementCount int
+	PackageName          string
+	b                    *bytecode.ByteCode
+	t                    *tokenizer.Tokenizer
+	s                    *symbols.SymbolTable
+	loops                *Loop
+	coerce               *bytecode.ByteCode
+	constants            []string
+	packages             PackageDictionary
+	blockDepth           int
+	statementCount       int
+	LowercaseIdentifiers bool
 }
 
 // New creates a new compiler instance
 func New() *Compiler {
 	cInstance := Compiler{
-		b:         nil,
-		t:         nil,
-		s:         &symbols.SymbolTable{Name: "compile-unit"},
-		constants: make([]string, 0),
-		packages:  PackageDictionary{},
+		b:                    nil,
+		t:                    nil,
+		s:                    &symbols.SymbolTable{Name: "compile-unit"},
+		constants:            make([]string, 0),
+		packages:             PackageDictionary{},
+		LowercaseIdentifiers: false,
 	}
 	c := &cInstance
 	return c
@@ -124,6 +126,15 @@ func (c *Compiler) AddBuiltins(pkgname string) bool {
 // Get retrieves a compile-time symbol value.
 func (c *Compiler) Get(name string) (interface{}, bool) {
 	return c.s.Get(name)
+}
+
+// Normalize performs case-normalization based on the current
+// compiler settings
+func (c *Compiler) Normalize(name string) string {
+	if c.LowercaseIdentifiers {
+		return strings.ToLower(name)
+	}
+	return name
 }
 
 // AddPackageFunction adds a new package function to the compiler's package dictionary. If the

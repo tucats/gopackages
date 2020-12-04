@@ -18,6 +18,7 @@ func (c *Compiler) IsLValue() bool {
 	if tokenizer.InList(name, []string{"print", "for", "array", "if", "call", "return"}) {
 		return false
 	}
+	name = c.Normalize(name)
 
 	next := c.t.Peek(2)
 	if next == "." || next == "[" {
@@ -41,6 +42,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 	if !tokenizer.IsSymbol(name) {
 		return nil, c.NewError(InvalidSymbolError, name)
 	}
+	name = c.Normalize(name)
 
 	needLoad := true
 	// Until we get to the end of the lvalue...
@@ -107,7 +109,8 @@ func (c *Compiler) lvalueTerm(bc *bytecode.ByteCode) error {
 		if !tokenizer.IsSymbol(member) {
 			return c.NewError(InvalidSymbolError, member)
 		}
-		bc.Emit(bytecode.Push, member)
+
+		bc.Emit(bytecode.Push, c.Normalize(member))
 		bc.Emit(bytecode.LoadIndex)
 		return nil
 	}

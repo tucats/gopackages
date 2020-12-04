@@ -12,6 +12,7 @@ func (c *Compiler) Type() error {
 	if !tokenizer.IsSymbol(name) {
 		return c.NewError(InvalidSymbolError)
 	}
+	name = c.Normalize(name)
 
 	parent := name
 	if c.t.Peek(1) == "->" {
@@ -20,6 +21,7 @@ func (c *Compiler) Type() error {
 		if !tokenizer.IsSymbol(parent) {
 			return c.NewError(InvalidSymbolError)
 		}
+		c.Normalize(parent)
 	}
 	if c.t.Peek(1) != "{" {
 		return c.NewError(MissingBracketError)
@@ -64,6 +66,8 @@ func (c *Compiler) compileType() error {
 		if !tokenizer.IsSymbol(name) {
 			return c.NewError(InvalidSymbolError, name)
 		}
+		name = c.Normalize(name)
+
 		count = count + 1
 		if c.t.Peek(1) == "{" {
 			err := c.compileType()

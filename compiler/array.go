@@ -18,6 +18,7 @@ func (c *Compiler) Array() error {
 		c.t.Advance(-1)
 		return c.NewError(InvalidSymbolError, name)
 	}
+	name = c.Normalize(name)
 
 	if !c.t.IsNext("[") {
 		return c.NewError(MissingBracketError)

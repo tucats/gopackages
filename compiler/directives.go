@@ -45,6 +45,7 @@ func (c *Compiler) Template() error {
 	if !tokenizer.IsSymbol(name) {
 		return c.NewError(InvalidSymbolError, name)
 	}
+	name = c.Normalize(name)
 
 	// Get the template string definition
 	bc, err := c.Expression()

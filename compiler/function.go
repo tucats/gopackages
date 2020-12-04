@@ -35,6 +35,9 @@ func (c *Compiler) Function(literal bool) error {
 			}
 		}
 	}
+	name = c.Normalize(name)
+	fname = c.Normalize(fname)
+
 	// Process parameter names
 	varargs := false
 	if c.t.IsNext("(") {
@@ -54,6 +57,7 @@ func (c *Compiler) Function(literal bool) error {
 			} else {
 				return c.NewError(InvalidFunctionArgument)
 			}
+			name = c.Normalize(name)
 
 			// Is there a type name that follows it? We have to check for "[]" and "{}"
 			// as two differnt tokens. Also note that you can use the word array or struct

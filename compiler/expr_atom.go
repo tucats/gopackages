@@ -2,7 +2,6 @@ package compiler
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
@@ -74,13 +73,9 @@ func (c *Compiler) expressionAtom() error {
 		return err
 	}
 	if tokenizer.IsSymbol(t) {
-
 		c.t.Advance(1)
-		t := strings.ToLower(t)
-
-		// Nope, probably name from the symbol table
+		t = c.Normalize(t)
 		c.b.Emit(bytecode.Load, t)
-
 		return nil
 
 	}
@@ -191,6 +186,7 @@ func (c *Compiler) parseStruct() error {
 				return c.NewError(InvalidSymbolError, name)
 			}
 		}
+		name = c.Normalize(name)
 
 		// Second element: colon
 		if c.t.Next() != ":" {

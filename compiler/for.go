@@ -26,6 +26,7 @@ func (c *Compiler) For() error {
 		indexName = c.t.Next()
 		c.t.Advance(1)
 	}
+	indexName = c.Normalize(indexName)
 
 	// Must be a valid lvalue
 	if !c.IsLValue() {
