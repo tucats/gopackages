@@ -68,9 +68,9 @@ func (c *Compiler) WithTokens(t *tokenizer.Tokenizer) *Compiler {
 	return c
 }
 
-// IdentifierNormalization sets the normalization flag and can be chained
+// WithNormalization sets the normalization flag and can be chained
 // onto a compiler.New...() operation
-func (c *Compiler) IdentifierNormalization(f bool) *Compiler {
+func (c *Compiler) WithNormalization(f bool) *Compiler {
 	c.LowercaseIdentifiers = f
 	return c
 }
