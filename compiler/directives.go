@@ -238,7 +238,7 @@ func (c *Compiler) TestPass() error {
 
 // Error implements the @error directive
 func (c *Compiler) Error() error {
-	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
+	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP-1])
 	code, err := c.Expression()
 	if err == nil {
 		c.b.Append(code)
