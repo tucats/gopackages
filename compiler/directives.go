@@ -239,10 +239,25 @@ func (c *Compiler) TestPass() error {
 // Error implements the @error directive
 func (c *Compiler) Error() error {
 	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP-1])
-	code, err := c.Expression()
-	if err == nil {
-		c.b.Append(code)
-		c.b.Emit(bytecode.Panic, false) // Does not cause fatal error
+	if !c.atStatementEnd() {
+		code, err := c.Expression()
+		if err == nil {
+			c.b.Append(code)
+		}
+	} else {
+		c.b.Emit(bytecode.Push, GenericError)
 	}
-	return err
+	c.b.Emit(bytecode.Panic, false) // Does not cause fatal error
+
+	return nil
+}
+
+// atStatementEnd checks the next token in the stream to see if it indicates
+// that we have parsed all of the statement.
+func (c *Compiler) atStatementEnd() bool {
+	token := c.t.Peek(1)
+	if token == tokenizer.EndOfTokens || token == ";" || token == "{" || token == "}" {
+		return true
+	}
+	return false
 }

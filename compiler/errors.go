@@ -21,6 +21,7 @@ type Error struct {
 const (
 	BlockQuoteError                = "invalid block quote"
 	FunctionAlreadyExistsError     = "function already defined"
+	GenericError                   = "general error"
 	InvalidConstantError           = "invalid constant expression"
 	InvalidDirectiveError          = "invalid directive name"
 	InvalidFunctionArgument        = "invalid function argument"
