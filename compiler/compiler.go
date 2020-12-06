@@ -16,6 +16,13 @@ const (
 	rangeLoopType = 2
 )
 
+// RequiredPackages is the list of packages that are always imported, regardless
+// of user import statements or auto-import profile settings.
+var RequiredPackages []string = []string{
+	"util",
+	"profile",
+}
+
 // Loop is a structure that defines a loop type.
 type Loop struct {
 	Parent *Loop
@@ -198,21 +205,35 @@ func (c *Compiler) Symbols() *symbols.SymbolTable {
 	return c.s
 }
 
-// AutoImport arranges for the import all of the built-in
-// packages.
-func (c *Compiler) AutoImport() error {
+// AutoImport arranges for the import of built-in packages. The
+// parameter indicates if all available packages (including those
+// found in the ego path) are imported, versus just essential
+// packages like "util".
+func (c *Compiler) AutoImport(all bool) error {
 
-	// Start by making a list of the packages by scanning all the built-in
-	// function names for package names. We ignore functions that don't have
-	// package names as those are always available already.
+	// Start by making a list of the packages. If we need all packages,
+	// scan all the built-in function names for package names. We ignore
+	// functions that don't have package names as those are already
+	// available.
+	//
+	// If we aren't loading all packages, at least always load "util"
+	// which is required for the exit command to function.
 	uniqueNames := map[string]bool{}
-	for fn := range functions.FunctionDictionary {
-		dot := strings.Index(fn, ".")
-		if dot > 0 {
-			fn = fn[:dot]
-			uniqueNames[fn] = true
+	if all {
+		for fn := range functions.FunctionDictionary {
+			dot := strings.Index(fn, ".")
+			if dot > 0 {
+				fn = fn[:dot]
+				uniqueNames[fn] = true
+			}
+		}
+	} else {
+		for _, p := range RequiredPackages {
+			uniqueNames[p] = true
+			uniqueNames[p] = true
 		}
 	}
+
 	// Make the order stable
 	sortedPackageNames := []string{}
 	for k := range uniqueNames {
