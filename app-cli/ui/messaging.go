@@ -43,9 +43,6 @@ var QuietMode = false
 var sequence = 0
 var sequenceMux sync.Mutex
 
-// Loggers is a map of the names of logging modes that are enabled
-var Loggers = map[string]bool{}
-
 // Names of loggers go here.
 const (
 	DebugLogger    = "DEBUG"
@@ -55,11 +52,28 @@ const (
 	ServerLogger   = "SERVER"
 	AppLogger      = "APP"
 	ByteCodeLogger = "BYTECODE"
+	UserLogger     = "USER"
 )
 
+// Loggers is a map of the names of logging modes that are enabled
+var Loggers = map[string]bool{
+	DebugLogger:    false,
+	CLILogger:      false,
+	CompilerLogger: false,
+	SymbolLogger:   false,
+	ServerLogger:   false,
+	AppLogger:      false,
+	ByteCodeLogger: false,
+	UserLogger:     false,
+}
+
 // SetLogger enables or disables a logger
-func SetLogger(logger string, mode bool) {
+func SetLogger(logger string, mode bool) bool {
+	if _, ok := Loggers[logger]; !ok {
+		return false
+	}
 	Loggers[logger] = mode
+	return true
 }
 
 // Debug displays a message if debugging mode is enabled.

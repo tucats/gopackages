@@ -13,31 +13,31 @@ import (
 )
 
 var testGrammar1 = []cli.Option{
-	cli.Option{
+	{
 		LongName:    "stuff",
 		OptionType:  cli.BooleanType,
 		Description: "stuff mart",
 	},
-	cli.Option{
+	{
 		LongName:    "sub1",
 		OptionType:  cli.Subcommand,
 		Description: "sub1 subcommand",
 		Action:      testAction0,
 	},
-	cli.Option{
+	{
 		LongName:    "sub2",
 		OptionType:  cli.Subcommand,
 		Description: "sub2 subcommand has options",
 		Action:      testAction0,
 		Value: []cli.Option{
-			cli.Option{
+			{
 				ShortName:   "x",
 				LongName:    "explode",
 				Description: "Make something blow up",
 				OptionType:  cli.StringType,
 				Action:      testAction1,
 			},
-			cli.Option{
+			{
 				LongName:    "count",
 				Description: "Count of things to blow up",
 				OptionType:  cli.IntType,

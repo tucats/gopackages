@@ -32,7 +32,16 @@ func OutputFormatAction(c *cli.Context) error {
 
 // DebugAction is an action routine to set the global debug status if specified
 func DebugAction(c *cli.Context) error {
-	ui.DebugMode = c.FindGlobal().GetBool("debug")
+
+	loggers, mode := c.FindGlobal().GetStringList("debug")
+	ui.DebugMode = mode
+
+	for _, v := range loggers {
+		valid := ui.SetLogger(strings.ToUpper(v), true)
+		if !valid {
+			return fmt.Errorf("invalid logger name: %s", v)
+		}
+	}
 	return nil
 }
 
