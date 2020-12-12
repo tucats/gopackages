@@ -73,17 +73,23 @@ func SetLogger(logger string, mode bool) bool {
 		return false
 	}
 	Loggers[logger] = mode
+
+	// If any loggers are on, enable logging mode.
+	DebugMode = false
+	for _, v := range Loggers {
+		if v {
+			DebugMode = true
+		}
+	}
 	return true
 }
 
 // Debug displays a message if debugging mode is enabled.
 func Debug(logger string, format string, args ...interface{}) {
-
 	if DebugMode {
-		Loggers[DebugLogger] = true
-	}
-	if active, found := Loggers[logger]; active && found {
-		Log(logger, format, args...)
+		if active, found := Loggers[logger]; active && found {
+			Log(logger, format, args...)
+		}
 	}
 }
 
