@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Server",
+            "name": "Run test.ego",
             "type": "go",
             "request": "launch",
             "mode": "auto",
             "program": "/Users/tom/Go/src/github.com/tucats/ego/",
             "env": {},
-            "args": [ "run","test.ego"]
+            "args": [ "run", "test.ego" ]
         }
     ]
 }

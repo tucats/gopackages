@@ -2,6 +2,7 @@ package profile
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/cli"
@@ -12,19 +13,19 @@ import (
 
 // Grammar describes profile subcommands
 var Grammar = []cli.Option{
-	cli.Option{
+	{
 		LongName:    "list",
 		Description: "List all profiles",
 		Action:      ListAction,
 		OptionType:  cli.Subcommand,
 	},
-	cli.Option{
+	{
 		LongName:    "show",
 		Description: "Show the current profile",
 		Action:      ShowAction,
 		OptionType:  cli.Subcommand,
 	},
-	cli.Option{
+	{
 		LongName:             "set-output",
 		OptionType:           cli.Subcommand,
 		Description:          "Set the default output type (text or json)",
@@ -32,7 +33,7 @@ var Grammar = []cli.Option{
 		Action:               SetOutputAction,
 		ParametersExpected:   1,
 	},
-	cli.Option{
+	{
 		LongName:             "set-description",
 		OptionType:           cli.Subcommand,
 		Description:          "Set the profile description",
@@ -40,7 +41,7 @@ var Grammar = []cli.Option{
 		ParametersExpected:   1,
 		Action:               SetDescriptionAction,
 	},
-	cli.Option{
+	{
 		LongName:             "delete",
 		OptionType:           cli.Subcommand,
 		Description:          "Delete a key from the profile",
@@ -48,19 +49,19 @@ var Grammar = []cli.Option{
 		ParametersExpected:   1,
 		ParameterDescription: "key",
 	},
-	cli.Option{
+	{
 		LongName:    "set",
 		Description: "Set a profile value",
 		Action:      SetAction,
 		OptionType:  cli.Subcommand,
 		Value: []cli.Option{
-			cli.Option{
+			{
 				LongName:    "key",
 				Description: "The key that will be set in the profile. Can be of the form key=value.",
 				OptionType:  cli.StringType,
 				Required:    true,
 			},
-			cli.Option{
+			{
 				LongName:    "value",
 				Description: "The value to set for the key. If missing, the key is deleted",
 				OptionType:  cli.StringType,
@@ -75,9 +76,12 @@ func ShowAction(c *cli.Context) error {
 	t, _ := tables.New([]string{"Key", "Value"})
 
 	for k, v := range persistence.CurrentConfiguration.Items {
-		t.AddRowItems(k, v)
+		if len(fmt.Sprintf("%v", v)) > 60 {
+			v = fmt.Sprintf("%v", v)[:60] + "..."
+		}
+		_ = t.AddRowItems(k, v)
 	}
-	t.SetOrderBy("key")
+	_ = t.SetOrderBy("key")
 	t.ShowUnderlines(false)
 	t.Print(ui.TextTableFormat)
 
@@ -90,9 +94,9 @@ func ListAction(c *cli.Context) error {
 	t, _ := tables.New([]string{"Name", "Description"})
 
 	for k, v := range persistence.Configurations {
-		t.AddRowItems(k, v.Description)
+		_ = t.AddRowItems(k, v.Description)
 	}
-	t.SetOrderBy("name")
+	_ = t.SetOrderBy("name")
 	t.ShowUnderlines(false)
 	t.Print(ui.TextTableFormat)
 
