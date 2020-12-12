@@ -67,6 +67,10 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 	return ctxp
 }
 
+func (c *Context) SetGlobal(name string, value interface{}) error {
+	return c.symbols.SetGlobal(name, value)
+}
+
 // EnableConsoleOutput tells the context to begin capturing all output normally generated
 // from Print and Newline into a buffer instead of going to stdout
 func (c *Context) EnableConsoleOutput(flag bool) {

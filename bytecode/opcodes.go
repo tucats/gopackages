@@ -43,6 +43,7 @@ const (
 	LessThanOrEqual
 	Load
 	Store
+	StoreGlobal
 	Array
 	MakeArray
 	LoadIndex
@@ -132,6 +133,7 @@ var opcodeNames = map[int]string{
 	Panic:              "Panic",
 	Template:           "Template",
 	Return:             "Return",
+	StoreGlobal:        "StoreGlobal",
 }
 
 func initializeDispatch() {
@@ -158,6 +160,7 @@ func initializeDispatch() {
 			Call:               CallOpcode,
 			Load:               LoadOpcode,
 			Store:              StoreOpcode,
+			StoreGlobal:        StoreGlobalOpcode,
 			Branch:             BranchOpcode,
 			BranchTrue:         BranchTrueOpcode,
 			BranchFalse:        BranchFalseOpcode,

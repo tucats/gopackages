@@ -20,21 +20,47 @@ func (c *Compiler) Directive() error {
 	}
 
 	switch name {
-	case "error":
-		return c.Error()
-	case "template":
-		return c.Template()
-	case "pass":
-		return c.TestPass()
 	case "assert":
 		return c.Assert()
+	case "error":
+		return c.Error()
 	case "fail":
 		return c.Fail()
+	case "global":
+		return c.Global()
+	case "pass":
+		return c.TestPass()
+	case "template":
+		return c.Template()
 	case "test":
 		return c.Test()
 	default:
 		return c.NewError(InvalidDirectiveError, name)
 	}
+}
+
+// Global parses the @global directive which sets a symbol
+// value in the root symbol table, global to all execution.
+func (c *Compiler) Global() error {
+	if c.t.AtEnd() {
+		return c.NewError(InvalidSymbolError)
+	}
+	name := c.t.Next()
+	if !tokenizer.IsSymbol(name) {
+		return c.NewError(InvalidSymbolError, name)
+	}
+	name = c.Normalize(name)
+	if c.t.AtEnd() {
+		c.b.Emit(bytecode.Push, "")
+	} else {
+		bc, err := c.Expression()
+		if err != nil {
+			return err
+		}
+		c.b.Append(bc)
+	}
+	c.b.Emit(bytecode.StoreGlobal, name)
+	return nil
 }
 
 // Template implements the template compiler directive

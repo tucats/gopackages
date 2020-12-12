@@ -457,6 +457,18 @@ This will result in a runtime error being generated with the error text
 "unrecognized value: unknown". This error can be intercepted in a try/catch
 block if desired.
 
+## @global
+You can store a value in the Root symbol table (the table that is the
+ultimate parent of all other symbols). You cannot modify an existing
+readonly value, but you can create new readonly values, or values that
+can be changed by the user.
+
+    @global base "http://localhost:8080"
+
+This creates a variable named `base` that is in the root symbol table,
+with the value of the given expression. If you do not specify an expression,
+the variable is created as an empty-string.
+
 ## @template
 You can store away a named Go template as inline code. The template
 can reference any other templates defined. 
