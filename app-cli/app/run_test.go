@@ -84,7 +84,7 @@ func TestRun(t *testing.T) {
 			name: "Invalid global option",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "--booboo"},
+				[]string{"test-driver", "-d", "debug", "--booboo"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -93,7 +93,7 @@ func TestRun(t *testing.T) {
 			name: "Valid global option",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "--stuff"},
+				[]string{"test-driver", "-d", "debug", "--stuff"},
 				"testing: the test app",
 			},
 			wantErr: false,
@@ -102,7 +102,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "sub1"},
+				[]string{"test-driver", "-d", "debug", "sub1"},
 				"testing: the test app",
 			},
 			wantErr: false,
@@ -111,7 +111,7 @@ func TestRun(t *testing.T) {
 			name: "Invalid subcommand",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "subzero"},
+				[]string{"test-driver", "-d", "debug", "subzero"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -120,7 +120,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid short option name",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "sub2", "-x", "bob"},
+				[]string{"test-driver", "-d", "debug", "sub2", "-x", "bob"},
 				"testing: the test app",
 			},
 			wantErr: false,
@@ -129,7 +129,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid long option",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "sub2", "--explode", "bob"},
+				[]string{"test-driver", "-d", "debug", "sub2", "--explode", "bob"},
 				"testing: the test app",
 			},
 			wantErr: false,
@@ -138,7 +138,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid option but invalid value",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "sub2", "-x", "bob2"},
+				[]string{"test-driver", "-d", "debug", "sub2", "-x", "bob2"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -147,7 +147,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid option but missing value",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "sub2", "-x"},
+				[]string{"test-driver", "-d", "debug", "sub2", "-x"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -156,7 +156,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with invalid int valid option ",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "sub2", "--count", "42F"},
+				[]string{"test-driver", "-d", "debug", "sub2", "--count", "42F"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -165,7 +165,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid option ",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "sub2", "--count", "42"},
+				[]string{"test-driver", "-d", "debug", "sub2", "--count", "42"},
 				"testing: the test app",
 			},
 			wantErr: false,
@@ -174,7 +174,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid option with wrong value",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "sub2", "--count", "43"},
+				[]string{"test-driver", "-d", "debug", "sub2", "--count", "43"},
 				"testing: the test app",
 			},
 			wantErr: true,

@@ -27,6 +27,14 @@ func (c *Compiler) reference() error {
 			c.b.Emit(bc.Push, name)
 			c.b.Emit(bc.ClassMember)
 
+		// Function invocation
+		case "(":
+			c.t.Advance(1)
+			err := c.functionCall()
+			if err != nil {
+				return err
+			}
+
 		// Map member reference
 		case ".":
 			c.t.Advance(1)
