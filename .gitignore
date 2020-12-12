@@ -1,3 +1,6 @@
 cli-driver/cli-driver
 .vscode/launch.json
 app-cli/go.sum
+*.code-workspace
+.DS_Store
+
