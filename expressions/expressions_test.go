@@ -376,12 +376,12 @@ func TestNew(t *testing.T) {
 
 			// Create a common symbol table.
 			s := symbols.NewSymbolTable(tt.name)
-			s.SetAlways("i", 42)
-			s.SetAlways("pi", 3.14)
-			s.SetAlways("name", "Tom")
-			s.SetAlways("b", true)
-			s.SetAlways("roman12", "XII")
-			s.SetAlways("a", []interface{}{1, "tom", 33., false})
+			_ = s.SetAlways("i", 42)
+			_ = s.SetAlways("pi", 3.14)
+			_ = s.SetAlways("name", "Tom")
+			_ = s.SetAlways("b", true)
+			_ = s.SetAlways("roman12", "XII")
+			_ = s.SetAlways("a", []interface{}{1, "tom", 33., false})
 
 			// Compile the string and evaluate using the symbol table
 			v1, err := Evaluate(tt.expr, s)

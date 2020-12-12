@@ -75,7 +75,7 @@ func (c *Compiler) Test() error {
 	test["isType"] = TestIsType
 	test["description"] = s
 
-	c.s.SetAlways("testing", test)
+	_ = c.s.SetAlways("testing", test)
 
 	// Generate code to update the description (this is required for the
 	// cases of the ego test command running multiple tests as a single

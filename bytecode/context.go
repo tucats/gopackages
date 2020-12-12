@@ -13,21 +13,20 @@ import (
 // Context holds the runtime information about an instance of bytecode being
 // executed.
 type Context struct {
-	Name        string
-	bc          *ByteCode
-	pc          int
-	stack       []interface{}
-	sp          int
-	running     bool
-	line        int
-	symbols     *sym.SymbolTable
-	Tracing     bool
-	tokenizer   *tokenizer.Tokenizer
-	try         []int
-	output      *strings.Builder
-	stackMarker []int
-	this        interface{}
-	result      interface{}
+	Name      string
+	bc        *ByteCode
+	pc        int
+	stack     []interface{}
+	sp        int
+	running   bool
+	line      int
+	symbols   *sym.SymbolTable
+	Tracing   bool
+	tokenizer *tokenizer.Tokenizer
+	try       []int
+	output    *strings.Builder
+	this      interface{}
+	result    interface{}
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode
@@ -61,7 +60,7 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 	// Append any bytecode symbols into the symbol table.
 	if b.Symbols != nil {
 		for k, v := range b.Symbols.Symbols {
-			s.SetAlways(k, v)
+			_ = s.SetAlways(k, v)
 		}
 	}
 
@@ -72,7 +71,7 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 // from Print and Newline into a buffer instead of going to stdout
 func (c *Context) EnableConsoleOutput(flag bool) {
 
-	ui.Debug(">>> Console output set to %v", flag)
+	ui.Debug(ui.AppLogger, ">>> Console output set to %v", flag)
 	if !flag {
 		var b strings.Builder
 		c.output = &b
@@ -104,7 +103,7 @@ func (c *Context) GetTokenizer() *tokenizer.Tokenizer {
 // example.
 func (c *Context) AppendSymbols(s symbols.SymbolTable) {
 	for k, v := range s.Symbols {
-		c.symbols.SetAlways(k, v)
+		_ = c.symbols.SetAlways(k, v)
 	}
 }
 

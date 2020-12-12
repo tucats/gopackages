@@ -69,13 +69,16 @@ func (c *Compiler) NewError(msg string, args ...interface{}) *Error {
 	if len(args) > 0 {
 		token = util.GetString(args[0])
 	}
-	return &Error{
-		text:   msg,
-		line:   c.t.Line[p],
-		column: c.t.Pos[p],
-		token:  token,
-		pkg:    c.PackageName,
+	e := &Error{
+		text:  msg,
+		token: token,
+		pkg:   c.PackageName,
 	}
+	if p >= 0 {
+		e.line = c.t.Line[p]
+		e.column = c.t.Pos[p]
+	}
+	return e
 }
 
 // Error produces an error string from this object.

@@ -48,7 +48,7 @@ func (c *Context) RunFromAddress(addr int) error {
 	}
 
 	if c.Tracing {
-		ui.Debug("*** Tracing " + c.Name)
+		ui.Debug(ui.ByteCodeLogger, "*** Tracing "+c.Name)
 	}
 
 	fullStackListing := util.GetBool(c.GetConfig("full_stack_listing"))
@@ -67,7 +67,7 @@ func (c *Context) RunFromAddress(addr int) error {
 			if !fullStackListing && len(s2) > 50 {
 				s2 = s2[:50]
 			}
-			ui.Debug("%5d: %-30s stack[%2d]: %s", c.pc, s, c.sp, s2)
+			ui.Debug(ui.ByteCodeLogger, "%5d: %-30s stack[%2d]: %s", c.pc, s, c.sp, s2)
 		}
 		c.pc = c.pc + 1
 
@@ -91,20 +91,20 @@ func (c *Context) RunFromAddress(addr int) error {
 				// Zero out the jump point for this try/catch block so recursive
 				// errors don't occur.
 				c.try[len(c.try)-1] = 0
-				c.symbols.SetAlways("_error", text)
+				_ = c.symbols.SetAlways("_error", text)
 				if c.Tracing {
-					ui.Debug("*** Branch to %d on error: %s", c.pc, text)
+					ui.Debug(ui.ByteCodeLogger, "*** Branch to %d on error: %s", c.pc, text)
 				}
 			} else {
 				if c.Tracing {
-					ui.Debug("*** Return error: %s", text)
+					ui.Debug(ui.ByteCodeLogger, "*** Return error: %s", text)
 				}
 				return err
 			}
 		}
 	}
 	if c.Tracing {
-		ui.Debug("*** End tracing " + c.Name)
+		ui.Debug(ui.ByteCodeLogger, "*** End tracing "+c.Name)
 	}
 
 	return err

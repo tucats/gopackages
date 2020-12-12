@@ -11,7 +11,7 @@ import (
 // zero-based column number.
 func (t *Table) FindColumn(name string) (int, bool) {
 	for n, v := range t.columns {
-		if strings.ToLower(v) == strings.ToLower(name) {
+		if strings.EqualFold(v, name) {
 			return n, true
 		}
 	}

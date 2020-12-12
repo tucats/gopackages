@@ -38,7 +38,7 @@ func Min(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 			}
 
 		case bool:
-			if v.(bool) == false {
+			if !v.(bool) {
 				r = v
 			}
 		default:
@@ -63,24 +63,24 @@ func Max(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 		if v == nil {
 			return nil, NewError("max", InvalidTypeError)
 		}
-		switch r.(type) {
+		switch rr := r.(type) {
 		case int:
-			if v.(int) > r.(int) {
+			if v.(int) > rr {
 				r = v
 			}
 
 		case float64:
-			if v.(float64) > r.(float64) {
+			if v.(float64) > rr {
 				r = v
 			}
 
 		case string:
-			if v.(string) > r.(string) {
+			if v.(string) > rr {
 				r = v
 			}
 
 		case bool:
-			if v.(bool) == true {
+			if v.(bool) {
 				r = v
 			}
 

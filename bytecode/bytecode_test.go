@@ -29,11 +29,6 @@ func TestByteCode_Emit2(t *testing.T) {
 		Name    string
 		opcodes []I
 		emitPos int
-		pc      int
-		stack   []interface{}
-		sp      int
-		running bool
-		emit    []I
 	}
 	type args struct {
 		emit []I
@@ -51,11 +46,11 @@ func TestByteCode_Emit2(t *testing.T) {
 			},
 			args: args{
 				emit: []I{
-					I{Push, 33},
+					{Push, 33},
 				},
 			},
 			want: []I{
-				I{Push, 33},
+				{Push, 33},
 			},
 		},
 		{
@@ -65,17 +60,17 @@ func TestByteCode_Emit2(t *testing.T) {
 			},
 			args: args{
 				emit: []I{
-					I{Push, 33},
-					I{Push, "stuff"},
-					I{Opcode: Add},
-					I{Opcode: Stop},
+					{Push, 33},
+					{Push, "stuff"},
+					{Opcode: Add},
+					{Opcode: Stop},
 				},
 			},
 			want: []I{
-				I{Push, 33},
-				I{Push, "stuff"},
-				I{Opcode: Add},
-				I{Opcode: Stop},
+				{Push, 33},
+				{Push, "stuff"},
+				{Opcode: Add},
+				{Opcode: Stop},
 			},
 		},
 		// TODO: Add test cases.
@@ -120,23 +115,23 @@ func TestByteCode_Append(t *testing.T) {
 			name: "simple append",
 			fields: fields{
 				opcodes: []I{
-					I{Push, 0},
-					I{Push, 0},
+					{Push, 0},
+					{Push, 0},
 				},
 				emitPos: 2,
 			},
 			args: args{
 				a: &ByteCode{
 					opcodes: []I{
-						I{Add, nil},
+						{Add, nil},
 					},
 					emitPos: 1,
 				},
 			},
 			want: []I{
-				I{Push, 0},
-				I{Push, 0},
-				I{Add, nil},
+				{Push, 0},
+				{Push, 0},
+				{Add, nil},
 			},
 			wantPos: 3,
 		},
@@ -144,25 +139,25 @@ func TestByteCode_Append(t *testing.T) {
 			name: "branch append",
 			fields: fields{
 				opcodes: []I{
-					I{Push, 11},
-					I{Push, 22},
+					{Push, 11},
+					{Push, 22},
 				},
 				emitPos: 2,
 			},
 			args: args{
 				a: &ByteCode{
 					opcodes: []I{
-						I{Branch, 2}, // Must be updated
-						I{Add, nil},
+						{Branch, 2}, // Must be updated
+						{Add, nil},
 					},
 					emitPos: 2,
 				},
 			},
 			want: []I{
-				I{Push, 11},
-				I{Push, 22},
-				I{Branch, 4}, // Updated from new offset
-				I{Add, nil},
+				{Push, 11},
+				{Push, 22},
+				{Branch, 4}, // Updated from new offset
+				{Add, nil},
 			},
 			wantPos: 4,
 		},

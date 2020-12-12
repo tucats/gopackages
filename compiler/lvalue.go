@@ -18,7 +18,6 @@ func (c *Compiler) IsLValue() bool {
 	if tokenizer.InList(name, []string{"print", "for", "array", "if", "call", "return"}) {
 		return false
 	}
-	name = c.Normalize(name)
 
 	next := c.t.Peek(2)
 	if next == "." || next == "[" {

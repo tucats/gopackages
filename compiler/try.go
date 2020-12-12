@@ -17,7 +17,7 @@ func (c *Compiler) Try() error {
 	}
 	b2 := c.b.Mark()
 	c.b.Emit(bytecode.Branch, 0)
-	c.b.SetAddressHere(b1)
+	_ = c.b.SetAddressHere(b1)
 
 	if !c.t.IsNext("catch") {
 		return c.NewError(MissingCatchError)
@@ -27,7 +27,7 @@ func (c *Compiler) Try() error {
 	if err != nil {
 		return err
 	}
-	c.b.SetAddressHere(b2)
+	_ = c.b.SetAddressHere(b2)
 	c.b.Emit(bytecode.TryPop)
 
 	return nil

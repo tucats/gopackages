@@ -31,7 +31,7 @@ func TestTable_FormatJSON(t *testing.T) {
 			fields: fields{
 				columnCount: 1,
 				columns:     []string{"one"},
-				rows:        [][]string{[]string{"1"}},
+				rows:        [][]string{{"1"}},
 				columnOrder: []int{0},
 			},
 			want: "[{\"one\":1}]",
@@ -41,7 +41,7 @@ func TestTable_FormatJSON(t *testing.T) {
 			fields: fields{
 				columnCount: 3,
 				columns:     []string{"one", "two", "three"},
-				rows:        [][]string{[]string{"1", "true", "Tom"}},
+				rows:        [][]string{{"1", "true", "Tom"}},
 				columnOrder: []int{0, 1, 2},
 			},
 			want: "[{\"one\":1,\"two\":true,\"three\":\"Tom\"}]",
@@ -53,8 +53,8 @@ func TestTable_FormatJSON(t *testing.T) {
 				columns:     []string{"one", "two"},
 				columnOrder: []int{0, 1},
 				rows: [][]string{
-					[]string{"60", "Tom"},
-					[]string{"59", "Mary"},
+					{"60", "Tom"},
+					{"59", "Mary"},
 				},
 			},
 			want: "[{\"one\":60,\"two\":\"Tom\"},{\"one\":59,\"two\":\"Mary\"}]",

@@ -30,16 +30,16 @@ func (c *Compiler) If() error {
 	if c.t.IsNext("else") {
 		b2 := c.b.Mark()
 		c.b.Emit(bytecode.Branch, 0)
-		c.b.SetAddressHere(b1)
+		_ = c.b.SetAddressHere(b1)
 
 		err = c.Statement()
 		if err != nil {
 			return err
 		}
-		c.b.SetAddressHere(b2)
+		_ = c.b.SetAddressHere(b2)
 
 	} else {
-		c.b.SetAddressHere(b1)
+		_ = c.b.SetAddressHere(b1)
 	}
 	return nil
 }

@@ -38,15 +38,15 @@ func (t *Table) AddRowItems(items ...interface{}) error {
 
 	for n, item := range items {
 
-		switch item.(type) {
+		switch v := item.(type) {
 		case int:
-			buffer = strconv.Itoa(item.(int))
+			buffer = strconv.Itoa(v)
 
 		case string:
-			buffer = item.(string)
+			buffer = v
 
 		case bool:
-			if item.(bool) {
+			if v {
 				buffer = "true"
 			} else {
 				buffer = "false"

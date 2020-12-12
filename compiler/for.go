@@ -100,13 +100,13 @@ func (c *Compiler) For() error {
 		// Branch back to start of loop
 		c.b.Emit(bytecode.Branch, b1)
 		for _, fixAddr := range c.loops.continues {
-			c.b.SetAddress(fixAddr, b3)
+			_ = c.b.SetAddress(fixAddr, b3)
 		}
 
-		c.b.SetAddressHere(b2)
+		_ = c.b.SetAddressHere(b2)
 
 		for _, fixAddr := range c.loops.breaks {
-			c.b.SetAddressHere(fixAddr)
+			_ = c.b.SetAddressHere(fixAddr)
 		}
 		c.PopLoop()
 		c.b.Emit(bytecode.SymbolDelete, indexName)
@@ -118,7 +118,7 @@ func (c *Compiler) For() error {
 	// Nope, normal numeric loop conditions. At this point there should not
 	// be an index variable defined.
 	if indexName != "" {
-		c.NewError(InvalidLoopIndexError)
+		return c.NewError(InvalidLoopIndexError)
 	}
 	c.PushLoop(indexLoopType)
 
@@ -131,7 +131,7 @@ func (c *Compiler) For() error {
 	c.b.Append(indexStore)
 
 	if !c.t.IsNext(";") {
-		c.NewError(MissingSemicolonError)
+		return c.NewError(MissingSemicolonError)
 	}
 
 	// Now get the condition clause that tells us if the loop
@@ -142,7 +142,7 @@ func (c *Compiler) For() error {
 	}
 
 	if !c.t.IsNext(";") {
-		c.NewError(MissingSemicolonError)
+		return c.NewError(MissingSemicolonError)
 	}
 
 	// Finally, get the clause that updates something
@@ -181,14 +181,14 @@ func (c *Compiler) For() error {
 	c.b.Append(incrementCode)
 	c.b.Append(incrementStore)
 	c.b.Emit(bytecode.Branch, b1)
-	c.b.SetAddressHere(b2)
+	_ = c.b.SetAddressHere(b2)
 
 	for _, fixAddr := range c.loops.continues {
-		c.b.SetAddress(fixAddr, b1)
+		_ = c.b.SetAddress(fixAddr, b1)
 	}
 
 	for _, fixAddr := range c.loops.breaks {
-		c.b.SetAddressHere(fixAddr)
+		_ = c.b.SetAddressHere(fixAddr)
 	}
 	c.b.Emit(bytecode.PopScope)
 	c.PopLoop()
@@ -237,6 +237,6 @@ func (c *Compiler) PopLoop() {
 		c.loops = c.loops.Parent
 		// ui.Debug("=== Pop loop scope")
 	} else {
-		ui.Debug("=== loop stack empty")
+		ui.Debug(ui.ByteCodeLogger, "=== loop stack empty")
 	}
 }

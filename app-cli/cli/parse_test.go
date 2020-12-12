@@ -68,51 +68,51 @@ func TestContext_ParseGrammar(t *testing.T) {
 	}
 
 	var grammar1 = []Option{
-		Option{
+		{
 			LongName:   "sub1",
 			OptionType: Subcommand,
 			Action:     dummyAction,
 			Value: []Option{
-				Option{
+				{
 					LongName:   "subopt1",
 					OptionType: BooleanType,
 				},
 			},
 		},
-		Option{
+		{
 			LongName:           "sub2",
 			Aliases:            []string{"s2"},
 			OptionType:         Subcommand,
 			Action:             dummyAction,
 			ParametersExpected: -3,
 			Value: []Option{
-				Option{
+				{
 					LongName:   "subopt2",
 					OptionType: BooleanType,
 				},
 			},
 		},
-		Option{
+		{
 			LongName:           "sub3",
 			Aliases:            []string{"s3"},
 			OptionType:         Subcommand,
 			Action:             dummyAction,
 			ParametersExpected: 1,
 			Value: []Option{
-				Option{
+				{
 					LongName:   "subopt2",
 					OptionType: BooleanType,
 				},
 			},
 		},
-		Option{
+		{
 			ShortName:   "a",
 			LongName:    "alpha",
 			OptionType:  BooleanType,
 			Description: "alpha option",
 			Action:      dummyAction,
 		},
-		Option{
+		{
 			ShortName:   "i",
 			LongName:    "integer",
 			Aliases:     []string{"int"},
@@ -120,21 +120,21 @@ func TestContext_ParseGrammar(t *testing.T) {
 			Description: "integer option",
 			Action:      integerAction,
 		},
-		Option{
+		{
 			ShortName:   "b",
 			LongName:    "boolean",
 			OptionType:  BooleanValueType,
 			Description: "boolean value option",
 			Action:      booleanValueAction,
 		},
-		Option{
+		{
 			ShortName:   "f",
 			LongName:    "flag",
 			OptionType:  BooleanType,
 			Description: "boolean option",
 			Action:      booleanAction,
 		},
-		Option{
+		{
 			ShortName:   "s",
 			LongName:    "string",
 			OptionType:  StringType,

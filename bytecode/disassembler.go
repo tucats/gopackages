@@ -15,10 +15,10 @@ func (b *ByteCode) Disasm() {
 	for n := 0; n < b.emitPos; n++ {
 		i := b.opcodes[n]
 		op := FormatInstruction(i)
-		ui.Debug("%4d: %s", n, op)
+		ui.Debug(ui.ByteCodeLogger, "%4d: %s", n, op)
 	}
 
-	ui.Debug("*** Disassembled %d instructions", b.emitPos)
+	ui.Debug(ui.ByteCodeLogger, "*** Disassembled %d instructions", b.emitPos)
 }
 
 // FormatInstruction formats a single instruction as a string.

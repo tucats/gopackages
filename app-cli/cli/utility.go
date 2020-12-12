@@ -9,7 +9,7 @@ import (
 func ValidKeyword(test string, valid []string) bool {
 
 	for _, v := range valid {
-		if strings.ToLower(test) == strings.ToLower(v) {
+		if strings.EqualFold(test, v) {
 			return true
 		}
 	}
@@ -23,7 +23,7 @@ func ValidKeyword(test string, valid []string) bool {
 func FindKeyword(test string, valid []string) int {
 
 	for n, v := range valid {
-		if strings.ToLower(test) == strings.ToLower(v) {
+		if strings.EqualFold(test, v) {
 			return n
 		}
 	}

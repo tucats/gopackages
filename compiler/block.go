@@ -20,9 +20,8 @@ func (c *Compiler) Block() error {
 			return err
 		}
 
-		if c.t.IsNext(";") {
-			// No action needed
-		}
+		// Skip over a semicolon if found
+		_ = c.t.IsNext(";")
 
 		if c.t.AtEnd() {
 			return c.NewError(MissingEndOfBlockError)

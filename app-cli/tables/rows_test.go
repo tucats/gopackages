@@ -22,14 +22,14 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:       "Simple table with one column, two rows",
 			headers:    []string{"first"},
-			rows:       [][]string{[]string{"v2"}, []string{"v1"}},
+			rows:       [][]string{{"v2"}, {"v1"}},
 			sortColumn: "first",
 			result:     []string{"first    ", "=====    ", "v1       ", "v2       "},
 		},
 		{
 			name:       "Simple table with two columns, two rows",
 			headers:    []string{"first", "second"},
-			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:       [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn: "first",
 			result:     []string{"first    second    ", "=====    ======    ", "v1       d2        ", "v2       d1        "},
 			wantErr:    false,
@@ -37,7 +37,7 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:       "Simple table with two columns, two rows, alternate sort",
 			headers:    []string{"first", "second"},
-			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:       [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn: "second",
 			result:     []string{"first    second    ", "=====    ======    ", "v2       d1        ", "v1       d2        "},
 			wantErr:    false,
@@ -45,7 +45,7 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:       "Simple table with two columns, two rows, alternate descending sort",
 			headers:    []string{"first", "second"},
-			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:       [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn: "~second",
 			result:     []string{"first    second    ", "=====    ======    ", "v1       d2        ", "v2       d1        "},
 			wantErr:    false,
@@ -53,7 +53,7 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:       "Simple table with two columns, two rows, invalid sort",
 			headers:    []string{"first", "second"},
-			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:       [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn: "foobar",
 			result:     []string{"first    second    ", "=====    ======    ", "v2       d1        ", "v1       d2        "},
 			wantErr:    true,
@@ -61,7 +61,7 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:        "Starting row",
 			headers:     []string{"first", "second"},
-			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:        [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn:  "second",
 			result:      []string{"first    second    ", "=====    ======    ", "v1       d2        "},
 			startingRow: 2,
@@ -69,7 +69,7 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:        "Invalid starting row",
 			headers:     []string{"first", "second"},
-			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:        [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn:  "second",
 			result:      []string{"first    second    ", "=====    ======    ", "v2       d1        ", "v1       d2        "},
 			startingRow: -5,
@@ -78,7 +78,7 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:       "Format table without underlines",
 			headers:    []string{"first", "second"},
-			rows:       [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:       [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn: "second",
 			result:     []string{"first    second    ", "v2       d1        ", "v1       d2        "},
 			hideLines:  true,
@@ -86,7 +86,7 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:        "Format table without headings",
 			headers:     []string{"first", "second"},
-			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:        [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn:  "second",
 			result:      []string{"v2       d1        ", "v1       d2        "},
 			hideHeaders: true,
@@ -94,7 +94,7 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:        "Valid minimum width",
 			headers:     []string{"first", "second"},
-			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:        [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn:  "second",
 			result:      []string{"v2       d1            ", "v1       d2            "},
 			hideHeaders: true,
@@ -103,7 +103,7 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:        "Valid but ineffective width",
 			headers:     []string{"first", "second"},
-			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:        [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn:  "second",
 			result:      []string{"v2       d1        ", "v1       d2        "},
 			width:       2,
@@ -112,7 +112,7 @@ func TestTable_SortRows(t *testing.T) {
 		{
 			name:        "Invalid minimum width",
 			headers:     []string{"first", "second"},
-			rows:        [][]string{[]string{"v2", "d1"}, []string{"v1", "d2"}},
+			rows:        [][]string{{"v2", "d1"}, {"v1", "d2"}},
 			sortColumn:  "second",
 			result:      []string{"v2       d1        ", "v1       d2        "},
 			hideHeaders: true,
@@ -126,7 +126,7 @@ func TestTable_SortRows(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			table, _ := New(tt.headers)
 			for _, r := range tt.rows {
-				table.AddRow(r)
+				_ = table.AddRow(r)
 			}
 
 			if tt.sortColumn != "" {
@@ -207,7 +207,7 @@ func TestTable_AddRow(t *testing.T) {
 				alignment:      []int{AlignmentLeft},
 				spacing:        "    ",
 				indent:         "",
-				rows:           [][]string{[]string{"first"}},
+				rows:           [][]string{{"first"}},
 				orderBy:        -1,
 				ascending:      true,
 				showUnderlines: true,
@@ -242,7 +242,7 @@ func TestTable_AddRow(t *testing.T) {
 				alignment:      []int{AlignmentLeft, AlignmentLeft, AlignmentLeft},
 				spacing:        "    ",
 				indent:         "",
-				rows:           [][]string{[]string{"first", "second", "third"}},
+				rows:           [][]string{{"first", "second", "third"}},
 				orderBy:        -1,
 				ascending:      true,
 				showUnderlines: true,
@@ -308,15 +308,15 @@ func TestTable_AddRowItems(t *testing.T) {
 	t.Run("Add row items", func(t *testing.T) {
 		tb, _ := New([]string{"Age", "Name", "Active", "Ratio"})
 
-		tb.AddRowItems(60, "Tom", true, 28.5)
-		tb.AddRowItems(59, "Mary", true, 23.5)
-		tb.AddRowItems(62, "Tony", false, 35.9)
-		tb.SortRows(3, false)
+		_ = tb.AddRowItems(60, "Tom", true, 28.5)
+		_ = tb.AddRowItems(59, "Mary", true, 23.5)
+		_ = tb.AddRowItems(62, "Tony", false, 35.9)
+		_ = tb.SortRows(3, false)
 
 		expected := [][]string{
-			[]string{"62", "Tony", "false", "35.9"},
-			[]string{"60", "Tom", "true", "28.5"},
-			[]string{"59", "Mary", "true", "23.5"},
+			{"62", "Tony", "false", "35.9"},
+			{"60", "Tom", "true", "28.5"},
+			{"59", "Mary", "true", "23.5"},
 		}
 
 		if !reflect.DeepEqual(tb.rows, expected) {

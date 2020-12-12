@@ -207,24 +207,24 @@ func Coerce(v interface{}, model interface{}) interface{} {
 
 	case bool:
 
-		switch v.(type) {
+		switch vv := v.(type) {
 		case nil:
 			return false
 
 		case bool:
-			return v
+			return vv
 
 		case int:
-			return (v.(int) != 0)
+			return (vv != 0)
 
 		case int64:
-			return (v.(int64) != int64(0))
+			return vv != int64(0)
 
 		case float64:
-			return v.(float64) != 0.0
+			return vv != 0.0
 
 		case string:
-			switch v.(string) {
+			switch vv {
 			case "true":
 				return true
 			case "false":
@@ -266,37 +266,34 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 		}
 
 	case string:
-		switch v2.(type) {
+		switch vv := v2.(type) {
 		case string:
 			return v1, v2
 		case int:
-			return v1, strconv.Itoa(v2.(int))
+			return v1, strconv.Itoa(vv)
 		case float64:
-			return v1, fmt.Sprintf("%v", v2.(float64))
+			return v1, fmt.Sprintf("%v", vv)
 		case bool:
-			if v2.(bool) {
-				return v1, "true"
-			}
-			return v1, "false"
+			return v1, vv
 		}
 
 	case float64:
-		switch v2.(type) {
+		switch vv := v2.(type) {
 		case string:
 			return fmt.Sprintf("%v", v1.(float64)), v2
 		case int:
-			return v1, float64(v2.(int))
+			return v1, float64(vv)
 		case float64:
 			return v1, v2
 		case bool:
-			if v2.(bool) {
+			if vv {
 				return v1, 1.0
 			}
 			return v1, 0.0
 		}
 
 	case int:
-		switch v2.(type) {
+		switch vv := v2.(type) {
 		case string:
 			return strconv.Itoa(v1.(int)), v2
 		case int:
@@ -304,24 +301,24 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 		case float64:
 			return float64(v1.(int)), v2
 		case bool:
-			if v2.(bool) {
+			if vv {
 				return v1, 1
 			}
 			return v1, 0
 		}
 
 	case int64:
-		switch v2.(type) {
+		switch vv := v2.(type) {
 		case string:
 			return fmt.Sprintf("%v", v1.(int64)), v2
 		case int:
-			return int64(v1.(int64)), int64(v2.(int))
+			return int64(v1.(int64)), int64(vv)
 		case int64:
 			return v1, v2
 		case float64:
 			return float64(v1.(int64)), v2
 		case bool:
-			if v2.(bool) {
+			if vv {
 				return v1, 1
 			}
 			return v1, 0

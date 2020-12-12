@@ -57,7 +57,6 @@ func (c *Compiler) Function(literal bool) error {
 			} else {
 				return c.NewError(InvalidFunctionArgument)
 			}
-			name = c.Normalize(name)
 
 			// Is there a type name that follows it? We have to check for "[]" and "{}"
 			// as two differnt tokens. Also note that you can use the word array or struct
@@ -86,9 +85,7 @@ func (c *Compiler) Function(literal bool) error {
 			}
 
 			parameters = append(parameters, p)
-			if c.t.IsNext(",") {
-				// No action
-			}
+			_ = c.t.IsNext(",")
 		}
 	}
 
@@ -186,9 +183,9 @@ func (c *Compiler) Function(literal bool) error {
 		// Store address of the function, either in the current
 		// compiler's symbol table or active package.
 		if c.PackageName == "" {
-			c.s.SetAlways(fname, b)
+			_ = c.s.SetAlways(fname, b)
 		} else {
-			c.AddPackageFunction(c.PackageName, fname, b)
+			_ = c.AddPackageFunction(c.PackageName, fname, b)
 		}
 	}
 	return nil

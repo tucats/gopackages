@@ -221,7 +221,7 @@ func (c *Compiler) parseStruct() error {
 
 func (c *Compiler) unLit(s string) (string, error) {
 	quote := s[0:1]
-	if s[len(s)-1:len(s)] != quote {
+	if s[len(s)-1:] != quote {
 		return s[1:], c.NewError(BlockQuoteError, quote)
 	}
 	return s[1 : len(s)-1], nil

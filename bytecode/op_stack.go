@@ -39,8 +39,8 @@ func DupOpcode(c *Context, i interface{}) error {
 	if err != nil {
 		return err
 	}
-	c.Push(v)
-	c.Push(v)
+	_ = c.Push(v)
+	_ = c.Push(v)
 	return nil
 }
 
@@ -54,8 +54,8 @@ func SwapOpcode(c *Context, i interface{}) error {
 	if err != nil {
 		return err
 	}
-	c.Push(v1)
-	c.Push(v2)
+	_ = c.Push(v1)
+	_ = c.Push(v2)
 	return nil
 }
 
@@ -65,13 +65,13 @@ func CopyOpcode(c *Context, i interface{}) error {
 	if err != nil {
 		return err
 	}
-	c.Push(v)
+	_ = c.Push(v)
 
 	// Use JSON as a reflection-based cloner
 	var v2 interface{}
 	byt, _ := json.Marshal(v)
-	json.Unmarshal(byt, &v2)
+	err = json.Unmarshal(byt, &v2)
 
-	c.Push(2)
-	return nil
+	_ = c.Push(2)
+	return err
 }

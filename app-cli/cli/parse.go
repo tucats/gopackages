@@ -56,7 +56,7 @@ func (c *Context) parseGrammar(args []string) error {
 			globalContext := c.FindGlobal()
 			globalContext.Parameters = append(globalContext.Parameters, option)
 			count := len(globalContext.Parameters)
-			ui.Debug("added parameter %d", count)
+			ui.Debug(ui.CLILogger, "added parameter %d", count)
 			continue
 		}
 
@@ -145,7 +145,7 @@ func (c *Context) parseGrammar(args []string) error {
 
 					if entry.Action != nil {
 						subContext.Action = entry.Action
-						ui.Debug("Saving action routine in subcommand context")
+						ui.Debug(ui.CLILogger, "Saving action routine in subcommand context")
 					}
 					ui.Debug("Transferring control to subgrammar for %s", entry.LongName)
 					return subContext.parseGrammar(args[currentArg+1:])
@@ -156,7 +156,7 @@ func (c *Context) parseGrammar(args []string) error {
 			g := c.FindGlobal()
 			g.Parameters = append(g.Parameters, option)
 			count := len(g.Parameters)
-			ui.Debug("Unclaimed token added parameter %d", count)
+			ui.Debug(ui.CLILogger, "Unclaimed token added parameter %d", count)
 
 		} else {
 
@@ -201,7 +201,7 @@ func (c *Context) parseGrammar(args []string) error {
 				location.Value = i
 			}
 
-			ui.Debug("Option value set to %#v", location.Value)
+			ui.Debug(ui.CLILogger, "Option value set to %#v", location.Value)
 
 			// After parsing the option value, if there is an action routine, call it
 			if location.Action != nil {
@@ -231,9 +231,9 @@ func (c *Context) parseGrammar(args []string) error {
 
 		g := c.FindGlobal()
 		if g.ExpectedParameterCount == -99 {
-			ui.Debug("Parameters expected: <varying> found %d", g.GetParameterCount())
+			ui.Debug(ui.CLILogger, "Parameters expected: <varying> found %d", g.GetParameterCount())
 		} else {
-			ui.Debug("Parameters expected: %d  found %d", g.ExpectedParameterCount, g.GetParameterCount())
+			ui.Debug(ui.CLILogger, "Parameters expected: %d  found %d", g.ExpectedParameterCount, g.GetParameterCount())
 		}
 		if g.ExpectedParameterCount == 0 && len(g.Parameters) > 0 {
 			return errors.New("unexpected parameters on command line")
@@ -250,15 +250,15 @@ func (c *Context) parseGrammar(args []string) error {
 
 		// Search the tree to see if we have any environment variable settings that
 		// should be pulled into the grammar.
-		c.ResolveEnvironmentVariables()
+		_ = c.ResolveEnvironmentVariables()
 
 		// Did we ever find an action routine? If so, let's run it. Otherwise,
 		// there wasn't enough command to determine what to do, so show the help.
 		if c.Action != nil {
-			ui.Debug("Invoking command action")
+			ui.Debug(ui.CLILogger, "Invoking command action")
 			err = c.Action(c)
 		} else {
-			ui.Debug("No command action was ever specified during parsing")
+			ui.Debug(ui.CLILogger, "No command action was ever specified during parsing")
 			ShowHelp(c)
 		}
 	}

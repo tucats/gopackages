@@ -36,7 +36,7 @@ func (c *Compiler) conditional() error {
 	m2 := c.b.Mark()
 	c.b.Emit(bc.Branch, 0)
 
-	c.b.SetAddressHere(m1)
+	_ = c.b.SetAddressHere(m1)
 	c.t.Advance(1)
 	err = c.relations()
 	if err != nil {
@@ -44,7 +44,7 @@ func (c *Compiler) conditional() error {
 	}
 
 	// Patch up the forward references.
-	c.b.SetAddressHere(m2)
+	_ = c.b.SetAddressHere(m2)
 
 	return nil
 

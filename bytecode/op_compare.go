@@ -50,7 +50,7 @@ func EqualOpcode(c *Context, i interface{}) error {
 		}
 	}
 
-	c.Push(r)
+	_ = c.Push(r)
 	return nil
 
 }
@@ -94,7 +94,7 @@ func NotEqualOpcode(c *Context, i interface{}) error {
 		}
 	}
 
-	c.Push(r)
+	_ = c.Push(r)
 	return nil
 
 }
@@ -134,7 +134,7 @@ func GreaterThanOpcode(c *Context, i interface{}) error {
 
 		}
 	}
-	c.Push(r)
+	_ = c.Push(r)
 	return nil
 }
 
@@ -173,7 +173,7 @@ func GreaterThanOrEqualOpcode(c *Context, i interface{}) error {
 
 		}
 	}
-	c.Push(r)
+	_ = c.Push(r)
 	return nil
 }
 
@@ -192,11 +192,11 @@ func LessThanOpcode(c *Context, i interface{}) error {
 
 	// Handle nil cases
 	if v1 == nil && v2 == nil {
-		c.Push(true)
+		_ = c.Push(true)
 		return nil
 	}
 	if v1 == nil || v2 == nil {
-		c.Push(false)
+		_ = c.Push(false)
 		return nil
 	}
 
@@ -223,7 +223,7 @@ func LessThanOpcode(c *Context, i interface{}) error {
 
 		}
 	}
-	c.Push(r)
+	_ = c.Push(r)
 	return nil
 }
 
@@ -262,6 +262,6 @@ func LessThanOrEqualOpcode(c *Context, i interface{}) error {
 
 		}
 	}
-	c.Push(r)
+	_ = c.Push(r)
 	return nil
 }

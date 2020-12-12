@@ -107,7 +107,7 @@ func Open(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	file := map[string]interface{}{}
 	file["id"] = f
-	s.SetAlways(id, file)
+	_ = s.SetAlways(id, file)
 	return id, nil
 }
 
@@ -125,7 +125,7 @@ func Close(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	f := file["id"].(*os.File)
 	err := f.Close()
 
-	s.DeleteAlways(id)
+	_ = s.DeleteAlways(id)
 
 	return err == nil, err
 }
@@ -149,7 +149,7 @@ func ReadString(s *symbols.SymbolTable, args []interface{}) (interface{}, error)
 	if !found {
 		scanner = bufio.NewScanner(f)
 		file["scanner"] = scanner
-		s.Set(id, file)
+		_ = s.Set(id, file)
 	} else {
 		scanner = scanX.(*bufio.Scanner)
 	}

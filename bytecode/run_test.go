@@ -13,12 +13,7 @@ func TestByteCode_Run(t *testing.T) {
 		Name    string
 		opcodes []I
 		emitPos int
-		pc      int
-		stack   []interface{}
-		sp      int
-		running bool
 		result  interface{}
-		symbols symbols.SymbolTable
 	}
 	tests := []struct {
 		name    string
@@ -30,7 +25,7 @@ func TestByteCode_Run(t *testing.T) {
 			name: "stop",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Stop},
+					{Opcode: Stop},
 				},
 			},
 		},
@@ -38,8 +33,8 @@ func TestByteCode_Run(t *testing.T) {
 			name: "push int",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 42},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 42},
+					{Opcode: Stop},
 				},
 				result: 42,
 			},
@@ -48,11 +43,11 @@ func TestByteCode_Run(t *testing.T) {
 			name: "drop 2 stack items",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 42},
-					I{Opcode: Push, Operand: 43},
-					I{Opcode: Push, Operand: 44},
-					I{Opcode: Drop, Operand: 2},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 42},
+					{Opcode: Push, Operand: 43},
+					{Opcode: Push, Operand: 44},
+					{Opcode: Drop, Operand: 2},
+					{Opcode: Stop},
 				},
 				result: 42,
 			},
@@ -61,8 +56,8 @@ func TestByteCode_Run(t *testing.T) {
 			name: "push float",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 3.14},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 3.14},
+					{Opcode: Stop},
 				},
 				result: 3.14,
 			},
@@ -71,10 +66,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "add int",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 5},
-					I{Opcode: Push, Operand: 7},
-					I{Opcode: Add},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 5},
+					{Opcode: Push, Operand: 7},
+					{Opcode: Add},
+					{Opcode: Stop},
 				},
 				result: 12,
 			},
@@ -83,10 +78,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "add float to int",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 3.14},
-					I{Opcode: Push, Operand: 7},
-					I{Opcode: Add},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 3.14},
+					{Opcode: Push, Operand: 7},
+					{Opcode: Add},
+					{Opcode: Stop},
 				},
 				result: 10.14,
 			},
@@ -95,10 +90,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "sub int from  int",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 5},
-					I{Opcode: Push, Operand: 8},
-					I{Opcode: Sub},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 5},
+					{Opcode: Push, Operand: 8},
+					{Opcode: Sub},
+					{Opcode: Stop},
 				},
 				result: -3,
 			},
@@ -107,10 +102,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "div float by int",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 10.0},
-					I{Opcode: Push, Operand: 2},
-					I{Opcode: Div},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 10.0},
+					{Opcode: Push, Operand: 2},
+					{Opcode: Div},
+					{Opcode: Stop},
 				},
 				result: 5.0,
 			},
@@ -119,10 +114,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "mul float by float",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 3.0},
-					I{Opcode: Push, Operand: 4.0},
-					I{Opcode: Mul},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 3.0},
+					{Opcode: Push, Operand: 4.0},
+					{Opcode: Mul},
+					{Opcode: Stop},
 				},
 				result: 12.0,
 			},
@@ -131,10 +126,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "equal int test",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 5},
-					I{Opcode: Push, Operand: 5},
-					I{Opcode: Equal},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 5},
+					{Opcode: Push, Operand: 5},
+					{Opcode: Equal},
+					{Opcode: Stop},
 				},
 				result: true,
 			},
@@ -143,10 +138,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "equal mixed test",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 5},
-					I{Opcode: Push, Operand: 5.0},
-					I{Opcode: Equal},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 5},
+					{Opcode: Push, Operand: 5.0},
+					{Opcode: Equal},
+					{Opcode: Stop},
 				},
 				result: true,
 			},
@@ -155,10 +150,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "not equal int test",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 5},
-					I{Opcode: Push, Operand: 5},
-					I{Opcode: NotEqual},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 5},
+					{Opcode: Push, Operand: 5},
+					{Opcode: NotEqual},
+					{Opcode: Stop},
 				},
 				result: false,
 			},
@@ -167,10 +162,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "not equal string test",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: "fruit"},
-					I{Opcode: Push, Operand: "fruit"},
-					I{Opcode: NotEqual},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: "fruit"},
+					{Opcode: Push, Operand: "fruit"},
+					{Opcode: NotEqual},
+					{Opcode: Stop},
 				},
 				result: false,
 			},
@@ -179,10 +174,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "not equal bool test",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: false},
-					I{Opcode: Push, Operand: false},
-					I{Opcode: NotEqual},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: false},
+					{Opcode: Push, Operand: false},
+					{Opcode: NotEqual},
+					{Opcode: Stop},
 				},
 				result: false,
 			},
@@ -191,10 +186,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "not equal float test",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 5.00000},
-					I{Opcode: Push, Operand: 5.00001},
-					I{Opcode: NotEqual},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 5.00000},
+					{Opcode: Push, Operand: 5.00001},
+					{Opcode: NotEqual},
+					{Opcode: Stop},
 				},
 				result: true,
 			},
@@ -203,10 +198,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "greater than test",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: 11.0},
-					I{Opcode: Push, Operand: 5},
-					I{Opcode: GreaterThan},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: 11.0},
+					{Opcode: Push, Operand: 5},
+					{Opcode: GreaterThan},
+					{Opcode: Stop},
 				},
 				result: true,
 			},
@@ -215,10 +210,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "greater than or equals test",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: "tom"},
-					I{Opcode: Push, Operand: "tom"},
-					I{Opcode: GreaterThanOrEqual},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: "tom"},
+					{Opcode: Push, Operand: "tom"},
+					{Opcode: GreaterThanOrEqual},
+					{Opcode: Stop},
 				},
 				result: true,
 			},
@@ -227,10 +222,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "length of string constant",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Load, Operand: "len"},
-					I{Opcode: Push, Operand: "fruitcake"},
-					I{Opcode: Call, Operand: 1},
-					I{Opcode: Stop},
+					{Opcode: Load, Operand: "len"},
+					{Opcode: Push, Operand: "fruitcake"},
+					{Opcode: Call, Operand: 1},
+					{Opcode: Stop},
 				},
 				result: 9,
 			},
@@ -240,13 +235,13 @@ func TestByteCode_Run(t *testing.T) {
 			fields: fields{
 				opcodes: []I{
 					// Arguments are pushed in the order parsed
-					I{Opcode: Load, Operand: "strings"},
-					I{Opcode: Push, Operand: "left"},
-					I{Opcode: Member},
-					I{Opcode: Push, Operand: "fruitcake"},
-					I{Opcode: Push, Operand: 5},
-					I{Opcode: Call, Operand: 2},
-					I{Opcode: Stop},
+					{Opcode: Load, Operand: "strings"},
+					{Opcode: Push, Operand: "left"},
+					{Opcode: Member},
+					{Opcode: Push, Operand: "fruitcake"},
+					{Opcode: Push, Operand: 5},
+					{Opcode: Call, Operand: 2},
+					{Opcode: Stop},
 				},
 				result: "fruit",
 			},
@@ -255,10 +250,10 @@ func TestByteCode_Run(t *testing.T) {
 			name: "simple branch",
 			fields: fields{
 				opcodes: []I{
-					I{Opcode: Push, Operand: "fruitcake"},
-					I{Opcode: Branch, Operand: 3},
-					I{Opcode: Push, Operand: "left"},
-					I{Opcode: Stop},
+					{Opcode: Push, Operand: "fruitcake"},
+					{Opcode: Branch, Operand: 3},
+					{Opcode: Push, Operand: "left"},
+					{Opcode: Stop},
 				},
 				result: "fruitcake",
 			},
@@ -270,13 +265,13 @@ func TestByteCode_Run(t *testing.T) {
 
 					// Use of "short-form" instruction initializer requires passing nil
 					// for those instructions without an operand
-					I{Push, "stuff"},
-					I{Push, "fruitcake"},
-					I{Push, "fruitcake"},
-					I{Equal, nil},
-					I{BranchTrue, 6},
-					I{Push, .33333},
-					I{Stop, nil},
+					{Push, "stuff"},
+					{Push, "fruitcake"},
+					{Push, "fruitcake"},
+					{Equal, nil},
+					{BranchTrue, 6},
+					{Push, .33333},
+					{Stop, nil},
 				},
 				result: "stuff",
 			},
@@ -288,13 +283,13 @@ func TestByteCode_Run(t *testing.T) {
 
 					// Use of "short-form" instruction initializer requires passing nil
 					// for those instructions without an operand
-					I{Push, "stuff"},
-					I{Push, "cake"},
-					I{Push, "fruitcake"},
-					I{Equal, nil},
-					I{BranchTrue, 6},
-					I{Push, 42},
-					I{Stop, nil},
+					{Push, "stuff"},
+					{Push, "cake"},
+					{Push, "fruitcake"},
+					{Equal, nil},
+					{BranchTrue, 6},
+					{Push, 42},
+					{Stop, nil},
 				},
 				result: 42,
 			},

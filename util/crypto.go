@@ -32,7 +32,7 @@ func Decrypt(data, password string) (string, error) {
 // key string result in the same hash value.
 func Hash(key string) string {
 	hasher := md5.New()
-	hasher.Write([]byte(key))
+	_, _ = hasher.Write([]byte(key))
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 func encrypt(data []byte, passphrase string) ([]byte, error) {
@@ -60,6 +60,9 @@ func decrypt(data []byte, passphrase string) ([]byte, error) {
 		return nil, err
 	}
 	nonceSize := gcm.NonceSize()
+	if nonceSize > len(data) {
+		return []byte(""), nil
+	}
 	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {

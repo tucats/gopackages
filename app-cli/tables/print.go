@@ -17,7 +17,7 @@ func (t *Table) Print(format string) error {
 
 	// If there is an orderBy set for the table, do the sort now
 	if t.orderBy >= 0 {
-		t.SortRows(t.orderBy, t.ascending)
+		_ = t.SortRows(t.orderBy, t.ascending)
 	}
 
 	if format == "" {
@@ -64,9 +64,9 @@ func (t *Table) FormatJSON() string {
 		if e != nil {
 			// Load up the symbol tables with column values and the row number
 			symbols := symbols.NewSymbolTable("rowset")
-			symbols.SetAlways("_row_", n+1)
+			_ = symbols.SetAlways("_row_", n+1)
 			for i, n := range t.columns {
-				symbols.SetAlways(strings.ToLower(n), row[i])
+				_ = symbols.SetAlways(strings.ToLower(n), row[i])
 			}
 			v, err := e.Eval(symbols)
 			if err != nil {
@@ -110,7 +110,7 @@ func (t *Table) FormatJSON() string {
 // FormatText will output a table using current rows and format specifications.
 func (t *Table) FormatText() []string {
 
-	ui.Debug("Print column order: %v", t.columnOrder)
+	ui.Debug(ui.AppLogger, "Print column order: %v", t.columnOrder)
 	output := make([]string, 0)
 
 	var e *expressions.Expression
@@ -183,9 +183,9 @@ func (t *Table) FormatText() []string {
 		if e != nil {
 			// Load up the symbol tables with column values and the row number
 			symbols := symbols.NewSymbolTable("rowset")
-			symbols.SetAlways("_row_", i+1)
+			_ = symbols.SetAlways("_row_", i+1)
 			for i, n := range t.columns {
-				symbols.SetAlways(strings.ToLower(n), r[i])
+				_ = symbols.SetAlways(strings.ToLower(n), r[i])
 			}
 			v, err := e.Eval(symbols)
 			if err != nil {

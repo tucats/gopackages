@@ -24,7 +24,6 @@ const (
 
 // Error contains an error generated from the compiler
 type Error struct {
-	code   int
 	text   string
 	line   int
 	column int

@@ -36,7 +36,7 @@ func MakeArrayOpcode(c *Context, i interface{}) error {
 		for n := 0; n < size; n++ {
 			array[n] = initialValue
 		}
-		c.Push(array)
+		_ = c.Push(array)
 		return nil
 	}
 
@@ -52,7 +52,7 @@ func MakeArrayOpcode(c *Context, i interface{}) error {
 		size = 0
 	}
 	array := make([]interface{}, size)
-	c.Push(array)
+	_ = c.Push(array)
 
 	return nil
 }
@@ -71,7 +71,7 @@ func ArrayOpcode(c *Context, i interface{}) error {
 		array[(count-n)-1] = v
 	}
 
-	c.Push(array)
+	_ = c.Push(array)
 	return nil
 }
 
@@ -97,7 +97,7 @@ func StructOpcode(c *Context, i interface{}) error {
 		m[util.GetString(name)] = value
 	}
 
-	c.Push(m)
+	_ = c.Push(m)
 	return nil
 }
 
@@ -134,7 +134,7 @@ func CoerceOpcode(c *Context, i interface{}) error {
 		return c.NewError(InvalidTypeError)
 	}
 
-	c.Push(v)
+	_ = c.Push(v)
 	return nil
 }
 
@@ -187,7 +187,7 @@ func LoadOpcode(c *Context, i interface{}) error {
 		return c.NewError(UnknownIdentifierError, name)
 	}
 
-	c.Push(v)
+	_ = c.Push(v)
 	return nil
 }
 
@@ -227,7 +227,7 @@ func MemberOpcode(c *Context, i interface{}) error {
 	} else {
 		return c.NewError(InvalidTypeError)
 	}
-	c.Push(v)
+	_ = c.Push(v)
 	return nil
 }
 
@@ -274,7 +274,7 @@ func ClassMemberOpcode(c *Context, i interface{}) error {
 			}
 			return c.NewError(UnknownMemberError, name)
 		}
-		c.Push(v)
+		_ = c.Push(v)
 
 	default:
 		return c.NewError(InvalidTypeError)
@@ -326,7 +326,7 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 		if !f {
 			return c.NewError(UnknownMemberError, subscript)
 		}
-		c.Push(v)
+		_ = c.Push(v)
 		c.this = a
 
 	case []interface{}:
@@ -335,7 +335,7 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 			return c.NewError(InvalidArrayIndexError, subscript)
 		}
 		v := a[subscript]
-		c.Push(v)
+		_ = c.Push(v)
 
 	default:
 		return c.NewError(InvalidTypeError)
@@ -375,7 +375,7 @@ func LoadSliceOpcode(c *Context, i interface{}) error {
 			return c.NewError(InvalidSliceIndexError, subscript2)
 		}
 		v := a[subscript1 : subscript2+1]
-		c.Push(v)
+		_ = c.Push(v)
 
 	default:
 		return c.NewError(InvalidTypeError)
@@ -437,7 +437,7 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 		// If we got a true argument, push the result back on the stack also. This
 		// is needed to create TYPE definitions.
 		if util.GetBool(i) {
-			c.Push(a)
+			_ = c.Push(a)
 		}
 
 	// Index into array is integer index
@@ -447,7 +447,7 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 			return c.NewError(InvalidArrayIndexError, subscript)
 		}
 		a[subscript] = v
-		c.Push(a)
+		_ = c.Push(a)
 
 	default:
 		return c.NewError(InvalidTypeError)

@@ -16,7 +16,7 @@ import (
 func Prompt(p string) string {
 	reader := bufio.NewReader(os.Stdin)
 	if !IsConsolePipe() {
-		fmt.Printf(p)
+		fmt.Printf("%s", p)
 	}
 	buffer, _ := reader.ReadString('\n')
 
@@ -47,9 +47,5 @@ func PromptPassword(p string) string {
 // is used to manage prompts, etc.
 func IsConsolePipe() bool {
 	fi, _ := os.Stdin.Stat() // get the FileInfo struct describing the standard input.
-
-	if (fi.Mode() & os.ModeCharDevice) == 0 {
-		return true
-	}
-	return false
+	return (fi.Mode() & os.ModeCharDevice) == 0
 }

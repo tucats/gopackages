@@ -4,7 +4,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
@@ -128,7 +127,7 @@ func (c *Compiler) AddBuiltins(pkgname string) bool {
 		}
 
 		if f.Pkg == pkgname {
-			c.AddPackageFunction(pkgname, name, f.F)
+			_ = c.AddPackageFunction(pkgname, name, f.F)
 			added = true
 		}
 	}
@@ -178,7 +177,7 @@ func (c *Compiler) AddPackageToSymbols(s *symbols.SymbolTable) {
 
 			// If the package name is empty, we add the individual items
 			if pkgname == "" {
-				s.SetConstant(k, v)
+				_ = s.SetConstant(k, v)
 			} else {
 				// Otherwise, copy the entire map
 				m[k] = v
@@ -188,7 +187,7 @@ func (c *Compiler) AddPackageToSymbols(s *symbols.SymbolTable) {
 		// any function definitions, etc. that are built in.
 		m["__readonly"] = true
 		if pkgname != "" {
-			s.SetConstant(pkgname, m)
+			_ = s.SetConstant(pkgname, m)
 		}
 	}
 }
@@ -245,7 +244,7 @@ func (c *Compiler) AutoImport(all bool) error {
 	savedT := c.t
 	var firstError error
 
-	ui.Debug("+++ Autoimporting %d packages", len(sortedPackageNames))
+	// ui.Debug("+++ Autoimporting %d packages", len(sortedPackageNames))
 
 	for _, packageName := range sortedPackageNames {
 		text := "import " + packageName

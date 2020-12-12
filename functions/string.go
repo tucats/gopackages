@@ -198,7 +198,10 @@ func Template(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 			if !ok {
 				return nil, NewError("template", InvalidTypeError, templateNode.Name)
 			}
-			tree.AddParseTree(templateNode.Name, t.Tree)
+			_, err = tree.AddParseTree(templateNode.Name, t.Tree)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

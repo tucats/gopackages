@@ -25,13 +25,13 @@ func NegateOpcode(c *Context, i interface{}) error {
 	switch value := v.(type) {
 
 	case bool:
-		c.Push(!value)
+		_ = c.Push(!value)
 
 	case int:
-		c.Push(-value)
+		_ = c.Push(-value)
 
 	case float64:
-		c.Push(0.0 - value)
+		_ = c.Push(0.0 - value)
 
 	case []interface{}:
 		// Create an array in inverse order
@@ -39,7 +39,7 @@ func NegateOpcode(c *Context, i interface{}) error {
 		for n, d := range value {
 			r[len(value)-n-1] = d
 		}
-		c.Push(r)
+		_ = c.Push(r)
 
 	default:
 		return c.NewError(InvalidTypeError)

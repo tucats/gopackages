@@ -61,7 +61,7 @@ func (c *Compiler) compileType() error {
 	}
 
 	count := 0
-	for true {
+	for {
 		name := c.t.Next()
 		if !tokenizer.IsSymbol(name) {
 			return c.NewError(InvalidSymbolError, name)
@@ -99,5 +99,4 @@ func (c *Compiler) compileType() error {
 			return c.NewError(MissingEndOfBlockError)
 		}
 	}
-	return nil
 }

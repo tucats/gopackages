@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -178,7 +177,7 @@ func DeepCopy(source interface{}) interface{} {
 		return r
 
 	default:
-		ui.Debug("DeepCopy of uncopyable type: %#v\n", v)
+		//ui.Debug("DeepCopy of uncopyable type: %#v\n", v)
 		return v
 	}
 }

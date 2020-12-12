@@ -5,7 +5,7 @@ import "github.com/tucats/gopackages/app-cli/ui"
 // Merge merges the contents of a table into the current table.
 func (s *SymbolTable) Merge(st *SymbolTable) {
 
-	ui.Debug("+++ Merging symbols from %s", st.Name)
+	ui.Debug(ui.SymbolLogger, "+++ Merging symbols from %s", st.Name)
 	for k, v := range st.Symbols {
 
 		// Is it a struct? If so we may need to merge to it...
@@ -24,29 +24,29 @@ func (s *SymbolTable) Merge(st *SymbolTable) {
 					// Copy the values into the existing map
 					for newkeyword, newvalue := range vv {
 						oldmap[newkeyword] = newvalue
-						ui.Debug("    adding %v as \"%s\"", newvalue, newkeyword)
+						ui.Debug(ui.SymbolLogger, "    adding %v as \"%s\"", newvalue, newkeyword)
 					}
 					// Rewrite the map back to the bytecode.
-					s.SetAlways(k, oldmap)
+					_ = s.SetAlways(k, oldmap)
 
 				default:
-					ui.Debug("    overwriting duplicate key \"%s\" with %v", k, old)
-					s.SetAlways(k, v)
+					ui.Debug(ui.SymbolLogger, "    overwriting duplicate key \"%s\" with %v", k, old)
+					_ = s.SetAlways(k, v)
 				}
 
 			} else {
-				ui.Debug("    creating new map \"%s\" with %v", k, v)
-				s.SetAlways(k, v)
+				ui.Debug(ui.SymbolLogger, "    creating new map \"%s\" with %v", k, v)
+				_ = s.SetAlways(k, v)
 			}
 		default:
-			//ui.Debug("    copying entry %s with %v", k, v)
-			s.SetAlways(k, vv)
+			ui.Debug(ui.SymbolLogger, "    copying entry %s with %v", k, v)
+			_ = s.SetAlways(k, vv)
 		}
 	}
 
 	// Do it again with the constants
 
-	ui.Debug("+++ Merging constants from  %s", st.Name)
+	ui.Debug(ui.SymbolLogger, "+++ Merging constants from  %s", st.Name)
 	for k, v := range st.Constants {
 
 		// Is it a struct? If so we may need to merge to it...
@@ -65,23 +65,23 @@ func (s *SymbolTable) Merge(st *SymbolTable) {
 					// Copy the values into the existing map
 					for newkeyword, newvalue := range vv {
 						oldmap[newkeyword] = newvalue
-						ui.Debug("    adding %v to old map at %s", newvalue, newkeyword)
+						ui.Debug(ui.SymbolLogger, "    adding %v to old map at %s", newvalue, newkeyword)
 					}
 					// Rewrite the map back to the bytecode.
-					s.SetConstant(k, oldmap)
+					_ = s.SetConstant(k, oldmap)
 
 				default:
-					ui.Debug("    overwriting duplicate key %s with %v", k, old)
-					s.SetConstant(k, v)
+					ui.Debug(ui.SymbolLogger, "    overwriting duplicate key %s with %v", k, old)
+					_ = s.SetConstant(k, v)
 				}
 
 			} else {
-				ui.Debug("    creating new map %s with %v", k, v)
-				s.SetConstant(k, v)
+				ui.Debug(ui.SymbolLogger, "    creating new map %s with %v", k, v)
+				_ = s.SetConstant(k, v)
 			}
 		default:
-			ui.Debug("    copying entry %s with %v", k, v)
-			s.SetConstant(k, vv)
+			ui.Debug(ui.SymbolLogger, "    copying entry %s with %v", k, v)
+			_ = s.SetConstant(k, vv)
 		}
 	}
 }

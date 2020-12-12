@@ -167,9 +167,7 @@ func Sort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error)
 	for _, a := range args {
 		switch v := a.(type) {
 		case []interface{}:
-			for _, vv := range v {
-				array = append(array, vv)
-			}
+			array = append(array, v...)
 		default:
 			array = append(array, v)
 		}

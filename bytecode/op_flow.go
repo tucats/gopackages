@@ -142,9 +142,9 @@ func CallOpcode(c *Context, i interface{}) error {
 		cx.stack = c.stack
 		cx.sp = c.sp
 
-		sf.SetAlways("_args", args)
+		_ = sf.SetAlways("_args", args)
 		if c.this != nil {
-			sf.SetAlways("_this", c.this)
+			_ = sf.SetAlways("_this", c.this)
 			c.this = nil
 		}
 
@@ -170,7 +170,7 @@ func CallOpcode(c *Context, i interface{}) error {
 			}
 		}
 		if c.this != nil {
-			c.symbols.SetAlways("_this", c.this)
+			_ = c.symbols.SetAlways("_this", c.this)
 			c.this = nil
 		}
 
@@ -194,7 +194,7 @@ func CallOpcode(c *Context, i interface{}) error {
 		return err
 	}
 	if result != nil {
-		c.Push(result)
+		_ = c.Push(result)
 	}
 	return nil
 }
@@ -261,7 +261,7 @@ func ArgCheckOpcode(c *Context, i interface{}) error {
 		if err != nil {
 			return err
 		}
-		c.SetAlways(thisName, this)
+		_ = c.SetAlways(thisName, this)
 		c.this = nil
 	}
 
@@ -296,6 +296,6 @@ func TryPopOpcode(c *Context, i interface{}) error {
 		c.try = c.try[:len(c.try)-1]
 	}
 
-	c.symbols.DeleteAlways("_error")
+	_ = c.symbols.DeleteAlways("_error")
 	return nil
 }

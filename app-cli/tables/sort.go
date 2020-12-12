@@ -34,7 +34,7 @@ func (t *Table) SetOrderBy(name string) error {
 	}
 
 	for n, v := range t.GetHeadings() {
-		if strings.ToLower(name) == strings.ToLower(v) {
+		if strings.EqualFold(name, v) {
 			t.orderBy = n
 			t.ascending = ascending
 			return nil

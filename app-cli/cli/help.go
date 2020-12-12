@@ -60,22 +60,22 @@ func ShowHelp(c *Context) {
 
 	tc, _ := tables.New([]string{"subcommand", "description"})
 	tc.ShowHeadings(false)
-	tc.SetIndent(3)
-	tc.SetSpacing(3)
-	tc.SetMinimumWidth(0, minimumFirstColumnWidth)
+	_ = tc.SetIndent(3)
+	_ = tc.SetSpacing(3)
+	_ = tc.SetMinimumWidth(0, minimumFirstColumnWidth)
 
 	for _, option := range c.Grammar {
 		if option.OptionType == Subcommand && !option.Private {
 			if !headerShown {
 				headerShown = true
 				fmt.Printf("Commands:\n")
-				tc.AddRow([]string{"help", "Display help text"})
+				_ = tc.AddRow([]string{"help", "Display help text"})
 			}
-			tc.AddRow([]string{option.LongName, option.Description})
+			_ = tc.AddRow([]string{option.LongName, option.Description})
 		}
 	}
 	if headerShown {
-		tc.SortRows(0, true)
+		_ = tc.SortRows(0, true)
 		tc.Print(ui.TextTableFormat)
 		fmt.Printf("\n")
 	}
@@ -83,14 +83,14 @@ func ShowHelp(c *Context) {
 	headerShown = false
 	tc, _ = tables.New([]string{"Parameter"})
 	tc.ShowHeadings(false)
-	tc.SetIndent(3)
-	tc.SetMinimumWidth(0, minimumFirstColumnWidth)
+	_ = tc.SetIndent(3)
+	_ = tc.SetMinimumWidth(0, minimumFirstColumnWidth)
 	for _, option := range c.Grammar {
 		if option.OptionType == ParameterType {
 			if !headerShown {
 				fmt.Printf("Parameters:\n")
 				headerShown = true
-				tc.AddRowItems(option.Description)
+				_ = tc.AddRowItems(option.Description)
 			}
 
 		}
@@ -102,9 +102,9 @@ func ShowHelp(c *Context) {
 
 	to, _ := tables.New([]string{"option", "description"})
 	to.ShowHeadings(false)
-	to.SetIndent(3)
-	to.SetSpacing(3)
-	to.SetMinimumWidth(0, minimumFirstColumnWidth)
+	_ = to.SetIndent(3)
+	_ = to.SetSpacing(3)
+	_ = to.SetMinimumWidth(0, minimumFirstColumnWidth)
 
 	for _, option := range c.Grammar {
 		if option.Private {
@@ -140,12 +140,12 @@ func ShowHelp(c *Context) {
 			if option.EnvironmentVariable != "" {
 				fullDescription = fullDescription + " [" + option.EnvironmentVariable + "]"
 			}
-			to.AddRow([]string{name, fullDescription})
+			_ = to.AddRow([]string{name, fullDescription})
 		}
 	}
 
 	fmt.Printf("Options:\n")
-	to.AddRow([]string{"--help, -h", "Show this help text"})
-	to.SortRows(0, true)
-	to.Print(ui.TextTableFormat)
+	_ = to.AddRow([]string{"--help, -h", "Show this help text"})
+	_ = to.SortRows(0, true)
+	_ = to.Print(ui.TextTableFormat)
 }

@@ -31,7 +31,7 @@ func (c *Compiler) Package() error {
 	// This is done by creating a source table and then merging it with the
 	// active table.
 	tmp := symbols.NewSymbolTable("")
-	tmp.SetAlways(name, map[string]interface{}{"__parent": name, "__readonly": true})
+	_ = tmp.SetAlways(name, map[string]interface{}{"__parent": name, "__readonly": true})
 	c.s.Merge(tmp)
 
 	return nil
@@ -50,7 +50,7 @@ func (c *Compiler) Import() error {
 	isList := false
 	if c.t.IsNext("(") {
 		isList = true
-		ui.Debug("*** Processing import list")
+		ui.Debug(ui.CompilerLogger, "*** Processing import list")
 	}
 
 	parsing := true
@@ -61,7 +61,7 @@ func (c *Compiler) Import() error {
 			parsing = false
 		}
 		fileName := c.t.Next()
-		ui.Debug("*** Importing package \"%s\"", fileName)
+		ui.Debug(ui.CompilerLogger, "*** Importing package \"%s\"", fileName)
 		// End of the list? If so, break out
 		if isList && fileName == ")" {
 			break
@@ -83,7 +83,7 @@ func (c *Compiler) Import() error {
 
 		// If this is an import of a package already processed, no work to do.
 		if _, found := c.s.Get(packageName); found {
-			ui.Debug("+++ Previously imported \"%s\", skipping", packageName)
+			ui.Debug(ui.CompilerLogger, "+++ Previously imported \"%s\", skipping", packageName)
 			continue
 		}
 
@@ -94,9 +94,9 @@ func (c *Compiler) Import() error {
 
 		builtinsAdded := c.AddBuiltins(packageName)
 		if builtinsAdded {
-			ui.Debug("+++ Adding builtins for package " + packageName)
+			ui.Debug(ui.CompilerLogger, "+++ Adding builtins for package "+packageName)
 		} else {
-			ui.Debug("+++ No builtins for package " + packageName)
+			ui.Debug(ui.CompilerLogger, "+++ No builtins for package "+packageName)
 		}
 
 		// Save some state
@@ -124,7 +124,7 @@ func (c *Compiler) Import() error {
 			return err
 		}
 
-		ui.Debug("+++ Adding source for package " + packageName)
+		ui.Debug(ui.CompilerLogger, "+++ Adding source for package "+packageName)
 		// Set up the new compiler settings
 		c.statementCount = 0
 		c.t = tokenizer.New(text)
@@ -164,7 +164,7 @@ func (c *Compiler) ReadFile(name string) (string, error) {
 	if err == nil {
 		return s, nil
 	}
-	ui.Debug("+++ Reading package file %s", name)
+	ui.Debug(ui.CompilerLogger, "+++ Reading package file %s", name)
 	// Not a directory, try to read the file
 	content, err := ioutil.ReadFile(name)
 	if err != nil {
@@ -197,21 +197,21 @@ func (c *Compiler) ReadDirectory(name string) (string, error) {
 	dirname := name
 	if !strings.HasPrefix(dirname, r) {
 		dirname = filepath.Join(r, name)
-		ui.Debug("+++ Applying EGO_PATH, %s", dirname)
+		ui.Debug(ui.CompilerLogger, "+++ Applying EGO_PATH, %s", dirname)
 	}
 	fi, err := ioutil.ReadDir(dirname)
 	if err != nil {
 		if _, ok := err.(*os.PathError); ok {
-			ui.Debug("+++ No such directory")
+			ui.Debug(ui.CompilerLogger, "+++ No such directory")
 		}
 		return "", err
 	}
 
 	ui.Debug("+++ Directory read attempt for \"%s\"", name)
 	if len(fi) == 0 {
-		ui.Debug("+++ Directory is empty")
+		ui.Debug(ui.CompilerLogger, "+++ Directory is empty")
 	} else {
-		ui.Debug("+++ Reading package directory %s", dirname)
+		ui.Debug(ui.CompilerLogger, "+++ Reading package directory %s", dirname)
 	}
 
 	// For all the items that aren't directories themselves, and

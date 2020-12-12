@@ -28,7 +28,7 @@ func (c *Compiler) Switch() error {
 	for !c.t.IsNext("}") {
 
 		if next > 0 {
-			c.b.SetAddressHere(next)
+			_ = c.b.SetAddressHere(next)
 		}
 
 		// Could be a default statement:
@@ -80,7 +80,7 @@ func (c *Compiler) Switch() error {
 
 	// If there was a last case with conditional, branch it here.
 	if next > 0 {
-		c.b.SetAddressHere(next)
+		_ = c.b.SetAddressHere(next)
 	}
 
 	// If there was a default block, emit it here
@@ -90,7 +90,7 @@ func (c *Compiler) Switch() error {
 
 	// Fixup all the jumps to the exit point
 	for _, n := range fixups {
-		c.b.SetAddressHere(n)
+		_ = c.b.SetAddressHere(n)
 	}
 	c.b.Emit(bytecode.SymbolDelete, t)
 	return nil

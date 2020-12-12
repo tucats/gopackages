@@ -29,7 +29,7 @@ func TestCompiler_ReadDirectory(t *testing.T) {
 		// TODO: Add test cases.
 	}
 
-	persistence.Load("ego", "")
+	_ = persistence.Load("ego", "")
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

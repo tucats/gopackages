@@ -29,7 +29,7 @@ func PrintOpcode(c *Context, i interface{}) error {
 		if err != nil {
 			return err
 		}
-		s := fmt.Sprintf("%s", util.FormatUnquoted(v))
+		s := util.FormatUnquoted(v)
 		if c.output == nil {
 			fmt.Printf("%s", s)
 		} else {
@@ -80,7 +80,7 @@ func TemplateOpcode(c *Context, i interface{}) error {
 	name := util.GetString(i)
 	t, err := c.Pop()
 	if err == nil {
-		t, err := template.New(name).Parse(util.GetString(t))
+		t, err = template.New(name).Parse(util.GetString(t))
 		if err == nil {
 			err = c.Push(t)
 		}
