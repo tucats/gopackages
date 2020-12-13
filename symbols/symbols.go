@@ -52,11 +52,8 @@ func NewChildSymbolTable(name string, parent *SymbolTable) *SymbolTable {
 	return &symbols
 }
 func (s *SymbolTable) SetGlobal(name string, value interface{}) error {
-	err := RootSymbolTable.Create(name)
-	if err == nil {
-		err = RootSymbolTable.Set(name, value)
-	}
-	return err
+	_ = RootSymbolTable.Create(name)
+	return RootSymbolTable.SetAlways(name, value)
 }
 
 // Get retrieves a symbol from the current table or any parent

@@ -201,6 +201,32 @@ func StoreGlobalOpcode(c *Context, i interface{}) error {
 	return err
 }
 
+// StoreAlwaysOpcode implementation
+func StoreAlwaysOpcode(c *Context, i interface{}) error {
+
+	v, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	// Get the name.
+	varname := util.GetString(i)
+	err = c.SetAlways(varname, v)
+	if err != nil {
+		return c.NewError(err.Error())
+	}
+
+	// Is this a readonly variable that is a structure? If so, mark it
+	// with the embedded readonly flag.
+	if len(varname) > 1 && varname[0:1] == "_" {
+		switch a := v.(type) {
+		case map[string]interface{}:
+			a["__readonly"] = true
+		}
+	}
+	return err
+}
+
 // LoadOpcode implementation
 func LoadOpcode(c *Context, i interface{}) error {
 

@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/functions"
@@ -30,6 +31,9 @@ func (c *Compiler) Directive() error {
 		return c.Global()
 	case "pass":
 		return c.TestPass()
+	case "status":
+		return c.RestStatus()
+
 	case "template":
 		return c.Template()
 	case "test":
@@ -46,12 +50,32 @@ func (c *Compiler) Global() error {
 		return c.NewError(InvalidSymbolError)
 	}
 	name := c.t.Next()
-	if !tokenizer.IsSymbol(name) {
+	if strings.HasPrefix(name, "_") || !tokenizer.IsSymbol(name) {
 		return c.NewError(InvalidSymbolError, name)
 	}
 	name = c.Normalize(name)
 	if c.t.AtEnd() {
 		c.b.Emit(bytecode.Push, "")
+	} else {
+		bc, err := c.Expression()
+		if err != nil {
+			return err
+		}
+		c.b.Append(bc)
+	}
+	c.b.Emit(bytecode.StoreGlobal, name)
+	return nil
+}
+
+// RestStatus parses the @status directive which sets a symbol
+// value in the root symbol table with the REST calls tatus value
+func (c *Compiler) RestStatus() error {
+	if c.t.AtEnd() {
+		return c.NewError(InvalidSymbolError)
+	}
+	name := "_rest_status"
+	if c.t.AtEnd() {
+		c.b.Emit(bytecode.Push, 200)
 	} else {
 		bc, err := c.Expression()
 		if err != nil {

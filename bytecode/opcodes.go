@@ -44,6 +44,7 @@ const (
 	Load
 	Store
 	StoreGlobal
+	StoreAlways
 	Array
 	MakeArray
 	LoadIndex
@@ -134,6 +135,7 @@ var opcodeNames = map[int]string{
 	Template:           "Template",
 	Return:             "Return",
 	StoreGlobal:        "StoreGlobal",
+	StoreAlways:        "StoreAlways",
 }
 
 func initializeDispatch() {
@@ -161,6 +163,7 @@ func initializeDispatch() {
 			Load:               LoadOpcode,
 			Store:              StoreOpcode,
 			StoreGlobal:        StoreGlobalOpcode,
+			StoreAlways:        StoreAlwaysOpcode,
 			Branch:             BranchOpcode,
 			BranchTrue:         BranchTrueOpcode,
 			BranchFalse:        BranchFalseOpcode,

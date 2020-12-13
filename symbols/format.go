@@ -52,7 +52,13 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 		b.WriteString("   ")
 		b.WriteString(k)
 		b.WriteString(" = ")
-		b.WriteString(util.Format(v))
+
+		// Any variable named _password or _token has it's value obscured
+		if k == "_password" || k == "_token" {
+			b.WriteString("\"******\"")
+		} else {
+			b.WriteString(util.Format(v))
+		}
 		b.WriteString("\n")
 	}
 
