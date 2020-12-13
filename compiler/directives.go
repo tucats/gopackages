@@ -29,11 +29,14 @@ func (c *Compiler) Directive() error {
 		return c.Fail()
 	case "global":
 		return c.Global()
+	case "log":
+		return c.Log()
 	case "pass":
 		return c.TestPass()
+	case "response":
+		return c.RestResponse()
 	case "status":
 		return c.RestStatus()
-
 	case "template":
 		return c.Template()
 	case "test":
@@ -67,6 +70,29 @@ func (c *Compiler) Global() error {
 	return nil
 }
 
+// Log parses the @log directive
+func (c *Compiler) Log() error {
+	if c.t.AtEnd() {
+		return c.NewError(InvalidSymbolError)
+	}
+	name := strings.ToUpper(c.t.Next())
+	if !tokenizer.IsSymbol(name) {
+		return c.NewError(InvalidSymbolError, name)
+	}
+
+	if c.t.AtEnd() {
+		c.b.Emit(bytecode.Push, "")
+	} else {
+		bc, err := c.Expression()
+		if err != nil {
+			return err
+		}
+		c.b.Append(bc)
+	}
+	c.b.Emit(bytecode.Log, name)
+	return nil
+}
+
 // RestStatus parses the @status directive which sets a symbol
 // value in the root symbol table with the REST calls tatus value
 func (c *Compiler) RestStatus() error {
@@ -84,6 +110,25 @@ func (c *Compiler) RestStatus() error {
 		c.b.Append(bc)
 	}
 	c.b.Emit(bytecode.StoreGlobal, name)
+	return nil
+}
+
+// RestResponse processes the @response directive
+func (c *Compiler) RestResponse() error {
+	if c.t.AtEnd() {
+		return c.NewError(InvalidSymbolError)
+	}
+	name := "_rest_response"
+	if c.t.AtEnd() {
+		c.b.Emit(bytecode.Push, "")
+	} else {
+		bc, err := c.Expression()
+		if err != nil {
+			return err
+		}
+		c.b.Append(bc)
+	}
+	c.b.Emit(bytecode.StoreAlways, name)
 	return nil
 }
 

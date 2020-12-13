@@ -85,16 +85,27 @@ func (s *SymbolTable) SetConstant(name string, v interface{}) error {
 // any parent table is affected. This can be used for functions and
 // readonly values.
 func (s *SymbolTable) SetAlways(name string, v interface{}) error {
+
 	if s.Symbols == nil {
 		s.Symbols = map[string]interface{}{}
 	}
 
+	// Hack. If this is the "_rest_response" variable, we have
+	// to find the right table to put it in, which may be different
+	// that were we started.
+
+	syms := s
+	if name == "_rest_response" {
+		for syms.Parent != nil && syms.Parent.Parent != nil {
+			syms = syms.Parent
+		}
+	}
 	// See if it's in the current constants table.
-	if s.IsConstant(name) {
+	if syms.IsConstant(name) {
 		return s.NewError(ReadOnlyValueError, name)
 	}
 
-	s.Symbols[name] = v
+	syms.Symbols[name] = v
 	return nil
 }
 

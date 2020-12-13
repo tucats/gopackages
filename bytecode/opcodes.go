@@ -68,6 +68,7 @@ const (
 	Panic
 	Template
 	Return
+	Log
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction
@@ -136,6 +137,7 @@ var opcodeNames = map[int]string{
 	Return:             "Return",
 	StoreGlobal:        "StoreGlobal",
 	StoreAlways:        "StoreAlways",
+	Log:                "Log",
 }
 
 func initializeDispatch() {
@@ -194,6 +196,7 @@ func initializeDispatch() {
 			ClassMember:        ClassMemberOpcode,
 			Template:           TemplateOpcode,
 			Return:             ReturnOpcode,
+			Log:                LogOpcode,
 		}
 	}
 }

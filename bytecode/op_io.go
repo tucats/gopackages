@@ -46,6 +46,16 @@ func PrintOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
+// LogOpcode imeplements the Log option.
+func LogOpcode(c *Context, i interface{}) error {
+	logger := util.GetString(i)
+	msg, err := c.Pop()
+	if err == nil {
+		ui.Debug(logger, "%v", msg)
+	}
+	return err
+}
+
 // SayOpcode implementation. This can be used in place
 // of NewLine to end buffered output, but the output is
 // only displayed if we are not in --quiet mode.
