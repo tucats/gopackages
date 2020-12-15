@@ -1,6 +1,8 @@
 package functions
 
 import (
+	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -38,9 +40,12 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"string":            {Min: 1, Max: 1, F: String},
 	"sum":               {Min: 1, Max: Any, F: Sum},
 	"type":              {Min: 1, Max: 1, F: Type},
+	"cipher.create":     {Min: 1, Max: 2, F: CreateToken},
 	"cipher.decrypt":    {Min: 2, Max: 2, F: Decrypt},
 	"cipher.encrypt":    {Min: 2, Max: 2, F: Encrypt},
 	"cipher.hash":       {Min: 1, Max: 1, F: Hash},
+	"cipher.token":      {Min: 1, Max: 2, F: Extract},
+	"cipher.validate":   {Min: 1, Max: 1, F: Validate},
 	"io.close":          {Min: 1, Max: 1, F: Close},
 	"io.delete":         {Min: 1, Max: 1, F: DeleteFile},
 	"io.expand":         {Min: 1, Max: 2, F: Expand},
@@ -145,4 +150,30 @@ func FindName(f func(*symbols.SymbolTable, []interface{}) (interface{}, error)) 
 	}
 
 	return ""
+}
+
+func CallBuiltin(s *symbols.SymbolTable, name string, args ...interface{}) (interface{}, error) {
+
+	// Search the dictionary for a name match
+	var fdef = FunctionDefinition{}
+	found := false
+	for fn, d := range FunctionDictionary {
+		if fn == name {
+			fdef = d
+			found = true
+		}
+	}
+	if !found {
+		return nil, errors.New("no such function: " + name)
+	}
+
+	if len(args) < fdef.Min || len(args) > fdef.Max {
+		return nil, errors.New("incorrect number of arguments")
+	}
+
+	fn, ok := fdef.F.(func(*symbols.SymbolTable, []interface{}) (interface{}, error))
+	if !ok {
+		return nil, fmt.Errorf("unable to convert %#v to function pointer", fdef.F)
+	}
+	return fn(s, args)
 }
