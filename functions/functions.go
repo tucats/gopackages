@@ -47,7 +47,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"cipher.token":      {Min: 1, Max: 2, F: Extract},
 	"cipher.validate":   {Min: 1, Max: 1, F: Validate},
 	"fmt.printf":        {Min: 1, Max: Any, F: Printf},
-	"fmt.println":       {Min: 1, Max: Any, F: Println},
+	"fmt.println":       {Min: 0, Max: Any, F: Println},
 	"fmt.sprintf":       {Min: 1, Max: Any, F: Sprintf},
 	"io.close":          {Min: 1, Max: 1, F: Close},
 	"io.delete":         {Min: 1, Max: 1, F: DeleteFile},
