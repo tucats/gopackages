@@ -11,7 +11,8 @@
             "mode": "auto",
             "program": "/Users/tom/Go/src/github.com/tucats/ego/",
             "env": {},
-            "args": [ "logon", "-u", "admin", "-p", "password" ]
+          //  "args": [ "logon", "-u", "admin", "-p", "password" ]
+            "args": [ "run", "test.ego"]
         }
     ]
 }

@@ -43,6 +43,10 @@ func (c *Compiler) Statement() error {
 	// form runtime error messages as needed.
 	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
 
+	if c.IsFunctionCall() {
+		return c.Call()
+	}
+
 	// If the next item(s) constitute a value LValue, then this is
 	// an assignment statement.
 	if c.IsLValue() {
@@ -91,4 +95,118 @@ func (c *Compiler) Statement() error {
 
 	// Unknown statement, return an error
 	return c.NewError(UnrecognizedStatementError, c.t.Peek(0))
+}
+
+// IsFunctionCall indicates if the token stream points to a function call
+func (c *Compiler) IsFunctionCall() bool {
+
+	// Skip through any referencing tokens to see if we find a function
+	// invocation.
+	pos := 1
+	subexpr := 0
+	lastWasSymbol := false
+
+	for pos < len(c.t.Tokens) {
+
+		// Are we at the end?
+		t := c.t.Peek(pos)
+		if t == tokenizer.EndOfTokens {
+			return false
+		}
+
+		// If this is a paren and there are no
+		// pending subexpression tokens, then this
+		// is a function calls
+		if t == "(" && subexpr == 0 {
+			return true
+		}
+
+		// Is this a reserved word or delimiter punctuation? IF so we've shot past the statement
+		if subexpr == 0 && inList(t, []string{
+			";",
+			"@",
+			"{",
+			",",
+			"+",
+			"/",
+			"*",
+			"-",
+			"^",
+			"&",
+			"|",
+			"==",
+			">=",
+			"<=",
+			"!=",
+			"==",
+			"=",
+			"array",
+			"assert",
+			"break",
+			"call",
+			"const",
+			"continue",
+			"exit",
+			"for",
+			"func",
+			"if",
+			"import",
+			"package",
+			"return",
+			"switch",
+			"try",
+			"type",
+		}) {
+			return false
+		}
+
+		// If it's a symbol, just consume it unless the last token was also a symbol
+		if tokenizer.IsSymbol(t) {
+			if lastWasSymbol {
+				return false
+			}
+			pos++
+			lastWasSymbol = true
+			continue
+		} else {
+			lastWasSymbol = false
+		}
+
+		// if it's the end of an array subexpression, decrement
+		// the subexpression counter and keep going
+		if t == "]" {
+			subexpr--
+			pos++
+			continue
+		}
+
+		// If it's the start of an array subexpression, increment
+		// th esubexpression counter and keep going.
+		if t == "[" {
+			subexpr++
+			pos++
+			continue
+		}
+
+		// If it's a member dereference, keep on going.
+		if t == "." {
+			pos++
+			continue
+		}
+
+		// If we're just in a subexpression, keep consuming tokens.
+		if subexpr > 0 {
+			pos++
+			continue
+		}
+
+		// Is this a reserved word or delimiter punctuation? IF so we've shot past the statement
+		if inList(t, []string{",", "array", "packate", "import", "if", "for", "break", "continue", "return", "exit", "@", "{"}) {
+			return false
+		}
+
+		// Nope, not a (valid) function invocation
+		return false
+	}
+	return false
 }
