@@ -134,6 +134,7 @@ func (c *Compiler) IsFunctionCall() bool {
 			"^",
 			"&",
 			"|",
+			"{",
 			"==",
 			">=",
 			"<=",
@@ -198,11 +199,6 @@ func (c *Compiler) IsFunctionCall() bool {
 		if subexpr > 0 {
 			pos++
 			continue
-		}
-
-		// Is this a reserved word or delimiter punctuation? IF so we've shot past the statement
-		if inList(t, []string{",", "array", "packate", "import", "if", "for", "break", "continue", "return", "exit", "@", "{"}) {
-			return false
 		}
 
 		// Nope, not a (valid) function invocation

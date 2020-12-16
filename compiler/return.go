@@ -30,7 +30,7 @@ func (c *Compiler) Return() error {
 func (c *Compiler) Exit() error {
 
 	c.b.Emit(bytecode.Load, "util")
-	c.b.Emit(bytecode.Member, "exit")
+	c.b.Emit(bytecode.Member, "Exit")
 
 	argCount := 0
 	if !c.StatementEnd() {

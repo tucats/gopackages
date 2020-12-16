@@ -236,7 +236,7 @@ func TestByteCode_Run(t *testing.T) {
 				opcodes: []I{
 					// Arguments are pushed in the order parsed
 					{Opcode: Load, Operand: "strings"},
-					{Opcode: Push, Operand: "left"},
+					{Opcode: Push, Operand: "Left"},
 					{Opcode: Member},
 					{Opcode: Push, Operand: "fruitcake"},
 					{Opcode: Push, Operand: 5},
@@ -252,7 +252,7 @@ func TestByteCode_Run(t *testing.T) {
 				opcodes: []I{
 					{Opcode: Push, Operand: "fruitcake"},
 					{Opcode: Branch, Operand: 3},
-					{Opcode: Push, Operand: "left"},
+					{Opcode: Push, Operand: "Left"},
 					{Opcode: Stop},
 				},
 				result: "fruitcake",

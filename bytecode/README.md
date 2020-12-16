@@ -21,7 +21,8 @@ Here is a trival example of generating bytecode and executing it.
     
     // Create a ByteCode object and write some instructions into it.
     b := bytecode.New("sample program")
-    b.Emit(bytecode.Load, "left")
+    b.Emit(bytecode.Load, "strings")
+    b.Emit(bytecode.Member, "left")
     b.Emit{bytecode.Push, "fruitcake")
     b.Emit(bytecode.Push, 5)
     b.Emit(bytecode.Call, 2)
