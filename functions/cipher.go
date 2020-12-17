@@ -52,25 +52,25 @@ func Validate(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	// Take the token value, and de-hexify it.
 	b, err := hex.DecodeString(util.GetString(args[0]))
 	if err != nil {
-		return false, nil
+		return false, err
 	}
 
 	// Decrypt the token into a json string
 	key := persistence.Get("token-key")
 	j, err := util.Decrypt(string(b), key)
 	if err != nil {
-		return false, nil
+		return false, err
 	}
 	var t = Token{}
 	err = json.Unmarshal([]byte(j), &t)
 	if err != nil {
-		return false, nil
+		return false, err
 	}
 
 	// Has the expiration passed?
 	d := time.Since(t.Expires)
 	if d.Seconds() > 0 {
-		return false, nil
+		return false, errors.New("token expired")
 	}
 
 	return true, nil
