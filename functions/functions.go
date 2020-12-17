@@ -45,7 +45,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"cipher.Encrypt":       {Min: 2, Max: 2, F: Encrypt},
 	"cipher.Hash":          {Min: 1, Max: 1, F: Hash},
 	"cipher.Token":         {Min: 1, Max: 2, F: Extract},
-	"cipher.Validate":      {Min: 1, Max: 1, F: Validate},
+	"cipher.Validate":      {Min: 1, Max: 2, F: Validate},
 	"fmt.Print":            {Min: 1, Max: Any, F: Print},
 	"fmt.Printf":           {Min: 1, Max: Any, F: Printf},
 	"fmt.Println":          {Min: 0, Max: Any, F: Println},

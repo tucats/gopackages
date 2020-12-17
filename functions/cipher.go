@@ -49,34 +49,59 @@ func Decrypt(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 func Validate(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	var err error
 
+	reportErr := false
+	if len(args) > 1 {
+		reportErr = util.GetBool(args[1])
+	}
+
 	// Take the token value, and de-hexify it.
 	b, err := hex.DecodeString(util.GetString(args[0]))
 	if err != nil {
-		return false, err
+		if reportErr {
+			return false, err
+		} else {
+			return false, nil
+		}
 	}
 
 	// Decrypt the token into a json string
 	key := persistence.Get("token-key")
 	j, err := util.Decrypt(string(b), key)
-	if err != nil {
-		return false, err
+	if err == nil && len(j) == 0 {
+		err = errors.New("invalid token encryption")
 	}
+	if err != nil {
+		if reportErr {
+			return false, err
+		} else {
+			return false, nil
+		}
+	}
+
 	var t = Token{}
 	err = json.Unmarshal([]byte(j), &t)
 	if err != nil {
-		return false, err
+		if reportErr {
+			return false, err
+		} else {
+			return false, nil
+		}
 	}
 
 	// Has the expiration passed?
 	d := time.Since(t.Expires)
 	if d.Seconds() > 0 {
-		return false, errors.New("token expired")
+		if reportErr {
+			return false, errors.New("token expired")
+		} else {
+			return false, nil
+		}
 	}
 
 	return true, nil
 }
 
-// Validate creates a new token with a username and a data payload
+// Extract extracts the data from a token and returns it as a struct
 func Extract(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	var err error
 
@@ -92,6 +117,10 @@ func Extract(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(j) == 0 {
+		return nil, errors.New("invalid token encryption")
+	}
+
 	var t = Token{}
 	err = json.Unmarshal([]byte(j), &t)
 	if err != nil {
