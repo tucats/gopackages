@@ -134,6 +134,7 @@ func Extract(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	}
 
 	r := map[string]interface{}{}
+	r["expires"] = t.Expires.String()
 	r["name"] = t.Name
 	r["data"] = t.Data
 	r["session"] = t.AuthID.String()
