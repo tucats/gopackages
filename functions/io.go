@@ -222,12 +222,9 @@ func ExpandPath(path, ext string) ([]string, error) {
 		if ext != "" && !strings.HasSuffix(fn, ext) {
 			return names, nil
 		}
-		// ui.Debug("+++ scan file      \"%s\"", fn)
-
 		names = append(names, fn)
 		return names, nil
 	}
-	// ui.Debug("+++ scan directory \"%s\"", path)
 
 	// Read as a directory
 	for _, f := range fi {

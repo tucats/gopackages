@@ -11,7 +11,7 @@ import (
 // Disasm prints out a representation of the bytecode for debugging purposes
 func (b *ByteCode) Disasm() {
 
-	ui.Debug("*** Disassembly %s", b.Name)
+	ui.Debug(ui.ByteCodeLogger, "*** Disassembly %s", b.Name)
 	for n := 0; n < b.emitPos; n++ {
 		i := b.opcodes[n]
 		op := FormatInstruction(i)

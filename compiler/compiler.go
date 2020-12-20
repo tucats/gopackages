@@ -243,9 +243,6 @@ func (c *Compiler) AutoImport(all bool) error {
 	savedBC := c.b
 	savedT := c.t
 	var firstError error
-
-	// ui.Debug("+++ Autoimporting %d packages", len(sortedPackageNames))
-
 	for _, packageName := range sortedPackageNames {
 		text := "import " + packageName
 		_, err := c.CompileString(text)

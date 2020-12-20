@@ -14,7 +14,10 @@
             "env": {},
           //  "args": [ "logon", "-u", "admin", "-p", "password" ]
           //  "args": [ "run", "test.ego"]
-            "args": [ "run" ]
+          // "args": [ "run" ]
+          // "args": [ "--output-format", "json", "server", "add-user", "-u", "mary", "-p", "sam"]
+          "args": [ "server", "run", "-k" ]
+
         }
     ]
 }

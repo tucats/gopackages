@@ -55,7 +55,7 @@ func QuietAction(c *cli.Context) error {
 // option. It's string value is used as the name of the active profile.
 func UseProfileAction(c *cli.Context) error {
 	name, _ := c.GetString("profile")
-	ui.Debug("Using profile %s", name)
+	ui.Debug(ui.AppLogger, "Using profile %s", name)
 	persistence.UseProfile(name)
 	return nil
 }

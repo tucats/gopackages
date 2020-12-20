@@ -44,7 +44,7 @@ func (c *Context) parseGrammar(args []string) error {
 	for currentArg := 0; currentArg < lastArg; currentArg++ {
 
 		option := args[currentArg]
-		ui.Debug("Processing token: %s", option)
+		ui.Debug(ui.CLILogger, "Processing token: %s", option)
 
 		var location *Option
 		var name string
@@ -147,7 +147,7 @@ func (c *Context) parseGrammar(args []string) error {
 						subContext.Action = entry.Action
 						ui.Debug(ui.CLILogger, "Saving action routine in subcommand context")
 					}
-					ui.Debug("Transferring control to subgrammar for %s", entry.LongName)
+					ui.Debug(ui.CLILogger, "Transferring control to subgrammar for %s", entry.LongName)
 					return subContext.parseGrammar(args[currentArg+1:])
 				}
 			}
@@ -200,7 +200,6 @@ func (c *Context) parseGrammar(args []string) error {
 				}
 				location.Value = i
 			}
-
 			ui.Debug(ui.CLILogger, "Option value set to %#v", location.Value)
 
 			// After parsing the option value, if there is an action routine, call it

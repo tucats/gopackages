@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/tucats/ego/defs"
 	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
@@ -190,7 +191,7 @@ func (c *Compiler) ReadDirectory(name string) (string, error) {
 	var b strings.Builder
 	r := os.Getenv("EGO_PATH")
 	if r == "" {
-		r = persistence.Get("ego-path")
+		r = persistence.Get(defs.EgoPathSetting)
 	}
 	r = filepath.Join(r, "lib")
 
@@ -207,7 +208,7 @@ func (c *Compiler) ReadDirectory(name string) (string, error) {
 		return "", err
 	}
 
-	ui.Debug("+++ Directory read attempt for \"%s\"", name)
+	ui.Debug(ui.CompilerLogger, "+++ Directory read attempt for \"%s\"", name)
 	if len(fi) == 0 {
 		ui.Debug(ui.CompilerLogger, "+++ Directory is empty")
 	} else {

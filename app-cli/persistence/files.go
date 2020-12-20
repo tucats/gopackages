@@ -24,8 +24,8 @@ var ProfileName = "default"
 
 // Configuration describes what is known about a configuration
 type Configuration struct {
-	Description string            `json:"description,omit"`
-	ID          string            `json:"id,omit"`
+	Description string            `json:"description,omitempty"`
+	ID          string            `json:"id,omitempty"`
 	Items       map[string]string `json:"items"`
 }
 
@@ -116,7 +116,7 @@ func Save() error {
 	path.WriteString(ProfileDirectory)
 
 	if _, err := os.Stat(path.String()); os.IsNotExist(err) {
-		os.MkdirAll(path.String(), os.ModePerm)
+		_ = os.MkdirAll(path.String(), os.ModePerm)
 	}
 
 	path.WriteRune(os.PathSeparator)
@@ -127,11 +127,11 @@ func Save() error {
 		c := Configurations[n]
 		if c.ID == "" {
 			c.ID = uuid.New().String()
-			ui.Debug("Creating configuration \"%s\" with id %s", n, c.ID)
+			ui.Debug(ui.AppLogger, "Creating configuration \"%s\" with id %s", n, c.ID)
 			Configurations[n] = c
 		}
 	}
-	byteBuffer, err := json.MarshalIndent(&Configurations, "", "  ")
+	byteBuffer, _ := json.MarshalIndent(&Configurations, "", "  ")
 
 	err = ioutil.WriteFile(path.String(), byteBuffer, os.ModePerm)
 	return err
@@ -153,14 +153,11 @@ func UseProfile(name string) {
 
 // Set puts a profile entry in the current Configuration structure
 func Set(key string, value string) {
-
 	explicitValues.Items[key] = value
-
 	c := getCurrentConfiguration()
 	c.Items[key] = value
 	ProfileDirty = true
-	ui.Debug("Setting profile key \"%s\" = \"%s\"", key, value)
-
+	ui.Debug(ui.AppLogger, "Setting profile key \"%s\" = \"%s\"", key, value)
 }
 
 // SetDefault puts a profile entry in the current Configuration structure. It is
@@ -168,7 +165,7 @@ func Set(key string, value string) {
 // to update on account of this setting.
 func SetDefault(key string, value string) {
 	explicitValues.Items[key] = value
-	ui.Debug("Setting default key \"%s\" = \"%s\"", key, value)
+	ui.Debug(ui.AppLogger, "Setting default key \"%s\" = \"%s\"", key, value)
 }
 
 // Get gets a profile entry in the current configuration structure.
@@ -182,7 +179,7 @@ func Get(key string) string {
 		c := getCurrentConfiguration()
 		v = c.Items[key]
 	}
-	ui.Debug("Reading profile key \"%s\" : \"%s\"", key, v)
+	ui.Debug(ui.AppLogger, "Reading profile key \"%s\" : \"%s\"", key, v)
 	return v
 }
 
@@ -203,7 +200,7 @@ func Delete(key string) {
 	delete(c.Items, key)
 	delete(explicitValues.Items, key)
 	ProfileDirty = true
-	ui.Debug("Deleting profile key \"%s\"", key)
+	ui.Debug(ui.AppLogger, "Deleting profile key \"%s\"", key)
 }
 
 // Keys returns the list of keys in the profile as an array

@@ -177,7 +177,6 @@ func DeepCopy(source interface{}) interface{} {
 		return r
 
 	default:
-		//ui.Debug("DeepCopy of uncopyable type: %#v\n", v)
 		return v
 	}
 }

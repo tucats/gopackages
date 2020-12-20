@@ -120,7 +120,7 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 				ui.Debug(ui.CompilerLogger, "    AddBuiltins creating new package %s", d.Pkg)
 			}
 			p.(map[string]interface{})[n] = d.F
-			ui.Debug("    adding builtin %s to %s", n, d.Pkg)
+			ui.Debug(ui.CompilerLogger, "    adding builtin %s to %s", n, d.Pkg)
 			_ = symbols.SetAlways(d.Pkg, p)
 		}
 	}

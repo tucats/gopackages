@@ -22,7 +22,7 @@ func (c *Context) ResolveEnvironmentVariables() error {
 		if !entry.Found && entry.EnvironmentVariable > "" {
 			value, wasFound := os.LookupEnv(entry.EnvironmentVariable)
 			if wasFound {
-				ui.Debug("resolving env %s = \"%s\"", entry.EnvironmentVariable, value)
+				ui.Debug(ui.CLILogger, "resolving env %s = \"%s\"", entry.EnvironmentVariable, value)
 				c.Grammar[found].Found = true
 				switch c.Grammar[found].OptionType {
 				case BooleanType:
@@ -35,7 +35,7 @@ func (c *Context) ResolveEnvironmentVariables() error {
 					c.Grammar[found].Value = value
 				}
 				if c.Grammar[found].Action != nil {
-					ui.Debug("Invoking %s handler for value %#v", c.Grammar[found].LongName, c.Grammar[found].Value)
+					ui.Debug(ui.CLILogger, "Invoking %s handler for value %#v", c.Grammar[found].LongName, c.Grammar[found].Value)
 					err = c.Grammar[found].Action(c)
 				}
 			}

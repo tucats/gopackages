@@ -12,6 +12,9 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
+const TokenExpirationSetting = "token-expiration"
+const TokenKeySetting = "token-key"
+
 type Token struct {
 	Name    string
 	Data    string
@@ -65,7 +68,8 @@ func Validate(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	}
 
 	// Decrypt the token into a json string
-	key := persistence.Get("token-key")
+	key := getTokenKey()
+
 	j, err := util.Decrypt(string(b), key)
 	if err == nil && len(j) == 0 {
 		err = errors.New("invalid token encryption")
@@ -111,8 +115,9 @@ func Extract(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		return nil, err
 	}
 
-	// Decrypt the token into a json string
-	key := persistence.Get("token-key")
+	// Decrypt the token into a json string. We use the token key stored in
+	// the preferences data. If there isn't one, generate a new random key.
+	key := getTokenKey()
 	j, err := util.Decrypt(string(b), key)
 	if err != nil {
 		return nil, err
@@ -170,7 +175,7 @@ func CreateToken(s *symbols.SymbolTable, args []interface{}) (interface{}, error
 
 	// Fetch the default interval, or use 15 minutes as the default.
 	// Calculate a time value for when this token expires
-	interval := persistence.Get("token-expiration")
+	interval := persistence.Get(TokenExpirationSetting)
 	if interval == "" {
 		interval = "15m"
 	}
@@ -187,10 +192,21 @@ func CreateToken(s *symbols.SymbolTable, args []interface{}) (interface{}, error
 	}
 
 	// Encrypt the string value
-	key := persistence.Get("token-key")
-	encryptedString, err := util.Encrypt(string(b), key)
+	encryptedString, err := util.Encrypt(string(b), getTokenKey())
 	if err != nil {
 		return b, err
 	}
 	return hex.EncodeToString([]byte(encryptedString)), nil
+}
+
+// getTokenKey fetches the key used to encrypt tokens. If it
+// was not already set up, a new random one is generated.
+func getTokenKey() string {
+	key := persistence.Get(TokenKeySetting)
+	if key == "" {
+		key = uuid.New().String() + "-" + uuid.New().String()
+		persistence.Set(TokenKeySetting, key)
+		_ = persistence.Save()
+	}
+	return key
 }
