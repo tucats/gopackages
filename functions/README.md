@@ -271,11 +271,49 @@ The typical use is to simply print the string:
     {
         x = 42
         y := "test"
-        print util.symbols()
+        fmt.Println( util.symbols() )
     }
 
 This will print the symbols for the nested basic block as well as the
 symbols for the main program.
+
+## Formatted Output
+You can print values to the console (or stdout device) by using calls
+into the functions of the `fmt` package.
+
+### fmt.Print(...)
+The `Print` function prints any values passed as parameters to the
+standard output, using the default formatting operations for Ego
+values. There is no trailing newline after the output, so multiple
+Print() calls will produce output on a single line of text.
+
+### fmt.Println(...)
+The `Println` function prints any values passed as parameters to the
+standard output, using the default formatting operations. After any
+values are printed, a newline is printed. This can also be used with
+no parameters to produce a newline character after a series of `Print`
+calls.
+
+### fmt.Printf(format, ...)
+The `Printf` function formats output and prints it. You must specify
+at least one parameter which is a string containing the format 
+specification to print. This can include substitution operators
+for values in thie string, which correspond to the additional
+parameters passed after the format string.
+
+This uses the Go format processor, so it can support the exact
+same format specifications as Go.
+
+### fmt.Sprintf(format, ...)
+The `Sprintf` function formats output and returns it as a string
+value. You must specify
+at least one parameter which is a string containing the format 
+specification to output. This can include substitution operators
+for values in thie string, which correspond to the additional
+parameters passed after the format string.
+
+This uses the Go format processor, so it can support the exact
+same format specifications as Go.
 
 ## JSON Support
 You can formalize the parsing of JSON strings into Ego variables using
@@ -305,7 +343,7 @@ a value.
 
     keys := profile.keys()
     for i := range keys {
-        print "profile key is ", i
+        fmt.Printf("profile key is %s\n", i)
     }
 
 ### profile.get()

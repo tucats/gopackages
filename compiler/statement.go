@@ -3,6 +3,7 @@ package compiler
 import (
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
+	"github.com/tucats/gopackages/util"
 )
 
 // Predefined names used by statement processing.
@@ -65,8 +66,6 @@ func (c *Compiler) Statement() error {
 		return c.Assert()
 	case "break":
 		return c.Break()
-	case "call":
-		return c.Call()
 	case "const":
 		return c.Constant()
 	case "continue":
@@ -81,8 +80,6 @@ func (c *Compiler) Statement() error {
 		return c.Import()
 	case "package":
 		return c.Package()
-	case "print":
-		return c.Print()
 	case "return":
 		return c.Return()
 	case "switch":
@@ -122,7 +119,7 @@ func (c *Compiler) IsFunctionCall() bool {
 		}
 
 		// Is this a reserved word or delimiter punctuation? IF so we've shot past the statement
-		if subexpr == 0 && inList(t, []string{
+		if subexpr == 0 && util.InList(t,
 			";",
 			"@",
 			"{",
@@ -157,7 +154,7 @@ func (c *Compiler) IsFunctionCall() bool {
 			"switch",
 			"try",
 			"type",
-		}) {
+		) {
 			return false
 		}
 

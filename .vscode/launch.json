@@ -13,10 +13,10 @@
             "program": "/Users/tom/Go/src/github.com/tucats/ego/",
             "env": {},
           //  "args": [ "logon", "-u", "admin", "-p", "password" ]
-          //  "args": [ "run", "test.ego"]
+            "args": [ "run", "test.ego"]
           // "args": [ "run" ]
           // "args": [ "--output-format", "json", "server", "add-user", "-u", "mary", "-p", "sam"]
-          "args": [ "server", "run", "-k" ]
+          // "args": [ "server", "run", "-k" ]
 
         }
     ]

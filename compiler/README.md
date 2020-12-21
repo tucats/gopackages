@@ -115,12 +115,12 @@ instance of the existing type. For example,
      a := { age: 55, name: "Timmy"}
      b := a
      b.age = 4
-     print a.age    // Prints the value 4
+     fmt.Println( a.age )   // Prints the value 4
 
      c := { age: 55, name: "Timmy"}
      d := new(c)
      d.age = 4
-     print c.age    // Prints the value 55
+     fmt.Println( c.age )    // Prints the value 55
 
 
 ## Scope
@@ -206,38 +206,6 @@ condition is false, as in
 If the value of `flag` does not equal the string "-d" then the 
 code will call the function `regular()` instead of `debug()`.
 
-## print
-The `print` statement accepts a list of expressions, and displays them on
-the current stdout stream. There is no formatting built into the `print`
-statement at this time; each term in the list is printed sequentially,
-and a newline is added after all the items are printed.
-
-    print "My name is ", name
-
-
-Using `print` without any arguments just prints a newline character.
-
-## call
-The `call` statement is used to invoke a function that does not return
-a value. It is followed by a function name and arguments, and these are
-used to call the named function. However, even if the function uses a
-`return` statement to return a value, it is ignored by the `call` 
-statement. 
-
-    call profile("secret", "cookies")
-
-This calls the `profile()` function. When that function gets two
-paramters, it sets the profile value named in the first argument to
-the string value of the second argument. The function returns true
-because all functions must return a value, but the `call` statement
-discards the result.  This is the same as using the statement:
-
-    
-    x := profile("secret", "cookies")
-
-Where the "x" is the name of an ignored value.
-
-
 ## func
 The `func` statement defines a function. This must have a name
 which is a valid symbol, followed by an argument list. 
@@ -302,7 +270,7 @@ loop. There are two kinds of loops.
 
     x := [101, 232,363]
     for n:=0; n < len(x); n = n + 1 {
-        print "element ", n, " is ", x[n]
+        fmt.Printf("element %d is %d\n", n, x[n])
     }
 
 This example creates an array, and then uses a loop to read all
@@ -320,7 +288,7 @@ hand version of this.
 
     x := [ 101, 232, 363 ]
     for n := range x {
-        print "The value is ", n
+        fmt.Println( "The value is ", n)
     }
 
 In this example, the value of `n` will take on each element of
@@ -330,7 +298,7 @@ the value.
 
     x := [ 101, 232, 363 ]
     for i, n := range x {
-        print "Element ", i, " is ", n
+        fmt.Println( "Element ", i, " is ", n )
     }
 
 Here, the array index is stored in `i` and the value of
@@ -339,7 +307,7 @@ identical to the following more explicit loop structure:
 
     for i := 1; i <= len(x); i = i + 1 {
         n := x[i]
-        print "Element ", i, " is ", n
+        fmt.Println( "Element ", i, " is ", n )
     }
 
 ## break
@@ -350,7 +318,7 @@ loop had terminated normally.
         if i == 5 {
             break
         }
-        print i
+        fmt.Println( i )
     }
 
 This loop run run only five times, printing the values 0..4. On the next
@@ -369,10 +337,10 @@ as if the loop had restarted with the next iteration.
         if i == 5 {
             continue
         }
-        print i
+        fmt.Println( i )
     }
 
-This loop run run only all ten times, but will only print the values
+This loop run run only all ten times, but will only output the values
 0..4 and 6..9. When the index `i` is equal to 5, the loop starts again
 at the top of the loop with the next index value.
 
@@ -389,9 +357,9 @@ If there are no errors,  execution continues after the catch block.
     try {
         x = pay / hours
     } catch {
-        print "Hours were zero!"
+        fmt.Println( "Hours were zero!" )
     }
-    print "The result is ", x
+    fmt.Println( "The result is ", x )
 
 If the value of `hours` is non-zero, the assignment statement will assign
 the dividend to `x`. However, if hours is zero it will trigger a runtime
@@ -480,7 +448,7 @@ The resulting templates are available to the template() function,
  parameter is a record containing all the named values that might
  be substituted into the template.  For example,
 
-     print strings.template(hello, { Name: "Tom"})
+     fmt.Println( strings.template(hello, { Name: "Tom"}))
 
 This results in the string "Greetings, Tom" being printed on the
 stdout console. Note that `hello` becomes a global variable in the program, and

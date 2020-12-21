@@ -3,6 +3,7 @@ package compiler
 import (
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
+	"github.com/tucats/gopackages/util"
 )
 
 // Function compiles a function definition. If the literal flag is
@@ -10,6 +11,8 @@ import (
 // stack. IF not set, the function is added to the global or local
 // function dictionary.
 func (c *Compiler) Function(literal bool) error {
+
+	coercions := []*bytecode.ByteCode{}
 
 	type parameter struct {
 		name string
@@ -67,7 +70,7 @@ func (c *Compiler) Function(literal bool) error {
 			} else if c.t.Peek(1) == "{" && c.t.Peek(2) == "}" {
 				p.kind = bytecode.ArrayType
 				c.t.Advance(2)
-			} else if inList(c.t.Peek(1), []string{"any", "int", "string", "bool", "float", "array", "struct"}) {
+			} else if util.InList(c.t.Peek(1), "any", "int", "string", "bool", "float", "array", "struct") {
 				switch c.t.Next() {
 				case "int":
 					p.kind = bytecode.IntType
@@ -126,52 +129,73 @@ func (c *Compiler) Function(literal bool) error {
 	// by a return statement
 	coercion := bytecode.New(fname + " return")
 
-	if c.t.Peek(1) == "[" && c.t.Peek(2) == "]" {
-		coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
-		c.t.Advance(2)
-	} else {
-		if c.t.Peek(1) == "{" && c.t.Peek(2) == "}" {
-			coercion.Emit(bytecode.Coerce, bytecode.StructType)
+	// Is there a list of return items (expressed as a parenthesis)?
+	hasReturnList := c.t.IsNext("(")
+
+	// Loop over the (possibly singular) return type specification
+	for {
+		if c.t.Peek(1) == "[" && c.t.Peek(2) == "]" {
+			coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
 			c.t.Advance(2)
 		} else {
-			switch c.t.Peek(1) {
-			case "int":
-				coercion.Emit(bytecode.Coerce, bytecode.IntType)
-				c.t.Advance(1)
-			case "float":
-				coercion.Emit(bytecode.Coerce, bytecode.FloatType)
-				c.t.Advance(1)
-			case "string":
-				coercion.Emit(bytecode.Coerce, bytecode.StringType)
-				c.t.Advance(1)
-			case "bool":
-				coercion.Emit(bytecode.Coerce, bytecode.BoolType)
-				c.t.Advance(1)
-			case "struct":
+			if c.t.Peek(1) == "{" && c.t.Peek(2) == "}" {
 				coercion.Emit(bytecode.Coerce, bytecode.StructType)
-				c.t.Advance(1)
-			case "array":
-				coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
-				c.t.Advance(1)
-			case "any":
-				coercion.Emit(bytecode.Coerce, bytecode.UndefinedType)
-				c.t.Advance(1)
+				c.t.Advance(2)
+			} else {
+				switch c.t.Peek(1) {
+				case "int":
+					coercion.Emit(bytecode.Coerce, bytecode.IntType)
+					c.t.Advance(1)
+				case "float":
+					coercion.Emit(bytecode.Coerce, bytecode.FloatType)
+					c.t.Advance(1)
+				case "string":
+					coercion.Emit(bytecode.Coerce, bytecode.StringType)
+					c.t.Advance(1)
+				case "bool":
+					coercion.Emit(bytecode.Coerce, bytecode.BoolType)
+					c.t.Advance(1)
+				case "struct":
+					coercion.Emit(bytecode.Coerce, bytecode.StructType)
+					c.t.Advance(1)
+				case "array":
+					coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
+					c.t.Advance(1)
+				case "any":
+					coercion.Emit(bytecode.Coerce, bytecode.UndefinedType)
+					c.t.Advance(1)
 
-			case "void":
-				// Do nothing, there is no result.
-				c.t.Advance(1)
+				case "void":
+					// Do nothing, there is no result.
+					c.t.Advance(1)
 
-			default:
-				return c.NewError(MissingFunctionTypeError)
+				default:
+					return c.NewError(MissingFunctionTypeError)
+				}
 			}
 		}
+		coercions = append(coercions, coercion)
+		if c.t.Peek(1) != "," {
+			break
+		}
+		// If we got here, but never had a () around this list, it's an error
+		if !hasReturnList {
+			return c.NewError(InvalidReturnTypeList)
+		}
+		c.t.Advance(1)
 	}
+
+	// If the return types were expressed as a list, there must be a trailing paren.
+	if hasReturnList && !c.t.IsNext(")") {
+		return c.NewError(MissingParenthesisError)
+	}
+
 	// Now compile a statement or block into the function body. We'll use the
 	// current token stream in progress, and the current bytecode.
 	cx := New()
 	cx.t = c.t
 	cx.b = b
-	cx.coerce = coercion
+	cx.coerce = coercions
 	err := cx.Statement()
 	if err != nil {
 		return err
@@ -189,13 +213,4 @@ func (c *Compiler) Function(literal bool) error {
 		}
 	}
 	return nil
-}
-
-func inList(search string, values []string) bool {
-	for _, item := range values {
-		if search == item {
-			return true
-		}
-	}
-	return false
 }

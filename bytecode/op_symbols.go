@@ -39,6 +39,29 @@ func SymbolCreateOpcode(c *Context, i interface{}) error {
 	return err
 }
 
+// SymbolOptCreateOpcode implementation
+func SymbolOptCreateOpcode(c *Context, i interface{}) error {
+
+	n := util.GetString(i)
+	if c.IsConstant(n) {
+		return c.NewError(ReadOnlyError)
+	}
+
+	sp := c.symbols
+	for sp.Parent != nil {
+		if _, found := sp.Get(n); found {
+			return nil
+		}
+		sp = sp.Parent
+	}
+
+	err := c.Create(n)
+	if err != nil {
+		err = c.NewError(err.Error())
+	}
+	return err
+}
+
 // SymbolDeleteOpcode implementation
 func SymbolDeleteOpcode(c *Context, i interface{}) error {
 

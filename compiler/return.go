@@ -7,18 +7,38 @@ import (
 // Return handles the return statment compilation
 func (c *Compiler) Return() error {
 
+	returnExpressions := []*bytecode.ByteCode{}
+
 	hasReturnValue := false
-	if !c.StatementEnd() {
+	returnCount := 0
+
+	for !c.StatementEnd() {
 		bc, err := c.Expression()
 		if err != nil {
 			return err
 		}
-		if c.coerce.Mark() == 0 {
-			return c.NewError(InvalidReturnValueError)
+		if returnCount >= len(c.coerce) {
+			return c.NewError(TooManyReturnValues)
 		}
-		c.b.Append(bc)
-		c.b.Append(c.coerce)
+		bc.Append(c.coerce[returnCount])
+		returnCount++
+
+		returnExpressions = append(returnExpressions, bc)
 		hasReturnValue = true
+		if !c.t.IsNext(",") {
+			break
+		}
+	}
+	if returnCount < len(c.coerce) {
+		return c.NewError(MissingReturnValues)
+	}
+	// If there was a return value, the return values must be
+	// pushed on the stack in reverse order so they match up
+	// with any multiple-assignment calls.
+	if hasReturnValue {
+		for i := len(returnExpressions) - 1; i >= 0; i = i - 1 {
+			c.b.Append(returnExpressions[i])
+		}
 	}
 
 	// Stop execution of this stream

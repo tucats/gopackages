@@ -1,6 +1,8 @@
 package compiler
 
 import (
+	"errors"
+
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
 	"github.com/tucats/gopackages/util"
@@ -19,22 +21,84 @@ func (c *Compiler) IsLValue() bool {
 	if util.InList(name, tokenizer.ReservedWords...) {
 		return false
 	}
-
-	next := c.t.Peek(2)
-	if next == "." || next == "[" {
-		return true
-	}
-
-	if util.InList(next, "=", ":=") {
+	// Let's look ahead to see if it contains any of the tell-tale
+	// characters that indicate an lvalue starting. This does not
+	// say if it is a valid/correct lvalue.
+	if util.InList(c.t.Peek(2), ".", ",", "[", "=", ":=") {
 		return true
 	}
 	return false
+}
+
+// Check to see if this is a list of lvalues, which can occur
+// in a multi-part assignment.
+func lvalueList(c *Compiler) (*bytecode.ByteCode, error) {
+	bc := bytecode.New("lvalue list")
+	savedPosition := c.t.TokenP
+
+	isLvalueList := false
+	for {
+		name := c.t.Next()
+
+		if !tokenizer.IsSymbol(name) {
+			return nil, c.NewError(InvalidSymbolError, name)
+		}
+		name = c.Normalize(name)
+
+		needLoad := true
+		// Until we get to the end of the lvalue...
+		for util.InList(c.t.Peek(1), ".", "[") {
+
+			if needLoad {
+				bc.Emit(bytecode.Load, name)
+				needLoad = false
+			}
+			err := c.lvalueTerm(bc)
+			if err != nil {
+				return nil, err
+			}
+
+		}
+
+		// Cheating here a bit; this opcode does an optional create
+		// if it's not found anywhere in the tree already.
+		bc.Emit(bytecode.SymbolOptCreate, name)
+
+		// Is the last operation in the stack referecing
+		// a parent object? If so, convert the last one to
+		// a store operation.
+		ops := bc.Opcodes()
+		opsPos := bc.Mark() - 1
+		if opsPos > 0 && ops[opsPos].Opcode == bytecode.LoadIndex {
+			ops[opsPos].Opcode = bytecode.StoreIndex
+		} else {
+			bc.Emit(bytecode.Store, name)
+		}
+
+		if c.t.Peek(1) == "," {
+			c.t.Advance(1)
+			isLvalueList = true
+			continue
+		}
+		if util.InList(c.t.Peek(1), "=", ":=") {
+			break
+		}
+	}
+	if isLvalueList {
+		return bc, nil
+	}
+	c.t.TokenP = savedPosition
+	return nil, errors.New("not an lvalue list")
 }
 
 // LValue compiles the information on the left side of
 // an assignment. This information is used later to store the
 // data in the named object.
 func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
+
+	if bc, err := lvalueList(c); err == nil {
+		return bc, nil
+	}
 
 	bc := bytecode.New("lvalue")
 	name := c.t.Next()

@@ -20,55 +20,57 @@ package bytecode
 const (
 	Stop   = 0
 	AtLine = iota + BuiltinInstructions
-	Call
+
+	Add
+	And
 	ArgCheck
-	Push
+	Array
+	Call
+	ClassMember
+	Coerce
+	Constant
+	Copy
+	Div
 	Drop
 	Dup
-	Copy
-	Swap
-	Add
-	Sub
-	Div
-	Mul
-	Exp
-	And
-	Or
-	Negate
 	Equal
-	NotEqual
+	Exp
 	GreaterThan
-	LessThan
 	GreaterThanOrEqual
+	LessThan
 	LessThanOrEqual
 	Load
-	Store
-	StoreGlobal
-	StoreAlways
-	Array
-	MakeArray
 	LoadIndex
-	StoreIndex
 	LoadSlice
-	Struct
+	Log
+	MakeArray
 	Member
-	ClassMember
-	Print
-	Say
+	Mul
+	Negate
 	Newline
-	SymbolDelete
-	SymbolCreate
-	Constant
-	PushScope
+	NotEqual
+	Or
+	Panic
 	PopScope
+	Print
+	Push
+	PushScope
+	Return
+	Say
+	Store
+	StoreAlways
+	StoreGlobal
+	StoreIndex
+	Struct
+	Sub
+	Swap
+	SymbolCreate
+	SymbolDelete
+	SymbolOptCreate
+	Template
+	This
 	Try
 	TryPop
-	Coerce
-	This
-	Panic
-	Template
-	Return
-	Log
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction
@@ -84,119 +86,121 @@ const (
 )
 
 var opcodeNames = map[int]string{
-	Stop:               "Stop",
-	Call:               "Call",
-	Push:               "Push",
 	Add:                "Add",
-	Sub:                "Sub",
-	Div:                "Div",
-	Mul:                "Mul",
-	Exp:                "Exp",
 	And:                "And",
-	Or:                 "Or",
-	Negate:             "Negate",
+	ArgCheck:           "ArgCheck",
+	Array:              "Array",
+	AtLine:             "AtLine",
 	Branch:             "Branch",
-	BranchTrue:         "BranchTrue",
 	BranchFalse:        "BranchFalse",
+	BranchTrue:         "BranchTrue",
+	Call:               "Call",
+	ClassMember:        "ClassMember",
+	Coerce:             "Coerce",
+	Constant:           "Constant",
+	Copy:               "Copy",
+	Div:                "Div",
+	Drop:               "Drop",
+	Dup:                "Dup",
 	Equal:              "Equal",
-	NotEqual:           "NotEqual",
+	Exp:                "Exp",
 	GreaterThan:        "GreaterThan",
-	LessThan:           "LessThan",
 	GreaterThanOrEqual: "GreaterThanOrEqual",
+	LessThan:           "LessThan",
 	LessThanOrEqual:    "LessThanOrEqual",
 	Load:               "Load",
-	Store:              "Store",
-	Array:              "Array",
 	LoadIndex:          "LoadIndex",
 	LoadSlice:          "LoadSlice",
+	Log:                "Log",
+	MakeArray:          "MakeArray",
+	Member:             "Member",
+	Mul:                "Mul",
+	Negate:             "Negate",
+	Newline:            "Newline",
+	NotEqual:           "NotEqual",
+	Or:                 "Or",
+	Panic:              "Panic",
+	PopScope:           "PopScope",
+	Print:              "Print",
+	Push:               "Push",
+	PushScope:          "PushScope",
+	Return:             "Return",
+	Say:                "Say",
+	Stop:               "Stop",
+	Store:              "Store",
+	StoreAlways:        "StoreAlways",
+	StoreGlobal:        "StoreGlobal",
 	StoreIndex:         "StoreIndex",
 	Struct:             "Struct",
-	Member:             "Member",
-	Print:              "Print",
-	Say:                "Say",
-	Newline:            "Newline",
-	Drop:               "Drop",
-	AtLine:             "AtLine",
-	MakeArray:          "MakeArray",
-	SymbolDelete:       "SymbolDelete",
+	Sub:                "Sub",
+	Swap:               "Swap",
 	SymbolCreate:       "SymbolCreate",
-	PushScope:          "PushScope",
-	PopScope:           "PopScope",
-	Constant:           "Constant",
+	SymbolDelete:       "SymbolDelete",
+	SymbolOptCreate:    "SymbolOptCreate",
+	Template:           "Template",
+	This:               "This",
 	Try:                "Try",
 	TryPop:             "TryPop",
-	Coerce:             "Coerce",
-	ArgCheck:           "ArgCheck",
-	This:               "This",
-	Dup:                "Dup",
-	Copy:               "Copy",
-	Swap:               "Swap",
-	ClassMember:        "ClassMember",
-	Panic:              "Panic",
-	Template:           "Template",
-	Return:             "Return",
-	StoreGlobal:        "StoreGlobal",
-	StoreAlways:        "StoreAlways",
-	Log:                "Log",
 }
 
 func initializeDispatch() {
 	if dispatch == nil {
 		dispatch = DispatchMap{
-			Panic:              PanicOpcode,
-			Stop:               StopOpcode,
-			AtLine:             AtLineOpcode,
-			Push:               PushOpcode,
-			Array:              ArrayOpcode,
-			LoadIndex:          LoadIndexOpcode,
-			LoadSlice:          LoadSliceOpcode,
-			StoreIndex:         StoreIndexOpcode,
-			Struct:             StructOpcode,
-			Member:             MemberOpcode,
 			Add:                AddOpcode,
-			Sub:                SubOpcode,
-			Mul:                MulOpcode,
-			Div:                DivOpcode,
-			Exp:                ExpOpcode,
 			And:                AndOpcode,
-			Or:                 OrOpcode,
-			Negate:             NegateOpcode,
-			Call:               CallOpcode,
-			Load:               LoadOpcode,
-			Store:              StoreOpcode,
-			StoreGlobal:        StoreGlobalOpcode,
-			StoreAlways:        StoreAlwaysOpcode,
+			ArgCheck:           ArgCheckOpcode,
+			Array:              ArrayOpcode,
+			AtLine:             AtLineOpcode,
 			Branch:             BranchOpcode,
-			BranchTrue:         BranchTrueOpcode,
 			BranchFalse:        BranchFalseOpcode,
+			BranchTrue:         BranchTrueOpcode,
+			Call:               CallOpcode,
+			ClassMember:        ClassMemberOpcode,
+			Coerce:             CoerceOpcode,
+			Constant:           ConstantOpcode,
+			Copy:               CopyOpcode,
+			Div:                DivOpcode,
+			Drop:               DropOpcode,
+			Dup:                DupOpcode,
 			Equal:              EqualOpcode,
-			NotEqual:           NotEqualOpcode,
-			LessThan:           LessThanOpcode,
-			LessThanOrEqual:    LessThanOrEqualOpcode,
+			Exp:                ExpOpcode,
 			GreaterThan:        GreaterThanOpcode,
 			GreaterThanOrEqual: GreaterThanOrEqualOpcode,
-			Print:              PrintOpcode,
-			Say:                SayOpcode,
-			Newline:            NewlineOpcode,
-			Drop:               DropOpcode,
+			LessThan:           LessThanOpcode,
+			LessThanOrEqual:    LessThanOrEqualOpcode,
+			Load:               LoadOpcode,
+			LoadIndex:          LoadIndexOpcode,
+			LoadSlice:          LoadSliceOpcode,
+			Log:                LogOpcode,
 			MakeArray:          MakeArrayOpcode,
-			SymbolDelete:       SymbolDeleteOpcode,
-			SymbolCreate:       SymbolCreateOpcode,
-			PushScope:          PushScopeOpcode,
+			Member:             MemberOpcode,
+			Mul:                MulOpcode,
+			Negate:             NegateOpcode,
+			Newline:            NewlineOpcode,
+			NotEqual:           NotEqualOpcode,
+			Or:                 OrOpcode,
+			Panic:              PanicOpcode,
 			PopScope:           PopScopeOpcode,
-			Constant:           ConstantOpcode,
+			Print:              PrintOpcode,
+			Push:               PushOpcode,
+			PushScope:          PushScopeOpcode,
+			Return:             ReturnOpcode,
+			Say:                SayOpcode,
+			Stop:               StopOpcode,
+			Store:              StoreOpcode,
+			StoreAlways:        StoreAlwaysOpcode,
+			StoreGlobal:        StoreGlobalOpcode,
+			StoreIndex:         StoreIndexOpcode,
+			Struct:             StructOpcode,
+			Sub:                SubOpcode,
+			Swap:               SwapOpcode,
+			SymbolCreate:       SymbolCreateOpcode,
+			SymbolDelete:       SymbolDeleteOpcode,
+			SymbolOptCreate:    SymbolOptCreateOpcode,
+			Template:           TemplateOpcode,
+			This:               ThisOpcode,
 			Try:                TryOpcode,
 			TryPop:             TryPopOpcode,
-			Coerce:             CoerceOpcode,
-			ArgCheck:           ArgCheckOpcode,
-			This:               ThisOpcode,
-			Dup:                DupOpcode,
-			Copy:               CopyOpcode,
-			Swap:               SwapOpcode,
-			ClassMember:        ClassMemberOpcode,
-			Template:           TemplateOpcode,
-			Return:             ReturnOpcode,
-			Log:                LogOpcode,
 		}
 	}
 }
