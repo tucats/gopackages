@@ -4,6 +4,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
@@ -52,6 +53,7 @@ type Compiler struct {
 	blockDepth           int
 	statementCount       int
 	LowercaseIdentifiers bool
+	printEnabled         bool
 }
 
 // New creates a new compiler instance
@@ -63,9 +65,9 @@ func New() *Compiler {
 		constants:            make([]string, 0),
 		packages:             PackageDictionary{},
 		LowercaseIdentifiers: false,
+		printEnabled:         persistence.GetBool("print-enabled"),
 	}
-	c := &cInstance
-	return c
+	return &cInstance
 }
 
 // WithTokens supplies the token stream to a compiler

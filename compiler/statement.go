@@ -80,6 +80,12 @@ func (c *Compiler) Statement() error {
 		return c.Import()
 	case "package":
 		return c.Package()
+	case "print":
+		if c.printEnabled {
+			return c.Print()
+		}
+		return c.NewError(UnrecognizedStatementError, c.t.Peek(0))
+
 	case "return":
 		return c.Return()
 	case "switch":
