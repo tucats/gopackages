@@ -3,6 +3,7 @@ package compiler
 import (
 	bc "github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
+	"github.com/tucats/gopackages/util"
 )
 
 // relations compiles a relationship expression.
@@ -70,7 +71,7 @@ func (c *Compiler) addSubtract() error {
 			break
 		}
 		op := c.t.Peek(1)
-		if tokenizer.InList(op, []string{"+", "-", "&"}) {
+		if util.InList(op, "+", "-", "&") {
 			c.t.Advance(1)
 
 			if c.t.IsNext(tokenizer.EndOfTokens) {

@@ -3,6 +3,7 @@ package compiler
 import (
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
+	"github.com/tucats/gopackages/util"
 )
 
 // IsLValue peeks ahead to see if this is likely to be an lValue
@@ -14,8 +15,8 @@ func (c *Compiler) IsLValue() bool {
 		return false
 	}
 
-	// See  if it's on a reserved word.
-	if tokenizer.InList(name, []string{"print", "for", "array", "if", "call", "return"}) {
+	// See if it's a reserved word.
+	if util.InList(name, tokenizer.ReservedWords...) {
 		return false
 	}
 
@@ -24,7 +25,7 @@ func (c *Compiler) IsLValue() bool {
 		return true
 	}
 
-	if tokenizer.InList(next, []string{"=", ":="}) {
+	if util.InList(next, "=", ":=") {
 		return true
 	}
 	return false

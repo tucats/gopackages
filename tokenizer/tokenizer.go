@@ -42,7 +42,7 @@ func New(src string) *Tokenizer {
 		nextToken := s.TokenText()
 
 		if nextToken == "=" {
-			if InList(previousToken, []string{"!", "<", ">", ":", "="}) {
+			if util.InList(previousToken, "!", "<", ">", ":", "=") {
 				t.Tokens[len(t.Tokens)-1] = previousToken + nextToken
 				previousToken = ""
 				continue
@@ -109,17 +109,6 @@ func (t *Tokenizer) Advance(p int) {
 	if t.TokenP >= len(t.Tokens) {
 		t.TokenP = len(t.Tokens)
 	}
-}
-
-// InList is an internal function to determine if a string is in a set of
-// other possible strings.
-func InList(s string, list []string) bool {
-	for _, i := range list {
-		if s == i {
-			return true
-		}
-	}
-	return false
 }
 
 // IsNext tests to see if the next token is the given token, and if so
