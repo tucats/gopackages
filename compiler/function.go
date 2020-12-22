@@ -1,6 +1,8 @@
 package compiler
 
 import (
+	"fmt"
+
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
 	"github.com/tucats/gopackages/util"
@@ -124,16 +126,12 @@ func (c *Compiler) Function(literal bool) error {
 		b.Emit(bytecode.Store, p.name)
 	}
 
-	// Look for return type definition. If found, compile the appropriate
-	// coercion code which will be stored in the compiler block for use
-	// by a return statement
-	coercion := bytecode.New(fname + " return")
-
 	// Is there a list of return items (expressed as a parenthesis)?
 	hasReturnList := c.t.IsNext("(")
-
+	returnValueCount := 0
 	// Loop over the (possibly singular) return type specification
 	for {
+		coercion := bytecode.New(fmt.Sprintf("%s return item %d", fname, returnValueCount))
 		if c.t.Peek(1) == "[" && c.t.Peek(2) == "]" {
 			coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
 			c.t.Advance(2)
@@ -143,6 +141,9 @@ func (c *Compiler) Function(literal bool) error {
 				c.t.Advance(2)
 			} else {
 				switch c.t.Peek(1) {
+				// Start of block means no more types here.
+				case "{":
+					break
 				case "int":
 					coercion.Emit(bytecode.Coerce, bytecode.IntType)
 					c.t.Advance(1)

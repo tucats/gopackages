@@ -1,6 +1,8 @@
 package compiler
 
 import (
+	"fmt"
+
 	"github.com/tucats/gopackages/bytecode"
 )
 
@@ -36,6 +38,13 @@ func (c *Compiler) Return() error {
 	// pushed on the stack in reverse order so they match up
 	// with any multiple-assignment calls.
 	if hasReturnValue {
+		// If there are multiple return values, start with pushing
+		// a unique marker value.
+		if len(returnExpressions) > 1 {
+			c.b.Emit(bytecode.Push, bytecode.StackMarker{
+				Desc: fmt.Sprintf("func %s() returns %d values", c.b.Name, returnCount),
+			})
+		}
 		for i := len(returnExpressions) - 1; i >= 0; i = i - 1 {
 			c.b.Append(returnExpressions[i])
 		}

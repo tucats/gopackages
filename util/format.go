@@ -116,6 +116,13 @@ func Format(arg interface{}) string {
 			}
 			return fmt.Sprintf("ptr %s", ts)
 		}
+
+		if strings.HasPrefix(vv.String(), "<bytecode.StackMarker") {
+			e := reflect.ValueOf(v).Field(0)
+			name := GetString(e.Interface())
+			return fmt.Sprintf("marker(%s)", name)
+		}
+
 		if ui.DebugMode {
 			return fmt.Sprintf("kind %v <%#v>", vv.Kind(), v)
 		}

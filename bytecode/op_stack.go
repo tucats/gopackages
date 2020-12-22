@@ -2,15 +2,44 @@ package bytecode
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/tucats/gopackages/util"
 )
+
+type StackMarker struct {
+	Desc string
+}
+
+func NewStackMarker(label string, count int) StackMarker {
+	return StackMarker{
+		Desc: fmt.Sprintf("%s %d items", label, count),
+	}
+}
 
 /******************************************\
 *                                         *
 *    S T A C K   M A N A G E M E N T      *
 *                                         *
 \******************************************/
+
+// StackCheckOpcode has an integer argument, and verifies
+// that there are this many items on the stack, which is
+// used to verify that multiple return-values on the stack
+// are present.
+func StackCheckOpcode(c *Context, i interface{}) error {
+	count := util.GetInt(i)
+	if c.sp <= count {
+		return c.NewError(IncorrectReturnValueCount)
+	}
+
+	// The marker is an instance of a StackMarker object.
+	v := c.stack[c.sp-(count+1)]
+	if _, ok := v.(StackMarker); ok {
+		return nil
+	}
+	return c.NewError(IncorrectReturnValueCount)
+}
 
 // PushOpcode bytecode implementation
 func PushOpcode(c *Context, i interface{}) error {

@@ -57,6 +57,7 @@ const (
 	PushScope
 	Return
 	Say
+	StackCheck
 	Store
 	StoreAlways
 	StoreGlobal
@@ -126,6 +127,7 @@ var opcodeNames = map[int]string{
 	PushScope:          "PushScope",
 	Return:             "Return",
 	Say:                "Say",
+	StackCheck:         "StackCheck",
 	Stop:               "Stop",
 	Store:              "Store",
 	StoreAlways:        "StoreAlways",
@@ -186,6 +188,7 @@ func initializeDispatch() {
 			PushScope:          PushScopeOpcode,
 			Return:             ReturnOpcode,
 			Say:                SayOpcode,
+			StackCheck:         StackCheckOpcode,
 			Stop:               StopOpcode,
 			Store:              StoreOpcode,
 			StoreAlways:        StoreAlwaysOpcode,

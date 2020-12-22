@@ -34,8 +34,10 @@ func (c *Compiler) IsLValue() bool {
 // in a multi-part assignment.
 func lvalueList(c *Compiler) (*bytecode.ByteCode, error) {
 	bc := bytecode.New("lvalue list")
-	savedPosition := c.t.TokenP
+	bc.Emit(bytecode.StackCheck, 1)
 
+	count := 0
+	savedPosition := c.t.TokenP
 	isLvalueList := false
 	for {
 		name := c.t.Next()
@@ -64,6 +66,7 @@ func lvalueList(c *Compiler) (*bytecode.ByteCode, error) {
 		// if it's not found anywhere in the tree already.
 		bc.Emit(bytecode.SymbolOptCreate, name)
 		patchStore(bc, name)
+		count++
 
 		if c.t.Peek(1) == "," {
 			c.t.Advance(1)
@@ -75,6 +78,15 @@ func lvalueList(c *Compiler) (*bytecode.ByteCode, error) {
 		}
 	}
 	if isLvalueList {
+		// Patch up the stack size check. We can use the SetAddress
+		// operator to do this because it really just updates the
+		// integer instruction argument.
+		_ = bc.SetAddress(0, count)
+
+		// Also, add an instruction that will drop the marker (nil)
+		// value
+		bc.Emit(bytecode.Drop)
+
 		return bc, nil
 	}
 	c.t.TokenP = savedPosition
