@@ -116,7 +116,7 @@ func (c *Compiler) multDivide() error {
 			break
 		}
 		op := c.t.Peek(1)
-		if c.t.AnyNext([]string{"^", "*", "/", "|"}) {
+		if c.t.AnyNext("^", "*", "/", "|") {
 
 			if c.t.IsNext(tokenizer.EndOfTokens) {
 				return c.NewError(MissingTermError)

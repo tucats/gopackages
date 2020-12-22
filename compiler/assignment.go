@@ -7,7 +7,7 @@ func (c *Compiler) Assignment() error {
 	if err != nil {
 		return err
 	}
-	if !c.t.AnyNext([]string{":=", "="}) {
+	if !c.t.AnyNext(":=", "=") {
 		return c.NewError(MissingAssignmentError)
 	}
 

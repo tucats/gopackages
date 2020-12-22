@@ -63,17 +63,7 @@ func lvalueList(c *Compiler) (*bytecode.ByteCode, error) {
 		// Cheating here a bit; this opcode does an optional create
 		// if it's not found anywhere in the tree already.
 		bc.Emit(bytecode.SymbolOptCreate, name)
-
-		// Is the last operation in the stack referecing
-		// a parent object? If so, convert the last one to
-		// a store operation.
-		ops := bc.Opcodes()
-		opsPos := bc.Mark() - 1
-		if opsPos > 0 && ops[opsPos].Opcode == bytecode.LoadIndex {
-			ops[opsPos].Opcode = bytecode.StoreIndex
-		} else {
-			bc.Emit(bytecode.Store, name)
-		}
+		patchStore(bc, name)
 
 		if c.t.Peek(1) == "," {
 			c.t.Advance(1)
@@ -120,7 +110,6 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 		if err != nil {
 			return nil, err
 		}
-
 	}
 
 	// Quick optimization; if the name is "_" it just means
@@ -133,19 +122,27 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 		if c.t.Peek(1) == ":=" {
 			bc.Emit(bytecode.SymbolCreate, name)
 		}
-
-		// Is the last operation in the stack referecing
-		// a parent object? If so, convert the last one to
-		// a store operation.
-		ops := bc.Opcodes()
-		opsPos := bc.Mark() - 1
-		if opsPos > 0 && ops[opsPos].Opcode == bytecode.LoadIndex {
-			ops[opsPos].Opcode = bytecode.StoreIndex
-		} else {
-			bc.Emit(bytecode.Store, name)
-		}
+		patchStore(bc, name)
 	}
 	return bc, nil
+}
+
+// Helper function for LValue processing. If the token stream we are
+// generating ends in a LoadIndex, but this is the last part of the
+// storagebytecode, convert the last operation to a Store which writes
+// the value back.
+func patchStore(bc *bytecode.ByteCode, name string) {
+
+	// Is the last operation in the stack referecing
+	// a parent object? If so, convert the last one to
+	// a store operation.
+	ops := bc.Opcodes()
+	opsPos := bc.Mark() - 1
+	if opsPos > 0 && ops[opsPos].Opcode == bytecode.LoadIndex {
+		ops[opsPos].Opcode = bytecode.StoreIndex
+	} else {
+		bc.Emit(bytecode.Store, name)
+	}
 }
 
 // lvalueTerm parses secondary lvalue operations (array indexes, or struct member dereferences)
