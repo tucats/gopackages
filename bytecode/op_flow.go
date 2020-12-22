@@ -37,7 +37,9 @@ func PanicOpcode(c *Context, i interface{}) error {
 // from the source where this was found. This is used
 // in error messaging, primarily.
 func AtLineOpcode(c *Context, i interface{}) error {
+
 	c.line = util.GetInt(i)
+	// If we are tracing, put that out now.
 	if c.tokenizer != nil {
 		fmt.Printf("%d:  %s\n", c.line, c.tokenizer.GetLine(c.line))
 	}

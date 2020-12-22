@@ -42,6 +42,7 @@ func (c *Compiler) Statement() error {
 	// At this point, we know we're trying to compile a statement,
 	// so store the current line number in the stream to help us
 	// form runtime error messages as needed.
+
 	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
 
 	if c.IsFunctionCall() {

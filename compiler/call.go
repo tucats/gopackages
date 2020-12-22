@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -14,12 +15,15 @@ func (c *Compiler) Call() error {
 		return c.NewError(InvalidFunctionCall)
 	}
 
-	// Parse the function as an expression, which we then ignore the
-	// result of.
+	c.b.Emit(bytecode.Push, bytecode.StackMarker{Desc: "call"})
+	// Parse the function as an expression
 	bc, err := c.Expression()
 	if err != nil {
 		return err
 	}
 	c.b.Append(bc)
+
+	// We don't care about the result values, so flush to the marker.
+	c.b.Emit(bytecode.DropToMarker)
 	return nil
 }

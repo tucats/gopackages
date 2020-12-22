@@ -85,7 +85,7 @@ func lvalueList(c *Compiler) (*bytecode.ByteCode, error) {
 
 		// Also, add an instruction that will drop the marker (nil)
 		// value
-		bc.Emit(bytecode.Drop)
+		bc.Emit(bytecode.DropToMarker)
 
 		return bc, nil
 	}

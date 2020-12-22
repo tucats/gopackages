@@ -14,7 +14,7 @@ func TestFormatStack(t *testing.T) {
 		{
 			name: "empty stack",
 			args: args{s: []interface{}{}},
-			want: "<empty>",
+			want: "<EOS>",
 		},
 
 		{

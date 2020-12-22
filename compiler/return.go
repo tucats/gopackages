@@ -42,7 +42,7 @@ func (c *Compiler) Return() error {
 		// a unique marker value.
 		if len(returnExpressions) > 1 {
 			c.b.Emit(bytecode.Push, bytecode.StackMarker{
-				Desc: fmt.Sprintf("func %s() returns %d values", c.b.Name, returnCount),
+				Desc: fmt.Sprintf("%s(),%d]", c.b.Name, returnCount),
 			})
 		}
 		for i := len(returnExpressions) - 1; i >= 0; i = i - 1 {

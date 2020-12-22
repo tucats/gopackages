@@ -182,7 +182,7 @@ func (c *Context) Push(v interface{}) error {
 func FormatStack(s []interface{}, newlines bool) string {
 
 	if len(s) == 0 {
-		return "<empty>"
+		return "<EOS>"
 	}
 	var b strings.Builder
 	if newlines {

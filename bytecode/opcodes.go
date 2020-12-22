@@ -32,6 +32,7 @@ const (
 	Copy
 	Div
 	Drop
+	DropToMarker
 	Dup
 	Equal
 	Exp
@@ -102,6 +103,7 @@ var opcodeNames = map[int]string{
 	Copy:               "Copy",
 	Div:                "Div",
 	Drop:               "Drop",
+	DropToMarker:       "DropToMarker",
 	Dup:                "Dup",
 	Equal:              "Equal",
 	Exp:                "Exp",
@@ -163,6 +165,7 @@ func initializeDispatch() {
 			Copy:               CopyOpcode,
 			Div:                DivOpcode,
 			Drop:               DropOpcode,
+			DropToMarker:       DropToMarkerOpcode,
 			Dup:                DupOpcode,
 			Equal:              EqualOpcode,
 			Exp:                ExpOpcode,

@@ -23,6 +23,22 @@ func NewStackMarker(label string, count int) StackMarker {
 *                                         *
 \******************************************/
 
+// DropToMarkerOpcode discards items on the stack until it
+// finds a marker value, at which point it stops. This is
+// used to discard unused return values on the stack. IF there
+// is no marker, this drains the stack.
+func DropToMarkerOpcode(c *Context, i interface{}) error {
+	found := false
+	for !found {
+		v, err := c.Pop()
+		if err != nil {
+			break
+		}
+		_, found = v.(StackMarker)
+	}
+	return nil
+}
+
 // StackCheckOpcode has an integer argument, and verifies
 // that there are this many items on the stack, which is
 // used to verify that multiple return-values on the stack
