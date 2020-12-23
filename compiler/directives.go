@@ -123,7 +123,7 @@ func (c *Compiler) Authenticated() error {
 	} else {
 		token = strings.ToLower(c.t.Next())
 	}
-	if !util.InList(token, "user", "admin", "any") {
+	if !util.InList(token, "user", "admin", "any", "token", "tokenadmin") {
 		return c.NewError("Invalid authentication type", token)
 	}
 	c.b.Emit(bytecode.Auth, token)

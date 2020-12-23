@@ -115,6 +115,20 @@ func AuthOpcode(c *Context, i interface{}) error {
 	if v, ok := c.Get("_password"); ok {
 		user = util.GetString(v)
 	}
+	tokenValid := false
+	if v, ok := c.Get("_token_valid"); ok {
+		user = util.Bool(v)
+	}
+
+	if (kind == "token" || kind == "tokenadmin") && !tokenValid {
+		_ = c.SetAlways("_rest_status", 403)
+		if c.output != nil {
+			c.output.WriteString("403 Forbidden")
+		}
+		c.running = false
+		ui.Debug(ui.ServerLogger, "@authenticated token: no valid token")
+		return nil
+	}
 
 	if kind == "user" && user == "" && pass == "" {
 		_ = c.SetAlways("_rest_status", 401)
@@ -139,12 +153,12 @@ func AuthOpcode(c *Context, i interface{}) error {
 				c.output.WriteString("403 Forbidden")
 			}
 			c.running = false
-			ui.Debug(ui.ServerLogger, "@authenticated: not authenticated")
+			ui.Debug(ui.ServerLogger, "@authenticated any: not authenticated")
 			return nil
 		}
 	}
 
-	if kind == "admin" {
+	if kind == "admin" || kind == "admintoken" {
 		isAuth := false
 		if v, ok := c.Get("_superuser"); ok {
 			isAuth = util.GetBool(v)
@@ -155,8 +169,7 @@ func AuthOpcode(c *Context, i interface{}) error {
 				c.output.WriteString("403 Forbidden")
 			}
 			c.running = false
-			ui.Debug(ui.ServerLogger, "@authenticated: not admin")
-
+			ui.Debug(ui.ServerLogger, fmt.Sprintf("@authenticated %s: not admin", kind))
 		}
 	}
 
