@@ -117,7 +117,7 @@ func AuthOpcode(c *Context, i interface{}) error {
 	}
 	tokenValid := false
 	if v, ok := c.Get("_token_valid"); ok {
-		user = util.Bool(v)
+		tokenValid = util.GetBool(v)
 	}
 
 	if (kind == "token" || kind == "tokenadmin") && !tokenValid {
