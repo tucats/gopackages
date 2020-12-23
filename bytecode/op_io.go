@@ -1,6 +1,7 @@
 package bytecode
 
 import (
+	"encoding/json"
 	"fmt"
 	"text/template"
 
@@ -96,4 +97,101 @@ func TemplateOpcode(c *Context, i interface{}) error {
 		}
 	}
 	return err
+}
+
+/******************************************\
+*                                         *
+*            R E S T   I / O              *
+*                                         *
+\******************************************/
+
+func AuthOpcode(c *Context, i interface{}) error {
+
+	kind := util.GetString(i)
+	var user, pass string
+	if v, ok := c.Get("_user"); ok {
+		user = util.GetString(v)
+	}
+	if v, ok := c.Get("_password"); ok {
+		user = util.GetString(v)
+	}
+
+	if kind == "user" && user == "" && pass == "" {
+		_ = c.SetAlways("_rest_status", 401)
+		if c.output != nil {
+			c.output.WriteString("401 Not authorized")
+		}
+		c.running = false
+		ui.Debug(ui.ServerLogger, "@authenticated user: no credentials")
+		return nil
+	} else {
+		kind = "any"
+	}
+
+	if kind == "any" {
+		isAuth := false
+		if v, ok := c.Get("_authenticated"); ok {
+			isAuth = util.GetBool(v)
+		}
+		if !isAuth {
+			_ = c.SetAlways("_rest_status", 403)
+			if c.output != nil {
+				c.output.WriteString("403 Forbidden")
+			}
+			c.running = false
+			ui.Debug(ui.ServerLogger, "@authenticated: not authenticated")
+			return nil
+		}
+	}
+
+	if kind == "admin" {
+		isAuth := false
+		if v, ok := c.Get("_superuser"); ok {
+			isAuth = util.GetBool(v)
+		}
+		if !isAuth {
+			_ = c.SetAlways("_rest_status", 403)
+			if c.output != nil {
+				c.output.WriteString("403 Forbidden")
+			}
+			c.running = false
+			ui.Debug(ui.ServerLogger, "@authenticated: not admin")
+
+		}
+	}
+
+	return nil
+}
+
+func ResponseOpcode(c *Context, i interface{}) error {
+
+	// See if we have a media type specified.
+	isJSON := false
+	if v, found := c.Get("_json"); found {
+		isJSON = util.GetBool(v)
+	}
+
+	var output string
+	v, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	if isJSON {
+		b, err := json.Marshal(v)
+		if err != nil {
+			return err
+		}
+		output = string(b)
+	} else {
+		output = util.FormatUnquoted(v)
+	}
+
+	if c.output == nil {
+		fmt.Println(output)
+	} else {
+		c.output.WriteString(output)
+		c.output.WriteRune('\n')
+	}
+	return nil
 }

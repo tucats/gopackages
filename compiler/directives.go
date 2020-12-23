@@ -23,6 +23,8 @@ func (c *Compiler) Directive() error {
 	switch name {
 	case "assert":
 		return c.Assert()
+	case "authenticated":
+		return c.Authenticated()
 	case "error":
 		return c.Error()
 	case "fail":
@@ -113,22 +115,32 @@ func (c *Compiler) RestStatus() error {
 	return nil
 }
 
+func (c *Compiler) Authenticated() error {
+
+	var token string
+	if c.t.AtEnd() {
+		token = "any"
+	} else {
+		token = strings.ToLower(c.t.Next())
+	}
+	if !util.InList(token, "user", "admin", "any") {
+		return c.NewError("Invalid authentication type", token)
+	}
+	c.b.Emit(bytecode.Auth, token)
+	return nil
+}
+
 // RestResponse processes the @response directive
 func (c *Compiler) RestResponse() error {
 	if c.t.AtEnd() {
 		return c.NewError(InvalidSymbolError)
 	}
-	name := "_rest_response"
-	if c.t.AtEnd() {
-		c.b.Emit(bytecode.Push, "")
-	} else {
-		bc, err := c.Expression()
-		if err != nil {
-			return err
-		}
-		c.b.Append(bc)
+	bc, err := c.Expression()
+	if err != nil {
+		return err
 	}
-	c.b.Emit(bytecode.StoreAlways, name)
+	c.b.Append(bc)
+	c.b.Emit(bytecode.Response)
 	return nil
 }
 

@@ -25,6 +25,7 @@ const (
 	And
 	ArgCheck
 	Array
+	Auth
 	Call
 	ClassMember
 	Coerce
@@ -56,6 +57,7 @@ const (
 	Print
 	Push
 	PushScope
+	Response
 	Return
 	Say
 	StackCheck
@@ -93,6 +95,7 @@ var opcodeNames = map[int]string{
 	ArgCheck:           "ArgCheck",
 	Array:              "Array",
 	AtLine:             "AtLine",
+	Auth:               "Auth",
 	Branch:             "Branch",
 	BranchFalse:        "BranchFalse",
 	BranchTrue:         "BranchTrue",
@@ -127,6 +130,7 @@ var opcodeNames = map[int]string{
 	Print:              "Print",
 	Push:               "Push",
 	PushScope:          "PushScope",
+	Response:           "Response",
 	Return:             "Return",
 	Say:                "Say",
 	StackCheck:         "StackCheck",
@@ -155,6 +159,7 @@ func initializeDispatch() {
 			ArgCheck:           ArgCheckOpcode,
 			Array:              ArrayOpcode,
 			AtLine:             AtLineOpcode,
+			Auth:               AuthOpcode,
 			Branch:             BranchOpcode,
 			BranchFalse:        BranchFalseOpcode,
 			BranchTrue:         BranchTrueOpcode,
@@ -189,6 +194,7 @@ func initializeDispatch() {
 			Print:              PrintOpcode,
 			Push:               PushOpcode,
 			PushScope:          PushScopeOpcode,
+			Response:           ResponseOpcode,
 			Return:             ReturnOpcode,
 			Say:                SayOpcode,
 			StackCheck:         StackCheckOpcode,

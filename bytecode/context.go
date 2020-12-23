@@ -36,8 +36,13 @@ type Context struct {
 // @TOMCOLE Is this a good idea? Should a context take a snapshot of the bytecode at
 // the time so it is immutable?
 func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
+
+	name := ""
+	if b != nil {
+		name = b.Name
+	}
 	ctx := Context{
-		Name:    b.Name,
+		Name:    name,
 		bc:      b,
 		pc:      0,
 		stack:   make([]interface{}, InitialStackSize),

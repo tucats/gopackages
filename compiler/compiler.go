@@ -70,6 +70,12 @@ func New() *Compiler {
 	return &cInstance
 }
 
+// If set to true, the compiler allows the PRINT statement
+func (c *Compiler) PrintEnabled(b bool) *Compiler {
+	c.printEnabled = b
+	return c
+}
+
 // WithTokens supplies the token stream to a compiler
 func (c *Compiler) WithTokens(t *tokenizer.Tokenizer) *Compiler {
 	c.t = t
