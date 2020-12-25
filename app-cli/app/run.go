@@ -34,12 +34,11 @@ func runFromContext(context *cli.Context) error {
 			EnvironmentVariable: "CLI_PROFILE",
 		},
 		{
-			ShortName:           "d",
-			LongName:            "debug",
-			Description:         "Debug loggers to enable",
-			OptionType:          cli.StringListType,
-			Action:              DebugAction,
-			EnvironmentVariable: "CLI_DEBUG",
+			ShortName:   "d",
+			LongName:    "debug",
+			Description: "Debug loggers to enable",
+			OptionType:  cli.StringListType,
+			Action:      DebugAction,
 		},
 		{
 			LongName:            "output-format",
