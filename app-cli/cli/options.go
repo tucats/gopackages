@@ -22,6 +22,10 @@ const (
 
 	// ParameterType is a parameter from the command line. They should be declared in order
 	ParameterType = 8
+
+	// UUIDType defines a value that must be a valid (parsable) UUID, though the value is stored
+	// as a string datum.
+	UUIDType = 9
 )
 
 // Option defines the structure of each option that can be parsed.

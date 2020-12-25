@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/tucats/gopackages/app-cli/ui"
 )
 
@@ -191,8 +192,16 @@ func (c *Context) parseGrammar(args []string) error {
 			case StringType:
 				location.Value = value
 
+			case UUIDType:
+				uuid, err := uuid.Parse(value)
+				if err != nil {
+					return err
+				}
+				location.Value = uuid.String()
+
 			case StringListType:
 				location.Value = MakeList(value)
+
 			case IntType:
 				i, err := strconv.Atoi(value)
 				if err != nil {

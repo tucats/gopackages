@@ -81,9 +81,9 @@ func (c *Context) GetString(name string) (string, bool) {
 			subContext := entry.Value.(Context)
 			return subContext.GetString(name)
 		}
-		if entry.Found && (entry.OptionType == StringListType || entry.OptionType == StringType) && name == entry.LongName {
+		if entry.Found && (entry.OptionType == StringListType || entry.OptionType == UUIDType || entry.OptionType == StringType) && name == entry.LongName {
 
-			if entry.OptionType == StringType {
+			if entry.OptionType == StringType || entry.OptionType == UUIDType {
 				return entry.Value.(string), true
 			}
 			var b strings.Builder
