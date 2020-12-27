@@ -72,8 +72,7 @@ func runFromContext(context *cli.Context) error {
 		},
 	}
 
-	// Add the logon command grammar and the user-provided grammar
-	grammar = append(grammar, LogonGrammar...)
+	// Add the user-provided grammar
 	grammar = append(grammar, context.Grammar...)
 
 	// Load the active profile, if any from the profile for this application.

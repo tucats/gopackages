@@ -22,21 +22,21 @@ var LogonGrammar = []cli.Option{
 		ShortName:           "u",
 		OptionType:          cli.StringType,
 		Description:         "Username for login",
-		EnvironmentVariable: "EGO_USERNAME",
+		EnvironmentVariable: "CLI_USERNAME",
 	},
 	{
 		LongName:            "password",
 		ShortName:           "p",
 		OptionType:          cli.StringType,
 		Description:         "Password for login",
-		EnvironmentVariable: "EGO_PASSWORD",
+		EnvironmentVariable: "CLI_PASSWORD",
 	},
 	{
 		LongName:            "logon-server",
 		ShortName:           "l",
 		OptionType:          cli.StringType,
 		Description:         "URL of logon server",
-		EnvironmentVariable: "EGO_LOGON_SERVER",
+		EnvironmentVariable: "CLI_LOGON_SERVER",
 	},
 }
 
