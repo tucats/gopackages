@@ -34,7 +34,6 @@ func New(appName string) App {
 		appName = strings.TrimSpace(appName[:i])
 	}
 	app := App{Name: appName, Description: appDescription}
-
 	return app
 }
 
@@ -44,7 +43,7 @@ func (app *App) SetVersion(major, minor, delta int) {
 	symbols.RootSymbolTable.Symbols["_version"] = app.Version
 }
 
-// SetCopyright sets the copy right string (if any) used in the
+// SetCopyright sets the copyright string (if any) used in the
 // help output.
 func (app *App) SetCopyright(s string) {
 	app.Copyright = s
@@ -64,8 +63,7 @@ func (app *App) Parse(grammar []cli.Option, args []string, action func(c *cli.Co
 // applciation. The grammar must declare action routines for the
 // various subcommands, which will be executed by the parser.
 func (app *App) Run(grammar []cli.Option, args []string) error {
-
-	context := cli.Context{
+	app.Context = &cli.Context{
 		Description: app.Description,
 		Copyright:   app.Copyright,
 		Version:     app.Version,
@@ -74,7 +72,5 @@ func (app *App) Run(grammar []cli.Option, args []string) error {
 		Args:        args,
 		Action:      app.Action,
 	}
-	app.Context = &context
-
 	return runFromContext(app.Context)
 }

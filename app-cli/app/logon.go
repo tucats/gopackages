@@ -11,9 +11,18 @@ import (
 	"github.com/tucats/gopackages/app-cli/ui"
 )
 
-const LogonEndpoint = "/services/logon"
-const LogonServerSetting = "logon-server"
-const LogonTokenSetting = "logon-token"
+const (
+	// LogonEndpoint is the endpoint for the logon service
+	LogonEndpoint = "/services/logon"
+
+	// LogonServerSetting is the name of the profile item that
+	// describes the URL of the logon server (less the endpoint)
+	LogonServerSetting = "logon-server"
+
+	// LogonTokenSetting is th ename of the profile item that
+	// contains the logon token recieved from a succesful logon
+	LogonTokenSetting = "logon-token"
+)
 
 // LogonGrammar describes the login subcommand
 var LogonGrammar = []cli.Option{
@@ -43,7 +52,9 @@ var LogonGrammar = []cli.Option{
 // Logon handles the logon subcommand
 func Logon(c *cli.Context) error {
 
-	// Do we know where the logon server is?
+	// Do we know where the logon server is? Start with the default from
+	// the profile, but if it was explicitly set on the command line, use
+	// the command line item and update the saved profile setting.
 	url := persistence.Get(LogonServerSetting)
 	if c.WasFound("logon-server") {
 		url, _ = c.GetString("logon-server")
@@ -53,21 +64,26 @@ func Logon(c *cli.Context) error {
 		return errors.New("no --logon-server specified")
 	}
 
+	// Get the username. If not supplied by the user, prompt until provided.
 	user, _ := c.GetString("username")
-	pass, _ := c.GetString("password")
-
 	for user == "" {
 		user = ui.Prompt("Username: ")
 	}
+
+	// Get the password. If not supplied by the user, prompt until provided.
+	pass, _ := c.GetString("password")
 	for pass == "" {
 		pass = ui.PromptPassword("Password: ")
 	}
 
-	// Turn logon server into full URL
+	// Turn logon server address and endpoint into full URL
 	url = strings.TrimSuffix(url, "/") + LogonEndpoint
 
 	// Call the endpoint
 	r, err := resty.New().SetDisableWarn(true).SetBasicAuth(user, pass).NewRequest().Get(url)
+
+	// If the call was successful and the server responded with Success, remove any trailing
+	// newline from the result body and store the string as the new token value.
 	if err == nil && r.StatusCode() == 200 {
 		token := strings.TrimSuffix(string(r.Body()), "\n")
 		persistence.Set(LogonTokenSetting, token)
@@ -78,7 +94,7 @@ func Logon(c *cli.Context) error {
 		return err
 	}
 
-	// IF there was an error condition, let's report it now.
+	// If there was an  HTTP error condition, let's report it now.
 	if err == nil {
 		switch r.StatusCode() {
 		case 401:

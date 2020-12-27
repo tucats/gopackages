@@ -86,7 +86,6 @@ func runFromContext(context *cli.Context) error {
 	// Parse the grammar and call the actions (essentially, execute
 	// the function of the CLI)
 	context.Grammar = grammar
-
 	err := context.Parse()
 
 	// If no errors, then write out an updated profile as needed.
