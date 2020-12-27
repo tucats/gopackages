@@ -17,13 +17,21 @@ func runFromContext(context *cli.Context) error {
 
 	// Create a new grammar which prepends the default supplied options
 	// to the caller's grammar definition.
-	grammar := append([]cli.Option{
+	grammar := []cli.Option{
 		{
 			LongName:    "profile",
 			Aliases:     []string{"prof"},
 			OptionType:  cli.Subcommand,
 			Description: "Manage the default profile",
 			Value:       profile.Grammar,
+		},
+		{
+			LongName:    "logon",
+			Aliases:     []string{"login"},
+			OptionType:  cli.Subcommand,
+			Description: "Log on to a remote server",
+			Action:      Logon,
+			Value:       LogonGrammar,
 		},
 		{
 			ShortName:           "p",
@@ -61,7 +69,12 @@ func runFromContext(context *cli.Context) error {
 			OptionType:          cli.BooleanType,
 			Action:              QuietAction,
 			EnvironmentVariable: "CLI_QUIET",
-		}}, context.Grammar...)
+		},
+	}
+
+	// Add the logon command grammar and the user-provided grammar
+	grammar = append(grammar, LogonGrammar...)
+	grammar = append(grammar, context.Grammar...)
 
 	// Load the active profile, if any from the profile for this application.
 	_ = persistence.Load(context.AppName, "default")
