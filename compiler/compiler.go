@@ -49,6 +49,7 @@ type Compiler struct {
 	loops                *Loop
 	coerce               []*bytecode.ByteCode
 	constants            []string
+	deferQueue           []int
 	packages             PackageDictionary
 	blockDepth           int
 	statementCount       int
@@ -63,6 +64,7 @@ func New() *Compiler {
 		t:                    nil,
 		s:                    &symbols.SymbolTable{Name: "compile-unit"},
 		constants:            make([]string, 0),
+		deferQueue:           make([]int, 0),
 		packages:             PackageDictionary{},
 		LowercaseIdentifiers: false,
 		printEnabled:         persistence.GetBool("print-enabled"),

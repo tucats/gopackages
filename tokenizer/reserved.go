@@ -9,6 +9,7 @@ var ReservedWords []string = []string{
 	"call",
 	"catch",
 	"const",
+	"defer",
 	"else",
 	"for",
 	"func",

@@ -83,6 +83,7 @@ const (
 	Branch
 	BranchTrue
 	BranchFalse
+	LocalCall
 
 	// After this value, additional user branch instructions are
 	// can be defined.
@@ -117,6 +118,7 @@ var opcodeNames = map[int]string{
 	Load:               "Load",
 	LoadIndex:          "LoadIndex",
 	LoadSlice:          "LoadSlice",
+	LocalCall:          "LocalCall",
 	Log:                "Log",
 	MakeArray:          "MakeArray",
 	Member:             "Member",
@@ -181,6 +183,7 @@ func initializeDispatch() {
 			Load:               LoadOpcode,
 			LoadIndex:          LoadIndexOpcode,
 			LoadSlice:          LoadSliceOpcode,
+			LocalCall:          LocalCallOpcode,
 			Log:                LogOpcode,
 			MakeArray:          MakeArrayOpcode,
 			Member:             MemberOpcode,

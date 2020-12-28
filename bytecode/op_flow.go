@@ -101,6 +101,33 @@ func BranchTrueOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
+func LocalCallOpcode(c *Context, i interface{}) error {
+
+	// Make a new symbol table for the fucntion to run with,
+	// and a new execution context. Store the argument list in
+	// the child table.
+	sf := symbols.NewChildSymbolTable("defer", c.symbols)
+	cx := NewContext(sf, c.bc)
+	cx.Tracing = c.Tracing
+
+	cx.SetTokenizer(c.GetTokenizer())
+	cx.result = nil
+
+	// Make the caller's stack our stack
+	cx.stack = c.stack
+	cx.sp = c.sp
+
+	// Run the function. If it doesn't get an error, then
+	// extract the top stack item as the result
+	err := cx.RunFromAddress(util.GetInt(i))
+
+	// Because we share a stack with our caller, make sure the
+	// caller's stack pointer is updated to match our value.
+	c.sp = cx.sp
+	return err
+
+}
+
 // CallOpcode bytecode implementation.
 func CallOpcode(c *Context, i interface{}) error {
 

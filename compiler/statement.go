@@ -71,6 +71,8 @@ func (c *Compiler) Statement() error {
 		return c.Constant()
 	case "continue":
 		return c.Continue()
+	case "defer":
+		return c.Defer()
 	case "exit":
 		return c.Exit()
 	case "for":
