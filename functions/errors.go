@@ -1,8 +1,11 @@
 package functions
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
 
@@ -68,4 +71,14 @@ func (e Error) Error() string {
 		b.WriteString(e.token)
 	}
 	return b.String()
+}
+
+func NewErrorFunction(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	fmtString := util.GetString(args[0])
+
+	if len(args) == 1 {
+		return errors.New(fmtString), nil
+	}
+	return fmt.Errorf(fmtString, args[1:]...), nil
 }

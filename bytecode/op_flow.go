@@ -205,6 +205,15 @@ func CallOpcode(c *Context, i interface{}) error {
 
 		result, err = af(c.symbols, args)
 
+		// If there was an error but this function allows it, then
+		// just push the result values
+		if df.ErrReturn {
+			_ = c.Push(StackMarker{Desc: "builtin result"})
+			_ = c.Push(err)
+			_ = c.Push(result)
+			return nil
+		}
+
 		// Functions implemented natively cannot wrap them up as runtime
 		// errors, so let's help them out.
 		if err != nil {

@@ -36,6 +36,7 @@ const (
 	BoolType
 	ArrayType
 	StructType
+	ErrorType
 )
 
 // I contains the information about a single bytecode instruction.

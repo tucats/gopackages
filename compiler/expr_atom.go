@@ -11,6 +11,13 @@ func (c *Compiler) expressionAtom() error {
 
 	t := c.t.Peek(1)
 
+	// Is this the "nil" constant?
+	if t == "nil" {
+		c.t.Advance(1)
+		c.b.Emit(bytecode.Push, nil)
+		return nil
+	}
+
 	// Is this a function definition?
 	if t == "func" && c.t.Peek(2) == "(" {
 		c.t.Advance(1)

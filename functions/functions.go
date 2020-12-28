@@ -12,18 +12,21 @@ import (
 
 // FunctionDefinition is an element in the function dictionary
 type FunctionDefinition struct {
-	Name string
-	Pkg  string
-	Min  int
-	Max  int
-	F    interface{}
+	Name      string
+	Pkg       string
+	Min       int
+	Max       int
+	ErrReturn bool
+	F         interface{}
 }
 
 // Any is a constant that defines that a function can have as many arguments
 // as desired.
 const Any = 999999
 
-// FunctionDictionary is the dictionary of functions
+// FunctionDictionary is the dictionary of functions. As functions are determined
+// to allow the return of both a value and an error as multi-part results, add the
+// ErrReturn:true falg to each function definition.a
 var FunctionDictionary = map[string]FunctionDefinition{
 	"array":                {Min: 1, Max: 2, F: Array},
 	"bool":                 {Min: 1, Max: 1, F: Bool},
@@ -46,23 +49,24 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"cipher.Hash":          {Min: 1, Max: 1, F: Hash},
 	"cipher.Token":         {Min: 1, Max: 2, F: Extract},
 	"cipher.Validate":      {Min: 1, Max: 2, F: Validate},
+	"errors.New":           {Min: 1, Max: Any, F: NewErrorFunction},
 	"fmt.Print":            {Min: 1, Max: Any, F: Print},
-	"fmt.Printf":           {Min: 1, Max: Any, F: Printf},
+	"fmt.Printf":           {Min: 1, Max: Any, F: Printf, ErrReturn: true},
 	"fmt.Println":          {Min: 0, Max: Any, F: Println},
 	"fmt.Sprintf":          {Min: 1, Max: Any, F: Sprintf},
 	"io.Close":             {Min: 1, Max: 1, F: Close},
-	"io.Delete":            {Min: 1, Max: 1, F: DeleteFile},
+	"io.Delete":            {Min: 1, Max: 1, F: DeleteFile, ErrReturn: true},
 	"io.Expand":            {Min: 1, Max: 2, F: Expand},
 	"io.Open":              {Min: 1, Max: 2, F: Open},
 	"io.ReadDir":           {Min: 1, Max: 1, F: ReadDir},
-	"io.ReadFile":          {Min: 1, Max: 1, F: ReadFile},
+	"io.ReadFile":          {Min: 1, Max: 1, F: ReadFile, ErrReturn: true},
 	"io.ReadString":        {Min: 1, Max: 1, F: ReadString},
 	"io.Split":             {Min: 1, Max: 1, F: Split},
 	"io.WriteFile":         {Min: 2, Max: 2, F: WriteFile},
 	"io.WriteString":       {Min: 1, Max: 2, F: WriteString},
-	"json.UnMarshal":       {Min: 1, Max: 1, F: Decode},
-	"json.Marshal":         {Min: 1, Max: Any, F: Encode},
-	"json.MarshalIndented": {Min: 1, Max: Any, F: EncodeFormatted},
+	"json.UnMarshal":       {Min: 1, Max: 1, F: Decode, ErrReturn: true},
+	"json.Marshal":         {Min: 1, Max: Any, F: Encode, ErrReturn: true},
+	"json.MarshalIndented": {Min: 1, Max: Any, F: EncodeFormatted, ErrReturn: true},
 	"math.Abs":             {Min: 1, Max: 1, F: Abs},
 	"math.Log":             {Min: 1, Max: 1, F: Log},
 	"math.Sqrt":            {Min: 1, Max: 1, F: Sqrt},

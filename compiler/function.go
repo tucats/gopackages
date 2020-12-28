@@ -144,6 +144,10 @@ func (c *Compiler) Function(literal bool) error {
 				// Start of block means no more types here.
 				case "{":
 					break
+				case "error":
+					c.t.Advance(1)
+					coercion.Emit(bytecode.Coerce, bytecode.ErrorType)
+
 				case "int":
 					coercion.Emit(bytecode.Coerce, bytecode.IntType)
 					c.t.Advance(1)

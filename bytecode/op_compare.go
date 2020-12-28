@@ -29,6 +29,9 @@ func EqualOpcode(c *Context, i interface{}) error {
 
 	switch v1.(type) {
 
+	case nil:
+		r = (v2 == nil)
+
 	case map[string]interface{}:
 		r = reflect.DeepEqual(v1, v2)
 
@@ -38,6 +41,8 @@ func EqualOpcode(c *Context, i interface{}) error {
 	default:
 		v1, v2 = util.Normalize(v1, v2)
 		switch v1.(type) {
+		case nil:
+			r = false
 		case int:
 			r = v1.(int) == v2.(int)
 		case float64:
@@ -73,6 +78,9 @@ func NotEqualOpcode(c *Context, i interface{}) error {
 
 	switch v1.(type) {
 
+	case nil:
+		r = v2 != nil
+
 	case map[string]interface{}:
 		r = !reflect.DeepEqual(v1, v2)
 
@@ -82,6 +90,8 @@ func NotEqualOpcode(c *Context, i interface{}) error {
 	default:
 		v1, v2 = util.Normalize(v1, v2)
 		switch v1.(type) {
+		case nil:
+			r = false
 		case int:
 			r = v1.(int) != v2.(int)
 		case float64:
@@ -112,6 +122,10 @@ func GreaterThanOpcode(c *Context, i interface{}) error {
 		return err
 	}
 
+	if v1 == nil || v2 == nil {
+		_ = c.Push(false)
+		return nil
+	}
 	var r bool
 
 	switch v1.(type) {
@@ -149,6 +163,10 @@ func GreaterThanOrEqualOpcode(c *Context, i interface{}) error {
 	v1, err := c.Pop()
 	if err != nil {
 		return err
+	}
+	if v1 == nil || v2 == nil {
+		_ = c.Push(false)
+		return nil
 	}
 
 	var r bool
@@ -191,10 +209,6 @@ func LessThanOpcode(c *Context, i interface{}) error {
 	}
 
 	// Handle nil cases
-	if v1 == nil && v2 == nil {
-		_ = c.Push(true)
-		return nil
-	}
 	if v1 == nil || v2 == nil {
 		_ = c.Push(false)
 		return nil
@@ -238,6 +252,10 @@ func LessThanOrEqualOpcode(c *Context, i interface{}) error {
 	v1, err := c.Pop()
 	if err != nil {
 		return err
+	}
+	if v1 == nil || v2 == nil {
+		_ = c.Push(false)
+		return nil
 	}
 
 	var r bool

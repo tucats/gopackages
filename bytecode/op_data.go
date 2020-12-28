@@ -109,6 +109,8 @@ func CoerceOpcode(c *Context, i interface{}) error {
 		return err
 	}
 	switch t {
+	case ErrorType:
+		v = errors.New(util.GetString(v))
 	case IntType:
 		v = util.GetInt(v)
 	case FloatType:

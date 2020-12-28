@@ -76,6 +76,9 @@ func Length(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 
 	switch arg := args[0].(type) {
 
+	case error:
+		return len(arg.Error()), nil
+
 	case map[string]interface{}:
 		keys := make([]string, 0)
 		for k := range arg {
