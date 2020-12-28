@@ -11,9 +11,10 @@ func (c *Compiler) Return() error {
 
 	returnExpressions := []*bytecode.ByteCode{}
 
-	// Generate the deferal invocations, if any
-	for _, a := range c.deferQueue {
-		c.b.Emit(bytecode.LocalCall, a)
+	// Generate the deferal invocations, if any, in reverse order
+	// that they were defined.
+	for i := len(c.deferQueue) - 1; i >= 0; i = i - 1 {
+		c.b.Emit(bytecode.LocalCall, c.deferQueue[i])
 	}
 
 	hasReturnValue := false
