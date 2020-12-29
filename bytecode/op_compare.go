@@ -40,18 +40,21 @@ func EqualOpcode(c *Context, i interface{}) error {
 
 	default:
 		v1, v2 = util.Normalize(v1, v2)
-		switch v1.(type) {
-		case nil:
-			r = false
-		case int:
-			r = v1.(int) == v2.(int)
-		case float64:
-			r = v1.(float64) == v2.(float64)
-		case string:
-			r = v1.(string) == v2.(string)
-		case bool:
-			r = v1.(bool) == v2.(bool)
-
+		if v1 == nil && v2 == nil {
+			r = true
+		} else {
+			switch v1.(type) {
+			case nil:
+				r = false
+			case int:
+				r = v1.(int) == v2.(int)
+			case float64:
+				r = v1.(float64) == v2.(float64)
+			case string:
+				r = v1.(string) == v2.(string)
+			case bool:
+				r = v1.(bool) == v2.(bool)
+			}
 		}
 	}
 
@@ -79,7 +82,10 @@ func NotEqualOpcode(c *Context, i interface{}) error {
 	switch v1.(type) {
 
 	case nil:
-		r = v2 != nil
+		r = (v2 != nil)
+
+	case error:
+		r = !reflect.DeepEqual(v1, v2)
 
 	case map[string]interface{}:
 		r = !reflect.DeepEqual(v1, v2)
