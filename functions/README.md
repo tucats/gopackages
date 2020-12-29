@@ -171,58 +171,61 @@ long string.
 ## IO Functions
 These functions handle general input and output to files.
 
-### io.readdir(path)
+### io.Readdir(path)
 This reads the contents of a directory, specified as a string path. The result
 is an array of structures, one structure for each file. The information in the
 structure contains the name, mode, size, modification date, and a flag indicating
 if this entry is a directory or not.
 
-### io.readfile(name)
+### io.Readfile(name)
 This reads the entire contents of the named file as a single large string,
 and returns that string as the function result.
 
-### io.writefile(name, text)
+### io.Writefile(name, text)
 This writes the string text to the output file, which is created if it
 does not already exist. The text becomes the contents of the file; any
 previous contents are lost.
 
-### io.split(text)
-This will split a single string (typically read using the `io.readfile()`
+### io.Split(text)
+This will split a single string (typically read using the `io.Readfile()`
 function) into an array of strings on line boundaries.
 
-    buffer := io.readfile("test.txt")
-    lines := io.split(buffer)
+    buffer := io.Readfile("test.txt")
+    lines := io.Split(buffer)
 
 The result of this is that lines is an array of strings, each of which
 represents a line of text. Note that this function can be used on any
 string, but resides in the `io` package because it is most commonly
 used in support of IO operations.
 
-### io.open(name [, createFlag ]) 
+### io.Open(name [, createFlag ]) 
 This opens a new file of the given name. If the optional second parameter
-is given and it is true, then the file is created. Otherwise, the file
-must already exist. The return value is an identifier for this instance
-of the open file. This identifier must be used in `io` package calls
-to read or write from that file.
+is given it specifies the mode "create", "append", or "read". This determines
+if the file is created/overwritten versus appended to for writes, or only
+used for reads. The result is a file handle and an error value. If the error
+is nil, the file handle can be used for additional operations documented
+below.
 
-     f := io.open("file.txt", true)
+     f := io.Open("file.txt", "create")
 
 This creates a new file named "file.txt" in the current directory, and
-returns the identifier for the file as the variable `f`.
+returns the identifier for the file as the variable `f`. The variable `f`
+is a readonly struct, which also contains a field `name` that contains
+the fully-qualified file name of the file that was opened.
 
-### io.readstring(f)
+### f.ReadString()
 This reads the next line of text from the input file and returns it as
 a string value. The file identifier f must have previously been returned
-by an `io.open()` function call.
+by an `io.Open()` function call.
 
-### io.writestring(f, text)
+### f.WriteString(text)
 This writes a line of text to the output file `f`. The line of text is
 always followed by a newline character.
 
-### io.close(f)
+### f.Close()
 This closes the file, and releases the resources for the file. After the
-`close()` call, the identifier cannot be used in a file function until it
-is reset using a call to `io.open()`.
+`Close()` call, the identifier cannot be used in a file function until it
+is reset using a call to `io.Open()`.
 
 
 ## Utility Functions
