@@ -20,6 +20,14 @@ type FunctionDefinition struct {
 	F         interface{}
 }
 
+// MultiValueReturn is a type used to return a list of values from a builtin
+// function. This an be used to return a result and an err to the caller, for
+// example. The Value list must contain the values in the order received by
+// the caller.
+type MultiValueReturn struct {
+	Value []interface{}
+}
+
 // Any is a constant that defines that a function can have as many arguments
 // as desired.
 const Any = 999999
@@ -54,16 +62,13 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"fmt.Printf":           {Min: 1, Max: Any, F: Printf, ErrReturn: true},
 	"fmt.Println":          {Min: 0, Max: Any, F: Println},
 	"fmt.Sprintf":          {Min: 1, Max: Any, F: Sprintf},
-	"io.Close":             {Min: 1, Max: 1, F: Close, ErrReturn: true},
 	"io.Delete":            {Min: 1, Max: 1, F: DeleteFile, ErrReturn: true},
 	"io.Expand":            {Min: 1, Max: 2, F: Expand, ErrReturn: true},
 	"io.Open":              {Min: 1, Max: 2, F: Open, ErrReturn: true},
 	"io.ReadDir":           {Min: 1, Max: 1, F: ReadDir, ErrReturn: true},
 	"io.ReadFile":          {Min: 1, Max: 1, F: ReadFile, ErrReturn: true},
-	"io.ReadString":        {Min: 1, Max: 1, F: ReadString, ErrReturn: true},
 	"io.Split":             {Min: 1, Max: 1, F: Split},
 	"io.WriteFile":         {Min: 2, Max: 2, F: WriteFile, ErrReturn: true},
-	"io.WriteString":       {Min: 1, Max: 2, F: WriteString, ErrReturn: true},
 	"json.UnMarshal":       {Min: 1, Max: 1, F: Decode, ErrReturn: true},
 	"json.Marshal":         {Min: 1, Max: Any, F: Encode, ErrReturn: true},
 	"json.MarshalIndented": {Min: 1, Max: Any, F: EncodeFormatted, ErrReturn: true},

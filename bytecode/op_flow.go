@@ -205,6 +205,13 @@ func CallOpcode(c *Context, i interface{}) error {
 
 		result, err = af(c.symbols, args)
 
+		if r, ok := result.(functions.MultiValueReturn); ok {
+			_ = c.Push(StackMarker{Desc: "multivalue result"})
+			for i := len(r.Value) - 1; i >= 0; i = i - 1 {
+				_ = c.Push(r.Value[i])
+			}
+			return nil
+		}
 		// If there was an error but this function allows it, then
 		// just push the result values
 		if df != nil && df.ErrReturn {

@@ -15,6 +15,7 @@ var ReservedWords []string = []string{
 	"func",
 	"if",
 	"import",
+	"nil",
 	"package",
 	"print",
 	"return",

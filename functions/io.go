@@ -2,12 +2,14 @@ package functions
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/gob"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
@@ -18,14 +20,13 @@ import (
 func ReadFile(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	name := util.GetString(args[0])
-
 	if name == "." {
 		return ui.Prompt(""), nil
 	}
 
 	content, err := ioutil.ReadFile(name)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Convert []byte to string
@@ -76,110 +77,188 @@ func WriteFile(s *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 	text := util.GetString(args[1])
 
 	err := ioutil.WriteFile(fname, []byte(text), 0777)
-	return err == nil, err
+	return len(text), err
 }
 
 // Open opens a file
 func Open(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	fname, err := filepath.Abs(util.GetString(args[0]))
+	if err != nil {
+		return nil, err
+	}
+	mode := os.O_RDONLY
+	var mask os.FileMode = 0644
 
-	fname := util.GetString(args[0])
-	outputFile := false
 	if len(args) > 1 {
-		mode := strings.ToLower(util.GetString(args[1]))
-		if mode == "true" || mode == "create" || mode == "output" {
-			outputFile = true
+		modeValue := strings.ToLower(util.GetString(args[1]))
+
+		// If we are opening for output mode, delete the file if it already
+		// exists
+		if util.InList(modeValue, "true", "create", "output") {
+			_ = os.Remove(fname)
+			mode = os.O_CREATE | os.O_WRONLY
 		}
+
+		// For append, adjust the mode bits
+		if modeValue == "append" {
+			mode = os.O_APPEND | os.O_WRONLY
+		}
+	}
+	if len(args) > 2 {
+		mask = os.FileMode(util.GetInt(args[2]))
 	}
 
 	var f *os.File
-	var err error
-
-	if outputFile {
-		f, err = os.OpenFile(fname, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	} else {
-		f, err = os.Open(fname)
-	}
+	f, err = os.OpenFile(fname, mode, mask)
 	if err != nil {
 		return nil, err
 	}
 
-	id := "__file-" + uuid.New().String()
+	fobj := map[string]interface{}{
+		"Close":       Close,
+		"ReadString":  ReadString,
+		"WriteString": WriteString,
+		"Write":       Write,
+		"WriteAt":     WriteAt,
 
-	file := map[string]interface{}{}
-	file["id"] = f
-	_ = s.SetAlways(id, file)
-	return id, nil
+		"f":          f,
+		"valid":      true,
+		"name":       fname,
+		"__readonly": true,
+	}
+	return fobj, nil
+}
+
+// getThis returns a map for the "this" object in the current
+// symbol table.
+func getThis(s *symbols.SymbolTable) map[string]interface{} {
+	t, ok := s.Get("_this")
+	if !ok {
+		return nil
+	}
+	this, ok := t.(map[string]interface{})
+	if !ok {
+		return nil
+	}
+	return this
+}
+
+// Helper function that gets the file handle for a all to a
+// handle-based function.
+func getFile(s *symbols.SymbolTable) (*os.File, error) {
+
+	this := getThis(s)
+	if v, ok := this["valid"]; ok && util.GetBool(v) {
+		fh, ok := this["f"]
+		if ok {
+			f, ok := fh.(*os.File)
+			if ok {
+				return f, nil
+			}
+		}
+	}
+	return nil, NewError("close", InvalidFileIdentifierError)
 }
 
 // Close closes a file
 func Close(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
-	id := util.GetString(args[0])
-	handle, found := s.Get(id)
-
-	if !found {
-		return false, NewError("close", InvalidFileIdentifierError, args[0])
+	if len(args) > 0 {
+		return nil, errors.New(ArgumentCountError)
 	}
 
-	file := handle.(map[string]interface{})
-	f := file["id"].(*os.File)
-	err := f.Close()
+	f, err := getFile(s)
+	if err == nil {
+		err = f.Close()
+		this := getThis(s)
+		delete(this, "valid")
+	}
 
-	_ = s.DeleteAlways(id)
-
-	return err == nil, err
+	return err, nil
 }
 
 // ReadString closes a file
 func ReadString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
-	id := util.GetString(args[0])
-	handle, found := s.Get(id)
-
-	if !found {
-		return false, NewError("read", InvalidFileIdentifierError, args[0])
+	if len(args) > 0 {
+		return nil, errors.New(ArgumentCountError)
+	}
+	f, err := getFile(s)
+	if err != nil {
+		return MultiValueReturn{Value: []interface{}{nil, err}}, err
 	}
 
-	file := handle.(map[string]interface{})
-	f := file["id"].(*os.File)
-
 	var scanner *bufio.Scanner
-
-	scanX, found := file["scanner"]
+	this := getThis(s)
+	scanX, found := this["scanner"]
 	if !found {
 		scanner = bufio.NewScanner(f)
-		file["scanner"] = scanner
-		_ = s.Set(id, file)
+		this["scanner"] = scanner
 	} else {
 		scanner = scanX.(*bufio.Scanner)
 	}
 	scanner.Scan()
-	return scanner.Text(), nil
+	return MultiValueReturn{Value: []interface{}{scanner.Text(), err}}, err
+
 }
 
-// WriteString closes a file
+// WriteString writes a file
 func WriteString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
-	id := util.GetString(args[0])
-	handle, found := s.Get(id)
-
-	if !found {
-		return false, NewError("write", InvalidFileIdentifierError, args[0])
+	if len(args) != 1 {
+		return nil, errors.New(ArgumentCountError)
 	}
 
-	file := handle.(map[string]interface{})
-	f := file["id"].(*os.File)
+	length := 0
+	f, err := getFile(s)
+	if err == nil {
+		length, err = f.WriteString(util.GetString(args[0]) + "\n")
+	}
+	return MultiValueReturn{Value: []interface{}{length, err}}, err
+}
 
-	l, err := f.WriteString(util.GetString(args[1]) + "\n")
-	return l, err
+// Write writes an arbitrary binary object to a file
+func Write(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	if len(args) != 1 {
+		return nil, errors.New(ArgumentCountError)
+	}
 
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(args[0])
+	if err != nil {
+		return nil, err
+	}
+	bytes := buf.Bytes()
+	length := len(bytes)
+	f, err := getFile(s)
+	if err == nil {
+		length, err = f.Write(bytes)
+	}
+	return MultiValueReturn{Value: []interface{}{length, err}}, err
+}
+
+// Write writes an arbitrary binary object to a file at an offset
+func WriteAt(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	if len(args) != 2 {
+		return nil, errors.New(ArgumentCountError)
+	}
+	offset := util.GetInt(args[1])
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(args[0])
+	if err != nil {
+		return nil, err
+	}
+	bytes := buf.Bytes()
+	length := len(bytes)
+	f, err := getFile(s)
+	if err == nil {
+		length, err = f.WriteAt(bytes, int64(offset))
+	}
+	return MultiValueReturn{Value: []interface{}{length, err}}, err
 }
 
 // DeleteFile delete a file
 func DeleteFile(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
 	fname := util.GetString(args[0])
-
 	err := os.Remove(fname)
 	return err == nil, err
 }
