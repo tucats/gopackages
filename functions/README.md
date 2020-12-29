@@ -46,62 +46,62 @@ Thsi returns the float64 value 3.1415.
 These functions act on string values, and usually return a string values as the
 result.
 
-### strings.format(fmtstring, values...)
+### strings.Format(fmtstring, values...)
 This returns a `string` containing the formatted value of the values array, using
 the Go-style `fmtstring` value. This supports any Go-style formatting.
 
-### strings.left(string, count)
+### strings.Left(string, count)
 This returns `count` characters from the left side of the string.
     
-    strings.left("abraham", 3)
+    strings.Left("abraham", 3)
 
 This returns the value "abr".
 
 
-### strings.right(string, count)
+### strings.Right(string, count)
 This returns `count` characters from the right side of the string.
     
-    strings.right("abraham", 4)
+    strings.Right("abraham", 4)
 
 This returns the value "aham".
 
-### strings.substring(string, start, count)
+### strings.Substring(string, start, count)
 This extracts a substring from the string argument. The substring
 starts at the `start` character position, and includes `count` characters
 in the result.
     
-    strings.substring("Thomas Jefferson", 8, 4)
+    j := strings.Substring("Thomas Jefferson", 8, 4)
 
 This returns the string "Jeff".
 
-### strings.index(string, substring)
+### strings.Index(string, substring)
 This searches the `string` parameter for the first instance of the
 `substring` parameter. If it is found, the function returns the
 character position where it starts. If it was not found, it returns
 an integer zero.
     
-    strings.index("Scores of fun", "ore")
+    strings.Index("Scores of fun", "ore")
 
 This returns the value 3, indicating that the string "ore" starts
 at the third character of the string.
 
-### strings.lower(string)
+### strings.Lower(string)
 This converts the string value given to lower-case letters. If the
 value is not a string, it is first coerced to a string type.
     
-    strings.lower("Tom")
+    strings.Lower("Tom")
 
 This results in the string value "tom".
 
-### strings.upper(string)
+### strings.Upper(string)
 This converts the string value given to uooer-case letters. If the
 value is not a string, it is first coerced to a string type.
     
-    strings.upper("Jeffrey")
+    strings.Upper("Jeffrey")
 
 This results in the string value "JEFFREY".
 
-### strings.tokenize(string)
+### strings.Tokenize(string)
 This converts a string into an array of strings, tokenized using the same
 syntax rules that the `Ego` language uses itself. An empty string results
 in an empty token array.
@@ -243,7 +243,7 @@ of sorting the data.
 It is an error to call this function with an array that contains elements that
 are arrays or structures. 
 
-### util.uuid()
+### util.UUID()
 This generates a UUID (universal unique identifier) and returns it formatted
 as a string value. Every call to this function will result in a new unique
 value.
@@ -265,7 +265,7 @@ the fields of the structure, and they are always returned in alphabetical
 order. The assignment statement uses the first array element ("age") to access
 the value of e.age.
 
-### util.symbols()
+### util.Symbols()
 Returns a string containing a formatted expression of the symbol table at
 the moment the function is called, including all nested levels of scope.
 The typical use is to simply print the string:
@@ -324,13 +324,22 @@ the `json` package. This converts a string containing a JSON represetnation
 into an Ego object, or converts an Ego object into the corresponding JSON
 string.
 
-### json.encode()
+### json.Marshal()
 Returns a string containing the JSON representation of the arguments. If only
 one argument is given, the result is the JSON for that specific argument. If
 more than one argument is given, the result is always encoded as a JSON array
 where each element matches a parameter to the call.
 
-### json.decode()
+### json.MarshalIndented()
+Returns a string containing the JSON representation of the arguments. If only
+one argument is given, the result is the JSON for that specific argument. If
+more than one argument is given, the result is always encoded as a JSON array
+where each element matches a parameter to the call.
+
+This function differs from `json.Marshal` in the the resulting string contains
+newline and indentation spaces to make the string more human-readable.
+
+### json.UnMarhsal()
 This accepts a string that must contain a syntactically valid JSON expression,
 which is then converted to the matching `Ego` data types. Supported types
 are int, float, bool, string, array, and struct elements.
@@ -339,38 +348,38 @@ are int, float, bool, string, array, and struct elements.
 This collection allows an Ego program to interact with the persistent settings
 profile data.
 
-### profile.keys()
+### profile.Keys()
 This returns an array of strings, each of which is a key value in the active
 profile. Each of these values can be used in a `profile.get()` call to read 
 a value.
 
-    keys := profile.keys()
+    keys := profile.Keys()
     for i := range keys {
         fmt.Printf("profile key is %s\n", i)
     }
 
-### profile.get()
+### profile.Get()
 Use this to read a single key value from the profile. The only parameter is
 the name of the profile key.
 
-     password := profile.get("secret-password")
+     password := profile.Get("secret-password")
 
 If the key is not valid, then an empty string is returned as the value.
 
-### profile.set()
+### profile.Set()
 Use this to store a value in the profile. The first parameter is the name of
 the profile key, and the second parameter is coerced to be a string value that
 is stored in the profile. If the key does not already exist, it is created.
 
-    call profile.set("secret-password", "gronzeldabelle")
+    profile.Set("secret-password", "gronzeldabelle")
 
 Note this can only be invoked as a `call` statement; it does not return a value.
 
-### profile.delete()
+### profile.Delete()
 This will delete a key from the current profile. If you try to delete a key
 that does not exist, there is no action taken.
 
-    call profile.delete("secret-password")
+    profile.Delete("secret-password")
 
 This must be invoked as a `call` statement; there is no function result value.
 This delete operation cannot be undone; the key value is immediately removed
@@ -379,7 +388,7 @@ from the profile and the profile is rewritten to disk.
 ## Strings
 This collection of functions support string operations.
 
-### strings.string(v...)
+### strings.String(v...)
 
 The function accepts one or more arguments, which are processed and concatenated
 into a single string value.
@@ -391,25 +400,25 @@ into a single string value.
 | []string | ["a", "b", "c"] | Array of string values |
 | []int ] [ 65, 66, 67 ] | Array of runes expressed as integer unicode value |
 
-### strings.ints(string)
+### strings.Ints(string)
 Given a string value, returns an array containing all the runes of the string
 expressed as integers containing the unicode values. If this array was passed
 to strings.string() it would return the original string.
 
-### strings.chars(string)
+### strings.Chars(string)
 Given a string value, return an array containing all the characters of the
 string as individual string array elements. So "test" becomes ["t", "e", "s", "t"]
 
 ## time
 The `time` package supports basic time calculations.
 
-### time.now()
+### time.Now()
 This returns the current time as a formatted string. Time values are generally always
 expressed as strings.
 
-### time.add(t, d)
+### time.Add(t, d)
 Adds a given duration ("1s", "-5h3m", etc) to the time and return a new time string.
 
-### time.subtract(t1, t2)
+### time.Subtract(t1, t2)
 Subtract t2 from t1 and return the duration ("-5s", etc). The sign will be "-" if t2
 is greater than t1.
