@@ -53,6 +53,7 @@ const (
 	AppLogger      = "APP"
 	ByteCodeLogger = "BYTECODE"
 	UserLogger     = "USER"
+	DBLogger       = "DB"
 )
 
 // Loggers is a map of the names of logging modes that are enabled
@@ -65,6 +66,7 @@ var Loggers = map[string]bool{
 	AppLogger:      false,
 	ByteCodeLogger: false,
 	UserLogger:     false,
+	DBLogger:       false,
 }
 
 // SetLogger enables or disables a logger

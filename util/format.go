@@ -44,6 +44,8 @@ func Format(arg interface{}) string {
 		return fmt.Sprintf("%v", v)
 	case int:
 		return fmt.Sprintf("%d", v)
+	case int64:
+		return fmt.Sprintf("%d", v)
 	case bool:
 		if v {
 			return "true"
