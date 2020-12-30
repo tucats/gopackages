@@ -269,6 +269,9 @@ func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	case []interface{}:
 		return "array", nil
 	case map[string]interface{}:
+		if sv, ok := v["__type"]; ok {
+			return util.GetString(sv), nil
+		}
 		return "struct", nil
 
 	default:
