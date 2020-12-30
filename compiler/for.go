@@ -28,9 +28,43 @@ func (c *Compiler) For() error {
 	}
 	indexName = c.Normalize(indexName)
 
-	// Must be a valid lvalue
+	// if not an lvalue, assume conditional mode
 	if !c.IsLValue() {
-		return c.NewError(MissingForLoopInitializerError)
+
+		bc, err := c.Expression()
+		if err != nil {
+			return c.NewError(MissingForLoopInitializerError)
+		}
+
+		// Make a new scope and emit the test expression.
+		c.PushLoop(rangeLoopType)
+
+		// Remember top of loop and generate test
+		b1 := c.b.Mark()
+		c.b.Append(bc)
+		b2 := c.b.Mark()
+		c.b.Emit(bytecode.BranchFalse, 0)
+
+		// Compile loop body
+		err = c.Statement()
+		if err != nil {
+			return err
+		}
+
+		// Branch back to start of loop
+		c.b.Emit(bytecode.Branch, b1)
+		for _, fixAddr := range c.loops.continues {
+			_ = c.b.SetAddress(fixAddr, b1)
+		}
+
+		// Update the loop exit instruction, and any breaks
+		_ = c.b.SetAddressHere(b2)
+		for _, fixAddr := range c.loops.breaks {
+			_ = c.b.SetAddressHere(fixAddr)
+		}
+		c.PopLoop()
+
+		return nil
 	}
 
 	indexStore, err := c.LValue()

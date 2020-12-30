@@ -21,11 +21,18 @@ func (c *Compiler) IsLValue() bool {
 	if util.InList(name, tokenizer.ReservedWords...) {
 		return false
 	}
+
 	// Let's look ahead to see if it contains any of the tell-tale
-	// characters that indicate an lvalue starting. This does not
-	// say if it is a valid/correct lvalue.
-	if util.InList(c.t.Peek(2), ".", ",", "[", "=", ":=") {
-		return true
+	// characters that indicate an lvalue. This does not say if it
+	// is a valid/correct lvalue. We also stop searching at some point.
+	for i := 2; i < 100; i = i + 1 {
+		t := c.t.Peek(i)
+		if util.InList(t, ":=", "=") {
+			return true
+		}
+		if util.InList(t, "{", ";", tokenizer.EndOfTokens) {
+			return false
+		}
 	}
 	return false
 }
