@@ -166,6 +166,8 @@ func (c *Compiler) AddPackageFunction(pkgname string, name string, function inte
 	fd, found := c.packages[pkgname]
 	if !found {
 		fd = FunctionDictionary{}
+		fd["__type"] = "package"
+		fd["__readonly"] = true
 	}
 
 	if _, found := fd[name]; found {
