@@ -32,7 +32,11 @@ func (c *Compiler) Package() error {
 	// This is done by creating a source table and then merging it with the
 	// active table.
 	tmp := symbols.NewSymbolTable("")
-	_ = tmp.SetAlways(name, map[string]interface{}{"__parent": name, "__readonly": true})
+	_ = tmp.SetAlways(name, map[string]interface{}{
+		"__parent":   name,
+		"__readonly": true,
+		"__type":     "package",
+	})
 	c.s.Merge(tmp)
 
 	return nil
