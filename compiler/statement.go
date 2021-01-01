@@ -97,6 +97,8 @@ func (c *Compiler) Statement() error {
 		return c.Try()
 	case "type":
 		return c.Type()
+	case "var":
+		return c.Var()
 	}
 
 	// Unknown statement, return an error
@@ -163,6 +165,7 @@ func (c *Compiler) IsFunctionCall() bool {
 			"switch",
 			"try",
 			"type",
+			"var",
 		) {
 			return false
 		}

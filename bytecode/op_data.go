@@ -457,15 +457,14 @@ func LoadSliceOpcode(c *Context, i interface{}) error {
 
 // StoreIndexOpcode implementation
 func StoreIndexOpcode(c *Context, i interface{}) error {
-
-	always := util.GetBool(i)
+	storeAlways := util.GetBool(i)
 
 	index, err := c.Pop()
 	if err != nil {
 		return err
 	}
 
-	array, err := c.Pop()
+	destination, err := c.Pop()
 	if err != nil {
 		return err
 	}
@@ -475,44 +474,49 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 		return err
 	}
 
-	switch a := array.(type) {
+	switch a := destination.(type) {
 
 	// Index into map is just member access. Make sure it's not
 	// a read-only member or a function pointer...
 	case map[string]interface{}:
 		subscript := util.GetString(index)
 
-		// Does this member have a flag marking it as readonly?
-		old, found := a["__readonly"]
-		if found && !always {
-			if util.GetBool(old) {
-				return c.NewError(ReadOnlyError)
-			}
-		}
-
-		// Does this item already exist and is readonly?
-		old, found = a[subscript]
-		if found {
-			if subscript[0:1] == "_" {
-				return c.NewError(ReadOnlyError)
+		// You can always update the __static item
+		if subscript != "__static" {
+			// Does this member have a flag marking it as readonly?
+			old, found := a["__readonly"]
+			if found && !storeAlways {
+				if util.GetBool(old) {
+					return c.NewError(ReadOnlyError)
+				}
 			}
 
-			// Check to be sure this isn't a restricted (function code) type
+			// Does this item already exist and is readonly?
+			old, found = a[subscript]
+			if found {
+				if subscript[0:1] == "_" {
+					return c.NewError(ReadOnlyError)
+				}
 
-			switch old.(type) {
+				// Check to be sure this isn't a restricted (function code) type
 
-			case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
-				return c.NewError(ReadOnlyError)
+				switch old.(type) {
+
+				case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
+					return c.NewError(ReadOnlyError)
+				}
 			}
-		}
 
-		// Is this a static (i.e. no new members) struct?
-		if _, ok := a["__static"]; ok && !always {
-			if _, ok := a[subscript]; !ok {
-				return c.NewError(UnknownMemberError, subscript)
+			// Is this a static (i.e. no new members) struct? The __static entry must be
+			// present, with a value that is true, and we are not doing the "store always"
+			if staticFlag, ok := a["__static"]; ok && util.GetBool(staticFlag) && !storeAlways {
+				if _, ok := a[subscript]; !ok {
+					return c.NewError(UnknownMemberError, subscript)
+				}
 			}
 		}
 		a[subscript] = v
+
 		// If we got a true argument, push the result back on the stack also. This
 		// is needed to create TYPE definitions.
 		if util.GetBool(i) {

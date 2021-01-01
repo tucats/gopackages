@@ -23,8 +23,13 @@ func (c *Compiler) Type() error {
 		}
 		c.Normalize(parent)
 	}
+
+	// Make sure this is a legit type definition
+	if c.t.Peek(1) == "struct" && c.t.Peek(2) == "{" {
+		c.t.Advance(1)
+	}
 	if c.t.Peek(1) != "{" {
-		return c.NewError(MissingBracketError)
+		return c.NewError(MissingBlockError)
 	}
 
 	// If there is not parent, seal the chain by making the link point to a string of our own name.
@@ -59,6 +64,7 @@ func (c *Compiler) Type() error {
 	c.b.Emit(bytecode.StoreIndex, true)
 
 	// Finally, make it a static value now.
+	c.b.Emit(bytecode.Dup) // One more needed for type statement
 	c.b.Emit(bytecode.Push, true)
 	c.b.Emit(bytecode.Swap)
 	c.b.Emit(bytecode.Push, "__static")
@@ -68,6 +74,11 @@ func (c *Compiler) Type() error {
 }
 
 func (c *Compiler) compileType() error {
+
+	// Skip over the optional struct type keyword
+	if c.t.Peek(1) == "struct" && c.t.Peek(2) == "{" {
+		c.t.Advance(1)
+	}
 
 	// Must start with {
 	if !c.t.IsNext("{") {
@@ -83,6 +94,10 @@ func (c *Compiler) compileType() error {
 		name = c.Normalize(name)
 
 		count = count + 1
+		// Skip over the optional struct type keyword
+		if c.t.Peek(1) == "struct" && c.t.Peek(2) == "{" {
+			c.t.Advance(1)
+		}
 		if c.t.Peek(1) == "{" {
 			err := c.compileType()
 			if err != nil {
@@ -105,6 +120,8 @@ func (c *Compiler) compileType() error {
 
 		c.b.Emit(bytecode.Push, name)
 
+		// Eat any trailing commas, and the see if we're at the end
+		_ = c.t.IsNext(",")
 		if c.t.IsNext("}") {
 			c.b.Emit(bytecode.Struct, count)
 			return nil

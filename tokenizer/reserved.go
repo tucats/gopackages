@@ -20,6 +20,11 @@ var ReservedWords []string = []string{
 	"print",
 	"return",
 	"try",
+	"int",
+	"float",
+	"string",
+	"bool",
+	"struct",
 }
 
 // IsReserved indicates if a name is a reserved word.

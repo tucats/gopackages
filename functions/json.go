@@ -16,7 +16,30 @@ func Decode(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	jsonBuffer := util.GetString(args[0])
 	err := json.Unmarshal([]byte(jsonBuffer), &v)
 
+	// If its a struct, make sure it has the static attribute
+	v = Seal(v)
+
 	return v, err
+}
+
+func Seal(i interface{}) interface{} {
+	switch ii := i.(type) {
+	case map[string]interface{}:
+		for k, v := range ii {
+			ii[k] = Seal(v)
+		}
+		ii["__static"] = true
+		return ii
+
+	case []interface{}:
+		for k, v := range ii {
+			ii[k] = Seal(v)
+		}
+		return ii
+
+	default:
+		return ii
+	}
 }
 
 // Encode writes a  JSON string from arbitrary data
