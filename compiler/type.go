@@ -50,6 +50,12 @@ func (c *Compiler) Type() error {
 	c.b.Emit(bytecode.SymbolCreate, name)
 	c.b.Emit(bytecode.Store, name)
 
+	// Use the name as the type.
+	c.b.Emit(bytecode.Push, "__type")
+	c.b.Emit(bytecode.StoreIndex, true)
+	c.b.Emit(bytecode.SymbolCreate, name)
+	c.b.Emit(bytecode.Store, name)
+
 	return nil
 }
 
