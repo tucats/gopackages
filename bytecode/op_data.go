@@ -96,7 +96,10 @@ func StructOpcode(c *Context, i interface{}) error {
 		}
 		m[util.GetString(name)] = value
 	}
-
+	// Only empty structures are allowed dynamic member creation
+	if count > 0 {
+		m["__static"] = true
+	}
 	_ = c.Push(m)
 	return nil
 }
@@ -455,6 +458,8 @@ func LoadSliceOpcode(c *Context, i interface{}) error {
 // StoreIndexOpcode implementation
 func StoreIndexOpcode(c *Context, i interface{}) error {
 
+	always := util.GetBool(i)
+
 	index, err := c.Pop()
 	if err != nil {
 		return err
@@ -479,11 +484,12 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 
 		// Does this member have a flag marking it as readonly?
 		old, found := a["__readonly"]
-		if found {
+		if found && !always {
 			if util.GetBool(old) {
 				return c.NewError(ReadOnlyError)
 			}
 		}
+
 		// Does this item already exist and is readonly?
 		old, found = a[subscript]
 		if found {
@@ -496,11 +502,16 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 			switch old.(type) {
 
 			case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
-				return errors.New(ReadOnlyError)
-
+				return c.NewError(ReadOnlyError)
 			}
 		}
 
+		// Is this a static (i.e. no new members) struct?
+		if _, ok := a["__static"]; ok && !always {
+			if _, ok := a[subscript]; !ok {
+				return c.NewError(UnknownMemberError, subscript)
+			}
+		}
 		a[subscript] = v
 		// If we got a true argument, push the result back on the stack also. This
 		// is needed to create TYPE definitions.

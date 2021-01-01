@@ -6,6 +6,7 @@ import (
 	"os"
 	"reflect"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -82,7 +83,7 @@ func Length(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 	case map[string]interface{}:
 		keys := make([]string, 0)
 		for k := range arg {
-			if k != "__readonly" && k != "__type" {
+			if !strings.HasPrefix(k, "__") {
 				keys = append(keys, k)
 			}
 		}
@@ -146,7 +147,7 @@ func Members(symbols *symbols.SymbolTable, args []interface{}) (interface{}, err
 
 		keys := make([]string, 0)
 		for k := range v {
-			if k != "__readonly" && k != "__type" {
+			if !strings.HasPrefix(k, "__") {
 				keys = append(keys, k)
 			}
 		}

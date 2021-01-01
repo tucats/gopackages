@@ -49,12 +49,19 @@ func (c *Compiler) Type() error {
 	c.b.Emit(bytecode.StoreIndex, true)
 	c.b.Emit(bytecode.SymbolCreate, name)
 	c.b.Emit(bytecode.Dup)
+	c.b.Emit(bytecode.Dup)
 	c.b.Emit(bytecode.Store, name)
 
 	// Use the name as the type.
 	c.b.Emit(bytecode.Push, name)
 	c.b.Emit(bytecode.Swap)
 	c.b.Emit(bytecode.Push, "__type")
+	c.b.Emit(bytecode.StoreIndex, true)
+
+	// Finally, make it a static value now.
+	c.b.Emit(bytecode.Push, true)
+	c.b.Emit(bytecode.Swap)
+	c.b.Emit(bytecode.Push, "__static")
 	c.b.Emit(bytecode.StoreIndex, true)
 
 	return nil
