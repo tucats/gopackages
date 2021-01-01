@@ -122,6 +122,10 @@ func (c *Compiler) IsFunctionCall() bool {
 			return false
 		}
 
+		// Part of an object-oriented call?
+		if t == "->" {
+			return true
+		}
 		// If this is a paren and there are no
 		// pending subexpression tokens, then this
 		// is a function calls

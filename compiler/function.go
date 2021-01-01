@@ -129,6 +129,7 @@ func (c *Compiler) Function(literal bool) error {
 	// Is there a list of return items (expressed as a parenthesis)?
 	hasReturnList := c.t.IsNext("(")
 	returnValueCount := 0
+	wasVoid := false
 	// Loop over the (possibly singular) return type specification
 	for {
 		coercion := bytecode.New(fmt.Sprintf("%s return item %d", fname, returnValueCount))
@@ -172,6 +173,7 @@ func (c *Compiler) Function(literal bool) error {
 
 				case "void":
 					// Do nothing, there is no result.
+					wasVoid = true
 					c.t.Advance(1)
 
 				default:
@@ -179,7 +181,10 @@ func (c *Compiler) Function(literal bool) error {
 				}
 			}
 		}
-		coercions = append(coercions, coercion)
+		if !wasVoid {
+			coercions = append(coercions, coercion)
+		}
+
 		if c.t.Peek(1) != "," {
 			break
 		}
