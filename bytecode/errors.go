@@ -29,6 +29,7 @@ const (
 	UnimplementedInstructionError = "unimplemented bytecode instruction"
 	UnknownIdentifierError        = "unknown identifier"
 	UnknownMemberError            = "unknown structure member"
+	UnknownPackageMemberError     = "unknown package member"
 )
 
 // Error contains an error generated from the execution context

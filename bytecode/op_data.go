@@ -273,8 +273,15 @@ func MemberOpcode(c *Context, i interface{}) error {
 
 	mv, ok := m.(map[string]interface{})
 	if ok {
+		isPackage := false
+		if t, found := mv["__type"]; found {
+			isPackage = (t == "package")
+		}
 		v, found = mv[name]
 		if !found {
+			if isPackage {
+				return c.NewError(UnknownPackageMemberError, name)
+			}
 			return c.NewError(UnknownMemberError, name)
 		}
 		c.this = m // Remember where we loaded this from
@@ -376,8 +383,15 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 	// Index into map is just member access
 	case map[string]interface{}:
 		subscript := util.GetString(index)
+		isPackage := false
+		if t, found := a["__type"]; found {
+			isPackage = (t == "package")
+		}
 		v, f := a[subscript]
 		if !f {
+			if isPackage {
+				return c.NewError(UnknownPackageMemberError, subscript)
+			}
 			return c.NewError(UnknownMemberError, subscript)
 		}
 		_ = c.Push(v)

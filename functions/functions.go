@@ -125,10 +125,12 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 			p, found := symbols.Get(d.Pkg)
 			if !found {
 				p = map[string]interface{}{}
-				p.(map[string]interface{})["readonly"] = true
 				ui.Debug(ui.CompilerLogger, "    AddBuiltins creating new package %s", d.Pkg)
 			}
 			p.(map[string]interface{})[n] = d.F
+			p.(map[string]interface{})["__type"] = "package"
+			p.(map[string]interface{})["__readonly"] = true
+
 			ui.Debug(ui.CompilerLogger, "    adding builtin %s to %s", n, d.Pkg)
 			_ = symbols.SetAlways(d.Pkg, p)
 		}
