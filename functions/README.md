@@ -112,6 +112,31 @@ These functions work generally with any type of value, and perform coercsions
 as needed. The first value in the argument list determines the type that all
 the remaining items will be coerced to.
 
+### append(array, items...)
+You can use the `append` function to add items to an array. The first argument
+is the source array to which data is to be appended. If the first argument is
+not an array, a new array is constructed containing that value.
+
+The subsequent arguments are added to the array, and the resulting array is
+returned as the new value. If you add in an array, the array becomes a single
+new member of the resulting array. You can use the `...` operator after the
+array name to cause it to be flattened out to be individual arguments, as if
+you has passed in each array member independantly. 
+
+### delete(v, k)
+The `delete` function is used to efficiently remove an element from an array, 
+or remove a field from a structure. The second argument is either the zero-based
+array index to delete, or a string value that describes the name of the field
+to be removed from the structure.
+
+    a := [101, 102, 103, 104]
+    b := delete(a, 2)           \\ Result is [101, 102, 104]
+    
+    a := { name: "Tom", age:55 }
+    a = delete(a, "age")         \\ Result is { name: "Tom" }
+
+You cannot use the delete function with anything other than a struct
+or array item.
 
 ### len(string)
 Return the length of the argument. The meaning of length depends on the 
