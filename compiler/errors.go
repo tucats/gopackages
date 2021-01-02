@@ -56,6 +56,7 @@ const (
 	TooManyReturnValues            = "too many return values"
 	UnexpectedTokenError           = "unexpected token"
 	UnrecognizedStatementError     = "unrecognized statement"
+	WrongModeError                 = "directive invalid for mode"
 )
 
 // NewError generates a new compiler error

@@ -19,6 +19,7 @@ func (c *Compiler) Directive() error {
 	if !tokenizer.IsSymbol(name) {
 		return c.NewError(InvalidDirectiveError, name)
 	}
+	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP-1])
 
 	switch name {
 	case "assert":
@@ -98,9 +99,12 @@ func (c *Compiler) Log() error {
 // RestStatus parses the @status directive which sets a symbol
 // value in the root symbol table with the REST calls tatus value
 func (c *Compiler) RestStatus() error {
+
 	if c.t.AtEnd() {
 		return c.NewError(InvalidSymbolError)
 	}
+	_ = c.modeCheck("server")
+
 	name := "_rest_status"
 	if c.t.AtEnd() {
 		c.b.Emit(bytecode.Push, 200)
@@ -116,6 +120,8 @@ func (c *Compiler) RestStatus() error {
 }
 
 func (c *Compiler) Authenticated() error {
+
+	_ = c.modeCheck("server")
 
 	var token string
 	if c.t.AtEnd() {
@@ -135,6 +141,8 @@ func (c *Compiler) RestResponse() error {
 	if c.t.AtEnd() {
 		return c.NewError(InvalidSymbolError)
 	}
+	_ = c.modeCheck("server")
+
 	bc, err := c.Expression()
 	if err != nil {
 		return err
@@ -169,6 +177,8 @@ func (c *Compiler) Template() error {
 
 // Test compiles the @test directive
 func (c *Compiler) Test() error {
+
+	_ = c.modeCheck("test")
 
 	s := c.t.Next()
 	if s[:1] == "\"" {
@@ -316,6 +326,8 @@ func (c *Compiler) Assert() error {
 
 // Fail implements the @fail directive
 func (c *Compiler) Fail() error {
+	_ = c.modeCheck("test")
+
 	next := c.t.Peek(1)
 	if next != "@" && next != ";" && next != tokenizer.EndOfTokens {
 		code, err := c.Expression()
@@ -332,6 +344,7 @@ func (c *Compiler) Fail() error {
 
 // TestPass implements the @pass directive
 func (c *Compiler) TestPass() error {
+	_ = c.modeCheck("test")
 
 	c.b.Emit(bytecode.Push, "PASS: ")
 	c.b.Emit(bytecode.Print)
@@ -346,7 +359,6 @@ func (c *Compiler) TestPass() error {
 
 // Error implements the @error directive
 func (c *Compiler) Error() error {
-	c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP-1])
 	if !c.atStatementEnd() {
 		code, err := c.Expression()
 		if err == nil {
@@ -368,4 +380,22 @@ func (c *Compiler) atStatementEnd() bool {
 		return true
 	}
 	return false
+}
+
+// modeCheck emits the code to verify that we are running
+// in the given mode.
+func (c *Compiler) modeCheck(mode string) error {
+
+	c.b.Emit(bytecode.Load, "_mode")
+	c.b.Emit(bytecode.Push, mode)
+	c.b.Emit(bytecode.Equal)
+	branch := c.b.Mark()
+	c.b.Emit(bytecode.BranchTrue, 0)
+	c.b.Emit(bytecode.Push, WrongModeError)
+	c.b.Emit(bytecode.Push, ": ")
+	c.b.Emit(bytecode.Load, "_mode")
+	c.b.Emit(bytecode.Add)
+	c.b.Emit(bytecode.Add)
+	c.b.Emit(bytecode.Panic, false) // Does not cause fatal error
+	return c.b.SetAddressHere(branch)
 }
