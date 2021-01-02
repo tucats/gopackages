@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"github.com/tucats/gopackages/bytecode"
 	bc "github.com/tucats/gopackages/bytecode"
 )
 
@@ -19,6 +20,11 @@ func (c *Compiler) functionCall() error {
 			break
 		}
 		if c.t.Peek(1) == ")" {
+			break
+		}
+		// Could be the "..." flatten operator
+		if c.t.IsNext("...") {
+			c.b.Emit(bytecode.Flatten)
 			break
 		}
 		if c.t.Peek(1) != "," {

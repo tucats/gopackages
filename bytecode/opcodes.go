@@ -37,6 +37,7 @@ const (
 	Dup
 	Equal
 	Exp
+	Flatten
 	GreaterThan
 	GreaterThanOrEqual
 	LessThan
@@ -111,6 +112,7 @@ var opcodeNames = map[int]string{
 	Dup:                "Dup",
 	Equal:              "Equal",
 	Exp:                "Exp",
+	Flatten:            "Flatten",
 	GreaterThan:        "GreaterThan",
 	GreaterThanOrEqual: "GreaterThanOrEqual",
 	LessThan:           "LessThan",
@@ -176,6 +178,7 @@ func initializeDispatch() {
 			Dup:                DupOpcode,
 			Equal:              EqualOpcode,
 			Exp:                ExpOpcode,
+			Flatten:            FlattenOpcode,
 			GreaterThan:        GreaterThanOpcode,
 			GreaterThanOrEqual: GreaterThanOrEqualOpcode,
 			LessThan:           LessThanOpcode,

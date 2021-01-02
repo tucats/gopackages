@@ -34,12 +34,22 @@ func New(src string) *Tokenizer {
 	s.Filename = "Input"
 
 	previousToken := ""
+	dots := 0
 
 	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
 
 		// See if this is one of the special cases where we patch up the previous token
-
 		nextToken := s.TokenText()
+		if nextToken == "." {
+			dots = dots + 1
+			if dots == 3 {
+				t.Tokens = append(t.Tokens[:len(t.Tokens)-2], "...")
+				dots = 0
+				continue
+			}
+		} else {
+			dots = 0
+		}
 
 		if nextToken == "=" {
 			if util.InList(previousToken, "!", "<", ">", ":", "=") {

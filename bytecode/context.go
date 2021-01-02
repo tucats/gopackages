@@ -13,20 +13,21 @@ import (
 // Context holds the runtime information about an instance of bytecode being
 // executed.
 type Context struct {
-	Name      string
-	bc        *ByteCode
-	pc        int
-	stack     []interface{}
-	sp        int
-	running   bool
-	line      int
-	symbols   *sym.SymbolTable
-	Tracing   bool
-	tokenizer *tokenizer.Tokenizer
-	try       []int
-	output    *strings.Builder
-	this      interface{}
-	result    interface{}
+	Name          string
+	bc            *ByteCode
+	pc            int
+	stack         []interface{}
+	sp            int
+	running       bool
+	line          int
+	symbols       *sym.SymbolTable
+	Tracing       bool
+	tokenizer     *tokenizer.Tokenizer
+	try           []int
+	output        *strings.Builder
+	this          interface{}
+	result        interface{}
+	argCountDelta int
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode

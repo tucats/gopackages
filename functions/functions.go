@@ -36,6 +36,7 @@ const Any = 999999
 // to allow the return of both a value and an error as multi-part results, add the
 // ErrReturn:true falg to each function definition.a
 var FunctionDictionary = map[string]FunctionDefinition{
+	"append":               {Min: 2, Max: Any, F: Append},
 	"array":                {Min: 1, Max: 2, F: Array},
 	"bool":                 {Min: 1, Max: 1, F: Bool},
 	"error":                {Min: 1, Max: 1, F: Signal},

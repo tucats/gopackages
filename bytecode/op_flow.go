@@ -134,8 +134,11 @@ func CallOpcode(c *Context, i interface{}) error {
 	var err error
 	var funcPointer interface{}
 
-	// Argument count is in operand
-	argc := i.(int)
+	// Argument count is in operand. It can be offset by a
+	// value held in the context cause during argument processing.
+	// Normally, this value is zero.
+	argc := i.(int) + c.argCountDelta
+	c.argCountDelta = 0
 
 	// Arguments are in reverse order on stack.
 	args := make([]interface{}, argc)

@@ -296,3 +296,17 @@ func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 func Signal(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return NewError("error", util.GetString(args[0]), args[1:]...), nil
 }
+
+// Append implements the builtin append() function, which concatenates all the items
+// together as an array.
+func Append(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	result := []interface{}{}
+	for i, j := range args {
+		if array, ok := j.([]interface{}); ok && i == 0 {
+			result = append(result, array...)
+		} else {
+			result = append(result, j)
+		}
+	}
+	return result, nil
+}

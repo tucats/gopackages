@@ -50,8 +50,8 @@ func (c *Compiler) Function(literal bool) error {
 			if c.t.AtEnd() {
 				break
 			}
-			if c.t.Peek(1) == "." && c.t.Peek(2) == "." && c.t.Peek(3) == "." {
-				c.t.Advance(3)
+			if c.t.Peek(1) == "..." {
+				c.t.Advance(1)
 				varargs = true
 				continue
 			}

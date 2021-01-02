@@ -551,3 +551,25 @@ func ThisOpcode(c *Context, i interface{}) error {
 	}
 	return c.NewError(InvalidThisError)
 }
+
+func FlattenOpcode(c *Context, i interface{}) error {
+	v, err := c.Pop()
+	c.argCountDelta = 0
+	if err == nil {
+		if array, ok := v.([]interface{}); ok {
+			for _, vv := range array {
+				_ = c.Push(vv)
+				c.argCountDelta++
+			}
+		} else {
+			_ = c.Push(v)
+		}
+	}
+	// If we found stuff to expand, reduce the count by one (since
+	// any argument list knows about the pre-flattened array value
+	// in the function call count)
+	if c.argCountDelta > 0 {
+		c.argCountDelta--
+	}
+	return err
+}
