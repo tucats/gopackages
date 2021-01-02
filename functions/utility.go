@@ -298,7 +298,8 @@ func Signal(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 }
 
 // Append implements the builtin append() function, which concatenates all the items
-// together as an array.
+// together as an array. The first argument is flattened into the result, and then each
+// additional argument is added to the array as-is.
 func Append(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	result := []interface{}{}
 	for i, j := range args {
@@ -309,4 +310,25 @@ func Append(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		}
 	}
 	return result, nil
+}
+
+func Delete(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	switch v := args[0].(type) {
+
+	case map[string]interface{}:
+		key := util.GetString(args[1])
+		delete(v, key)
+		return v, nil
+
+	case []interface{}:
+		i := util.GetInt(args[1])
+		if i < 0 || i >= len(v) {
+			return nil, errors.New(InvalidArrayIndexError)
+		}
+		r := append(v[:i], v[i+1:]...)
+		return r, nil
+
+	default:
+		return nil, errors.New(InvalidTypeError)
+	}
 }
