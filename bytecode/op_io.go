@@ -107,6 +107,9 @@ func TemplateOpcode(c *Context, i interface{}) error {
 
 func AuthOpcode(c *Context, i interface{}) error {
 
+	if _, ok := c.Get("_authenticated"); !ok {
+		return c.NewError(NotAServiceError)
+	}
 	kind := util.GetString(i)
 	var user, pass string
 	if v, ok := c.Get("_user"); ok {

@@ -21,6 +21,7 @@ const (
 	InvalidSliceIndexError        = "invalid slice index"
 	InvalidThisError              = "invalid _this_ identifier"
 	InvalidTypeError              = "invalid or unsupported data type for this operation"
+	NotAServiceError              = "not running as a service"
 	NotATypeError                 = "not a type"
 	OpcodeAlreadyDefinedError     = "opcode already defined: %d"
 	ReadOnlyError                 = "invalid write to read-only item"
