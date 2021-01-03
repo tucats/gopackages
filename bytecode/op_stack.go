@@ -23,11 +23,11 @@ func NewStackMarker(label string, count int) StackMarker {
 *                                         *
 \******************************************/
 
-// DropToMarkerOpcode discards items on the stack until it
+// DropToMarkerImpl discards items on the stack until it
 // finds a marker value, at which point it stops. This is
 // used to discard unused return values on the stack. IF there
 // is no marker, this drains the stack.
-func DropToMarkerOpcode(c *Context, i interface{}) error {
+func DropToMarkerImpl(c *Context, i interface{}) error {
 	found := false
 	for !found {
 		v, err := c.Pop()
@@ -39,11 +39,11 @@ func DropToMarkerOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// StackCheckOpcode has an integer argument, and verifies
+// StackCheckImpl has an integer argument, and verifies
 // that there are this many items on the stack, which is
 // used to verify that multiple return-values on the stack
 // are present.
-func StackCheckOpcode(c *Context, i interface{}) error {
+func StackCheckImpl(c *Context, i interface{}) error {
 	count := util.GetInt(i)
 	if c.sp <= count {
 		return c.NewError(IncorrectReturnValueCount)
@@ -57,14 +57,16 @@ func StackCheckOpcode(c *Context, i interface{}) error {
 	return c.NewError(IncorrectReturnValueCount)
 }
 
-// PushOpcode bytecode implementation
-func PushOpcode(c *Context, i interface{}) error {
+// PushImpl instruction processor. This pushes the instruction operand
+// onto the runtime stack.
+func PushImpl(c *Context, i interface{}) error {
 	return c.Push(i)
 }
 
-// DropOpcode implementation
-func DropOpcode(c *Context, i interface{}) error {
-
+// DropImpl instruction processor drops items from the stack and
+// discards them. By default, one item is dropped, but an integer
+// operand can be specified indicating how many items to drop.
+func DropImpl(c *Context, i interface{}) error {
 	count := 1
 	if i != nil {
 		count = util.GetInt(i)
@@ -78,8 +80,8 @@ func DropOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// DupOpcode implementation
-func DupOpcode(c *Context, i interface{}) error {
+// DupImpl instruction processor duplicates the top stack item.
+func DupImpl(c *Context, i interface{}) error {
 	v, err := c.Pop()
 	if err != nil {
 		return err
@@ -89,8 +91,10 @@ func DupOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// SwapOpcode implementation
-func SwapOpcode(c *Context, i interface{}) error {
+// SwapImpl instruction processor exchanges the top two
+// stack items. It is an error if there are not at least
+// two items on the stack.
+func SwapImpl(c *Context, i interface{}) error {
 	v1, err := c.Pop()
 	if err != nil {
 		return err
@@ -104,8 +108,10 @@ func SwapOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// CopyOpcode implementation
-func CopyOpcode(c *Context, i interface{}) error {
+// CopyImpl instruction processor makes a copy of the topmost
+// object. This is different than duplicating, as it creates a
+// entire deep copy of the object.
+func CopyImpl(c *Context, i interface{}) error {
 	v, err := c.Pop()
 	if err != nil {
 		return err

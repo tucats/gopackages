@@ -14,8 +14,12 @@ import (
 *                                         *
 \******************************************/
 
-// NegateOpcode implementation
-func NegateOpcode(c *Context, i interface{}) error {
+// NegateImpl instruction processor pops the top stack
+// item and pushes it's negative. For booleans, this is
+// a "not" operation; for numeric values it is simple
+// negation. For an array, it reverses the order of the
+// array elements
+func NegateImpl(c *Context, i interface{}) error {
 
 	v, err := c.Pop()
 	if err != nil {
@@ -47,8 +51,12 @@ func NegateOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// AddOpcode bytecode implementation
-func AddOpcode(c *Context, i interface{}) error {
+// AddImpl bytecode instruction processor. This removes the top two
+// items and adds them together. For boolean values, this is an OR
+// operation. For numeric values, it is arithmetic addition. For
+// strings or arrays, it concatenates the two items. For a struct,
+// it merges the addend into the first struct.
+func AddImpl(c *Context, i interface{}) error {
 
 	v2, err := c.Pop()
 	if err != nil {
@@ -108,8 +116,8 @@ func AddOpcode(c *Context, i interface{}) error {
 	}
 }
 
-// AndOpcode bytecode implementation
-func AndOpcode(c *Context, i interface{}) error {
+// AndImpl bytecode instruction processor
+func AndImpl(c *Context, i interface{}) error {
 
 	v1, err := c.Pop()
 	if err != nil {
@@ -124,8 +132,8 @@ func AndOpcode(c *Context, i interface{}) error {
 
 }
 
-// OrOpcode bytecode implementation
-func OrOpcode(c *Context, i interface{}) error {
+// OrImpl bytecode instruction processor
+func OrImpl(c *Context, i interface{}) error {
 
 	v1, err := c.Pop()
 	if err != nil {
@@ -140,8 +148,11 @@ func OrOpcode(c *Context, i interface{}) error {
 
 }
 
-// SubOpcode bytecode implementation
-func SubOpcode(c *Context, i interface{}) error {
+// SubtractImpl instruction processor removes two items from the
+// stack and subtracts them. For numeric values, this is arithmetic
+// subtraction. For an array, the item to be subtracted is removed
+// from the array (in any array location it is found)
+func SubtractImpl(c *Context, i interface{}) error {
 	v2, err := c.Pop()
 	if err != nil {
 		return err
@@ -180,8 +191,8 @@ func SubOpcode(c *Context, i interface{}) error {
 	}
 }
 
-// MulOpcode bytecode implementation
-func MulOpcode(c *Context, i interface{}) error {
+// MultiplyImpl bytecode instruction processor
+func MultiplyImpl(c *Context, i interface{}) error {
 
 	v2, err := c.Pop()
 	if err != nil {
@@ -205,8 +216,8 @@ func MulOpcode(c *Context, i interface{}) error {
 	}
 }
 
-// ExpOpcode bytecode implementation
-func ExpOpcode(c *Context, i interface{}) error {
+// ExponentImpl bytecode instruction processor
+func ExponentImpl(c *Context, i interface{}) error {
 
 	v2, err := c.Pop()
 	if err != nil {
@@ -239,8 +250,8 @@ func ExpOpcode(c *Context, i interface{}) error {
 	}
 }
 
-// DivOpcode bytecode implementation
-func DivOpcode(c *Context, i interface{}) error {
+// DivideImpl bytecode instruction processor
+func DivideImpl(c *Context, i interface{}) error {
 
 	if c.sp < 1 {
 		return c.NewError(StackUnderflowError)

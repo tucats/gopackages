@@ -17,11 +17,13 @@ package bytecode
  */
 
 // Constant describing instruction opcodes
-const (
-	Stop   = 0
-	AtLine = iota + BuiltinInstructions
 
-	Add
+type Instruction int
+
+const (
+	Stop   Instruction = 0
+	AtLine             = iota + BuiltinInstructions
+	Add    Instruction = iota
 	And
 	ArgCheck
 	Array
@@ -92,7 +94,7 @@ const (
 	UserBranchInstructions
 )
 
-var opcodeNames = map[int]string{
+var instructionNames = map[Instruction]string{
 	Add:                "Add",
 	And:                "And",
 	ArgCheck:           "ArgCheck",
@@ -160,68 +162,68 @@ var opcodeNames = map[int]string{
 func initializeDispatch() {
 	if dispatch == nil {
 		dispatch = DispatchMap{
-			Add:                AddOpcode,
-			And:                AndOpcode,
-			ArgCheck:           ArgCheckOpcode,
-			Array:              ArrayOpcode,
-			AtLine:             AtLineOpcode,
-			Auth:               AuthOpcode,
-			Branch:             BranchOpcode,
-			BranchFalse:        BranchFalseOpcode,
-			BranchTrue:         BranchTrueOpcode,
-			Call:               CallOpcode,
-			ClassMember:        ClassMemberOpcode,
-			Coerce:             CoerceOpcode,
-			Constant:           ConstantOpcode,
-			Copy:               CopyOpcode,
-			Div:                DivOpcode,
-			Drop:               DropOpcode,
-			DropToMarker:       DropToMarkerOpcode,
-			Dup:                DupOpcode,
-			Equal:              EqualOpcode,
-			Exp:                ExpOpcode,
-			Flatten:            FlattenOpcode,
-			GreaterThan:        GreaterThanOpcode,
-			GreaterThanOrEqual: GreaterThanOrEqualOpcode,
-			LessThan:           LessThanOpcode,
-			LessThanOrEqual:    LessThanOrEqualOpcode,
-			Load:               LoadOpcode,
-			LoadIndex:          LoadIndexOpcode,
-			LoadSlice:          LoadSliceOpcode,
-			LocalCall:          LocalCallOpcode,
-			Log:                LogOpcode,
-			MakeArray:          MakeArrayOpcode,
-			Member:             MemberOpcode,
-			Mul:                MulOpcode,
-			Negate:             NegateOpcode,
-			Newline:            NewlineOpcode,
-			NotEqual:           NotEqualOpcode,
-			Or:                 OrOpcode,
-			Panic:              PanicOpcode,
-			PopScope:           PopScopeOpcode,
-			Print:              PrintOpcode,
-			Push:               PushOpcode,
-			PushScope:          PushScopeOpcode,
-			Response:           ResponseOpcode,
-			Return:             ReturnOpcode,
-			Say:                SayOpcode,
-			StackCheck:         StackCheckOpcode,
-			StaticTyping:       StaticTypingOpcode,
-			Stop:               StopOpcode,
-			Store:              StoreOpcode,
-			StoreAlways:        StoreAlwaysOpcode,
-			StoreGlobal:        StoreGlobalOpcode,
-			StoreIndex:         StoreIndexOpcode,
-			Struct:             StructOpcode,
-			Sub:                SubOpcode,
-			Swap:               SwapOpcode,
-			SymbolCreate:       SymbolCreateOpcode,
-			SymbolDelete:       SymbolDeleteOpcode,
-			SymbolOptCreate:    SymbolOptCreateOpcode,
-			Template:           TemplateOpcode,
-			This:               ThisOpcode,
-			Try:                TryOpcode,
-			TryPop:             TryPopOpcode,
+			Add:                AddImpl,
+			And:                AndImpl,
+			ArgCheck:           ArgCheckImpl,
+			Array:              ArrayImpl,
+			AtLine:             AtLineImpl,
+			Auth:               AuthImpl,
+			Branch:             BranchImpl,
+			BranchFalse:        BranchFalseImpl,
+			BranchTrue:         BranchTrueImpl,
+			Call:               CallImpl,
+			ClassMember:        ClassMemberImpl,
+			Coerce:             CoerceImpl,
+			Constant:           ConstantImpl,
+			Copy:               CopyImpl,
+			Div:                DivideImpl,
+			Drop:               DropImpl,
+			DropToMarker:       DropToMarkerImpl,
+			Dup:                DupImpl,
+			Equal:              EqualImpl,
+			Exp:                ExponentImpl,
+			Flatten:            FlattenImpl,
+			GreaterThan:        GreaterThanImpl,
+			GreaterThanOrEqual: GreaterThanOrEqualImpl,
+			LessThan:           LessThanImpl,
+			LessThanOrEqual:    LessThanOrEqualImpl,
+			Load:               LoadImpl,
+			LoadIndex:          LoadIndexImpl,
+			LoadSlice:          LoadSliceImpl,
+			LocalCall:          LocalCallImpl,
+			Log:                LogImpl,
+			MakeArray:          MakeArrayImpl,
+			Member:             MemberImpl,
+			Mul:                MultiplyImpl,
+			Negate:             NegateImpl,
+			Newline:            NewlineImpl,
+			NotEqual:           NotEqualImpl,
+			Or:                 OrImpl,
+			Panic:              PanicImpl,
+			PopScope:           PopScopeImpl,
+			Print:              PrintImpl,
+			Push:               PushImpl,
+			PushScope:          PushScopeImpl,
+			Response:           ResponseImpl,
+			Return:             ReturnImpl,
+			Say:                SayImpl,
+			StackCheck:         StackCheckImpl,
+			StaticTyping:       StaticTypingImpl,
+			Stop:               StopImpl,
+			Store:              StoreImpl,
+			StoreAlways:        StoreAlwaysImpl,
+			StoreGlobal:        StoreGlobalImpl,
+			StoreIndex:         StoreIndexImpl,
+			Struct:             StructImpl,
+			Sub:                SubtractImpl,
+			Swap:               SwapImpl,
+			SymbolCreate:       SymbolCreateImpl,
+			SymbolDelete:       SymbolDeleteImpl,
+			SymbolOptCreate:    SymbolOptCreateImpl,
+			Template:           TemplateImpl,
+			This:               ThisImpl,
+			Try:                TryImpl,
+			TryPop:             TryPopImpl,
 		}
 	}
 }

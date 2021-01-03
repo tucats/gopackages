@@ -41,8 +41,8 @@ const (
 
 // I contains the information about a single bytecode instruction.
 type I struct {
-	Opcode  int
-	Operand interface{}
+	Operation Instruction
+	Operand   interface{}
 }
 
 // ByteCode contains the context of the execution of a bytecode stream.
@@ -67,11 +67,11 @@ func New(name string) *ByteCode {
 }
 
 // Emit emits a single instruction
-func (b *ByteCode) Emit(opcode int, operand ...interface{}) {
+func (b *ByteCode) Emit(opcode Instruction, operand ...interface{}) {
 	if b.emitPos >= len(b.opcodes) {
 		b.opcodes = append(b.opcodes, make([]I, GrowOpcodesBy)...)
 	}
-	i := I{Opcode: opcode}
+	i := I{Operation: opcode}
 	if len(operand) > 0 {
 		i.Operand = operand[0]
 	}
@@ -103,7 +103,7 @@ func (b *ByteCode) SetAddress(mark int, address int) error {
 	return nil
 }
 
-// Append appends another bytecode to the current bytecode,
+// Append appends another bytecode set to the current bytecode,
 // and updates all the link references.
 func (b *ByteCode) Append(a *ByteCode) {
 
@@ -113,23 +113,23 @@ func (b *ByteCode) Append(a *ByteCode) {
 	}
 
 	for _, i := range a.opcodes[:a.emitPos] {
-		if i.Opcode > BranchInstructions {
+		if i.Operation > BranchInstructions {
 			i.Operand = util.GetInt(i.Operand) + base
 		}
-		b.Emit(i.Opcode, i.Operand)
+		b.Emit(i.Operation, i.Operand)
 	}
 }
 
 // DefineInstruction adds a user-defined instruction to the bytecode
 // set.
-func DefineInstruction(opcode int, name string, implementation OpcodeHandler) error {
+func DefineInstruction(opcode Instruction, name string, implementation OpcodeHandler) error {
 
 	// First, make sure this isn't a duplicate
 	if _, found := dispatch[opcode]; found {
 		return fmt.Errorf(OpcodeAlreadyDefinedError, opcode)
 	}
 
-	opcodeNames[opcode] = name
+	instructionNames[opcode] = name
 	dispatch[opcode] = implementation
 
 	return nil

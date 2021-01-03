@@ -15,8 +15,8 @@ import (
 *                                         *
 \******************************************/
 
-// MakeArrayOpcode implementation
-func MakeArrayOpcode(c *Context, i interface{}) error {
+// MakeArrayImpl instruction processor
+func MakeArrayImpl(c *Context, i interface{}) error {
 
 	parms := util.GetInt(i)
 
@@ -58,8 +58,8 @@ func MakeArrayOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// ArrayOpcode implementation
-func ArrayOpcode(c *Context, i interface{}) error {
+// ArrayImpl instruction processor
+func ArrayImpl(c *Context, i interface{}) error {
 
 	count := util.GetInt(i)
 	array := make([]interface{}, count)
@@ -76,11 +76,11 @@ func ArrayOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// StructOpcode implementation. The operand is a count
+// StructImpl instruction processor. The operand is a count
 // of elements on the stack. These are pulled off in pairs,
 // where the first value is the name of the struct field and
 // the second value is the value of the struct field.
-func StructOpcode(c *Context, i interface{}) error {
+func StructImpl(c *Context, i interface{}) error {
 
 	count := util.GetInt(i)
 
@@ -106,8 +106,8 @@ func StructOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// CoerceOpcode implementation
-func CoerceOpcode(c *Context, i interface{}) error {
+// CoerceImpl instruction processor
+func CoerceImpl(c *Context, i interface{}) error {
 	t := util.GetInt(i)
 	v, err := c.Pop()
 	if err != nil {
@@ -151,8 +151,8 @@ func CoerceOpcode(c *Context, i interface{}) error {
 *                                         *
 \******************************************/
 
-// StoreOpcode implementation
-func StoreOpcode(c *Context, i interface{}) error {
+// StoreImpl instruction processor
+func StoreImpl(c *Context, i interface{}) error {
 
 	v, err := c.Pop()
 	if err != nil {
@@ -185,8 +185,8 @@ func StoreOpcode(c *Context, i interface{}) error {
 	return err
 }
 
-// StoreGlobalOpcode implementation
-func StoreGlobalOpcode(c *Context, i interface{}) error {
+// StoreGlobalImpl instruction processor
+func StoreGlobalImpl(c *Context, i interface{}) error {
 
 	v, err := c.Pop()
 	if err != nil {
@@ -211,8 +211,8 @@ func StoreGlobalOpcode(c *Context, i interface{}) error {
 	return err
 }
 
-// StoreAlwaysOpcode implementation
-func StoreAlwaysOpcode(c *Context, i interface{}) error {
+// StoreAlwaysImpl instruction processor
+func StoreAlwaysImpl(c *Context, i interface{}) error {
 
 	v, err := c.Pop()
 	if err != nil {
@@ -237,8 +237,8 @@ func StoreAlwaysOpcode(c *Context, i interface{}) error {
 	return err
 }
 
-// LoadOpcode implementation
-func LoadOpcode(c *Context, i interface{}) error {
+// LoadImpl instruction processor
+func LoadImpl(c *Context, i interface{}) error {
 
 	name := util.GetString(i)
 	if len(name) == 0 {
@@ -253,11 +253,11 @@ func LoadOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// MemberOpcode implementation. This pops two values from
+// MemberImpl instruction processor. This pops two values from
 // the stack (the first must be a string and the second a
 // map) and indexes into the map to get the matching value
 // and puts back on the stack.
-func MemberOpcode(c *Context, i interface{}) error {
+func MemberImpl(c *Context, i interface{}) error {
 
 	var name string
 	if i != nil {
@@ -300,7 +300,7 @@ func MemberOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// ClassMemberOpcode implementation. This pops two values from
+// ClassMemberImpl instruction processor. This pops two values from
 // the stack (the first must be a string and the second a
 // map) and indexes into the map to get the matching value
 // and puts back on the stack.
@@ -309,7 +309,7 @@ func MemberOpcode(c *Context, i interface{}) error {
 // member in the structure, we also search the __parent field
 // for the value. This supports calling packages based on
 // a given object value.
-func ClassMemberOpcode(c *Context, i interface{}) error {
+func ClassMemberImpl(c *Context, i interface{}) error {
 
 	var name string
 	if i != nil {
@@ -373,8 +373,8 @@ func searchParents(mv map[string]interface{}, name string) (interface{}, bool) {
 	return nil, false
 }
 
-// LoadIndexOpcode implementation
-func LoadIndexOpcode(c *Context, i interface{}) error {
+// LoadIndexImpl instruction processor
+func LoadIndexImpl(c *Context, i interface{}) error {
 
 	index, err := c.Pop()
 	if err != nil {
@@ -420,8 +420,8 @@ func LoadIndexOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// LoadSliceOpcode implementation
-func LoadSliceOpcode(c *Context, i interface{}) error {
+// LoadSliceImpl instruction processor
+func LoadSliceImpl(c *Context, i interface{}) error {
 
 	index2, err := c.Pop()
 	if err != nil {
@@ -460,8 +460,8 @@ func LoadSliceOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// StoreIndexOpcode implementation
-func StoreIndexOpcode(c *Context, i interface{}) error {
+// StoreIndexImpl instruction processor
+func StoreIndexImpl(c *Context, i interface{}) error {
 	storeAlways := util.GetBool(i)
 
 	index, err := c.Pop()
@@ -561,7 +561,7 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 
 // StaticTypeOpcode implements the StaticType opcode, which
 // sets the static typing flag for the current context.
-func StaticTypingOpcode(c *Context, i interface{}) error {
+func StaticTypingImpl(c *Context, i interface{}) error {
 	v, err := c.Pop()
 	if err == nil {
 		c.static = util.GetBool(v)
@@ -569,8 +569,8 @@ func StaticTypingOpcode(c *Context, i interface{}) error {
 	return err
 }
 
-// ThisOpcode implements the This opcode
-func ThisOpcode(c *Context, i interface{}) error {
+// ThisImpl implements the This opcode
+func ThisImpl(c *Context, i interface{}) error {
 	c.this = util.GetString(i)
 	v, err := c.Pop()
 	if err != nil {
@@ -582,7 +582,7 @@ func ThisOpcode(c *Context, i interface{}) error {
 	return c.NewError(InvalidThisError)
 }
 
-func FlattenOpcode(c *Context, i interface{}) error {
+func FlattenImpl(c *Context, i interface{}) error {
 	v, err := c.Pop()
 	c.argCountDelta = 0
 	if err == nil {

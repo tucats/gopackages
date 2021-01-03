@@ -11,22 +11,22 @@ import (
 *                                         *
 \******************************************/
 
-// PushScopeOpcode implementation
-func PushScopeOpcode(c *Context, i interface{}) error {
+// PushScopeImpl instruction processor
+func PushScopeImpl(c *Context, i interface{}) error {
 
 	s := symbols.NewChildSymbolTable("statement block", c.symbols)
 	c.symbols = s
 	return nil
 }
 
-// PopScopeOpcode implementation
-func PopScopeOpcode(c *Context, i interface{}) error {
+// PopScopeImpl instruction processor
+func PopScopeImpl(c *Context, i interface{}) error {
 	c.symbols = c.symbols.Parent
 	return nil
 }
 
-// SymbolCreateOpcode implementation
-func SymbolCreateOpcode(c *Context, i interface{}) error {
+// SymbolCreateImpl instruction processor
+func SymbolCreateImpl(c *Context, i interface{}) error {
 
 	n := util.GetString(i)
 	if c.IsConstant(n) {
@@ -39,8 +39,8 @@ func SymbolCreateOpcode(c *Context, i interface{}) error {
 	return err
 }
 
-// SymbolOptCreateOpcode implementation
-func SymbolOptCreateOpcode(c *Context, i interface{}) error {
+// SymbolOptCreateImpl instruction processor
+func SymbolOptCreateImpl(c *Context, i interface{}) error {
 
 	n := util.GetString(i)
 	if c.IsConstant(n) {
@@ -62,8 +62,8 @@ func SymbolOptCreateOpcode(c *Context, i interface{}) error {
 	return err
 }
 
-// SymbolDeleteOpcode implementation
-func SymbolDeleteOpcode(c *Context, i interface{}) error {
+// SymbolDeleteImpl instruction processor
+func SymbolDeleteImpl(c *Context, i interface{}) error {
 
 	n := util.GetString(i)
 	err := c.Delete(n)
@@ -73,8 +73,8 @@ func SymbolDeleteOpcode(c *Context, i interface{}) error {
 	return err
 }
 
-// ConstantOpcode implementation
-func ConstantOpcode(c *Context, i interface{}) error {
+// ConstantImpl instruction processor
+func ConstantImpl(c *Context, i interface{}) error {
 
 	v, err := c.Pop()
 	if err != nil {

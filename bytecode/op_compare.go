@@ -12,8 +12,8 @@ import (
 *                                         *
 \******************************************/
 
-// EqualOpcode implementation
-func EqualOpcode(c *Context, i interface{}) error {
+// EqualImpl instruction processor
+func EqualImpl(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -63,8 +63,8 @@ func EqualOpcode(c *Context, i interface{}) error {
 
 }
 
-// NotEqualOpcode implementation
-func NotEqualOpcode(c *Context, i interface{}) error {
+// NotEqualImpl instruction processor
+func NotEqualImpl(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -115,8 +115,8 @@ func NotEqualOpcode(c *Context, i interface{}) error {
 
 }
 
-// GreaterThanOpcode implementation
-func GreaterThanOpcode(c *Context, i interface{}) error {
+// GreaterThanImpl instruction processor
+func GreaterThanImpl(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -158,8 +158,8 @@ func GreaterThanOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// GreaterThanOrEqualOpcode implementation
-func GreaterThanOrEqualOpcode(c *Context, i interface{}) error {
+// GreaterThanOrEqualImpl instruction processor
+func GreaterThanOrEqualImpl(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -201,8 +201,8 @@ func GreaterThanOrEqualOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// LessThanOpcode implementation
-func LessThanOpcode(c *Context, i interface{}) error {
+// LessThanImpl instruction processor
+func LessThanImpl(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
@@ -247,8 +247,8 @@ func LessThanOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// LessThanOrEqualOpcode implementation
-func LessThanOrEqualOpcode(c *Context, i interface{}) error {
+// LessThanOrEqualImpl instruction processor
+func LessThanOrEqualImpl(c *Context, i interface{}) error {
 
 	// Terms pushed in reverse order
 	v2, err := c.Pop()

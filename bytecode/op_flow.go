@@ -14,15 +14,16 @@ import (
 *                                         *
 \******************************************/
 
-// StopOpcode bytecode implementation
-func StopOpcode(c *Context, i interface{}) error {
+// StopImpl instruction processor causes the current execution context to
+// stop executing immediately.
+func StopImpl(c *Context, i interface{}) error {
 	c.running = false
 	return nil
 }
 
-// PanicOpcode bytecode implementation. The boolean
-// flag has to indicate if this is a fatal error
-func PanicOpcode(c *Context, i interface{}) error {
+// PanicImpl instruction processor generates an error. The boolean flag is used
+// to indicate if this is a fatal error that stops Ego, versus a user error.
+func PanicImpl(c *Context, i interface{}) error {
 	c.running = !util.GetBool(i)
 	strValue, err := c.Pop()
 	if err != nil {
@@ -32,11 +33,10 @@ func PanicOpcode(c *Context, i interface{}) error {
 	return c.NewError(msg)
 }
 
-// AtLineOpcode implementation. This identifies the
-// start of a new statement, and tags the line number
-// from the source where this was found. This is used
+// AtLineImpl instruction processor. This identifies the start of a new statement,
+// and tags the line number from the source where this was found. This is used
 // in error messaging, primarily.
-func AtLineOpcode(c *Context, i interface{}) error {
+func AtLineImpl(c *Context, i interface{}) error {
 
 	c.line = util.GetInt(i)
 	// If we are tracing, put that out now.
@@ -46,8 +46,10 @@ func AtLineOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// BranchFalseOpcode bytecode implementation
-func BranchFalseOpcode(c *Context, i interface{}) error {
+// BranchFalseImpl instruction processor branches to the instruction named in
+// the operand if the top-of-stack item is a boolean FALSE value. Otherwise,
+// execution continues with the next instruction.
+func BranchFalseImpl(c *Context, i interface{}) error {
 
 	// Get test value
 	v, err := c.Pop()
@@ -67,8 +69,9 @@ func BranchFalseOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// BranchOpcode bytecode implementation
-func BranchOpcode(c *Context, i interface{}) error {
+// BranchImpl instruction processor branches to the instruction named in
+// the operand.
+func BranchImpl(c *Context, i interface{}) error {
 
 	// Get destination
 	address := util.GetInt(i)
@@ -80,8 +83,10 @@ func BranchOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// BranchTrueOpcode bytecode implementation
-func BranchTrueOpcode(c *Context, i interface{}) error {
+// BranchTrueImpl instruction processor branches to the instruction named in
+// the operand if the top-of-stack item is a boolean TRUE value. Otherwise,
+// execution continues with the next instruction.
+func BranchTrueImpl(c *Context, i interface{}) error {
 
 	// Get test value
 	v, err := c.Pop()
@@ -101,7 +106,12 @@ func BranchTrueOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-func LocalCallOpcode(c *Context, i interface{}) error {
+// LocalCallImpl runs a subroutine (a function that has no parameters and
+// no return value) that is compiled into the same bytecode as the current
+// instruction stream. This is used to implement defer statement blocks, for
+// example, so when defers have been generated then a local call is added to
+// the return statement(s) for the block.
+func LocalCallImpl(c *Context, i interface{}) error {
 
 	// Make a new symbol table for the fucntion to run with,
 	// and a new execution context. Store the argument list in
@@ -128,8 +138,13 @@ func LocalCallOpcode(c *Context, i interface{}) error {
 
 }
 
-// CallOpcode bytecode implementation.
-func CallOpcode(c *Context, i interface{}) error {
+// CallImpl instruction processor calls a function (which can have
+// parameters and a return value). The function value must be on the
+// stack, preceded by the function arguments. The operand indicates the
+// number of arguments that are on the stack. The function value must be
+// etiher a pointer to a built-in function, or a pointer to a bytecode
+// function implementation.
+func CallImpl(c *Context, i interface{}) error {
 
 	var err error
 	var funcPointer interface{}
@@ -247,9 +262,9 @@ func CallOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// ReturnOpcode implements the return opcode which returns
-// from a called function.
-func ReturnOpcode(c *Context, i interface{}) error {
+// ReturnImpl implements the return opcode which returns from a called function
+// or local subroutine
+func ReturnImpl(c *Context, i interface{}) error {
 	var err error
 	// Do we have a return value?
 	if b, ok := i.(bool); ok && b {
@@ -260,8 +275,12 @@ func ReturnOpcode(c *Context, i interface{}) error {
 	return err
 }
 
-// ArgCheckOpcode implementation
-func ArgCheckOpcode(c *Context, i interface{}) error {
+// ArgCheckImpl instruction processor verifies that there are enough items
+// on the stack to satisfy the function's argument list. The operand is the
+// number of values that must be available. Alternaitvely, the operand can be
+// an array of objects, which are the minimum count, maximum count, and
+// function name
+func ArgCheckImpl(c *Context, i interface{}) error {
 
 	min := 0
 	max := 0
@@ -326,15 +345,15 @@ func ArgCheckOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// TryOpcode implementation
-func TryOpcode(c *Context, i interface{}) error {
+// TryImpl instruction processor
+func TryImpl(c *Context, i interface{}) error {
 	addr := util.GetInt(i)
 	c.try = append(c.try, addr)
 	return nil
 }
 
-// TryPopOpcode implementation
-func TryPopOpcode(c *Context, i interface{}) error {
+// TryPopImpl instruction processor
+func TryPopImpl(c *Context, i interface{}) error {
 	if len(c.try) == 0 {
 		return c.NewError(TryCatchMismatchError)
 	}

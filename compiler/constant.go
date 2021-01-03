@@ -34,7 +34,7 @@ func (c *Compiler) Constant() error {
 		// constant
 
 		for _, i := range vx.Opcodes() {
-			if i.Opcode == bytecode.Load && !util.InList(util.GetString(i.Operand), c.constants...) {
+			if i.Operation == bytecode.Load && !util.InList(util.GetString(i.Operand), c.constants...) {
 				return c.NewError(InvalidConstantError)
 			}
 		}

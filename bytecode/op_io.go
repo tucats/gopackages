@@ -15,11 +15,9 @@ import (
 *                                         *
 \******************************************/
 
-// PrintOpcode implementation. If the operand
-// is given, it represents the number of items
-// to remove from the stack.
-func PrintOpcode(c *Context, i interface{}) error {
-
+// PrintImpl instruction processor. If the operand is given, it represents the number of items
+// to remove from the stack and print to stdout
+func PrintImpl(c *Context, i interface{}) error {
 	count := 1
 	if i != nil {
 		count = util.GetInt(i)
@@ -47,8 +45,9 @@ func PrintOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-// LogOpcode imeplements the Log option.
-func LogOpcode(c *Context, i interface{}) error {
+// LogImpl imeplements the Log directive, which outputs the top stack
+// item to the logger named in the operand.
+func LogImpl(c *Context, i interface{}) error {
 	logger := util.GetString(i)
 	msg, err := c.Pop()
 	if err == nil {
@@ -57,17 +56,16 @@ func LogOpcode(c *Context, i interface{}) error {
 	return err
 }
 
-// SayOpcode implementation. This can be used in place
-// of NewLine to end buffered output, but the output is
-// only displayed if we are not in --quiet mode.
-func SayOpcode(c *Context, i interface{}) error {
+// SayImpl instruction processor. This can be used in place of NewLine to end
+//buffered output, but the output is only displayed if we are not in --quiet mode.
+func SayImpl(c *Context, i interface{}) error {
 	ui.Say("%s\n", c.output.String())
 	c.output = nil
 	return nil
 }
 
-// NewlineOpcode implementation.
-func NewlineOpcode(c *Context, i interface{}) error {
+// NewlineImpl instruction processor generates a newline character to stdout
+func NewlineImpl(c *Context, i interface{}) error {
 
 	if c.output == nil {
 		fmt.Printf("\n")
@@ -83,11 +81,9 @@ func NewlineOpcode(c *Context, i interface{}) error {
 *                                         *
 \******************************************/
 
-// TemplateOpcode compiles a template string from the
-// stack and stores it in the template manager for the
-// context.
-func TemplateOpcode(c *Context, i interface{}) error {
-
+// TemplateImpl compiles a template string from the stack and stores it in
+// the template manager for the execution context.
+func TemplateImpl(c *Context, i interface{}) error {
 	name := util.GetString(i)
 	t, err := c.Pop()
 	if err == nil {
@@ -105,8 +101,11 @@ func TemplateOpcode(c *Context, i interface{}) error {
 *                                         *
 \******************************************/
 
-func AuthOpcode(c *Context, i interface{}) error {
-
+// AuthImpl validates if the current user is authenticated or not, using the global
+// variable _authenticated whose value was set during REST service initialization.
+// The operand determines what kind of authentication is required; i.e. via token
+// or username or either, and whether the user must be an admin (root) user.
+func AuthImpl(c *Context, i interface{}) error {
 	if _, ok := c.Get("_authenticated"); !ok {
 		return c.NewError(NotAServiceError)
 	}
@@ -179,7 +178,10 @@ func AuthOpcode(c *Context, i interface{}) error {
 	return nil
 }
 
-func ResponseOpcode(c *Context, i interface{}) error {
+// Generate a response body for a REST service. If the current media type is JSON, then the
+// top of stack is formatted as JSON, otherwise it is formatted as text, and written to the
+// response.
+func ResponseImpl(c *Context, i interface{}) error {
 
 	// See if we have a media type specified.
 	isJSON := false

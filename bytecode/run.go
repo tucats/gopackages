@@ -12,7 +12,7 @@ import (
 type OpcodeHandler func(b *Context, i interface{}) error
 
 // DispatchMap is a map that is used to locate the function for an opcode
-type DispatchMap map[int]OpcodeHandler
+type DispatchMap map[Instruction]OpcodeHandler
 
 var dispatch DispatchMap
 var dispatchMux sync.Mutex
@@ -43,7 +43,7 @@ func (c *Context) RunFromAddress(addr int) error {
 
 	// Make sure the opcode array ends in a Stop operation so we can never
 	// shoot off the end of the bytecode.
-	if c.bc.emitPos == 0 || c.bc.opcodes[c.bc.emitPos-1].Opcode != Stop {
+	if c.bc.emitPos == 0 || c.bc.opcodes[c.bc.emitPos-1].Operation != Stop {
 		c.bc.Emit(Stop)
 	}
 
@@ -71,9 +71,9 @@ func (c *Context) RunFromAddress(addr int) error {
 		}
 		c.pc = c.pc + 1
 
-		imp, found := dispatch[i.Opcode]
+		imp, found := dispatch[i.Operation]
 		if !found {
-			return c.NewError(UnimplementedInstructionError, strconv.Itoa(i.Opcode))
+			return c.NewError(UnimplementedInstructionError, strconv.Itoa(int(i.Operation)))
 		}
 		err = imp(c, i.Operand)
 		if err != nil {

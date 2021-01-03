@@ -157,8 +157,8 @@ func patchStore(bc *bytecode.ByteCode, name string) {
 	// a store operation.
 	ops := bc.Opcodes()
 	opsPos := bc.Mark() - 1
-	if opsPos > 0 && ops[opsPos].Opcode == bytecode.LoadIndex {
-		ops[opsPos].Opcode = bytecode.StoreIndex
+	if opsPos > 0 && ops[opsPos].Operation == bytecode.LoadIndex {
+		ops[opsPos].Operation = bytecode.StoreIndex
 	} else {
 		bc.Emit(bytecode.Store, name)
 	}

@@ -77,12 +77,12 @@ func (c *Compiler) For() error {
 		ops := bc.Opcodes()
 		isConstant := true
 		for _, b := range ops {
-			if b.Opcode == bytecode.Load ||
-				b.Opcode == bytecode.LoadIndex ||
-				b.Opcode == bytecode.Call ||
-				b.Opcode == bytecode.LocalCall ||
-				b.Opcode == bytecode.Member ||
-				b.Opcode == bytecode.ClassMember {
+			if b.Operation == bytecode.Load ||
+				b.Operation == bytecode.LoadIndex ||
+				b.Operation == bytecode.Call ||
+				b.Operation == bytecode.LocalCall ||
+				b.Operation == bytecode.Member ||
+				b.Operation == bytecode.ClassMember {
 				isConstant = false
 				break
 			}
@@ -114,7 +114,7 @@ func (c *Compiler) For() error {
 		// Uglier test, but also needs doing. If there was a statement, but
 		// it was a block that did not contain any statments, also empty body.
 		wasBlock := c.b.Opcodes()[len(c.b.Opcodes())-1]
-		if wasBlock.Opcode == bytecode.PopScope && stmts == c.statementCount-1 {
+		if wasBlock.Operation == bytecode.PopScope && stmts == c.statementCount-1 {
 			return c.NewError(LoopBodyError)
 		}
 		// Branch back to start of loop
