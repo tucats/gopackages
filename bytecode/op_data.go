@@ -2,6 +2,7 @@ package bytecode
 
 import (
 	"errors"
+	"reflect"
 
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
@@ -96,8 +97,9 @@ func StructOpcode(c *Context, i interface{}) error {
 		}
 		m[util.GetString(name)] = value
 	}
-	// Only empty structures are allowed dynamic member creation
-	if count > 0 {
+	// If we are in static mode, or this is a non-empty definition,
+	// mark the structure as having static members.
+	if c.static || count > 0 {
 		m["__static"] = true
 	}
 	_ = c.Push(m)
@@ -163,7 +165,10 @@ func StoreOpcode(c *Context, i interface{}) error {
 	if varname == "_" {
 		return nil
 	}
-	err = c.Set(varname, v)
+	err = c.checkType(varname, v)
+	if err == nil {
+		err = c.Set(varname, v)
+	}
 	if err != nil {
 		return c.NewError(err.Error())
 	}
@@ -515,6 +520,14 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 				}
 			}
 		}
+
+		if c.static {
+			if vv, ok := a[subscript]; ok && vv != nil {
+				if reflect.TypeOf(vv) != reflect.TypeOf(v) {
+					return c.NewError(InvalidVarTypeError)
+				}
+			}
+		}
 		a[subscript] = v
 
 		// If we got a true argument, push the result back on the stack also. This
@@ -529,6 +542,13 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 		if subscript < 0 || subscript >= len(a) {
 			return c.NewError(InvalidArrayIndexError, subscript)
 		}
+
+		if c.static {
+			vv := a[subscript]
+			if vv != nil && (reflect.TypeOf(vv) != reflect.TypeOf(v)) {
+				return c.NewError(InvalidVarTypeError)
+			}
+		}
 		a[subscript] = v
 		_ = c.Push(a)
 
@@ -537,6 +557,16 @@ func StoreIndexOpcode(c *Context, i interface{}) error {
 	}
 
 	return nil
+}
+
+// StaticTypeOpcode implements the StaticType opcode, which
+// sets the static typing flag for the current context.
+func StaticTypingOpcode(c *Context, i interface{}) error {
+	v, err := c.Pop()
+	if err == nil {
+		c.static = util.GetBool(v)
+	}
+	return err
 }
 
 // ThisOpcode implements the This opcode

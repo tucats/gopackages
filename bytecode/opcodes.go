@@ -62,6 +62,7 @@ const (
 	Return
 	Say
 	StackCheck
+	StaticTyping
 	Store
 	StoreAlways
 	StoreGlobal
@@ -138,6 +139,7 @@ var opcodeNames = map[int]string{
 	Return:             "Return",
 	Say:                "Say",
 	StackCheck:         "StackCheck",
+	StaticTyping:       "StaticTyping",
 	Stop:               "Stop",
 	Store:              "Store",
 	StoreAlways:        "StoreAlways",
@@ -204,6 +206,7 @@ func initializeDispatch() {
 			Return:             ReturnOpcode,
 			Say:                SayOpcode,
 			StackCheck:         StackCheckOpcode,
+			StaticTyping:       StaticTypingOpcode,
 			Stop:               StopOpcode,
 			Store:              StoreOpcode,
 			StoreAlways:        StoreAlwaysOpcode,

@@ -39,7 +39,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"append":               {Min: 2, Max: Any, F: Append},
 	"array":                {Min: 1, Max: 2, F: Array},
 	"bool":                 {Min: 1, Max: 1, F: Bool},
-	"delete":               {Min: 2, Max: 2, F: Delete},
+	"delete":               {Min: 1, Max: 2, F: Delete},
 	"error":                {Min: 1, Max: 1, F: Signal},
 	"float":                {Min: 1, Max: 1, F: Float},
 	"index":                {Min: 2, Max: 2, F: Index},

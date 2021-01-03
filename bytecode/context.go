@@ -1,6 +1,8 @@
 package bytecode
 
 import (
+	"errors"
+	"reflect"
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/ui"
@@ -19,6 +21,7 @@ type Context struct {
 	stack         []interface{}
 	sp            int
 	running       bool
+	static        bool
 	line          int
 	symbols       *sym.SymbolTable
 	Tracing       bool
@@ -42,6 +45,11 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 	if b != nil {
 		name = b.Name
 	}
+
+	static := false
+	if s, ok := s.Get("_static"); ok {
+		static = util.GetBool(s)
+	}
 	ctx := Context{
 		Name:    name,
 		bc:      b,
@@ -49,6 +57,7 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 		stack:   make([]interface{}, InitialStackSize),
 		sp:      0,
 		running: false,
+		static:  static,
 		line:    0,
 		symbols: s,
 		Tracing: false,
@@ -226,4 +235,21 @@ func (c *Context) GetConfig(name string) interface{} {
 		}
 	}
 	return i
+}
+
+func (c *Context) checkType(name string, value interface{}) error {
+
+	var err error
+	if !c.static {
+		return err
+	}
+	if oldValue, ok := c.Get(name); ok {
+		if oldValue == nil {
+			return err
+		}
+		if reflect.TypeOf(value) != reflect.TypeOf(oldValue) {
+			err = errors.New(InvalidVarTypeError)
+		}
+	}
+	return err
 }

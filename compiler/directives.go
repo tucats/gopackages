@@ -38,6 +38,8 @@ func (c *Compiler) Directive() error {
 		return c.TestPass()
 	case "response":
 		return c.RestResponse()
+	case "static":
+		return c.Static()
 	case "status":
 		return c.RestStatus()
 	case "template":
@@ -368,6 +370,21 @@ func (c *Compiler) Error() error {
 		c.b.Emit(bytecode.Push, GenericError)
 	}
 	c.b.Emit(bytecode.Panic, false) // Does not cause fatal error
+
+	return nil
+}
+
+// Static implements the @static directive
+func (c *Compiler) Static() error {
+	if !c.atStatementEnd() {
+		code, err := c.Expression()
+		if err == nil {
+			c.b.Append(code)
+		}
+	} else {
+		c.b.Emit(bytecode.Push, true)
+	}
+	c.b.Emit(bytecode.StaticTyping)
 
 	return nil
 }
