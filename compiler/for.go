@@ -98,17 +98,25 @@ func (c *Compiler) For() error {
 		c.b.Emit(bytecode.BranchFalse, 0)
 
 		// Compile loop body
-		opcount := bc.Mark()
+		opcount := c.b.Mark()
+		stmts := c.statementCount
+
 		err = c.Statement()
 		if err != nil {
 			return err
 		}
 		// If we didn't emit anything other than
 		// the AtLine then this is an invalid loop
-		if bc.Mark() <= opcount+1 {
+		if c.b.Mark() <= opcount+1 {
 			return c.NewError(LoopBodyError)
 		}
 
+		// Uglier test, but also needs doing. If there was a statement, but
+		// it was a block that did not contain any statments, also empty body.
+		wasBlock := c.b.Opcodes()[len(c.b.Opcodes())-1]
+		if wasBlock.Opcode == bytecode.PopScope && stmts == c.statementCount-1 {
+			return c.NewError(LoopBodyError)
+		}
 		// Branch back to start of loop
 		c.b.Emit(bytecode.Branch, b1)
 		for _, fixAddr := range c.loops.continues {
