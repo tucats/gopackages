@@ -72,7 +72,7 @@ func (c *Compiler) Function(literal bool) error {
 			} else if c.t.Peek(1) == "{" && c.t.Peek(2) == "}" {
 				p.kind = bytecode.ArrayType
 				c.t.Advance(2)
-			} else if util.InList(c.t.Peek(1), "any", "int", "string", "bool", "float", "array", "struct") {
+			} else if util.InList(c.t.Peek(1), "interface{}", "int", "string", "bool", "double", "float", "array", "struct") {
 				switch c.t.Next() {
 				case "int":
 					p.kind = bytecode.IntType
@@ -80,7 +80,7 @@ func (c *Compiler) Function(literal bool) error {
 					p.kind = bytecode.StringType
 				case "bool":
 					p.kind = bytecode.BoolType
-				case "float":
+				case "float", "double":
 					p.kind = bytecode.FloatType
 				case "struct":
 					p.kind = bytecode.StructType
@@ -119,8 +119,9 @@ func (c *Compiler) Function(literal bool) error {
 		b.Emit(bytecode.Load, "_args")
 		b.Emit(bytecode.Push, n)
 		b.Emit(bytecode.LoadIndex)
+
 		if p.kind != bytecode.UndefinedType {
-			b.Emit(bytecode.Coerce, p.kind)
+			b.Emit(bytecode.RequiredType, p.kind)
 		}
 		b.Emit(bytecode.SymbolCreate, p.name)
 		b.Emit(bytecode.Store, p.name)
@@ -148,11 +149,10 @@ func (c *Compiler) Function(literal bool) error {
 				case "error":
 					c.t.Advance(1)
 					coercion.Emit(bytecode.Coerce, bytecode.ErrorType)
-
 				case "int":
 					coercion.Emit(bytecode.Coerce, bytecode.IntType)
 					c.t.Advance(1)
-				case "float":
+				case "float", "double":
 					coercion.Emit(bytecode.Coerce, bytecode.FloatType)
 					c.t.Advance(1)
 				case "string":
@@ -167,10 +167,9 @@ func (c *Compiler) Function(literal bool) error {
 				case "array":
 					coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
 					c.t.Advance(1)
-				case "any":
+				case "interface{}":
 					coercion.Emit(bytecode.Coerce, bytecode.UndefinedType)
 					c.t.Advance(1)
-
 				case "void":
 					// Do nothing, there is no result.
 					wasVoid = true

@@ -40,6 +40,17 @@ func New(src string) *Tokenizer {
 
 		// See if this is one of the special cases where we patch up the previous token
 		nextToken := s.TokenText()
+
+		// Make interface{} a single token
+		if nextToken == "}" && len(t.Tokens) > 3 {
+			tlen := len(t.Tokens)
+			if t.Tokens[tlen-1] == "{" && t.Tokens[tlen-2] == "interface" {
+				t.Tokens = append(t.Tokens[:tlen-2], "interface{}")
+				continue
+			}
+		}
+
+		// Make "..." a single token
 		if nextToken == "." {
 			dots = dots + 1
 			if dots == 3 {

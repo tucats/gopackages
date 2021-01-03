@@ -14,6 +14,7 @@ const (
 	DivisionByZeroError           = "division by zero"
 	IncorrectReturnValueCount     = "incorrect number of return values"
 	InvalidArgCheckError          = "invalid ArgCheck array"
+	InvalidArgTypeError           = "function argument is of wrong type"
 	InvalidArrayIndexError        = "invalid array index"
 	InvalidBytecodeAddress        = "invalid bytecode address"
 	InvalidFunctionCallError      = "invalid function call"

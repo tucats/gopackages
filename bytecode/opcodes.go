@@ -60,6 +60,7 @@ const (
 	Print
 	Push
 	PushScope
+	RequiredType
 	Response
 	Return
 	Say
@@ -137,6 +138,7 @@ var instructionNames = map[Instruction]string{
 	Print:              "Print",
 	Push:               "Push",
 	PushScope:          "PushScope",
+	RequiredType:       "RequiredType",
 	Response:           "Response",
 	Return:             "Return",
 	Say:                "Say",
@@ -204,6 +206,7 @@ func initializeDispatch() {
 			Print:              PrintImpl,
 			Push:               PushImpl,
 			PushScope:          PushScopeImpl,
+			RequiredType:       RequiredTypeImpl,
 			Response:           ResponseImpl,
 			Return:             ReturnImpl,
 			Say:                SayImpl,

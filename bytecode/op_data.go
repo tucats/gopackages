@@ -615,3 +615,75 @@ func FlattenImpl(c *Context, i interface{}) error {
 	}
 	return err
 }
+
+func RequiredTypeImpl(c *Context, i interface{}) error {
+	v, err := c.Pop()
+	if err == nil {
+
+		// If we're doing strict type checking...
+		if c.static {
+			if t, ok := i.(reflect.Type); ok {
+				if t != reflect.TypeOf(v) {
+					err = c.NewError(InvalidArgTypeError)
+				}
+			} else {
+				if t, ok := i.(string); ok {
+					if t != reflect.TypeOf(v).String() {
+						err = c.NewError(InvalidArgTypeError)
+					}
+				} else {
+					if t, ok := i.(int); ok {
+						switch t {
+						case IntType:
+							ok = (reflect.TypeOf(v) == reflect.TypeOf(1))
+						case FloatType:
+							ok = (reflect.TypeOf(v) == reflect.TypeOf(1.0))
+						case BoolType:
+							ok = (reflect.TypeOf(v) == reflect.TypeOf(true))
+						case StringType:
+							ok = (reflect.TypeOf(v) == reflect.TypeOf(""))
+
+						default:
+							ok = true
+						}
+						if !ok {
+							err = c.NewError(InvalidArgTypeError)
+						}
+					}
+				}
+			}
+		} else {
+			t := util.GetInt(i)
+			switch t {
+			case ErrorType:
+				v = errors.New(util.GetString(v))
+			case IntType:
+				v = util.GetInt(v)
+			case FloatType:
+				v = util.GetFloat(v)
+			case StringType:
+				v = util.GetString(v)
+			case BoolType:
+				v = util.GetBool(v)
+			case ArrayType:
+				// If it's  not already an array, wrap it in one.
+				if _, ok := v.([]interface{}); !ok {
+					v = []interface{}{v}
+				}
+			case StructType:
+				// If it's not a struct, we can't do anything so fail
+				if _, ok := v.(map[string]interface{}); !ok {
+					return c.NewError(InvalidTypeError)
+				}
+			case UndefinedType:
+				// No work at all to do here.
+
+			default:
+				return c.NewError(InvalidTypeError)
+			}
+
+		}
+		_ = c.Push(v)
+	}
+	return err
+}
