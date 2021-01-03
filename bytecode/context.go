@@ -240,7 +240,7 @@ func (c *Context) GetConfig(name string) interface{} {
 func (c *Context) checkType(name string, value interface{}) error {
 
 	var err error
-	if !c.static {
+	if !c.static || value == nil {
 		return err
 	}
 	if oldValue, ok := c.Get(name); ok {

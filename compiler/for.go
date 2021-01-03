@@ -150,7 +150,7 @@ func (c *Compiler) For() error {
 		// This is wierd, but the LValue compiler will have inserted a "SymbolCreate" in the
 		// lValue due to the syntax, but we don't really want to create it as it will have already
 		// been generated once. So use it once to create a value, and then remove the store.
-		c.b.Emit(bytecode.Push, 0)
+		c.b.Emit(bytecode.Push, nil)
 		c.b.Append(indexStore)
 		indexStore.Remove(0)
 
@@ -183,6 +183,8 @@ func (c *Compiler) For() error {
 		c.b.Emit(bytecode.BranchTrue, 0)
 
 		// Load element of array
+		c.b.Emit(bytecode.Push, nil)
+		c.b.Append(indexStore)
 		c.b.Append(arrayCode)
 		c.b.Emit(bytecode.Load, indexName)
 		c.b.Emit(bytecode.LoadIndex)
