@@ -43,6 +43,7 @@ var Grammar = []cli.Option{
 	},
 	{
 		LongName:             "delete",
+		Aliases:              []string{"unset"},
 		OptionType:           cli.Subcommand,
 		Description:          "Delete a key from the profile",
 		Action:               DeleteAction,
@@ -50,23 +51,12 @@ var Grammar = []cli.Option{
 		ParameterDescription: "key",
 	},
 	{
-		LongName:    "set",
-		Description: "Set a profile value",
-		Action:      SetAction,
-		OptionType:  cli.Subcommand,
-		Value: []cli.Option{
-			{
-				LongName:    "key",
-				Description: "The key that will be set in the profile. Can be of the form key=value.",
-				OptionType:  cli.StringType,
-				Required:    true,
-			},
-			{
-				LongName:    "value",
-				Description: "The value to set for the key. If missing, the key is deleted",
-				OptionType:  cli.StringType,
-			},
-		},
+		LongName:             "set",
+		Description:          "Set a profile value",
+		Action:               SetAction,
+		OptionType:           cli.Subcommand,
+		ParametersExpected:   1,
+		ParameterDescription: "key=value",
 	},
 }
 
@@ -121,24 +111,15 @@ func SetOutputAction(c *cli.Context) error {
 func SetAction(c *cli.Context) error {
 
 	// Generic --key and --value specification
-	key, _ := c.GetString("key")
-	value, valueFound := c.GetString("value")
+	key := c.GetParameter(0)
+	value := "true"
 
-	if !valueFound {
-		if equals := strings.Index(key, "="); equals >= 0 {
-			value = key[equals+1:]
-			key = key[:equals]
-			valueFound = true
-		}
+	if equals := strings.Index(key, "="); equals >= 0 {
+		value = key[equals+1:]
+		key = key[:equals]
 	}
-
-	if valueFound {
-		persistence.Set(key, value)
-		ui.Say("Profile key %s written", key)
-	} else {
-		persistence.Delete(key)
-		ui.Say("Profile key %s deleted", key)
-	}
+	persistence.Set(key, value)
+	ui.Say("Profile key %s written", key)
 
 	return nil
 }
