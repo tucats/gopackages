@@ -64,11 +64,23 @@ func ArrayImpl(c *Context, i interface{}) error {
 	count := util.GetInt(i)
 	array := make([]interface{}, count)
 
+	var arrayType reflect.Type
 	for n := 0; n < count; n++ {
 		v, err := c.Pop()
 		if err != nil {
 			return err
 		}
+		// If we are in static mode, array must be homogeneous
+		if c.static {
+			if n == 0 {
+				arrayType = reflect.TypeOf(v)
+			} else {
+				if arrayType != reflect.TypeOf(v) {
+					return c.NewError(InvalidTypeError)
+				}
+			}
+		}
+		// All good, load it into the array
 		array[(count-n)-1] = v
 	}
 

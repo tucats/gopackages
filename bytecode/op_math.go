@@ -75,6 +75,18 @@ func AddImpl(c *Context, i interface{}) error {
 		switch vy := v2.(type) {
 		// Array requires a deep concatnation
 		case []interface{}:
+
+			// If we're in static type mode, each member of the
+			// array being added must match the type of the target
+			// array.
+			if c.static {
+				arrayType := reflect.TypeOf(vx[0])
+				for _, vv := range vy {
+					if arrayType != reflect.TypeOf(vv) {
+						return c.NewError(InvalidTypeError)
+					}
+				}
+			}
 			newArray := append(vx, vy...)
 			return c.Push(newArray)
 
