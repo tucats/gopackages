@@ -107,7 +107,7 @@ func (c *Compiler) compileType() error {
 			switch c.t.Next() {
 			case "int":
 				c.b.Emit(bytecode.Push, 0)
-			case "float":
+			case "float", "double":
 				c.b.Emit(bytecode.Push, 0.0)
 			case "bool":
 				c.b.Emit(bytecode.Push, false)

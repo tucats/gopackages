@@ -253,7 +253,7 @@ func FormatSymbols(syms *symbols.SymbolTable, args []interface{}) (interface{}, 
 	return syms.Format(false), nil
 }
 
-// Type implements the util.type() function
+// Type implements the type() function
 func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	switch v := args[0].(type) {
@@ -261,7 +261,7 @@ func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		return "error", nil
 	case int:
 		return "int", nil
-	case float64:
+	case float64, float32:
 		return "float", nil
 	case string:
 		return "string", nil

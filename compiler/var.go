@@ -46,7 +46,7 @@ func (c *Compiler) Var() error {
 			switch typename {
 			case "int":
 				c.b.Emit(bytecode.Push, int(0))
-			case "float":
+			case "float", "double":
 				c.b.Emit(bytecode.Push, 0.0)
 			case "string":
 				c.b.Emit(bytecode.Push, "")
