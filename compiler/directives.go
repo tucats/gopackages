@@ -105,7 +105,7 @@ func (c *Compiler) RestStatus() error {
 	if c.t.AtEnd() {
 		return c.NewError(InvalidSymbolError)
 	}
-	_ = c.modeCheck("server")
+	_ = c.modeCheck("server", true)
 
 	name := "_rest_status"
 	if c.t.AtEnd() {
@@ -123,7 +123,7 @@ func (c *Compiler) RestStatus() error {
 
 func (c *Compiler) Authenticated() error {
 
-	_ = c.modeCheck("server")
+	_ = c.modeCheck("server", true)
 
 	var token string
 	if c.t.AtEnd() {
@@ -143,7 +143,7 @@ func (c *Compiler) RestResponse() error {
 	if c.t.AtEnd() {
 		return c.NewError(InvalidSymbolError)
 	}
-	_ = c.modeCheck("server")
+	_ = c.modeCheck("server", true)
 
 	bc, err := c.Expression()
 	if err != nil {
@@ -180,7 +180,7 @@ func (c *Compiler) Template() error {
 // Test compiles the @test directive
 func (c *Compiler) Test() error {
 
-	_ = c.modeCheck("test")
+	_ = c.modeCheck("test", true)
 
 	s := c.t.Next()
 	if s[:1] == "\"" {
@@ -328,7 +328,7 @@ func (c *Compiler) Assert() error {
 
 // Fail implements the @fail directive
 func (c *Compiler) Fail() error {
-	_ = c.modeCheck("test")
+	_ = c.modeCheck("test", true)
 
 	next := c.t.Peek(1)
 	if next != "@" && next != ";" && next != tokenizer.EndOfTokens {
@@ -346,7 +346,7 @@ func (c *Compiler) Fail() error {
 
 // TestPass implements the @pass directive
 func (c *Compiler) TestPass() error {
-	_ = c.modeCheck("test")
+	_ = c.modeCheck("test", true)
 
 	c.b.Emit(bytecode.Push, "PASS: ")
 	c.b.Emit(bytecode.Print)
@@ -384,9 +384,10 @@ func (c *Compiler) Static() error {
 	} else {
 		c.b.Emit(bytecode.Push, true)
 	}
+	err := c.modeCheck("interactive", false)
 	c.b.Emit(bytecode.StaticTyping)
 
-	return nil
+	return err
 }
 
 // atStatementEnd checks the next token in the stream to see if it indicates
@@ -400,14 +401,20 @@ func (c *Compiler) atStatementEnd() bool {
 }
 
 // modeCheck emits the code to verify that we are running
-// in the given mode.
-func (c *Compiler) modeCheck(mode string) error {
+// in the given mode. If check is true, we require that we
+// are in the given mode. If check is false, we require that
+// we are not in the given mode.
+func (c *Compiler) modeCheck(mode string, check bool) error {
 
 	c.b.Emit(bytecode.Load, "_mode")
 	c.b.Emit(bytecode.Push, mode)
 	c.b.Emit(bytecode.Equal)
 	branch := c.b.Mark()
-	c.b.Emit(bytecode.BranchTrue, 0)
+	if check {
+		c.b.Emit(bytecode.BranchTrue, 0)
+	} else {
+		c.b.Emit(bytecode.BranchFalse, 0)
+	}
 	c.b.Emit(bytecode.Push, WrongModeError)
 	c.b.Emit(bytecode.Push, ": ")
 	c.b.Emit(bytecode.Load, "_mode")
