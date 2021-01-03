@@ -12,8 +12,10 @@ import (
 )
 
 const (
-	indexLoopType = 1
-	rangeLoopType = 2
+	indexLoopType       = 1
+	rangeLoopType       = 2
+	forLoopType         = 3
+	conditionalLoopType = 4
 )
 
 // RequiredPackages is the list of packages that are always imported, regardless

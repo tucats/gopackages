@@ -20,6 +20,41 @@ func (c *Compiler) For() error {
 
 	c.b.Emit(bytecode.PushScope)
 
+	// Is this a for{} with no conditional or iterator?
+
+	// if not an lvalue, assume conditional mode
+	if c.t.Peek(1) == "{" {
+
+		// Make a new scope and emit the test expression.
+		c.PushLoop(forLoopType)
+
+		// Remember top of loop and generate test
+		b1 := c.b.Mark()
+
+		// Compile loop body
+		err := c.Statement()
+		if err != nil {
+			return err
+		}
+
+		// Branch back to start of loop
+		c.b.Emit(bytecode.Branch, b1)
+		for _, fixAddr := range c.loops.continues {
+			_ = c.b.SetAddress(fixAddr, b1)
+		}
+
+		// Update any breaks. If there are no breaks,
+		// this is an illegal loop construct
+		if len(c.loops.breaks) == 0 {
+			return c.NewError(LoopExitError)
+		}
+		for _, fixAddr := range c.loops.breaks {
+			_ = c.b.SetAddressHere(fixAddr)
+		}
+		c.PopLoop()
+		return err
+	}
+
 	// Is this the two-value range thing?
 	indexName := ""
 	if tokenizer.IsSymbol(c.t.Peek(1)) && (c.t.Peek(2) == ",") {
@@ -36,8 +71,25 @@ func (c *Compiler) For() error {
 			return c.NewError(MissingForLoopInitializerError)
 		}
 
+		// Make a point of seeing if this is a constant value, which
+		// will require a break statement. We check to see if the test
+		// loads any symbols or calls any functions.
+		ops := bc.Opcodes()
+		isConstant := true
+		for _, b := range ops {
+			if b.Opcode == bytecode.Load ||
+				b.Opcode == bytecode.LoadIndex ||
+				b.Opcode == bytecode.Call ||
+				b.Opcode == bytecode.LocalCall ||
+				b.Opcode == bytecode.Member ||
+				b.Opcode == bytecode.ClassMember {
+				isConstant = false
+				break
+			}
+		}
+
 		// Make a new scope and emit the test expression.
-		c.PushLoop(rangeLoopType)
+		c.PushLoop(conditionalLoopType)
 
 		// Remember top of loop and generate test
 		b1 := c.b.Mark()
@@ -46,9 +98,15 @@ func (c *Compiler) For() error {
 		c.b.Emit(bytecode.BranchFalse, 0)
 
 		// Compile loop body
+		opcount := bc.Mark()
 		err = c.Statement()
 		if err != nil {
 			return err
+		}
+		// If we didn't emit anything other than
+		// the AtLine then this is an invalid loop
+		if bc.Mark() <= opcount+1 {
+			return c.NewError(LoopBodyError)
 		}
 
 		// Branch back to start of loop
@@ -59,6 +117,9 @@ func (c *Compiler) For() error {
 
 		// Update the loop exit instruction, and any breaks
 		_ = c.b.SetAddressHere(b2)
+		if isConstant && len(c.loops.breaks) == 0 {
+			return c.NewError(LoopExitError)
+		}
 		for _, fixAddr := range c.loops.breaks {
 			_ = c.b.SetAddressHere(fixAddr)
 		}

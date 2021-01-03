@@ -36,6 +36,8 @@ const (
 	InvalidReturnValueError        = "invalid return value for void function"
 	InvalidSymbolError             = "invalid symbol name"
 	InvalidTypeNameError           = "invalid type name"
+	LoopBodyError                  = "for{} body empty"
+	LoopExitError                  = "for{} has no exit"
 	MissingAssignmentError         = "missing '=' or ':='"
 	MissingBracketError            = "missing array bracket"
 	MissingBlockError              = "missing '{'"
