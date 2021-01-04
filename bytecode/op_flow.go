@@ -2,6 +2,9 @@ package bytecode
 
 import (
 	"fmt"
+	"reflect"
+	"runtime"
+	"strings"
 
 	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
@@ -176,11 +179,23 @@ func CallImpl(c *Context, i interface{}) error {
 	switch af := funcPointer.(type) {
 	case *ByteCode:
 
+		// Find the top of this scope level (typically)
+		parentTable := c.symbols
+		if !c.fullSymbolScope {
+			for !parentTable.ScopeBoundary && parentTable.Parent != nil {
+				parentTable = parentTable.Parent
+			}
+		}
+
+		funcSymbols := symbols.NewChildSymbolTable("Function", parentTable)
+		funcSymbols.ScopeBoundary = true
+
 		// Make a new symbol table for the fucntion to run with,
-		// and a new execution context. Store the argument list in
-		// the child table.
-		sf := symbols.NewChildSymbolTable("Function", c.symbols)
+		// and a new execution context. Note that this table has no
+		// visibility into the current scope of symbol values.
+		sf := symbols.NewChildSymbolTable("Function", parentTable)
 		cx := NewContext(sf, af)
+		cx.fullSymbolScope = c.fullSymbolScope
 		cx.Tracing = c.Tracing
 		cx.SetTokenizer(c.GetTokenizer())
 		cx.result = nil
@@ -210,18 +225,35 @@ func CallImpl(c *Context, i interface{}) error {
 
 		// First, can we check the argument count on behalf of the caller?
 		df := functions.FindFunction(af)
+		fname := runtime.FuncForPC(reflect.ValueOf(af).Pointer()).Name()
+		fname = strings.Replace(fname, "github.com/tucats/gopackages/", "", 1)
+
+		isUtilSymbols := (fname == "functions.FormatSymbols")
+
 		if df != nil {
 			if len(args) < df.Min || len(args) > df.Max {
 				name := functions.FindName(af)
 				return functions.NewError(name, ArgumentCountError)
 			}
 		}
-		if c.this != nil {
-			_ = c.symbols.SetAlways("_this", c.this)
-			c.this = nil
+
+		// Note special exclusion for the case of the util.Symbols function which must be
+		// able to see the entire tree...
+		parentTable := c.symbols
+		if !isUtilSymbols && !c.fullSymbolScope {
+			for !parentTable.ScopeBoundary && parentTable.Parent != nil {
+				parentTable = parentTable.Parent
+			}
 		}
 
-		result, err = af(c.symbols, args)
+		funcSymbols := symbols.NewChildSymbolTable(fname, parentTable)
+		funcSymbols.ScopeBoundary = true
+
+		if c.this != nil {
+			_ = funcSymbols.SetAlways("_this", c.this)
+			c.this = nil
+		}
+		result, err = af(funcSymbols, args)
 
 		if r, ok := result.(functions.MultiValueReturn); ok {
 			_ = c.Push(StackMarker{Desc: "multivalue result"})

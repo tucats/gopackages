@@ -15,22 +15,23 @@ import (
 // Context holds the runtime information about an instance of bytecode being
 // executed.
 type Context struct {
-	Name          string
-	bc            *ByteCode
-	pc            int
-	stack         []interface{}
-	sp            int
-	running       bool
-	Static        bool
-	line          int
-	symbols       *sym.SymbolTable
-	Tracing       bool
-	tokenizer     *tokenizer.Tokenizer
-	try           []int
-	output        *strings.Builder
-	this          interface{}
-	result        interface{}
-	argCountDelta int
+	Name            string
+	bc              *ByteCode
+	pc              int
+	stack           []interface{}
+	sp              int
+	running         bool
+	Static          bool
+	line            int
+	fullSymbolScope bool
+	symbols         *sym.SymbolTable
+	Tracing         bool
+	tokenizer       *tokenizer.Tokenizer
+	try             []int
+	output          *strings.Builder
+	this            interface{}
+	result          interface{}
+	argCountDelta   int
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode
@@ -51,18 +52,19 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 		static = util.GetBool(s)
 	}
 	ctx := Context{
-		Name:    name,
-		bc:      b,
-		pc:      0,
-		stack:   make([]interface{}, InitialStackSize),
-		sp:      0,
-		running: false,
-		Static:  static,
-		line:    0,
-		symbols: s,
-		Tracing: false,
-		this:    "",
-		try:     make([]int, 0),
+		Name:            name,
+		bc:              b,
+		pc:              0,
+		stack:           make([]interface{}, InitialStackSize),
+		sp:              0,
+		running:         false,
+		Static:          static,
+		line:            0,
+		symbols:         s,
+		fullSymbolScope: true,
+		Tracing:         false,
+		this:            "",
+		try:             make([]int, 0),
 	}
 	ctxp := &ctx
 	ctxp.SetByteCode(b)
@@ -80,6 +82,10 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 	}
 
 	return ctxp
+}
+
+func (c *Context) SetFullSymbolScope(b bool) {
+	c.fullSymbolScope = b
 }
 
 func (c *Context) SetGlobal(name string, value interface{}) error {

@@ -6,16 +6,18 @@ import (
 
 // SymbolTable contains an abstract symbol table
 type SymbolTable struct {
-	Name      string
-	Parent    *SymbolTable
-	Symbols   map[string]interface{}
-	Constants map[string]interface{}
+	Name          string
+	Parent        *SymbolTable
+	Symbols       map[string]interface{}
+	Constants     map[string]interface{}
+	ScopeBoundary bool
 }
 
 // RootSymbolTable is the parent of all other tables.
 var RootSymbolTable = SymbolTable{
-	Name:   "Root Symbol Table",
-	Parent: nil,
+	Name:          "Root Symbol Table",
+	Parent:        nil,
+	ScopeBoundary: true,
 	Symbols: map[string]interface{}{
 		"_author":    "Tom Cole",
 		"_copyright": "(c) Copyright 2020",
