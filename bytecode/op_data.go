@@ -635,13 +635,13 @@ func RequiredTypeImpl(c *Context, i interface{}) error {
 					if t, ok := i.(int); ok {
 						switch t {
 						case IntType:
-							ok = (reflect.TypeOf(v) == reflect.TypeOf(1))
+							_, ok = v.(int)
 						case FloatType:
-							ok = (reflect.TypeOf(v) == reflect.TypeOf(1.0))
+							_, ok = v.(float64)
 						case BoolType:
-							ok = (reflect.TypeOf(v) == reflect.TypeOf(true))
+							_, ok = v.(bool)
 						case StringType:
-							ok = (reflect.TypeOf(v) == reflect.TypeOf(""))
+							_, ok = v.(string)
 
 						default:
 							ok = true
