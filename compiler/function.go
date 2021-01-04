@@ -8,14 +8,15 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
-// Function compiles a function definition. If the literal flag is
-// set, this generates a function and puts the pointer to it on the
-// stack. IF not set, the function is added to the global or local
-// function dictionary.
+// Function compiles a function definition. The literal flag indicates if
+// this is a function literal, which is pushed on the stack, or a non-literal
+// which is added to the symbol table dictionary.
 func (c *Compiler) Function(literal bool) error {
 
+	// List of type coercions that will be needed for any RETURN statement.
 	coercions := []*bytecode.ByteCode{}
 
+	// Descriptor of each parameter in the parameter list.
 	type parameter struct {
 		name string
 		kind int
@@ -24,6 +25,8 @@ func (c *Compiler) Function(literal bool) error {
 	this := ""
 	fname := ""
 
+	// If it's not a literal, there will be a function name, which must be a valid
+	// symbol name. It might also be an object-oriented (a->b()) call.
 	if !literal {
 		fname = c.t.Next()
 		if !tokenizer.IsSymbol(fname) {
@@ -43,7 +46,7 @@ func (c *Compiler) Function(literal bool) error {
 		}
 	}
 
-	// Process parameter names
+	// Process the function parameter specification
 	varargs := false
 	if c.t.IsNext("(") {
 		for !c.t.IsNext(")") {
@@ -114,24 +117,29 @@ func (c *Compiler) Function(literal bool) error {
 		b.Emit(bytecode.This, this)
 	}
 
-	// Generate the parameter assignments. These are extracted
-	// from the automatic array named _args which is generated
-	// as part of the function call during bytecode execution.
+	// Generate the parameter assignments. These are extracted from the automatic
+	// array named _args which is generated as part of the bytecode function call.
 	for n, p := range parameters {
 
-		// is this the end of the fixed list?
+		// is this the end of the fixed list? If so, emit the instruction that scoops
+		// up the remaining arguments and stores them as an array value.
+		//
+		// Otherwise, generate code to extract the argument value by index number.
 		if p.kind == bytecode.VarArgs {
 			b.Emit(bytecode.GetVarArgs, n)
 		} else {
-
 			b.Emit(bytecode.Load, "_args")
 			b.Emit(bytecode.Push, n)
 			b.Emit(bytecode.LoadIndex)
 		}
 
+		// If this argumnet is not interface{} or a variable argument item,
+		// generaet code to validate/coerce the value to a given type.
 		if p.kind != bytecode.UndefinedType && p.kind != bytecode.VarArgs {
 			b.Emit(bytecode.RequiredType, p.kind)
 		}
+		// Generate code to store the value on top of the stack into the local
+		// symbol for the parameter name.
 		b.Emit(bytecode.SymbolCreate, p.name)
 		b.Emit(bytecode.Store, p.name)
 	}
@@ -140,6 +148,7 @@ func (c *Compiler) Function(literal bool) error {
 	hasReturnList := c.t.IsNext("(")
 	returnValueCount := 0
 	wasVoid := false
+
 	// Loop over the (possibly singular) return type specification
 	for {
 		coercion := bytecode.New(fmt.Sprintf("%s return item %d", fname, returnValueCount))
@@ -209,7 +218,9 @@ func (c *Compiler) Function(literal bool) error {
 	}
 
 	// Now compile a statement or block into the function body. We'll use the
-	// current token stream in progress, and the current bytecode.
+	// current token stream in progress, and the current bytecode. But otherwise we
+	// use a new compiler context, so any nested operations do not affect the definition
+	// of the function body we're compiling.
 	cx := New()
 	cx.t = c.t
 	cx.b = b
@@ -219,6 +230,9 @@ func (c *Compiler) Function(literal bool) error {
 		return err
 	}
 
+	// If it was a literal, push the body of the function (really, a bytecode expression
+	// of the function code) on the stack. Otherwise, let's store it in the symbol table
+	// or package dictionary as appropraite.
 	if literal {
 		c.b.Emit(bytecode.Push, b)
 	} else {
