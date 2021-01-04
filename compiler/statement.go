@@ -79,7 +79,6 @@ func (c *Compiler) Statement() error {
 		if c.extensionsEnabled {
 			return c.Call()
 		}
-		return c.NewError(UnrecognizedStatementError, c.t.Peek(0))
 	case "const":
 		return c.Constant()
 	case "continue":
@@ -87,7 +86,9 @@ func (c *Compiler) Statement() error {
 	case "defer":
 		return c.Defer()
 	case "exit":
-		return c.Exit()
+		if c.exitEnabled {
+			return c.Exit()
+		}
 	case "for":
 		return c.For()
 	case "if":
@@ -100,8 +101,6 @@ func (c *Compiler) Statement() error {
 		if c.extensionsEnabled {
 			return c.Print()
 		}
-		return c.NewError(UnrecognizedStatementError, c.t.Peek(0))
-
 	case "return":
 		return c.Return()
 	case "switch":
@@ -110,7 +109,6 @@ func (c *Compiler) Statement() error {
 		if c.extensionsEnabled {
 			return c.Try()
 		}
-		return c.NewError(UnrecognizedStatementError, c.t.Peek(0))
 	case "type":
 		return c.Type()
 	case "var":

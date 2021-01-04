@@ -57,6 +57,7 @@ type Compiler struct {
 	statementCount       int
 	LowercaseIdentifiers bool
 	extensionsEnabled    bool
+	exitEnabled          bool // Only true in interactive mode
 }
 
 // New creates a new compiler instance
@@ -74,8 +75,14 @@ func New() *Compiler {
 	return &cInstance
 }
 
-// If set to true, the compiler allows the PRINT statement
-func (c *Compiler) PrintEnabled(b bool) *Compiler {
+// If set to true, the compiler allows the EXIT statement
+func (c *Compiler) ExitEnabled(b bool) *Compiler {
+	c.exitEnabled = b
+	return c
+}
+
+// If set to true, the compiler allows the PRINT, TRY/CATCH, etc. statements
+func (c *Compiler) ExtensionsEnabled(b bool) *Compiler {
 	c.extensionsEnabled = b
 	return c
 }
