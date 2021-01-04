@@ -8,7 +8,7 @@ import (
 	"github.com/tucats/gopackages/tokenizer"
 )
 
-// For compiles the loop statement. This has two syntax types that
+// For compiles the loop statement. This has four syntax types that
 // can be specified.
 // 1. There are three clauses which are separated by ";", followed
 //    by a statement or block that is run as described by the loop
@@ -16,19 +16,27 @@ import (
 //
 // 2. There can be a range operation which creates an implied loop
 //    using each member of the array or struct.
+//
+// 3. There can be a simple conditional expression. The loop runs
+//    until the condition expression is false. The condition is
+//    tested at the start of every loop, so a condition that is
+//    initially false never runs the loop
+//
+// 4. A for{} with no condition, loop, or range expression. This
+//    form _requires_ that there be at least one break statement
+//    inside the loop, which algorithmically stops the loop
 func (c *Compiler) For() error {
 
 	c.b.Emit(bytecode.PushScope)
 
 	// Is this a for{} with no conditional or iterator?
-
-	// if not an lvalue, assume conditional mode
 	if c.t.Peek(1) == "{" {
 
 		// Make a new scope and emit the test expression.
 		c.PushLoop(forLoopType)
 
-		// Remember top of loop and generate test
+		// Remember top of loop. Three is no looping or condition code associated
+		// with the top of the loop.
 		b1 := c.b.Mark()
 
 		// Compile loop body
@@ -43,8 +51,7 @@ func (c *Compiler) For() error {
 			_ = c.b.SetAddress(fixAddr, b1)
 		}
 
-		// Update any breaks. If there are no breaks,
-		// this is an illegal loop construct
+		// Update any break statements. If there are no breaks, this is an illegal loop construct
 		if len(c.loops.breaks) == 0 {
 			return c.NewError(LoopExitError)
 		}
@@ -131,6 +138,7 @@ func (c *Compiler) For() error {
 		for _, fixAddr := range c.loops.breaks {
 			_ = c.b.SetAddressHere(fixAddr)
 		}
+		c.b.Emit(bytecode.PopScope)
 		c.PopLoop()
 
 		return nil
@@ -261,7 +269,6 @@ func (c *Compiler) For() error {
 	if !c.t.IsNext("=") {
 		return errors.New(MissingEqualError)
 	}
-
 	incrementCode, err := c.Expression()
 	if err != nil {
 		return err
@@ -300,7 +307,10 @@ func (c *Compiler) For() error {
 	return nil
 }
 
-// Break compiles a break statement
+// Break compiles a break statement. This is a branch, and the
+// destination is fixed up when the loop compilation finishes.
+// As such, the address of the fixup is added to the breaks list
+// in the compiler context.
 func (c *Compiler) Break() error {
 	if c.loops == nil {
 		return c.NewError(InvalidLoopControlError)
@@ -311,7 +321,10 @@ func (c *Compiler) Break() error {
 	return nil
 }
 
-// Continue compiles a continue statement
+// Continue compiles a continue statement. This is a branch, and the
+// destination is fixed up when the loop compilation finishes.
+// As such, the address of the fixup is added to the continues list
+// in the compiler context.
 func (c *Compiler) Continue() error {
 	if c.loops == nil {
 		return c.NewError(InvalidLoopControlError)
@@ -322,8 +335,11 @@ func (c *Compiler) Continue() error {
 	return nil
 }
 
-// PushLoop creates a new loop context and adds it to the
-// top of the loop stack.
+// PushLoop creates a new loop context and adds it to the top of the
+// loop stack. This stack retains information about the loop type and
+// the accumulation of breaks and continues that are specfied within
+// this loop body.  A break or continue _only_ applies to the loop scope
+// in which it occurs.
 func (c *Compiler) PushLoop(loopType int) {
 
 	loop := Loop{
@@ -335,7 +351,7 @@ func (c *Compiler) PushLoop(loopType int) {
 	c.loops = &loop
 }
 
-// PopLoop discards the top-most loop on the loop stack.
+// PopLoop discards the top-most loop context on the loop stack.
 func (c *Compiler) PopLoop() {
 	if c.loops != nil {
 		c.loops = c.loops.Parent
