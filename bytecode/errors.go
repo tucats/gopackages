@@ -33,6 +33,7 @@ const (
 	UnknownIdentifierError        = "unknown identifier"
 	UnknownMemberError            = "unknown structure member"
 	UnknownPackageMemberError     = "unknown package member"
+	VarArgError                   = "invalid variable-argument operation"
 )
 
 // Error contains an error generated from the execution context

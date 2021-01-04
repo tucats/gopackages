@@ -40,6 +40,7 @@ const (
 	Equal
 	Exp
 	Flatten
+	GetVarArgs
 	GreaterThan
 	GreaterThanOrEqual
 	LessThan
@@ -117,6 +118,7 @@ var instructionNames = map[Instruction]string{
 	Equal:              "Equal",
 	Exp:                "Exp",
 	Flatten:            "Flatten",
+	GetVarArgs:         "GetVarArgs",
 	GreaterThan:        "GreaterThan",
 	GreaterThanOrEqual: "GreaterThanOrEqual",
 	LessThan:           "LessThan",
@@ -185,6 +187,7 @@ func initializeDispatch() {
 			Equal:              EqualImpl,
 			Exp:                ExponentImpl,
 			Flatten:            FlattenImpl,
+			GetVarArgs:         GetVarArgsImpl,
 			GreaterThan:        GreaterThanImpl,
 			GreaterThanOrEqual: GreaterThanOrEqualImpl,
 			LessThan:           LessThanImpl,

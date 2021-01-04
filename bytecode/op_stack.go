@@ -126,3 +126,21 @@ func CopyImpl(c *Context, i interface{}) error {
 	_ = c.Push(2)
 	return err
 }
+
+func GetVarArgsImpl(c *Context, i interface{}) error {
+	err := c.NewError(VarArgError)
+	argPos := util.GetInt(i)
+
+	if arrayV, ok := c.Get("_args"); ok {
+		if args, ok := arrayV.([]interface{}); ok {
+			// If no more args in the list to satisfy, push empty array
+			if len(args) < argPos {
+				r := make([]interface{}, 0)
+				return c.Push(r)
+			} else {
+				return c.Push(args[argPos:])
+			}
+		}
+	}
+	return err
+}

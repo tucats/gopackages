@@ -50,17 +50,16 @@ func (c *Compiler) Function(literal bool) error {
 			if c.t.AtEnd() {
 				break
 			}
-			if c.t.Peek(1) == "..." {
-				c.t.Advance(1)
-				varargs = true
-				continue
-			}
 			name := c.t.Next()
 			p := parameter{kind: bytecode.UndefinedType}
 			if tokenizer.IsSymbol(name) {
 				p.name = name
 			} else {
 				return c.NewError(InvalidFunctionArgument)
+			}
+			if c.t.Peek(1) == "..." {
+				c.t.Advance(1)
+				varargs = true
 			}
 
 			// Is there a type name that follows it? We have to check for "[]" and "{}"
@@ -88,7 +87,9 @@ func (c *Compiler) Function(literal bool) error {
 					p.kind = bytecode.ArrayType
 				}
 			}
-
+			if varargs {
+				p.kind = bytecode.VarArgs
+			}
 			parameters = append(parameters, p)
 			_ = c.t.IsNext(",")
 		}
@@ -103,6 +104,7 @@ func (c *Compiler) Function(literal bool) error {
 		fname,
 	}
 	if varargs {
+		p[0] = len(parameters)
 		p[1] = -1
 	}
 	b.Emit(bytecode.ArgCheck, p)
@@ -116,11 +118,18 @@ func (c *Compiler) Function(literal bool) error {
 	// from the automatic array named _args which is generated
 	// as part of the function call during bytecode execution.
 	for n, p := range parameters {
-		b.Emit(bytecode.Load, "_args")
-		b.Emit(bytecode.Push, n)
-		b.Emit(bytecode.LoadIndex)
 
-		if p.kind != bytecode.UndefinedType {
+		// is this the end of the fixed list?
+		if p.kind == bytecode.VarArgs {
+			b.Emit(bytecode.GetVarArgs, n)
+		} else {
+
+			b.Emit(bytecode.Load, "_args")
+			b.Emit(bytecode.Push, n)
+			b.Emit(bytecode.LoadIndex)
+		}
+
+		if p.kind != bytecode.UndefinedType && p.kind != bytecode.VarArgs {
 			b.Emit(bytecode.RequiredType, p.kind)
 		}
 		b.Emit(bytecode.SymbolCreate, p.name)
