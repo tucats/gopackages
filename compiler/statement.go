@@ -62,11 +62,24 @@ func (c *Compiler) Statement() error {
 	case "{":
 		return c.Block()
 	case "array":
-		return c.Array()
+		if c.extensionsEnabled {
+			return c.Array()
+		}
+		return c.NewError(UnrecognizedStatementError, c.t.Peek(0))
+
 	case "assert":
-		return c.Assert()
+		if c.extensionsEnabled {
+			return c.Assert()
+		}
+		return c.NewError(UnrecognizedStatementError, c.t.Peek(0))
+
 	case "break":
 		return c.Break()
+	case "call":
+		if c.extensionsEnabled {
+			return c.Call()
+		}
+		return c.NewError(UnrecognizedStatementError, c.t.Peek(0))
 	case "const":
 		return c.Constant()
 	case "continue":
@@ -84,7 +97,7 @@ func (c *Compiler) Statement() error {
 	case "package":
 		return c.Package()
 	case "print":
-		if c.printEnabled {
+		if c.extensionsEnabled {
 			return c.Print()
 		}
 		return c.NewError(UnrecognizedStatementError, c.t.Peek(0))
@@ -94,7 +107,10 @@ func (c *Compiler) Statement() error {
 	case "switch":
 		return c.Switch()
 	case "try":
-		return c.Try()
+		if c.extensionsEnabled {
+			return c.Try()
+		}
+		return c.NewError(UnrecognizedStatementError, c.t.Peek(0))
 	case "type":
 		return c.Type()
 	case "var":

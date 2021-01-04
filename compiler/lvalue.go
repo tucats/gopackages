@@ -18,7 +18,7 @@ func (c *Compiler) IsLValue() bool {
 	}
 
 	// See if it's a reserved word.
-	if util.InList(name, tokenizer.ReservedWords...) {
+	if tokenizer.IsReserved(name, c.extensionsEnabled) {
 		return false
 	}
 

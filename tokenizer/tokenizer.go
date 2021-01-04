@@ -18,7 +18,7 @@ type Tokenizer struct {
 }
 
 // EndOfTokens is a reserved token that means end of the buffer was reached.
-const EndOfTokens = "$$$$$EOF$$$$!"
+const EndOfTokens = "<<end-of-tokens>>"
 
 // New creates a tokenizer instance and breaks the string
 // up into an array of tokens

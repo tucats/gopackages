@@ -117,7 +117,7 @@ func TestCompile(t *testing.T) {
 			tokens := tokenizer.New(tt.arg)
 			c := New()
 			// Make sure PRINT verb works for these tests.
-			c.printEnabled = true
+			c.extensionsEnabled = true
 			bc, err := c.Compile(tokens)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Compile() error = %v, wantErr %v", err, tt.wantErr)

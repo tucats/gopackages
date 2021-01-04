@@ -56,7 +56,7 @@ type Compiler struct {
 	blockDepth           int
 	statementCount       int
 	LowercaseIdentifiers bool
-	printEnabled         bool
+	extensionsEnabled    bool
 }
 
 // New creates a new compiler instance
@@ -69,14 +69,14 @@ func New() *Compiler {
 		deferQueue:           make([]int, 0),
 		packages:             PackageDictionary{},
 		LowercaseIdentifiers: false,
-		printEnabled:         persistence.GetBool("print-enabled"),
+		extensionsEnabled:    persistence.GetBool("extensions-enabled"),
 	}
 	return &cInstance
 }
 
 // If set to true, the compiler allows the PRINT statement
 func (c *Compiler) PrintEnabled(b bool) *Compiler {
-	c.printEnabled = b
+	c.extensionsEnabled = b
 	return c
 }
 

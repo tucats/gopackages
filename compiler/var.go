@@ -18,7 +18,7 @@ func (c *Compiler) Var() error {
 			return c.NewError(InvalidSymbolError, name)
 		}
 		// See if it's a reserved word.
-		if tokenizer.IsReserved(name) {
+		if tokenizer.IsReserved(name, c.extensionsEnabled) {
 			c.t.Advance(-1)
 			// If we mid-list, then just done with list
 			if len(names) > 0 {
