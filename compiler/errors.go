@@ -35,6 +35,7 @@ const (
 	InvalidReturnTypeList          = "invalid return type list"
 	InvalidReturnValueError        = "invalid return value for void function"
 	InvalidSymbolError             = "invalid symbol name"
+	InvalidTypeCheckError          = "invalid @type keyword"
 	InvalidTypeNameError           = "invalid type name"
 	LoopBodyError                  = "for{} body empty"
 	LoopExitError                  = "for{} has no exit"

@@ -79,7 +79,7 @@ func AddImpl(c *Context, i interface{}) error {
 			// If we're in static type mode, each member of the
 			// array being added must match the type of the target
 			// array.
-			if c.static {
+			if c.Static {
 				arrayType := reflect.TypeOf(vx[0])
 				for _, vv := range vy {
 					if arrayType != reflect.TypeOf(vv) {

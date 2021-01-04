@@ -21,7 +21,7 @@ type Context struct {
 	stack         []interface{}
 	sp            int
 	running       bool
-	static        bool
+	Static        bool
 	line          int
 	symbols       *sym.SymbolTable
 	Tracing       bool
@@ -47,7 +47,7 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 	}
 
 	static := false
-	if s, ok := s.Get("_static"); ok {
+	if s, ok := s.Get("_static_data_types"); ok {
 		static = util.GetBool(s)
 	}
 	ctx := Context{
@@ -57,7 +57,7 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 		stack:   make([]interface{}, InitialStackSize),
 		sp:      0,
 		running: false,
-		static:  static,
+		Static:  static,
 		line:    0,
 		symbols: s,
 		Tracing: false,
@@ -240,7 +240,7 @@ func (c *Context) GetConfig(name string) interface{} {
 func (c *Context) checkType(name string, value interface{}) error {
 
 	var err error
-	if !c.static || value == nil {
+	if !c.Static || value == nil {
 		return err
 	}
 	if oldValue, ok := c.Get(name); ok {

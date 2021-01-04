@@ -71,7 +71,7 @@ func ArrayImpl(c *Context, i interface{}) error {
 			return err
 		}
 		// If we are in static mode, array must be homogeneous
-		if c.static {
+		if c.Static {
 			if n == 0 {
 				arrayType = reflect.TypeOf(v)
 			} else {
@@ -111,7 +111,7 @@ func StructImpl(c *Context, i interface{}) error {
 	}
 	// If we are in static mode, or this is a non-empty definition,
 	// mark the structure as having static members.
-	if c.static || count > 0 {
+	if c.Static || count > 0 {
 		m["__static"] = true
 	}
 	_ = c.Push(m)
@@ -533,7 +533,7 @@ func StoreIndexImpl(c *Context, i interface{}) error {
 			}
 		}
 
-		if c.static {
+		if c.Static {
 			if vv, ok := a[subscript]; ok && vv != nil {
 				if reflect.TypeOf(vv) != reflect.TypeOf(v) {
 					return c.NewError(InvalidVarTypeError)
@@ -555,7 +555,7 @@ func StoreIndexImpl(c *Context, i interface{}) error {
 			return c.NewError(InvalidArrayIndexError, subscript)
 		}
 
-		if c.static {
+		if c.Static {
 			vv := a[subscript]
 			if vv != nil && (reflect.TypeOf(vv) != reflect.TypeOf(v)) {
 				return c.NewError(InvalidVarTypeError)
@@ -576,7 +576,8 @@ func StoreIndexImpl(c *Context, i interface{}) error {
 func StaticTypingImpl(c *Context, i interface{}) error {
 	v, err := c.Pop()
 	if err == nil {
-		c.static = util.GetBool(v)
+		c.Static = util.GetBool(v)
+		err = c.symbols.SetGlobal("_static_data_types", c.Static)
 	}
 	return err
 }
@@ -621,7 +622,7 @@ func RequiredTypeImpl(c *Context, i interface{}) error {
 	if err == nil {
 
 		// If we're doing strict type checking...
-		if c.static {
+		if c.Static {
 			if t, ok := i.(reflect.Type); ok {
 				if t != reflect.TypeOf(v) {
 					err = c.NewError(InvalidArgTypeError)

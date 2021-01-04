@@ -55,7 +55,7 @@ func (c *Compiler) Var() error {
 			case "uuid":
 				c.b.Emit(bytecode.Push, uuid.Nil)
 
-			// Must be a use type name
+			// Must be a user type name
 			default:
 				c.b.Emit(bytecode.Load, "new")
 				c.b.Emit(bytecode.Load, typename)

@@ -38,14 +38,15 @@ func (c *Compiler) Directive() error {
 		return c.TestPass()
 	case "response":
 		return c.RestResponse()
-	case "static":
-		return c.Static()
+
 	case "status":
 		return c.RestStatus()
 	case "template":
 		return c.Template()
 	case "test":
 		return c.Test()
+	case "type":
+		return c.TypeChecking()
 	default:
 		return c.NewError(InvalidDirectiveError, name)
 	}
@@ -374,17 +375,17 @@ func (c *Compiler) Error() error {
 	return nil
 }
 
-// Static implements the @static directive
-func (c *Compiler) Static() error {
-	if !c.atStatementEnd() {
-		code, err := c.Expression()
-		if err == nil {
-			c.b.Append(code)
-		}
+// TypeChecking implements the @type directive which must be followed by the
+// keyword "static" or "dynamic", indicating the type of type checking.
+func (c *Compiler) TypeChecking() error {
+	t := c.t.Next()
+	var err error
+
+	if util.InList(t, "static", "dynamic") {
+		c.b.Emit(bytecode.Push, t == "static")
 	} else {
-		c.b.Emit(bytecode.Push, true)
+		err = c.NewError(InvalidTypeCheckError, t)
 	}
-	err := c.modeCheck("interactive", false)
 	c.b.Emit(bytecode.StaticTyping)
 
 	return err
