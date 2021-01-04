@@ -91,6 +91,8 @@ func (c *Context) RunFromAddress(addr int) error {
 				// Zero out the jump point for this try/catch block so recursive
 				// errors don't occur.
 				c.try[len(c.try)-1] = 0
+
+				// Implicit pop-scope done here
 				_ = c.symbols.SetAlways("_error", text)
 				if c.Tracing {
 					ui.Debug(ui.ByteCodeLogger, "*** Branch to %d on error: %s", c.pc, text)

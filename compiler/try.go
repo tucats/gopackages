@@ -27,6 +27,10 @@ func (c *Compiler) Try() error {
 	if err != nil {
 		return err
 	}
+	// Need extra PopScope because we're still running in the scope of the try{} block
+	c.b.Emit(bytecode.PopScope)
+
+	// This marks the end of the try/catch
 	_ = c.b.SetAddressHere(b2)
 	c.b.Emit(bytecode.TryPop)
 
