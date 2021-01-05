@@ -51,6 +51,14 @@ var Grammar = []cli.Option{
 		ParameterDescription: "key",
 	},
 	{
+		LongName:             "remove",
+		OptionType:           cli.Subcommand,
+		Description:          "Delete an entire profile",
+		Action:               DeleteProfileAction,
+		ParametersExpected:   1,
+		ParameterDescription: "name",
+	},
+	{
 		LongName:             "set",
 		Description:          "Set a profile value",
 		Action:               SetAction,
@@ -132,6 +140,17 @@ func DeleteAction(c *cli.Context) error {
 	ui.Say("Profile key %s deleted", key)
 
 	return nil
+}
+
+// DeleteProfileAction deletes a named profile.
+func DeleteProfileAction(c *cli.Context) error {
+	key := c.GetParameter(0)
+	err := persistence.DeleteProfile(key)
+	if err == nil {
+		ui.Say("Profile %s deleted", key)
+		return nil
+	}
+	return err
 }
 
 // SetDescriptionAction sets the profile description string

@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -223,6 +224,24 @@ func Exists(key string) bool {
 		_, exists = c.Items[key]
 	}
 	return exists
+}
+
+func DeleteProfile(key string) error {
+	if cfg, ok := Configurations[key]; ok {
+		if cfg.ID == getCurrentConfiguration().ID {
+			ui.Debug(ui.AppLogger, "cannot delete active profile")
+			return fmt.Errorf("cannot delete active profile")
+		}
+		delete(Configurations, key)
+		ProfileDirty = true
+		err := Save()
+		if err == nil {
+			ui.Debug(ui.AppLogger, "deleted profile %s (%s)", key, cfg.ID)
+		}
+		return err
+	}
+	ui.Debug(ui.AppLogger, "no such profile to delete: %s", key)
+	return fmt.Errorf("no such profile: %s", key)
 }
 
 func getCurrentConfiguration() *Configuration {
