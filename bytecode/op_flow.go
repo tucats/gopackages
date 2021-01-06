@@ -203,6 +203,8 @@ func CallImpl(c *Context, i interface{}) error {
 		cx.Tracing = c.Tracing
 		cx.SetTokenizer(c.GetTokenizer())
 		cx.result = nil
+		debug := c.Debugging()
+		cx.SetDebug(debug)
 
 		// Make the caller's stack our stack
 		cx.stack = c.stack
@@ -213,9 +215,6 @@ func CallImpl(c *Context, i interface{}) error {
 			_ = sf.SetAlways("_this", c.this)
 			c.this = nil
 		}
-
-		// Run the function. If it doesn't get an error, then
-		// extract the top stack item as the result
 		err = cx.Run()
 		if err == nil {
 			result = cx.result

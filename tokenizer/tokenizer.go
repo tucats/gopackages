@@ -244,6 +244,15 @@ func splitLines(src string) []string {
 	return strings.Split(src, "\n")
 }
 
+// GetSource returns the entire string of the tokenizer
+func (t *Tokenizer) GetSource() string {
+	r := ""
+	for _, line := range t.Source {
+		r = r + line + "\n"
+	}
+	return r
+}
+
 // GetTokens returns a string representing the tokens
 // within the given range of tokens.
 func (t *Tokenizer) GetTokens(pos1, pos2 int, spacing bool) string {

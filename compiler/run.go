@@ -15,6 +15,7 @@ func RunString(s *symbols.SymbolTable, stmt string) error {
 func Run(s *symbols.SymbolTable, t *tokenizer.Tokenizer) error {
 
 	c := New()
+	c.ExtensionsEnabled(true)
 	bc, err := c.Compile(t)
 	if err == nil {
 		ctx := bytecode.NewContext(s, bc)
