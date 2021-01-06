@@ -22,6 +22,8 @@ type Context struct {
 	sp              int
 	running         bool
 	Static          bool
+	debugging       bool
+	singleStep      bool
 	line            int
 	fullSymbolScope bool
 	symbols         *sym.SymbolTable
@@ -84,8 +86,18 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 	return ctxp
 }
 
-func (c *Context) SetFullSymbolScope(b bool) {
+func (c *Context) GetLine() int {
+	return c.line
+}
+
+func (c *Context) SetDebug(b bool) *Context {
+	c.debugging = b
+	c.singleStep = true
+	return c
+}
+func (c *Context) SetFullSymbolScope(b bool) *Context {
 	c.fullSymbolScope = b
+	return c
 }
 
 func (c *Context) SetGlobal(name string, value interface{}) error {
@@ -94,7 +106,7 @@ func (c *Context) SetGlobal(name string, value interface{}) error {
 
 // EnableConsoleOutput tells the context to begin capturing all output normally generated
 // from Print and Newline into a buffer instead of going to stdout
-func (c *Context) EnableConsoleOutput(flag bool) {
+func (c *Context) EnableConsoleOutput(flag bool) *Context {
 
 	ui.Debug(ui.AppLogger, ">>> Console output set to %v", flag)
 	if !flag {
@@ -103,6 +115,7 @@ func (c *Context) EnableConsoleOutput(flag bool) {
 	} else {
 		c.output = nil
 	}
+	return c
 }
 
 // GetOutput retrieves the output buffer
@@ -114,13 +127,23 @@ func (c *Context) GetOutput() string {
 }
 
 // SetTokenizer sets a tokenizer in the current context for tracing and debugging.
-func (c *Context) SetTokenizer(t *tokenizer.Tokenizer) {
+func (c *Context) SetTokenizer(t *tokenizer.Tokenizer) *Context {
 	c.tokenizer = t
+	return c
 }
 
 // GetTokenizer gets the tokenizer in the current context for tracing and debugging.
 func (c *Context) GetTokenizer() *tokenizer.Tokenizer {
 	return c.tokenizer
+}
+
+func (c *Context) SetDugging(b bool) *Context {
+	c.debugging = b
+	return c
+}
+
+func (c *Context) Debugging() bool {
+	return c.debugging
 }
 
 // AppendSymbols appends a symbol table to the current

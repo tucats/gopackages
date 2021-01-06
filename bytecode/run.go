@@ -26,12 +26,17 @@ func (c *Context) Run() error {
 	return c.RunFromAddress(0)
 }
 
+// Used to resume execution after an event like the debugger being invoked.
+func (c *Context) Resume() error {
+	return c.RunFromAddress(c.pc)
+}
+
 // RunFromAddress executes a bytecode context from a given starting address.
 func (c *Context) RunFromAddress(addr int) error {
 
 	var err error
 
-	// Make sure globals are initialized. Becuase this updates a global, let's
+	// Make sure globals are initialized. Because this updates a global, let's
 	// do it in a thread-safe fashion.
 	dispatchMux.Lock()
 	initializeDispatch()
