@@ -60,9 +60,9 @@ func (c *Context) RunFromAddress(addr int) error {
 
 	// Make sure the opcode array ends in a Stop operation so we can never
 	// shoot off the end of the bytecode.
-	if c.bc.emitPos == 0 || c.bc.opcodes[c.bc.emitPos-1].Operation != Stop {
-		c.bc.Emit(Stop)
-	}
+	//if c.bc.emitPos == 0 || c.bc.opcodes[c.bc.emitPos-1].Operation != Stop {
+	//	c.bc.Emit(Stop)
+	//}
 
 	if c.Tracing {
 		ui.Debug(ui.ByteCodeLogger, "*** Tracing "+c.Name)
