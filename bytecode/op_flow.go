@@ -174,13 +174,13 @@ func CallImpl(c *Context, i interface{}) error {
 			}
 		}
 
-		funcSymbols := symbols.NewChildSymbolTable("Function", parentTable)
+		funcSymbols := symbols.NewChildSymbolTable("function "+af.Name, parentTable)
 		funcSymbols.ScopeBoundary = true
 
 		// Make a new symbol table for the fucntion to run with,
 		// and a new execution context. Note that this table has no
 		// visibility into the current scope of symbol values.
-		c.PushContext("Function", af, 0)
+		c.PushContext("function "+af.Name, af, 0)
 		_ = c.SetAlways("_args", args)
 		if c.this != nil {
 			_ = c.SetAlways("_this", c.this)
@@ -212,7 +212,7 @@ func CallImpl(c *Context, i interface{}) error {
 			}
 		}
 
-		funcSymbols := symbols.NewChildSymbolTable(fname, parentTable)
+		funcSymbols := symbols.NewChildSymbolTable("builtin "+fname, parentTable)
 		funcSymbols.ScopeBoundary = true
 
 		if c.this != nil {

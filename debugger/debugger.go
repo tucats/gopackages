@@ -19,8 +19,10 @@ const (
 var singleStep bool = true
 
 // This is called on AtLine to offer the chance for the debugger to take control.
-func Debugger(s *symbols.SymbolTable, module string, line int, text string) error {
+func Debugger(s *symbols.SymbolTable, module string, line int, tx *tokenizer.Tokenizer) error {
 	var err error
+	text := tx.GetLine(line)
+
 	prompt := false
 	// Are we in single-step mode?
 	if singleStep {
@@ -61,7 +63,7 @@ func Debugger(s *symbols.SymbolTable, module string, line int, text string) erro
 				prompt = false
 
 			case "show":
-				err = Show(s, tokens, line, text)
+				err = Show(s, tokens, line, tx)
 
 			case "set":
 				err = runAfterFirstToken(s, tokens)

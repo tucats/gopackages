@@ -14,7 +14,7 @@ import (
 // PushScopeImpl instruction processor
 func PushScopeImpl(c *Context, i interface{}) error {
 
-	s := symbols.NewChildSymbolTable("statement block", c.symbols)
+	s := symbols.NewChildSymbolTable("block", c.symbols)
 	c.symbols = s
 	return nil
 }
