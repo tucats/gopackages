@@ -53,6 +53,8 @@ func NewChildSymbolTable(name string, parent *SymbolTable) *SymbolTable {
 	}
 	return &symbols
 }
+
+// SetGlobal sets a symbol value in the global symbol table
 func (s *SymbolTable) SetGlobal(name string, value interface{}) error {
 	_ = RootSymbolTable.Create(name)
 	return RootSymbolTable.SetAlways(name, value)

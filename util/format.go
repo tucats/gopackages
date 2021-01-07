@@ -101,9 +101,14 @@ func Format(arg interface{}) string {
 		// IF it's an internal function, show it's name. If it is a standard builtin from the
 		// function library, show the short form of the name.
 		if vv.Kind() == reflect.Func {
-			name := runtime.FuncForPC(reflect.ValueOf(v).Pointer()).Name()
-			name = strings.Replace(name, "github.com/tucats/gopackages/", "", 1)
-			return "builtin <" + name + ">"
+			if ui.DebugMode {
+				name := runtime.FuncForPC(reflect.ValueOf(v).Pointer()).Name()
+				name = strings.Replace(name, "github.com/tucats/gopackages/", "", 1)
+				name = strings.Replace(name, "github.com/tucats/ego/runtime.", "", 1)
+				return "builtin " + name
+			} else {
+				return "builtin"
+			}
 		}
 
 		// If it's a bytecode.Bytecode pointer, use reflection to get the
@@ -113,8 +118,12 @@ func Format(arg interface{}) string {
 			ts := vv.String()
 			if ts == "<*bytecode.ByteCode Value>" {
 				e := reflect.ValueOf(v).Elem()
-				name := GetString(e.Field(0).Interface())
-				return "func <" + name + ">"
+				if ui.DebugMode {
+					name := GetString(e.Field(0).Interface())
+					return "func " + name
+				} else {
+					return "func"
+				}
 			}
 			return fmt.Sprintf("ptr %s", ts)
 		}
@@ -126,8 +135,8 @@ func Format(arg interface{}) string {
 		}
 
 		if ui.DebugMode {
-			return fmt.Sprintf("kind %v <%#v>", vv.Kind(), v)
+			return fmt.Sprintf("kind %v %#v", vv.Kind(), v)
 		}
-		return fmt.Sprintf("kind %v <%v>", vv.Kind(), v)
+		return fmt.Sprintf("kind %v %v", vv.Kind(), v)
 	}
 }

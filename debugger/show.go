@@ -17,7 +17,7 @@ func Show(s *symbols.SymbolTable, tokens *tokenizer.Tokenizer, line int, tx *tok
 		ShowBreaks()
 
 	case "symbols", "syms":
-		fmt.Println(s.Format(false))
+		fmt.Println(s.Format(true))
 
 	case "line":
 		text := tx.GetLine(line)

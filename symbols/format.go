@@ -1,6 +1,7 @@
 package symbols
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -31,6 +32,9 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 	// Now iterate over the keys in sorted order
 	for _, k := range keys {
 		v := s.Symbols[k]
+		skip := false
+		typeString := "package"
+
 		switch actual := v.(type) {
 		case func(*SymbolTable, []interface{}) (interface{}, error):
 			if !includeBuiltins {
@@ -38,11 +42,13 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 			}
 
 		case map[string]interface{}:
-			skip := false
-			for _, k2 := range actual {
+			for kk, k2 := range actual {
+				fmt.Printf("DEBUG: k = %s, kk = \"%s\"; k2 = %v\n", k, kk, k2)
+				if kk == "__type" {
+					typeString, _ = k2.(string)
+				}
 				if _, ok := k2.(func(*SymbolTable, []interface{}) (interface{}, error)); ok {
 					skip = true
-					break
 				}
 			}
 			if skip && !includeBuiltins {
@@ -52,6 +58,11 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 		b.WriteString("   ")
 		b.WriteString(k)
 		b.WriteString(" = ")
+		if skip {
+			b.WriteString("(")
+			b.WriteString(typeString)
+			b.WriteString(") ")
+		}
 
 		// Any variable named _password or _token has it's value obscured
 		if k == "_password" || k == "_token" {
