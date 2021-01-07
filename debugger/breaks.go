@@ -148,8 +148,6 @@ func EvaluateBreakpoint(s *symbols.SymbolTable, module string, line int, text st
 					} else {
 						b.hit = 0
 					}
-				} else {
-					//fmt.Printf("Break expression result not readable\n")
 				}
 			}
 			msg = "Break when " + b.text
