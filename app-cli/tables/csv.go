@@ -5,7 +5,7 @@ import "strings"
 // NewCSV creates a new table using a single string with comma-separated
 // heading names. These typically correspond to the first row in a CSV
 // data file.
-func NewCSV(h string) (Table, error) {
+func NewCSV(h string) (*Table, error) {
 	return New(CsvSplit(h))
 }
 

@@ -6,27 +6,31 @@ import (
 )
 
 // RowLimit sets the row limit for output (<0 means all rows)
-func (t *Table) RowLimit(limit int) {
+func (t *Table) RowLimit(limit int) *Table {
 	if limit <= 0 {
 		t.rowLimit = -1
 	} else {
 		t.rowLimit = limit
 	}
+	return t
 }
 
 // ShowUnderlines enables underlining of column headings when the parameter is true
-func (t *Table) ShowUnderlines(flag bool) {
+func (t *Table) ShowUnderlines(flag bool) *Table {
 	t.showUnderlines = flag
+	return t
 }
 
 // ShowHeadings disables printing of column headings when the parameter is true
-func (t *Table) ShowHeadings(flag bool) {
+func (t *Table) ShowHeadings(flag bool) *Table {
 	t.showHeadings = flag
+	return t
 }
 
 // ShowRowNumbers enables printing of column headings when the parameter is true
-func (t *Table) ShowRowNumbers(flag bool) {
+func (t *Table) ShowRowNumbers(flag bool) *Table {
 	t.showRowNumbers = flag
+	return t
 }
 
 // SetMinimumWidth specifies the minimum width of a column. The column number is

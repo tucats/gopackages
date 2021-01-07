@@ -12,7 +12,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      Table
+		want      *Table
 		wantError bool
 	}{
 		{
@@ -20,7 +20,7 @@ func TestNew(t *testing.T) {
 			args: args{
 				headings: []string{"simple"},
 			},
-			want: Table{
+			want: &Table{
 				rowLimit:       -1,
 				columnCount:    1,
 				columns:        []string{"simple"},
@@ -42,7 +42,7 @@ func TestNew(t *testing.T) {
 			args: args{
 				headings: []string{"simple", "test", "table"},
 			},
-			want: Table{
+			want: &Table{
 				rowLimit:       -1,
 				columnCount:    3,
 				columns:        []string{"simple", "test", "table"},
@@ -64,7 +64,7 @@ func TestNew(t *testing.T) {
 			args: args{
 				headings: []string{},
 			},
-			want:      Table{},
+			want:      &Table{},
 			wantError: true,
 		},
 		// TODO: Add test cases.

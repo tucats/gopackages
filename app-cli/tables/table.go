@@ -38,9 +38,9 @@ type Table struct {
 }
 
 // New creates a new table object, given a list of headings
-func New(headings []string) (Table, error) {
+func New(headings []string) (*Table, error) {
 
-	var t Table
+	t := &Table{}
 
 	if len(headings) == 0 {
 		return t, errors.New("cannot create table with zero columns")
@@ -69,6 +69,7 @@ func New(headings []string) (Table, error) {
 
 // SetWhere sets an expression to be used as a "where" clause
 // to select table rows.
-func (t *Table) SetWhere(clause string) {
+func (t *Table) SetWhere(clause string) *Table {
 	t.where = clause
+	return t
 }
