@@ -7,16 +7,16 @@ import (
 )
 
 // Given a string, compile and execute it immediately.
-func RunString(s *symbols.SymbolTable, stmt string) error {
-	return Run(s, tokenizer.New(stmt))
+func RunString(name string, s *symbols.SymbolTable, stmt string) error {
+	return Run(name, s, tokenizer.New(stmt))
 }
 
 // Given a token stream, compile and execute it immediately.
-func Run(s *symbols.SymbolTable, t *tokenizer.Tokenizer) error {
+func Run(name string, s *symbols.SymbolTable, t *tokenizer.Tokenizer) error {
 
 	c := New()
 	c.ExtensionsEnabled(true)
-	bc, err := c.Compile(t)
+	bc, err := c.Compile(name, t)
 	if err == nil {
 		ctx := bytecode.NewContext(s, bc)
 		err = ctx.Run()

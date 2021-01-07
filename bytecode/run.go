@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
 
@@ -20,6 +21,17 @@ var dispatchMux sync.Mutex
 // GrowStackBy indicates the number of eleemnts to add to the stack when
 // it runs out of space.
 const GrowStackBy = 50
+
+func (c *Context) GetName() string {
+	if c.bc != nil {
+		return c.bc.Name
+	}
+	return "main"
+}
+
+func (c *Context) GetSymbols() *symbols.SymbolTable {
+	return c.symbols
+}
 
 // Run executes a bytecode context
 func (c *Context) Run() error {
@@ -104,7 +116,7 @@ func (c *Context) RunFromAddress(addr int) error {
 					ui.Debug(ui.ByteCodeLogger, "*** Branch to %d on error: %s", c.pc, text)
 				}
 			} else {
-				if c.Tracing {
+				if text != "signal" && c.Tracing {
 					ui.Debug(ui.ByteCodeLogger, "*** Return error: %s", text)
 				}
 				return err

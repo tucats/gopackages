@@ -19,7 +19,7 @@ const (
 var singleStep bool = true
 
 // This is called on AtLine to offer the chance for the debugger to take control.
-func Debugger(s *symbols.SymbolTable, line int, text string) error {
+func Debugger(s *symbols.SymbolTable, module string, line int, text string) error {
 	var err error
 	prompt := false
 	// Are we in single-step mode?
@@ -27,20 +27,14 @@ func Debugger(s *symbols.SymbolTable, line int, text string) error {
 		fmt.Printf("%s:\n\t%5d, %s\n", stepTo, line, text)
 		prompt = true
 	} else {
-		for _, b := range breakPoints {
-			fmt.Printf("Evaluating break %d == %d\n", line, b.line)
-			if line == b.line {
-				prompt = true
-				fmt.Printf("%s:\n\t%5d, %s\n", breakAt, line, text)
-				b.hit++
-			}
-		}
+		prompt = EvaluateBreakpoint(s, module, line, text)
 	}
 
 	for prompt {
 		var tokens *tokenizer.Tokenizer
 
 		for {
+			// cmd := "break when a == 55"
 			cmd := getLine()
 			if len(strings.TrimSpace(cmd)) == 0 {
 				cmd = "step"
@@ -78,7 +72,7 @@ func Debugger(s *symbols.SymbolTable, line int, text string) error {
 			case "print":
 				text := "fmt.Println(" + strings.Replace(tokens.GetSource(), "print", "", 1) + ")"
 				t2 := tokenizer.New(text)
-				err = compiler.Run(s, t2)
+				err = compiler.Run("debugger", s, t2)
 
 			case "break":
 				err = Break(tokens)
@@ -89,9 +83,10 @@ func Debugger(s *symbols.SymbolTable, line int, text string) error {
 			default:
 				fmt.Printf("Unrecognized command: %s\n", t)
 			}
-
 			if err != nil {
-				fmt.Printf("Debugger error, %v\n", err)
+				if err.Error() != "stop" {
+					fmt.Printf("Debugger error, %v\n", err)
+				}
 				err = nil
 			}
 		}
@@ -103,7 +98,7 @@ func runAfterFirstToken(s *symbols.SymbolTable, t *tokenizer.Tokenizer) error {
 	verb := t.GetTokens(0, 1, false)
 	text := strings.TrimPrefix(strings.TrimSpace(t.GetSource()), verb)
 	t2 := tokenizer.New(text)
-	return compiler.Run(s, t2)
+	return compiler.Run("debugger", s, t2)
 }
 
 // getLine reads a line of text from the console, and requires that it contain matching

@@ -103,16 +103,16 @@ func (c *Compiler) WithNormalization(f bool) *Compiler {
 // CompileString turns a string into a compilation unit. This is a helper function
 // around the Compile() operation that removes the need for the caller
 // to provide a tokenizer.
-func (c *Compiler) CompileString(source string) (*bytecode.ByteCode, error) {
+func (c *Compiler) CompileString(name string, source string) (*bytecode.ByteCode, error) {
 	t := tokenizer.New(source)
-	return c.Compile(t)
+	return c.Compile(name, t)
 }
 
 // Compile starts a compilation unit, and returns a bytecode
 // of the compiled material.
-func (c *Compiler) Compile(t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
+func (c *Compiler) Compile(name string, t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
 
-	c.b = bytecode.New("")
+	c.b = bytecode.New(name)
 	c.t = t
 
 	c.t.Reset()
@@ -266,7 +266,7 @@ func (c *Compiler) AutoImport(all bool) error {
 	var firstError error
 	for _, packageName := range sortedPackageNames {
 		text := "import " + packageName
-		_, err := c.CompileString(text)
+		_, err := c.CompileString(packageName, text)
 		if err == nil {
 			firstError = err
 		}

@@ -118,7 +118,7 @@ func TestCompile(t *testing.T) {
 			c := New()
 			// Make sure PRINT verb works for these tests.
 			c.extensionsEnabled = true
-			bc, err := c.Compile(tokens)
+			bc, err := c.Compile("unit test", tokens)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Compile() error = %v, wantErr %v", err, tt.wantErr)
 				return

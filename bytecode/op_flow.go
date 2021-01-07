@@ -293,7 +293,7 @@ func (c *Context) PushContext(tableName string, bc *ByteCode, pc int) {
 func (c *Context) PopContext() {
 
 	// First, is there stuff on the stack we want to preserve?
-	stack := c.stack[c.fp : c.sp+1]
+	topOfStackSlice := c.stack[c.fp : c.sp+1]
 
 	// Now retrieve the runtime context stored on the stack and
 	// indicated by the fp (frame pointer)
@@ -314,10 +314,9 @@ func (c *Context) PopContext() {
 
 	// Finally, if there _was_ stuff on the stack after the call,
 	// it might be a multi-value return, so push that back.
-
-	if len(stack) > 0 {
-		c.stack = append(c.stack[:c.sp], stack...)
-		c.sp = c.sp + len(stack)
+	if len(topOfStackSlice) > 0 {
+		c.stack = append(c.stack[:c.sp], topOfStackSlice...)
+		c.sp = c.sp + len(topOfStackSlice)
 	} else {
 		// Alternatively, it could be a single-value return using the
 		// result holder. If so, push that on the stack and clear it.
