@@ -61,7 +61,8 @@ func (c *Context) RunFromAddress(addr int) error {
 	// Loop over the bytecodes and run.
 	for c.running {
 
-		if c.pc > len(c.bc.opcodes) {
+		if c.pc >= len(c.bc.opcodes) {
+			c.running = false
 			break
 		}
 

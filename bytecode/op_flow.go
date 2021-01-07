@@ -22,7 +22,7 @@ import (
 // stop executing immediately.
 func StopImpl(c *Context, i interface{}) error {
 	c.running = false
-	return nil
+	return errors.New("stop")
 }
 
 // PanicImpl instruction processor generates an error. The boolean flag is used
@@ -123,25 +123,8 @@ func LocalCallImpl(c *Context, i interface{}) error {
 	// Make a new symbol table for the fucntion to run with,
 	// and a new execution context. Store the argument list in
 	// the child table.
-	sf := symbols.NewChildSymbolTable("defer", c.symbols)
-	cx := NewContext(sf, c.bc)
-	cx.Tracing = c.Tracing
-
-	cx.SetTokenizer(c.GetTokenizer())
-	cx.result = nil
-
-	// Make the caller's stack our stack
-	cx.stack = c.stack
-	cx.sp = c.sp
-
-	// Run the function. If it doesn't get an error, then
-	// extract the top stack item as the result
-	err := cx.RunFromAddress(util.GetInt(i))
-
-	// Because we share a stack with our caller, make sure the
-	// caller's stack pointer is updated to match our value.
-	c.sp = cx.sp
-	return err
+	c.PushContext("defer", c.bc, util.GetInt(i))
+	return nil
 
 }
 
@@ -197,32 +180,12 @@ func CallImpl(c *Context, i interface{}) error {
 		// Make a new symbol table for the fucntion to run with,
 		// and a new execution context. Note that this table has no
 		// visibility into the current scope of symbol values.
-		sf := symbols.NewChildSymbolTable("Function", parentTable)
-		cx := NewContext(sf, af)
-		cx.fullSymbolScope = c.fullSymbolScope
-		cx.Tracing = c.Tracing
-		cx.SetTokenizer(c.GetTokenizer())
-		cx.result = nil
-		debug := c.Debugging()
-		cx.SetDebug(debug)
-
-		// Make the caller's stack our stack
-		cx.stack = c.stack
-		cx.sp = c.sp
-
-		_ = sf.SetAlways("_args", args)
+		c.PushContext("Function", af, 0)
+		_ = c.SetAlways("_args", args)
 		if c.this != nil {
-			_ = sf.SetAlways("_this", c.this)
+			_ = c.SetAlways("_this", c.this)
 			c.this = nil
 		}
-		err = cx.Run()
-		if err == nil {
-			result = cx.result
-		}
-
-		// Because we share a stack with our caller, make sure the
-		// caller's stack pointer is updated to match our value.
-		c.sp = cx.sp
 
 	case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
 
@@ -305,9 +268,64 @@ func ReturnImpl(c *Context, i interface{}) error {
 	if b, ok := i.(bool); ok && b {
 		c.result, err = c.Pop()
 	}
-	// Stop running this context
-	c.running = false
+
+	if err == nil {
+		// Use the frame pointer to reset the stack and retrieve the
+		// runtime state
+		c.PopContext()
+	}
 	return err
+}
+
+func (c *Context) PushContext(tableName string, bc *ByteCode, pc int) {
+	_ = c.Push(c.symbols)
+	_ = c.Push(c.bc)
+	_ = c.Push(c.pc)
+	_ = c.Push(c.fp)
+	c.fp = c.sp
+	c.result = nil
+	c.symbols = symbols.NewChildSymbolTable(tableName, c.symbols)
+
+	c.bc = bc
+	c.pc = pc
+}
+
+func (c *Context) PopContext() {
+
+	// First, is there stuff on the stack we want to preserve?
+	stack := c.stack[c.fp : c.sp+1]
+
+	// Now retrieve the runtime context stored on the stack and
+	// indicated by the fp (frame pointer)
+	c.sp = c.fp
+	if x, err := c.Pop(); err == nil {
+		c.fp = util.GetInt(x)
+	}
+	if x, err := c.Pop(); err == nil {
+		c.pc = util.GetInt(x)
+	}
+	if x, err := c.Pop(); err == nil {
+		c.bc = x.(*ByteCode)
+	}
+
+	if x, err := c.Pop(); err == nil {
+		c.symbols = x.(*symbols.SymbolTable)
+	}
+
+	// Finally, if there _was_ stuff on the stack after the call,
+	// it might be a multi-value return, so push that back.
+
+	if len(stack) > 0 {
+		c.stack = append(c.stack[:c.sp], stack...)
+		c.sp = c.sp + len(stack)
+	} else {
+		// Alternatively, it could be a single-value return using the
+		// result holder. If so, push that on the stack and clear it.
+		if c.result != nil {
+			_ = c.Push(c.result)
+			c.result = nil
+		}
+	}
 }
 
 // ArgCheckImpl instruction processor verifies that there are enough items

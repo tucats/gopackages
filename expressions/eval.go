@@ -17,7 +17,7 @@ func (e *Expression) Eval(s *symbols.SymbolTable) (interface{}, error) {
 
 	// If the symbol table we're given is unallocated, make one for our use now.
 	if s == nil {
-		s = symbols.NewSymbolTable("")
+		s = symbols.NewSymbolTable("eval()")
 
 	}
 
@@ -28,7 +28,9 @@ func (e *Expression) Eval(s *symbols.SymbolTable) (interface{}, error) {
 	ctx := bytecode.NewContext(s, e.b)
 	err := ctx.Run()
 	if err != nil {
-		return nil, err
+		if err.Error() != "stop" {
+			return nil, err
+		}
 	}
 
 	return ctx.Pop()

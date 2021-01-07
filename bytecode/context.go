@@ -20,6 +20,7 @@ type Context struct {
 	pc              int
 	stack           []interface{}
 	sp              int
+	fp              int
 	running         bool
 	Static          bool
 	debugging       bool
@@ -59,6 +60,7 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 		pc:              0,
 		stack:           make([]interface{}, InitialStackSize),
 		sp:              0,
+		fp:              0,
 		running:         false,
 		Static:          static,
 		line:            0,

@@ -307,7 +307,11 @@ func TestByteCode_Run(t *testing.T) {
 			c := NewContext(s, b)
 			functions.AddBuiltins(c.symbols)
 
-			if err := c.Run(); (err != nil) != tt.wantErr {
+			err := c.Run()
+			if err != nil && err.Error() == "stop" {
+				err = nil
+			}
+			if (err != nil) != tt.wantErr {
 				t.Errorf("ByteCode.Run() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if c.running {

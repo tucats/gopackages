@@ -3,7 +3,6 @@ package debugger
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/tucats/ego/io"
@@ -12,26 +11,11 @@ import (
 	"github.com/tucats/gopackages/tokenizer"
 )
 
-type breakPointType int
-
-const (
-	BreakDisabled breakPointType = 0
-	BreakAlways   breakPointType = iota
-	BreakValue
-)
-
 const (
 	stepTo  = "Stepped to"
 	breakAt = "Break at"
 )
 
-type breakPoint struct {
-	kind breakPointType
-	line int
-	hit  int
-}
-
-var breakPoints = []breakPoint{}
 var singleStep bool = true
 
 // This is called on AtLine to offer the chance for the debugger to take control.
@@ -71,6 +55,9 @@ func Debugger(s *symbols.SymbolTable, line int, text string) error {
 		if err == nil {
 			t := tokens.Peek(1)
 			switch t {
+			case "help":
+				_ = Help()
+
 			case "go", "continue":
 				singleStep = false
 				prompt = false
@@ -80,15 +67,7 @@ func Debugger(s *symbols.SymbolTable, line int, text string) error {
 				prompt = false
 
 			case "show":
-				t := tokens.Peek(2)
-				switch t {
-				case "symbols", "syms":
-					fmt.Println(s.Format(false))
-				case "line":
-					fmt.Printf("%s:\n\t%5d, %s\n", stepTo, line, text)
-				default:
-					err = fmt.Errorf("unreognized show command: %s", t)
-				}
+				err = Show(s, tokens, line, text)
 
 			case "set":
 				err = runAfterFirstToken(s, tokens)
@@ -105,7 +84,7 @@ func Debugger(s *symbols.SymbolTable, line int, text string) error {
 				err = Break(tokens)
 
 			case "exit":
-				return errors.New("exit from debugger")
+				return errors.New("stop")
 
 			default:
 				fmt.Printf("Unrecognized command: %s\n", t)
@@ -173,33 +152,4 @@ func getLine() string {
 		}
 	}
 	return text
-}
-
-func Break(t *tokenizer.Tokenizer) error {
-	var err error
-	var line int
-	t.Advance(1)
-
-	for t.Peek(1) != tokenizer.EndOfTokens {
-		switch t.Next() {
-		case "at":
-			line, err = strconv.Atoi(t.Next())
-			if err == nil {
-				err = breakAtLine(line)
-			}
-		default:
-			err = errors.New(InvalidBreakClauseError)
-		}
-
-		if err != nil {
-			break
-		}
-	}
-	return err
-}
-
-func breakAtLine(line int) error {
-	b := breakPoint{line: line, hit: 0, kind: BreakAlways}
-	breakPoints = append(breakPoints, b)
-	return nil
 }
