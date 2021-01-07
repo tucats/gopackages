@@ -229,6 +229,8 @@ func (c *Compiler) Function(literal bool) error {
 	if err != nil {
 		return err
 	}
+	// Add trailing return to ensure we close out the scope correctly
+	cx.b.Emit(bytecode.Return)
 
 	// If it was a literal, push the body of the function (really, a bytecode expression
 	// of the function code) on the stack. Otherwise, let's store it in the symbol table
