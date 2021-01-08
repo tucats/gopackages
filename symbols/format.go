@@ -1,7 +1,6 @@
 package symbols
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 
@@ -43,7 +42,6 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 
 		case map[string]interface{}:
 			for kk, k2 := range actual {
-				fmt.Printf("DEBUG: k = %s, kk = \"%s\"; k2 = %v\n", k, kk, k2)
 				if kk == "__type" {
 					typeString, _ = k2.(string)
 				}
