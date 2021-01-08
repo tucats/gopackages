@@ -25,6 +25,8 @@ type Context struct {
 	Static          bool
 	debugging       bool
 	singleStep      bool
+	stepOver        bool
+	tracing         bool
 	line            int
 	fullSymbolScope bool
 	symbols         *sym.SymbolTable
@@ -102,6 +104,10 @@ func (c *Context) SetFullSymbolScope(b bool) *Context {
 	return c
 }
 
+func (c *Context) SetPC(pc int) {
+	c.pc = pc
+}
+
 func (c *Context) SetGlobal(name string, value interface{}) error {
 	return c.symbols.SetGlobal(name, value)
 }
@@ -126,6 +132,10 @@ func (c *Context) GetOutput() string {
 		return c.output.String()
 	}
 	return ""
+}
+
+func (c *Context) SetTracing(b bool) {
+	c.tracing = b
 }
 
 // SetTokenizer sets a tokenizer in the current context for tracing and debugging.
@@ -160,6 +170,21 @@ func (c *Context) AppendSymbols(s symbols.SymbolTable) {
 // SetByteCode attaches a new bytecode object to the current run context.
 func (c *Context) SetByteCode(b *ByteCode) {
 	c.bc = b
+}
+
+func (c *Context) SetSingleStep(b bool) {
+	c.singleStep = b
+}
+func (c *Context) SingleStep() bool {
+	return c.singleStep
+}
+
+func (c *Context) SetStepOver(b bool) {
+	c.stepOver = b
+}
+
+func (c *Context) GetModuleName() string {
+	return c.bc.Name
 }
 
 // SetConstant is a helper function to define a constant value

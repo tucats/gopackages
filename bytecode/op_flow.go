@@ -42,6 +42,7 @@ func PanicImpl(c *Context, i interface{}) error {
 // in error messaging, primarily.
 func AtLineImpl(c *Context, i interface{}) error {
 	c.line = util.GetInt(i)
+	c.stepOver = false
 	// Are we in debug mode?
 	if c.debugging {
 		return errors.New("signal")
@@ -279,6 +280,7 @@ func ReturnImpl(c *Context, i interface{}) error {
 
 func (c *Context) PushContext(tableName string, bc *ByteCode, pc int) {
 	_ = c.Push(c.symbols)
+	_ = c.Push(c.singleStep)
 	_ = c.Push(c.bc)
 	_ = c.Push(c.pc)
 	_ = c.Push(c.fp)
@@ -288,6 +290,12 @@ func (c *Context) PushContext(tableName string, bc *ByteCode, pc int) {
 
 	c.bc = bc
 	c.pc = pc
+
+	// Now that we've saved state on the stack, if we are in step-over mode,
+	// then turn of single stepping
+	if c.singleStep && c.stepOver {
+		c.singleStep = false
+	}
 }
 
 func (c *Context) PopContext() {
@@ -307,7 +315,9 @@ func (c *Context) PopContext() {
 	if x, err := c.Pop(); err == nil {
 		c.bc = x.(*ByteCode)
 	}
-
+	if x, err := c.Pop(); err == nil {
+		c.singleStep = util.GetBool(x)
+	}
 	if x, err := c.Pop(); err == nil {
 		c.symbols = x.(*symbols.SymbolTable)
 	}

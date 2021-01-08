@@ -27,7 +27,7 @@ func Show(s *symbols.SymbolTable, tokens *tokenizer.Tokenizer, line int, tx *tok
 		syms := s
 		depth := 0
 		fmt.Printf("Symbol table scope:\n")
-		for syms.Parent != nil {
+		for syms != nil {
 			idx := "local"
 			if depth > 0 {
 				idx = fmt.Sprintf("%5d", depth)

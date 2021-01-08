@@ -7,7 +7,6 @@ import (
 
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/compiler"
-	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
 	"github.com/tucats/gopackages/util"
 )
@@ -31,7 +30,7 @@ type breakPoint struct {
 
 var breakPoints = []breakPoint{}
 
-func Break(t *tokenizer.Tokenizer) error {
+func Break(c *bytecode.Context, t *tokenizer.Tokenizer) error {
 	var err error
 	var line int
 	t.Advance(1)
@@ -55,7 +54,7 @@ func Break(t *tokenizer.Tokenizer) error {
 			if t.Peek(1) == ":" {
 				t.Advance(1)
 			} else {
-				name = "main"
+				name = c.GetModuleName()
 				t.Advance(-1)
 			}
 			line, err = strconv.Atoi(t.Next())
@@ -120,7 +119,10 @@ func FormatBreakpoint(b breakPoint) string {
 	}
 }
 
-func EvaluateBreakpoint(s *symbols.SymbolTable, module string, line int, text string) bool {
+// Using the current execution state, determine if a breakpoint has
+// been encountered.
+func EvaluateBreakpoint(c *bytecode.Context) bool {
+	s := c.GetSymbols()
 	msg := ""
 	prompt := false
 	for _, b := range breakPoints {
@@ -135,8 +137,14 @@ func EvaluateBreakpoint(s *symbols.SymbolTable, module string, line int, text st
 			ctx := bytecode.NewContext(s, b.expr)
 			ctx.SetDebug(false)
 			err := ctx.Run()
-			if err != nil && err.Error() == "stop" {
-				err = nil
+			if err != nil {
+				if err.Error() == StepOver.Error() {
+					err = nil
+					ctx.StepOver(true)
+				}
+				if err.Error() == SignalDebugger.Error() {
+					err = nil
+				}
 			}
 			//fmt.Printf("Break expression status = %v\n", err)
 			if err == nil {
@@ -153,10 +161,15 @@ func EvaluateBreakpoint(s *symbols.SymbolTable, module string, line int, text st
 			msg = "Break when " + b.text
 
 		case BreakAlways:
+			line := c.GetLine()
+			module := c.GetModuleName()
+			// fmt.Printf("Evaluating %s:%d = %s\n", module, line, text)
 			if module == b.module && line == b.line {
 				prompt = true
+				text := c.GetTokenizer().GetLine(line)
 				msg = fmt.Sprintf("%s:\n\t%5d, %s", breakAt, line, text)
 				b.hit++
+				break
 			}
 		}
 	}

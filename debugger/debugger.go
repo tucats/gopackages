@@ -1,11 +1,11 @@
 package debugger
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/tucats/ego/io"
+	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/compiler"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
@@ -16,27 +16,50 @@ const (
 	breakAt = "Break at"
 )
 
-var singleStep bool = true
+// Run a context but allow the debugger to take control as
+// needed.
+func Run(c *bytecode.Context) error {
+	return RunFrom(c, 0)
+}
+
+func RunFrom(c *bytecode.Context, pc int) error {
+	var err error
+	c.SetPC(pc)
+
+	for err == nil {
+		err = c.Resume()
+		if err != nil && err.Error() == SignalDebugger.Error() {
+			err = Debugger(c)
+		}
+		if err != nil && err.Error() == Stop.Error() {
+			return nil
+		}
+	}
+	return err
+}
 
 // This is called on AtLine to offer the chance for the debugger to take control.
-func Debugger(s *symbols.SymbolTable, module string, line int, tx *tokenizer.Tokenizer) error {
+func Debugger(c *bytecode.Context) error {
 	var err error
-	text := tx.GetLine(line)
+
+	line := c.GetLine()
+	text := c.GetTokenizer().GetLine(line)
+	s := c.GetSymbols()
 
 	prompt := false
 	// Are we in single-step mode?
-	if singleStep {
+	if c.SingleStep() {
 		fmt.Printf("%s:\n\t%5d, %s\n", stepTo, line, text)
 		prompt = true
 	} else {
-		prompt = EvaluateBreakpoint(s, module, line, text)
+		prompt = EvaluateBreakpoint(c)
 	}
 
 	for prompt {
 		var tokens *tokenizer.Tokenizer
 
 		for {
-			// cmd := "break when a == 55"
+			// cmd := ""
 			cmd := getLine()
 			if len(strings.TrimSpace(cmd)) == 0 {
 				cmd = "step"
@@ -55,15 +78,29 @@ func Debugger(s *symbols.SymbolTable, module string, line int, tx *tokenizer.Tok
 				_ = Help()
 
 			case "go", "continue":
-				singleStep = false
+				c.SetSingleStep(false)
 				prompt = false
 
 			case "step":
-				singleStep = true
+				c.SetSingleStep(true)
+				c.SetStepOver(false)
 				prompt = false
+				if tokens.Peek(2) == "over" {
+					c.SetStepOver(true)
+				} else {
+					if tokens.Peek(2) == "into" {
+						c.SetStepOver(false)
+					} else {
+						if tokens.Peek(2) != tokenizer.EndOfTokens {
+							err = fmt.Errorf("unrecognized step type: %s", tokens.Peek(2))
+							c.SetSingleStep(false)
+							prompt = true
+						}
+					}
+				}
 
 			case "show":
-				err = Show(s, tokens, line, tx)
+				err = Show(s, tokens, line, c.GetTokenizer())
 
 			case "set":
 				err = runAfterFirstToken(s, tokens)
@@ -75,21 +112,25 @@ func Debugger(s *symbols.SymbolTable, module string, line int, tx *tokenizer.Tok
 				text := "fmt.Println(" + strings.Replace(tokens.GetSource(), "print", "", 1) + ")"
 				t2 := tokenizer.New(text)
 				err = compiler.Run("debugger", s, t2)
-
+				if err != nil && err.Error() == Stop.Error() {
+					err = nil
+				}
 			case "break":
-				err = Break(tokens)
+				err = Break(c, tokens)
 
 			case "exit":
-				return errors.New("stop")
+				return Stop
 
 			default:
-				fmt.Printf("Unrecognized command: %s\n", t)
+				err = fmt.Errorf("unrecognized command: %s", t)
 			}
-			if err != nil {
-				if err.Error() != "stop" {
-					fmt.Printf("Debugger error, %v\n", err)
-				}
+			if err != nil && err.Error() != Stop.Error() && err.Error() != StepOver.Error() {
+				fmt.Printf("Debugger error, %v\n", err)
 				err = nil
+			}
+			if err != nil && err.Error() == Stop.Error() {
+				err = nil
+				prompt = false
 			}
 		}
 	}

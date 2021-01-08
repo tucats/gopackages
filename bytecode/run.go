@@ -29,6 +29,10 @@ func (c *Context) GetName() string {
 	return "main"
 }
 
+func (c *Context) StepOver(b bool) {
+	c.stepOver = b
+}
+
 func (c *Context) GetSymbols() *symbols.SymbolTable {
 	return c.symbols
 }
