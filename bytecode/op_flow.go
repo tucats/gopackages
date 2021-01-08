@@ -48,7 +48,7 @@ func AtLineImpl(c *Context, i interface{}) error {
 		return errors.New("signal")
 	}
 	// If we are tracing, put that out now.
-	if c.tokenizer != nil {
+	if c.tracing && c.tokenizer != nil {
 		fmt.Printf("%d:  %s\n", c.line, c.tokenizer.GetLine(c.line))
 	}
 	return nil
