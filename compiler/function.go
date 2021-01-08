@@ -110,6 +110,8 @@ func (c *Compiler) Function(literal bool) error {
 		p[0] = len(parameters)
 		p[1] = -1
 	}
+
+	b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
 	b.Emit(bytecode.ArgCheck, p)
 
 	// If there was a "this" variable defined, process it now.

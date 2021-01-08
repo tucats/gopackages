@@ -89,7 +89,8 @@ func (c *Context) RunFromAddress(addr int) error {
 			if !fullStackListing && len(s2) > 50 {
 				s2 = s2[:50]
 			}
-			ui.Debug(ui.ByteCodeLogger, "%5d: %-30s stack[%2d]: %s", c.pc, s, c.sp, s2)
+			ui.Debug(ui.ByteCodeLogger, "%8s%3d: %-30s stack[%2d]: %s",
+				c.GetModuleName(), c.pc, s, c.sp, s2)
 		}
 		c.pc = c.pc + 1
 

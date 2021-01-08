@@ -49,7 +49,7 @@ func Debugger(c *bytecode.Context) error {
 	prompt := false
 	// Are we in single-step mode?
 	if c.SingleStep() {
-		fmt.Printf("%s:\n\t%5d, %s\n", stepTo, line, text)
+		fmt.Printf("%s:\n  %s %3d, %s\n", stepTo, c.GetModuleName(), line, text)
 		prompt = true
 	} else {
 		prompt = EvaluateBreakpoint(c)
