@@ -134,6 +134,14 @@ func Format(arg interface{}) string {
 			return fmt.Sprintf("<%s>", name)
 		}
 
+		if strings.HasPrefix(vv.String(), "<bytecode.CallFrame") {
+			e := reflect.ValueOf(v).Field(0)
+			module := GetString(e.Interface())
+			e = reflect.ValueOf(v).Field(1)
+			line := GetInt(e.Interface())
+			return fmt.Sprintf("<frame %s:%d>", module, line)
+		}
+
 		if ui.DebugMode {
 			return fmt.Sprintf("kind %v %#v", vv.Kind(), v)
 		}

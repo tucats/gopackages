@@ -124,7 +124,7 @@ func LocalCallImpl(c *Context, i interface{}) error {
 	// Make a new symbol table for the fucntion to run with,
 	// and a new execution context. Store the argument list in
 	// the child table.
-	c.PushContext("defer", c.bc, util.GetInt(i))
+	c.PushFrame("defer", c.bc, util.GetInt(i))
 	return nil
 
 }
@@ -181,7 +181,7 @@ func CallImpl(c *Context, i interface{}) error {
 		// Make a new symbol table for the fucntion to run with,
 		// and a new execution context. Note that this table has no
 		// visibility into the current scope of symbol values.
-		c.PushContext("function "+af.Name, af, 0)
+		c.PushFrame("function "+af.Name, af, 0)
 		_ = c.SetAlways("_args", args)
 		if c.this != nil {
 			_ = c.SetAlways("_this", c.this)
@@ -273,68 +273,9 @@ func ReturnImpl(c *Context, i interface{}) error {
 	if err == nil {
 		// Use the frame pointer to reset the stack and retrieve the
 		// runtime state
-		c.PopContext()
+		err = c.PopFrame()
 	}
 	return err
-}
-
-func (c *Context) PushContext(tableName string, bc *ByteCode, pc int) {
-	_ = c.Push(c.symbols)
-	_ = c.Push(c.singleStep)
-	_ = c.Push(c.bc)
-	_ = c.Push(c.pc)
-	_ = c.Push(c.fp)
-	c.fp = c.sp
-	c.result = nil
-	c.symbols = symbols.NewChildSymbolTable(tableName, c.symbols)
-
-	c.bc = bc
-	c.pc = pc
-
-	// Now that we've saved state on the stack, if we are in step-over mode,
-	// then turn of single stepping
-	if c.singleStep && c.stepOver {
-		c.singleStep = false
-	}
-}
-
-func (c *Context) PopContext() {
-
-	// First, is there stuff on the stack we want to preserve?
-	topOfStackSlice := c.stack[c.fp : c.sp+1]
-
-	// Now retrieve the runtime context stored on the stack and
-	// indicated by the fp (frame pointer)
-	c.sp = c.fp
-	if x, err := c.Pop(); err == nil {
-		c.fp = util.GetInt(x)
-	}
-	if x, err := c.Pop(); err == nil {
-		c.pc = util.GetInt(x)
-	}
-	if x, err := c.Pop(); err == nil {
-		c.bc = x.(*ByteCode)
-	}
-	if x, err := c.Pop(); err == nil {
-		c.singleStep = util.GetBool(x)
-	}
-	if x, err := c.Pop(); err == nil {
-		c.symbols = x.(*symbols.SymbolTable)
-	}
-
-	// Finally, if there _was_ stuff on the stack after the call,
-	// it might be a multi-value return, so push that back.
-	if len(topOfStackSlice) > 0 {
-		c.stack = append(c.stack[:c.sp], topOfStackSlice...)
-		c.sp = c.sp + len(topOfStackSlice)
-	} else {
-		// Alternatively, it could be a single-value return using the
-		// result holder. If so, push that on the stack and clear it.
-		if c.result != nil {
-			_ = c.Push(c.result)
-			c.result = nil
-		}
-	}
 }
 
 // ArgCheckImpl instruction processor verifies that there are enough items

@@ -17,6 +17,7 @@ const (
 	InvalidArgTypeError           = "function argument is of wrong type"
 	InvalidArrayIndexError        = "invalid array index"
 	InvalidBytecodeAddress        = "invalid bytecode address"
+	InvalidCallFrame              = "invalid call frame on stack"
 	InvalidFunctionCallError      = "invalid function call"
 	InvalidIdentifierError        = "invalid identifier"
 	InvalidSliceIndexError        = "invalid slice index"
