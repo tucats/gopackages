@@ -45,6 +45,7 @@ type PackageDictionary map[string]FunctionDictionary
 // Compiler is a structure defining what we know about the compilation
 type Compiler struct {
 	PackageName          string
+	SourceFile           string
 	b                    *bytecode.ByteCode
 	t                    *tokenizer.Tokenizer
 	s                    *symbols.SymbolTable
@@ -263,6 +264,8 @@ func (c *Compiler) AutoImport(all bool) error {
 
 	savedBC := c.b
 	savedT := c.t
+	savedSource := c.SourceFile
+
 	var firstError error
 	for _, packageName := range sortedPackageNames {
 		text := "import " + packageName
@@ -274,5 +277,7 @@ func (c *Compiler) AutoImport(all bool) error {
 	}
 	c.b = savedBC
 	c.t = savedT
+	c.SourceFile = savedSource
+
 	return firstError
 }

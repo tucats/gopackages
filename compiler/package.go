@@ -109,6 +109,7 @@ func (c *Compiler) Import() error {
 		savedTokenizer := c.t
 		savedBlockDepth := c.blockDepth
 		savedStatementCount := c.statementCount
+		savedSourceFile := c.SourceFile
 
 		// Read the imported object as a file path
 		text, err := c.ReadFile(fileName)
@@ -147,9 +148,11 @@ func (c *Compiler) Import() error {
 			return c.NewError(MissingEndOfBlockError, packageName)
 		}
 
-		// Reset the token stream we were working on
+		// Reset the compiler back to the token stream we were working on
 		c.t = savedTokenizer
 		c.PackageName = savedPackageName
+		c.SourceFile = savedSourceFile
+
 		//	c.blockDepth = savedBlockDepth
 		c.statementCount = savedStatementCount
 		if !isList {
@@ -171,18 +174,25 @@ func (c *Compiler) ReadFile(name string) (string, error) {
 	}
 	ui.Debug(ui.CompilerLogger, "+++ Reading package file %s", name)
 	// Not a directory, try to read the file
-	content, err := ioutil.ReadFile(name)
+
+	fn := name
+	content, err := ioutil.ReadFile(fn)
 	if err != nil {
 		content, err = ioutil.ReadFile(name + ".ego")
 		if err != nil {
 			r := os.Getenv("EGO_PATH")
-			fn := filepath.Join(r, "lib", name+".ego")
+			fn = filepath.Join(r, "lib", name+".ego")
 			content, err = ioutil.ReadFile(fn)
 			if err != nil {
 				c.t.Advance(-1)
 				return "", c.NewError("unable to read import file", err.Error())
 			}
+		} else {
+			fn = name + ".ego"
 		}
+	}
+	if err == nil {
+		c.SourceFile = fn
 	}
 
 	// Convert []byte to string

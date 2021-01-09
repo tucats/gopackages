@@ -100,6 +100,11 @@ func (c *Compiler) Function(literal bool) error {
 
 	b := bytecode.New(fname)
 
+	// If we know our source file, mark it in the bytecode now.
+	if c.SourceFile != "" {
+		b.Emit(bytecode.FromFile, c.SourceFile)
+	}
+
 	// Generate the argument check
 	p := []interface{}{
 		len(parameters),

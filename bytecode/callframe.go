@@ -1,6 +1,9 @@
 package bytecode
 
-import "github.com/tucats/gopackages/symbols"
+import (
+	"github.com/tucats/gopackages/symbols"
+	"github.com/tucats/gopackages/tokenizer"
+)
 
 // Type of object pushed/popped from stack describes a call frame
 type CallFrame struct {
@@ -8,6 +11,7 @@ type CallFrame struct {
 	Line       int
 	Symbols    *symbols.SymbolTable
 	Bytecode   *ByteCode
+	Tokenizer  *tokenizer.Tokenizer
 	SingleStep bool
 	PC         int
 	FP         int
@@ -21,6 +25,7 @@ func (c *Context) PushFrame(tableName string, bc *ByteCode, pc int) {
 		Symbols:    c.symbols,
 		Bytecode:   c.bc,
 		SingleStep: c.singleStep,
+		Tokenizer:  c.tokenizer,
 		PC:         c.pc,
 		FP:         c.fp,
 		Module:     c.bc.Name,
@@ -59,6 +64,7 @@ func (c *Context) PopFrame() error {
 		c.line = callFrame.Line
 		c.symbols = callFrame.Symbols
 		c.singleStep = callFrame.SingleStep
+		c.tokenizer = callFrame.Tokenizer
 		c.bc = callFrame.Bytecode
 		c.pc = callFrame.PC
 		c.fp = callFrame.FP

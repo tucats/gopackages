@@ -3,9 +3,11 @@ package bytecode
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"text/template"
 
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/tokenizer"
 	"github.com/tucats/gopackages/util"
 )
 
@@ -212,4 +214,25 @@ func ResponseImpl(c *Context, i interface{}) error {
 		c.output.WriteRune('\n')
 	}
 	return nil
+}
+
+/******************************************\
+*                                         *
+*             U T I L I T Y               *
+*                                         *
+\******************************************/
+
+// FromFileImpl loads the context tokenizer with the
+// source from a file if it does not alrady exist and
+// we are in debug mode.
+func FromFileImpl(c *Context, i interface{}) error {
+	if !c.debugging {
+		return nil
+	}
+
+	b, err := ioutil.ReadFile(util.GetString(i))
+	if err == nil {
+		c.tokenizer = tokenizer.New(string(b))
+	}
+	return err
 }
