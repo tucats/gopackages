@@ -15,6 +15,7 @@ var helpText = [][]string{
 	{"print", "Print the value of an expression"},
 	{"set", "Set a variable to a value"},
 	{"show breaks", "Display list of breakpoints"},
+	{"show calls [n]", "Display the call stack to the given depth"},
 	{"show symbols", "Display the current symbol table"},
 	{"show line", "Display the current program line"},
 	{"show scope", "Display nested call scope"},

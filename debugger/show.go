@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
-func Show(s *symbols.SymbolTable, tokens *tokenizer.Tokenizer, line int, tx *tokenizer.Tokenizer) error {
+func Show(s *symbols.SymbolTable, tokens *tokenizer.Tokenizer, line int, c *bytecode.Context) error {
 	t := tokens.Peek(2)
+	tx := c.GetTokenizer()
+
 	var err error
 	switch t {
 
@@ -22,6 +25,18 @@ func Show(s *symbols.SymbolTable, tokens *tokenizer.Tokenizer, line int, tx *tok
 	case "line":
 		text := tx.GetLine(line)
 		fmt.Printf("%s:\n\t%5d, %s\n", stepTo, line, text)
+
+	case "frames", "calls":
+		depth := -1
+		tx := tokens.Peek(3)
+		if tx != tokenizer.EndOfTokens {
+			if tx != "all" {
+				depth, err = strconv.Atoi(tx)
+			}
+		}
+		if err == nil {
+			fmt.Print(c.FormatFrames(depth))
+		}
 
 	case "scope":
 		syms := s

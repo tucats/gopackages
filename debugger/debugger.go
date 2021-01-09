@@ -100,7 +100,7 @@ func Debugger(c *bytecode.Context) error {
 				}
 
 			case "show":
-				err = Show(s, tokens, line, c.GetTokenizer())
+				err = Show(s, tokens, line, c)
 
 			case "set":
 				err = runAfterFirstToken(s, tokens)

@@ -1,6 +1,8 @@
 package bytecode
 
 import (
+	"fmt"
+
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
 )
@@ -86,4 +88,29 @@ func (c *Context) PopFrame() error {
 		}
 	}
 	return err
+}
+
+func (c *Context) FormatFrames(maxDepth int) string {
+	f := c.fp
+	depth := 1
+	r := fmt.Sprintf("Call frames:\n  at: %12s  (%s)\n",
+		formatLocation(c.GetModuleName(), c.line), c.symbols.Name)
+
+	for (maxDepth < 0 || depth < maxDepth) && f > 0 {
+		fx := c.stack[f-1]
+		if frame, ok := fx.(CallFrame); ok {
+			r = r + fmt.Sprintf("from: %12s  (%s)\n",
+				formatLocation(frame.Module, frame.Line), frame.Symbols.Name)
+			depth++
+			f = frame.FP
+		} else {
+			break
+		}
+
+	}
+	return r
+}
+
+func formatLocation(module string, line int) string {
+	return fmt.Sprintf("%s %d", module, line)
 }
