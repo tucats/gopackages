@@ -131,7 +131,7 @@ func GetVarArgsImpl(c *Context, i interface{}) error {
 	err := c.NewError(VarArgError)
 	argPos := util.GetInt(i)
 
-	if arrayV, ok := c.Get("_args"); ok {
+	if arrayV, ok := c.Get("__args"); ok {
 		if args, ok := arrayV.([]interface{}); ok {
 			// If no more args in the list to satisfy, push empty array
 			if len(args) < argPos {

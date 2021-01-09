@@ -577,7 +577,7 @@ func StaticTypingImpl(c *Context, i interface{}) error {
 	v, err := c.Pop()
 	if err == nil {
 		c.Static = util.GetBool(v)
-		err = c.symbols.SetAlways("_static_data_types", c.Static)
+		err = c.symbols.SetAlways("__static_data_types", c.Static)
 	}
 	return err
 }

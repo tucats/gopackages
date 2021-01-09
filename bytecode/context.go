@@ -53,7 +53,7 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 	}
 
 	static := false
-	if s, ok := s.Get("_static_data_types"); ok {
+	if s, ok := s.Get("__static_data_types"); ok {
 		static = util.GetBool(s)
 	}
 	ctx := Context{

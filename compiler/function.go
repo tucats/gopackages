@@ -135,7 +135,7 @@ func (c *Compiler) Function(literal bool) error {
 		if p.kind == bytecode.VarArgs {
 			b.Emit(bytecode.GetVarArgs, n)
 		} else {
-			b.Emit(bytecode.Load, "_args")
+			b.Emit(bytecode.Load, "__args")
 			b.Emit(bytecode.Push, n)
 			b.Emit(bytecode.LoadIndex)
 		}

@@ -132,7 +132,7 @@ func Open(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 // getThis returns a map for the "this" object in the current
 // symbol table.
 func getThis(s *symbols.SymbolTable) map[string]interface{} {
-	t, ok := s.Get("_this")
+	t, ok := s.Get("__this")
 	if !ok {
 		return nil
 	}

@@ -43,6 +43,8 @@ func PanicImpl(c *Context, i interface{}) error {
 func AtLineImpl(c *Context, i interface{}) error {
 	c.line = util.GetInt(i)
 	c.stepOver = false
+	_ = c.symbols.SetAlways("__line", c.line)
+	_ = c.symbols.SetAlways("__module", c.bc.Name)
 	// Are we in debug mode?
 	if c.debugging {
 		return errors.New("signal")
@@ -182,9 +184,9 @@ func CallImpl(c *Context, i interface{}) error {
 		// and a new execution context. Note that this table has no
 		// visibility into the current scope of symbol values.
 		c.PushFrame("function "+af.Name, af, 0)
-		_ = c.SetAlways("_args", args)
+		_ = c.SetAlways("__args", args)
 		if c.this != nil {
-			_ = c.SetAlways("_this", c.this)
+			_ = c.SetAlways("__this", c.this)
 			c.this = nil
 		}
 
@@ -217,7 +219,7 @@ func CallImpl(c *Context, i interface{}) error {
 		funcSymbols.ScopeBoundary = true
 
 		if c.this != nil {
-			_ = funcSymbols.SetAlways("_this", c.this)
+			_ = funcSymbols.SetAlways("__this", c.this)
 			c.this = nil
 		}
 		result, err = af(funcSymbols, args)
@@ -319,7 +321,7 @@ func ArgCheckImpl(c *Context, i interface{}) error {
 		return c.NewError(InvalidArgCheckError)
 	}
 
-	v, found := c.Get("_args")
+	v, found := c.Get("__args")
 	if !found {
 		return c.NewError(InvalidArgCheckError)
 	}

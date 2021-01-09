@@ -20,11 +20,13 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 	}
 	b.WriteString(":\n")
 
-	// Iterate over the members to get a list of the keys
-
+	// Iterate over the members to get a list of the keys. Discard invisible
+	// items.
 	keys := make([]string, 0)
 	for k := range s.Symbols {
-		keys = append(keys, k)
+		if !strings.HasPrefix(k, "__") {
+			keys = append(keys, k)
+		}
 	}
 	sort.Strings(keys)
 
