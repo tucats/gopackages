@@ -407,7 +407,7 @@ func (c *Compiler) atStatementEnd() bool {
 // we are not in the given mode.
 func (c *Compiler) modeCheck(mode string, check bool) error {
 
-	c.b.Emit(bytecode.Load, "_mode")
+	c.b.Emit(bytecode.Load, "__exec_mode")
 	c.b.Emit(bytecode.Push, mode)
 	c.b.Emit(bytecode.Equal)
 	branch := c.b.Mark()
@@ -418,7 +418,7 @@ func (c *Compiler) modeCheck(mode string, check bool) error {
 	}
 	c.b.Emit(bytecode.Push, WrongModeError)
 	c.b.Emit(bytecode.Push, ": ")
-	c.b.Emit(bytecode.Load, "_mode")
+	c.b.Emit(bytecode.Load, "__exec_mode")
 	c.b.Emit(bytecode.Add)
 	c.b.Emit(bytecode.Add)
 	c.b.Emit(bytecode.Panic, false) // Does not cause fatal error

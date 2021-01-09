@@ -134,10 +134,19 @@ func Array(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error
 
 }
 
-// GetEnv implementes the util.getenv() function which reads
+// GetEnv implements the util.getenv() function which reads
 // an environment variable from the os.
 func GetEnv(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return os.Getenv(util.GetString(args[0])), nil
+}
+
+// GetMode implements the util.Mode() function which reports the runtime mode
+func GetMode(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	m, ok := symbols.Get("__exec_mode")
+	if !ok {
+		m = "run"
+	}
+	return m, nil
 }
 
 // Members gets an array of the names of the fields in a structure
@@ -346,4 +355,14 @@ func Delete(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	default:
 		return nil, errors.New(InvalidTypeError)
 	}
+}
+
+// GetArgs implements util.Args() which fetches command-line arguments from
+// the Ego command invocation, if any.
+func GetArgs(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+	r, found := s.Get("__cli_args")
+	if !found {
+		r = []interface{}{}
+	}
+	return r, nil
 }

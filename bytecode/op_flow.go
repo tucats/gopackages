@@ -197,7 +197,13 @@ func CallImpl(c *Context, i interface{}) error {
 		fname := runtime.FuncForPC(reflect.ValueOf(af).Pointer()).Name()
 		fname = strings.Replace(fname, "github.com/tucats/gopackages/", "", 1)
 
-		isUtilSymbols := (fname == "functions.FormatSymbols")
+		// See if it is a builtin function that needs visibility to the entire
+		// symbol stack without binding the scope to the parent of the current
+		// stack.
+		fullSymbolVisibility := c.fullSymbolScope
+		if df != nil {
+			fullSymbolVisibility = fullSymbolVisibility || df.FullScope
+		}
 
 		if df != nil {
 			if len(args) < df.Min || len(args) > df.Max {
@@ -209,7 +215,7 @@ func CallImpl(c *Context, i interface{}) error {
 		// Note special exclusion for the case of the util.Symbols function which must be
 		// able to see the entire tree...
 		parentTable := c.symbols
-		if !isUtilSymbols && !c.fullSymbolScope {
+		if !fullSymbolVisibility {
 			for !parentTable.ScopeBoundary && parentTable.Parent != nil {
 				parentTable = parentTable.Parent
 			}

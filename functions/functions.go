@@ -17,6 +17,7 @@ type FunctionDefinition struct {
 	Min       int
 	Max       int
 	ErrReturn bool
+	FullScope bool
 	F         interface{}
 }
 
@@ -98,11 +99,13 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"time.Now":             {Min: 0, Max: 0, F: TimeNow},
 	"time.Sleep":           {Min: 1, Max: 1, F: Sleep},
 	"time.Subtract":        {Min: 2, Max: 2, F: TimeSub},
+	"util.Args":            {Min: 0, Max: 0, F: GetArgs, FullScope: true},
 	"util.Coerce":          {Min: 2, Max: 2, F: Coerce},
 	"util.Exit":            {Min: 0, Max: 1, F: Exit},
 	"util.Getenv":          {Min: 1, Max: 1, F: GetEnv},
+	"util.Mode":            {Min: 0, Max: 0, F: GetMode, FullScope: true},
 	"util.Normalize":       {Min: 2, Max: 2, F: Normalize},
-	"util.Symbols":         {Min: 0, Max: 1, F: FormatSymbols},
+	"util.Symbols":         {Min: 0, Max: 1, F: FormatSymbols, FullScope: true},
 	"util.UUID":            {Min: 0, Max: 0, F: UUID},
 }
 
