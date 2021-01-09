@@ -19,7 +19,8 @@ var helpText = [][]string{
 	{"show line", "Display the current program line"},
 	{"show scope", "Display nested call scope"},
 	{"show source [start [:end]]", "Display source of current module"},
-	{"step", "Execute the next line of the program"},
+	{"step [into]", "Execute the next line of the program"},
+	{"step over", "Step over a function call to the next line in this program"},
 }
 
 func Help() error {
