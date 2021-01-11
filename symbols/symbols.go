@@ -1,6 +1,8 @@
 package symbols
 
 import (
+	"sync"
+
 	"github.com/google/uuid"
 )
 
@@ -66,9 +68,11 @@ func (s *SymbolTable) Get(name string) (interface{}, bool) {
 
 	v, f := s.Symbols[name]
 
+	constLock.Lock()
 	if !f {
 		v, f = s.Constants[name]
 	}
+	constLock.Unlock()
 
 	if !f && s.Parent != nil {
 		return s.Parent.Get(name)
@@ -76,12 +80,18 @@ func (s *SymbolTable) Get(name string) (interface{}, bool) {
 	return v, f
 }
 
-// SetConstant stores a constant for readonly use in the symbol table.
+var constLock sync.Mutex
+
+// SetConstant stores a constant for readonly use in the symbol table. Because this could be
+// done from many different threads in a REST server mode, use a lock to serialize writes.
 func (s *SymbolTable) SetConstant(name string, v interface{}) error {
+	constLock.Lock()
 	if s.Constants == nil {
 		s.Constants = map[string]interface{}{}
 	}
 	s.Constants[name] = v
+	constLock.Unlock()
+
 	return nil
 }
 
@@ -213,7 +223,10 @@ func (s *SymbolTable) Create(name string) error {
 func (s *SymbolTable) IsConstant(name string) bool {
 
 	if s.Constants != nil {
+		constLock.Lock()
 		_, found := s.Constants[name]
+		constLock.Unlock()
+
 		if found {
 			return true
 		}
