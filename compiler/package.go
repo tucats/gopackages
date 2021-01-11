@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/tucats/ego/defs"
 	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/symbols"
@@ -205,7 +204,7 @@ func (c *Compiler) ReadDirectory(name string) (string, error) {
 	var b strings.Builder
 	r := os.Getenv("EGO_PATH")
 	if r == "" {
-		r = persistence.Get(defs.EgoPathSetting)
+		r = persistence.Get(EgoPathSetting)
 	}
 	r = filepath.Join(r, "lib")
 

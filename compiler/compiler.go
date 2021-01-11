@@ -16,6 +16,9 @@ const (
 	rangeLoopType       = 2
 	forLoopType         = 3
 	conditionalLoopType = 4
+
+	ExtensionsSetting = "ego.compiler.extensions"
+	EgoPathSetting    = "ego.path"
 )
 
 // RequiredPackages is the list of packages that are always imported, regardless
@@ -71,7 +74,7 @@ func New() *Compiler {
 		deferQueue:           make([]int, 0),
 		packages:             PackageDictionary{},
 		LowercaseIdentifiers: false,
-		extensionsEnabled:    persistence.GetBool("extensions-enabled"),
+		extensionsEnabled:    persistence.GetBool(ExtensionsSetting),
 	}
 	return &cInstance
 }
