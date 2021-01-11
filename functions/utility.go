@@ -35,6 +35,14 @@ func ProfileGet(symbols *symbols.SymbolTable, args []interface{}) (interface{}, 
 func ProfileSet(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	key := util.GetString(args[0])
 
+	// Quick check here. The key must already exist if it's one of the
+	// "system" settings. That is, you can't create an ego.* setting that
+	// doesn't exist yet, for example
+	if strings.HasPrefix(key, "ego.") {
+		if !persistence.Exists(key) {
+			return nil, NewError("Set", "cannot create reserved setting", key)
+		}
+	}
 	// If the value is an empty string, delete the key else
 	// store the value for the key.
 	value := util.GetString(args[1])
@@ -43,7 +51,8 @@ func ProfileSet(symbols *symbols.SymbolTable, args []interface{}) (interface{}, 
 	} else {
 		persistence.Set(key, value)
 	}
-	return nil, nil
+
+	return nil, persistence.Save()
 }
 
 // ProfileDelete implements the profile.delete() function
