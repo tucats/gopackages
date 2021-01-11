@@ -147,8 +147,12 @@ func (c *Compiler) AddBuiltins(pkgname string) bool {
 		}
 
 		if f.Pkg == pkgname {
-			_ = c.AddPackageFunction(pkgname, name, f.F)
-			added = true
+			if f.F != nil {
+				_ = c.AddPackageFunction(pkgname, name, f.F)
+				added = true
+			} else {
+				_ = c.AddPackageValue(pkgname, name, f.V)
+			}
 		}
 	}
 	return added
@@ -184,6 +188,27 @@ func (c *Compiler) AddPackageFunction(pkgname string, name string, function inte
 		return c.NewError(FunctionAlreadyExistsError)
 	}
 	fd[name] = function
+	c.packages[pkgname] = fd
+
+	return nil
+}
+
+// AddPackageFunction adds a new package function to the compiler's package dictionary. If the
+// package name does not yet exist, it is created. The function name and interface are then used
+// to add an entry for that package.
+func (c *Compiler) AddPackageValue(pkgname string, name string, value interface{}) error {
+
+	fd, found := c.packages[pkgname]
+	if !found {
+		fd = FunctionDictionary{}
+		fd["__type"] = "package"
+		fd["__readonly"] = true
+	}
+
+	if _, found := fd[name]; found {
+		return c.NewError(FunctionAlreadyExistsError)
+	}
+	fd[name] = value
 	c.packages[pkgname] = fd
 
 	return nil

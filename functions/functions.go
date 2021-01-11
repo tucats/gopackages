@@ -19,6 +19,7 @@ type FunctionDefinition struct {
 	ErrReturn bool
 	FullScope bool
 	F         interface{}
+	V         interface{}
 }
 
 // MultiValueReturn is a type used to return a list of values from a builtin
@@ -95,10 +96,10 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"strings.Template":     {Min: 1, Max: 2, F: Template, ErrReturn: true},
 	"strings.Tokenize":     {Min: 1, Max: 1, F: Tokenize},
 	"strings.ToUpper":      {Min: 1, Max: 1, F: Upper},
-	"time.Add":             {Min: 2, Max: 2, F: TimeAdd},
 	"time.Now":             {Min: 0, Max: 0, F: TimeNow},
+	"time.Parse":           {Min: 1, Max: 2, F: TimeParse, ErrReturn: true},
+	"time.reference":       {V: "Mon Jan 2 15:04:05 -0700 MST 2006"},
 	"time.Sleep":           {Min: 1, Max: 1, F: Sleep},
-	"time.Subtract":        {Min: 2, Max: 2, F: TimeSub},
 	"util.Args":            {Min: 0, Max: 0, F: GetArgs, FullScope: true},
 	"util.Coerce":          {Min: 2, Max: 2, F: Coerce},
 	"util.Exit":            {Min: 0, Max: 1, F: Exit},
@@ -133,12 +134,20 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 				p = map[string]interface{}{}
 				ui.Debug(ui.CompilerLogger, "    AddBuiltins creating new package %s", d.Pkg)
 			}
-			p.(map[string]interface{})[n] = d.F
-			p.(map[string]interface{})["__type"] = "package"
-			p.(map[string]interface{})["__readonly"] = true
 
-			ui.Debug(ui.CompilerLogger, "    adding builtin %s to %s", n, d.Pkg)
-			_ = symbols.SetAlways(d.Pkg, p)
+			// Is this a value bound to the package, or a function?
+			if d.V != nil {
+				p.(map[string]interface{})[n] = d.V
+				ui.Debug(ui.CompilerLogger, "    adding value %s to %s", n, d.Pkg)
+				_ = symbols.SetAlways(d.Pkg, p)
+			} else {
+				p.(map[string]interface{})[n] = d.F
+				p.(map[string]interface{})["__type"] = "package"
+				p.(map[string]interface{})["__readonly"] = true
+
+				ui.Debug(ui.CompilerLogger, "    adding builtin %s to %s", n, d.Pkg)
+				_ = symbols.SetAlways(d.Pkg, p)
+			}
 		}
 	}
 }
@@ -150,9 +159,11 @@ func FindFunction(f func(*symbols.SymbolTable, []interface{}) (interface{}, erro
 	sf1 := reflect.ValueOf(f)
 
 	for _, d := range FunctionDictionary {
-		sf2 := reflect.ValueOf(d.F)
-		if sf1.Pointer() == sf2.Pointer() {
-			return &d
+		if d.F != nil { // Only function entry points have an F value
+			sf2 := reflect.ValueOf(d.F)
+			if sf1.Pointer() == sf2.Pointer() {
+				return &d
+			}
 		}
 	}
 	return nil
@@ -164,9 +175,11 @@ func FindName(f func(*symbols.SymbolTable, []interface{}) (interface{}, error)) 
 	sf1 := reflect.ValueOf(f)
 
 	for name, d := range FunctionDictionary {
-		sf2 := reflect.ValueOf(d.F)
-		if sf1.Pointer() == sf2.Pointer() {
-			return name
+		if d.F != nil {
+			sf2 := reflect.ValueOf(d.F)
+			if sf1.Pointer() == sf2.Pointer() {
+				return name
+			}
 		}
 	}
 
