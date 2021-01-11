@@ -304,7 +304,7 @@ func MemberImpl(c *Context, i interface{}) error {
 			}
 			return c.NewError(UnknownMemberError, name)
 		}
-		c.this = m // Remember where we loaded this from
+		c.lastStruct = m // Remember where we loaded this from
 	} else {
 		return c.NewError(InvalidTypeError)
 	}
@@ -415,7 +415,7 @@ func LoadIndexImpl(c *Context, i interface{}) error {
 			return c.NewError(UnknownMemberError, subscript)
 		}
 		_ = c.Push(v)
-		c.this = a
+		c.lastStruct = a
 
 	case []interface{}:
 		subscript := util.GetInt(index)
@@ -584,6 +584,12 @@ func StaticTypingImpl(c *Context, i interface{}) error {
 
 // ThisImpl implements the This opcode
 func ThisImpl(c *Context, i interface{}) error {
+
+	if i == nil {
+		c.this = c.lastStruct
+		c.lastStruct = nil
+		return nil
+	}
 	c.this = util.GetString(i)
 	v, err := c.Pop()
 	if err != nil {

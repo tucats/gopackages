@@ -9,6 +9,7 @@ func (c *Compiler) functionCall() error {
 
 	// Note, caller already consumed the opening paren
 	argc := 0
+	c.b.Emit(bytecode.This, nil)
 
 	for c.t.Peek(1) != ")" {
 		err := c.conditional()

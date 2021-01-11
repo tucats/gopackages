@@ -35,6 +35,7 @@ type Context struct {
 	try             []int
 	output          *strings.Builder
 	this            interface{}
+	lastStruct      interface{}
 	result          interface{}
 	argCountDelta   int
 }
