@@ -14,7 +14,7 @@ import (
 // OutputFormatAction sets the default output format to use.
 func OutputFormatAction(c *cli.Context) error {
 
-	if formatString, present := c.FindGlobal().GetString("output-format"); present {
+	if formatString, present := c.FindGlobal().GetString("ego.output-format"); present {
 		switch strings.ToLower(formatString) {
 		case "text":
 			ui.OutputFormat = ui.TextTableFormat
@@ -25,7 +25,7 @@ func OutputFormatAction(c *cli.Context) error {
 		default:
 			return errors.New("Invalid output format specified: " + formatString)
 		}
-		persistence.SetDefault("output-format", strings.ToLower(formatString))
+		persistence.SetDefault("ego.output-format", strings.ToLower(formatString))
 	}
 	return nil
 }

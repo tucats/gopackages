@@ -17,11 +17,11 @@ const (
 
 	// LogonServerSetting is the name of the profile item that
 	// describes the URL of the logon server (less the endpoint)
-	LogonServerSetting = "logon-server"
+	LogonServerSetting = "ego.logon.server"
 
 	// LogonTokenSetting is th ename of the profile item that
 	// contains the logon token recieved from a succesful logon
-	LogonTokenSetting = "logon-token"
+	LogonTokenSetting = "ego.logon.token"
 )
 
 // LogonGrammar describes the login subcommand
