@@ -22,6 +22,7 @@ const (
 	BlockQuoteError                = "invalid block quote"
 	FunctionAlreadyExistsError     = "function already defined"
 	GenericError                   = "general error"
+	InvalidChannelList             = "invalid use of assignment list for channel"
 	InvalidConstantError           = "invalid constant expression"
 	InvalidDirectiveError          = "invalid directive name"
 	InvalidFunctionArgument        = "invalid function argument"

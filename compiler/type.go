@@ -105,6 +105,8 @@ func (c *Compiler) compileType() error {
 			}
 		} else {
 			switch c.t.Next() {
+			case "chan":
+				c.b.Emit(bytecode.Push, make(chan interface{}))
 			case "int":
 				c.b.Emit(bytecode.Push, 0)
 			case "float", "double":

@@ -27,7 +27,7 @@ func (c *Compiler) IsLValue() bool {
 	// is a valid/correct lvalue. We also stop searching at some point.
 	for i := 2; i < 100; i = i + 1 {
 		t := c.t.Peek(i)
-		if util.InList(t, ":=", "=") {
+		if util.InList(t, ":=", "=", "<-") {
 			return true
 		}
 		if util.InList(t, "{", ";", tokenizer.EndOfTokens) {
@@ -72,7 +72,7 @@ func lvalueList(c *Compiler) (*bytecode.ByteCode, error) {
 		// Cheating here a bit; this opcode does an optional create
 		// if it's not found anywhere in the tree already.
 		bc.Emit(bytecode.SymbolOptCreate, name)
-		patchStore(bc, name)
+		patchStore(bc, name, false)
 		count++
 
 		if c.t.Peek(1) == "," {
@@ -80,11 +80,15 @@ func lvalueList(c *Compiler) (*bytecode.ByteCode, error) {
 			isLvalueList = true
 			continue
 		}
-		if util.InList(c.t.Peek(1), "=", ":=") {
+		if util.InList(c.t.Peek(1), "=", ":=", "<-") {
 			break
 		}
 	}
 	if isLvalueList {
+		// TODO if this is a channel store, then a list is not supported yet.
+		if c.t.Peek(1) == "<-" {
+			return nil, c.NewError(InvalidChannelList)
+		}
 		// Patch up the stack size check. We can use the SetAddress
 		// operator to do this because it really just updates the
 		// integer instruction argument.
@@ -133,7 +137,6 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 
 	// Quick optimization; if the name is "_" it just means
 	// discard and we can shortcircuit that.
-
 	if name == "_" {
 		bc.Emit(bytecode.Drop, 1)
 	} else {
@@ -141,7 +144,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 		if c.t.Peek(1) == ":=" {
 			bc.Emit(bytecode.SymbolCreate, name)
 		}
-		patchStore(bc, name)
+		patchStore(bc, name, c.t.Peek(1) == "<-")
 	}
 	return bc, nil
 }
@@ -150,7 +153,7 @@ func (c *Compiler) LValue() (*bytecode.ByteCode, error) {
 // generating ends in a LoadIndex, but this is the last part of the
 // storagebytecode, convert the last operation to a Store which writes
 // the value back.
-func patchStore(bc *bytecode.ByteCode, name string) {
+func patchStore(bc *bytecode.ByteCode, name string, isChan bool) {
 
 	// Is the last operation in the stack referecing
 	// a parent object? If so, convert the last one to
@@ -160,7 +163,11 @@ func patchStore(bc *bytecode.ByteCode, name string) {
 	if opsPos > 0 && ops[opsPos].Operation == bytecode.LoadIndex {
 		ops[opsPos].Operation = bytecode.StoreIndex
 	} else {
-		bc.Emit(bytecode.Store, name)
+		if isChan {
+			bc.Emit(bytecode.StoreChan, name)
+		} else {
+			bc.Emit(bytecode.Store, name)
+		}
 	}
 }
 

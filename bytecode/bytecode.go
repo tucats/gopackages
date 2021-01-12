@@ -37,7 +37,9 @@ const (
 	ArrayType
 	StructType
 	ErrorType
+	ChanType
 	VarArgs // pseudo type used for varible argument list items
+
 )
 
 // I contains the information about a single bytecode instruction.

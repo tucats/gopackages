@@ -277,6 +277,8 @@ func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	switch v := args[0].(type) {
 	case error:
 		return "error", nil
+	case chan interface{}:
+		return "chan", nil
 	case int:
 		return "int", nil
 	case float64, float32:

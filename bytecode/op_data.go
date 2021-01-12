@@ -197,6 +197,52 @@ func StoreImpl(c *Context, i interface{}) error {
 	return err
 }
 
+// StoreChan instruction processor
+func StoreChanImpl(c *Context, i interface{}) error {
+
+	v, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	// Get the name.
+	varname := util.GetString(i)
+	x, ok := c.Get(varname)
+	if !ok {
+		return c.NewError(UnknownIdentifierError, x)
+	}
+
+	sourceChan := false
+	destChan := false
+	if _, ok := v.(chan interface{}); ok {
+		sourceChan = true
+	}
+	if _, ok := x.(chan interface{}); ok {
+		destChan = true
+	}
+
+	if !sourceChan && !destChan {
+		return c.NewError(InvalidChannel)
+	}
+
+	var datum interface{}
+	if sourceChan {
+		datum = <-v.(chan interface{})
+	} else {
+		datum = v
+	}
+
+	if destChan {
+		x.(chan interface{}) <- datum
+	} else {
+		if varname != "_" {
+			err = c.Set(varname, datum)
+		}
+	}
+
+	return err
+}
+
 // StoreGlobalImpl instruction processor
 func StoreGlobalImpl(c *Context, i interface{}) error {
 

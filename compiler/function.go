@@ -74,7 +74,7 @@ func (c *Compiler) Function(literal bool) error {
 			} else if c.t.Peek(1) == "{" && c.t.Peek(2) == "}" {
 				p.kind = bytecode.ArrayType
 				c.t.Advance(2)
-			} else if util.InList(c.t.Peek(1), "interface{}", "int", "string", "bool", "double", "float", "array", "struct") {
+			} else if util.InList(c.t.Peek(1), "chan", "interface{}", "int", "string", "bool", "double", "float", "array", "struct") {
 				switch c.t.Next() {
 				case "int":
 					p.kind = bytecode.IntType
@@ -88,6 +88,8 @@ func (c *Compiler) Function(literal bool) error {
 					p.kind = bytecode.StructType
 				case "array":
 					p.kind = bytecode.ArrayType
+				case "chan":
+					p.kind = bytecode.ChanType
 				}
 			}
 			if varargs {
@@ -174,6 +176,9 @@ func (c *Compiler) Function(literal bool) error {
 				case "error":
 					c.t.Advance(1)
 					coercion.Emit(bytecode.Coerce, bytecode.ErrorType)
+				case "chan":
+					coercion.Emit(bytecode.Coerce, bytecode.ChanType)
+					c.t.Advance(1)
 				case "int":
 					coercion.Emit(bytecode.Coerce, bytecode.IntType)
 					c.t.Advance(1)
