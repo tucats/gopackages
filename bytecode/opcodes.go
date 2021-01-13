@@ -70,6 +70,7 @@ const (
 	StaticTyping
 	Store
 	StoreAlways
+	StoreChan
 	StoreGlobal
 	StoreIndex
 	Struct
@@ -151,6 +152,7 @@ var instructionNames = map[Instruction]string{
 	Stop:               "Stop",
 	Store:              "Store",
 	StoreAlways:        "StoreAlways",
+	StoreChan:          "StoreChan",
 	StoreGlobal:        "StoreGlobal",
 	StoreIndex:         "StoreIndex",
 	Struct:             "Struct",
@@ -221,6 +223,7 @@ func initializeDispatch() {
 			Stop:               StopImpl,
 			Store:              StoreImpl,
 			StoreAlways:        StoreAlwaysImpl,
+			StoreChan:          StoreChanImpl,
 			StoreGlobal:        StoreGlobalImpl,
 			StoreIndex:         StoreIndexImpl,
 			Struct:             StructImpl,

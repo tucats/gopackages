@@ -44,6 +44,8 @@ func (c *Compiler) Var() error {
 		} else {
 			typename := c.t.Next()
 			switch typename {
+			case "chan":
+				c.b.Emit(bytecode.Push, make(chan interface{}))
 			case "int":
 				c.b.Emit(bytecode.Push, int(0))
 			case "float", "double":

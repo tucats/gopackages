@@ -62,12 +62,20 @@ func New(src string) *Tokenizer {
 			dots = 0
 		}
 
+		// Handle compound relationships like ">=" or "!=""
 		if nextToken == "=" {
 			if util.InList(previousToken, "!", "<", ">", ":", "=") {
 				t.Tokens[len(t.Tokens)-1] = previousToken + nextToken
 				previousToken = ""
 				continue
 			}
+		}
+
+		// Handle channel route "<-" token
+		if nextToken == "-" && previousToken == "<" {
+			t.Tokens[len(t.Tokens)-1] = previousToken + nextToken
+			previousToken = ""
+			continue
 		}
 
 		if nextToken == ">" {

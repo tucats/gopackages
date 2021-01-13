@@ -18,6 +18,7 @@ const (
 	InvalidArrayIndexError        = "invalid array index"
 	InvalidBytecodeAddress        = "invalid bytecode address"
 	InvalidCallFrame              = "invalid call frame on stack"
+	InvalidChannel                = "neither source or destination is a channel"
 	InvalidFunctionCallError      = "invalid function call"
 	InvalidIdentifierError        = "invalid identifier"
 	InvalidSliceIndexError        = "invalid slice index"
