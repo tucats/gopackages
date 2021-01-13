@@ -92,6 +92,7 @@ func (t *Table) SetAlignment(column int, alignment int) error {
 	if column < 0 || column >= t.columnCount {
 		return errors.New("Invalid column number specified")
 	}
+
 	switch alignment {
 	case AlignmentLeft:
 		t.alignment[column] = AlignmentLeft
@@ -99,6 +100,8 @@ func (t *Table) SetAlignment(column int, alignment int) error {
 	case AlignmentRight:
 		t.alignment[column] = AlignmentRight
 
+	case AlignmentCenter:
+		t.alignment[column] = AlignmentCenter
 	default:
 		return errors.New("Unsupported alignment specified for table")
 	}

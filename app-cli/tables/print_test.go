@@ -1,6 +1,8 @@
 package tables
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestTable_FormatJSON(t *testing.T) {
 	type fields struct {
@@ -83,6 +85,58 @@ func TestTable_FormatJSON(t *testing.T) {
 			}
 			if got := tx.FormatJSON(); got != tt.want {
 				t.Errorf("Table.FormatJSON() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAlignText(t *testing.T) {
+	type args struct {
+		text      string
+		width     int
+		alignment int
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "simple left alignment with pad",
+			args: args{text: "hello", width: 10, alignment: AlignmentLeft},
+			want: "hello     ",
+		},
+		{
+			name: "simple right alignment with pad",
+			args: args{text: "hello", width: 10, alignment: AlignmentRight},
+			want: "     hello",
+		},
+		{
+			name: "simple center alignment with pad",
+			args: args{text: "hello", width: 9, alignment: AlignmentCenter},
+			want: "  hello  ",
+		},
+		{
+			name: "truncated left alignment",
+			args: args{text: "hello", width: 3, alignment: AlignmentLeft},
+			want: "hel",
+		},
+		{
+			name: "truncated right alignment",
+			args: args{text: "hello", width: 3, alignment: AlignmentRight},
+			want: "llo",
+		},
+		{
+			name: "truncated left alignment",
+			args: args{text: "hello", width: 3, alignment: AlignmentCenter},
+			want: "ell",
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := AlignText(tt.args.text, tt.args.width, tt.args.alignment); got != tt.want {
+				t.Errorf("AlignText() = %v, want %v", got, tt.want)
 			}
 		})
 	}

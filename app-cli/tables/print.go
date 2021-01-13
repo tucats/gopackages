@@ -134,19 +134,7 @@ func (t *Table) FormatText() []string {
 			buffer.WriteString(t.spacing)
 		}
 		for _, n := range t.columnOrder {
-			h := t.columns[n]
-			switch t.alignment[n] {
-			case AlignmentLeft:
-				buffer.WriteString(h)
-				for pad := len(h); pad < t.maxWidth[n]; pad++ {
-					buffer.WriteRune(' ')
-				}
-			case AlignmentRight:
-				for pad := len(h); pad < t.maxWidth[n]; pad++ {
-					buffer.WriteRune(' ')
-				}
-				buffer.WriteString(h)
-			}
+			buffer.WriteString(AlignText(t.columns[n], t.maxWidth[n], t.alignment[n]))
 			buffer.WriteString(t.spacing)
 		}
 		output = append(output, buffer.String())
@@ -204,22 +192,57 @@ func (t *Table) FormatText() []string {
 		// Loop over the elements of the row. Generate pre- or post-spacing as
 		// appropriate for the requested alignment, and any intra-column spacing.
 		for _, n := range t.columnOrder {
-			c := r[n]
-			if t.alignment[n] == AlignmentRight {
-				for pad := len(c); pad < t.maxWidth[n]; pad++ {
-					buffer.WriteRune(' ')
-				}
-			}
-			buffer.WriteString(c)
-			if t.alignment[n] == AlignmentLeft {
-				for pad := len(c); pad < t.maxWidth[n]; pad++ {
-					buffer.WriteRune(' ')
-				}
-			}
+			buffer.WriteString(AlignText(r[n], t.maxWidth[n], t.alignment[n]))
 			buffer.WriteString(t.spacing)
 		}
 		output = append(output, buffer.String())
 	}
 
 	return output
+}
+
+func AlignText(text string, width int, alignment int) string {
+
+	if len(text) >= width {
+		switch alignment {
+		case AlignmentLeft:
+			return text[:width]
+
+		case AlignmentRight:
+			return text[len(text)-width:]
+		case AlignmentCenter:
+			pos := len(text)/2 - (width / 2)
+			return text[pos : pos+width]
+
+		default:
+			return text[:width]
+		}
+	}
+	pad := strings.Repeat(" ", width)
+	switch alignment {
+	case AlignmentRight:
+		r := pad + text
+		return r[len(r)-width:]
+
+	case AlignmentLeft:
+		r := text + pad
+		return r[:width]
+
+	case AlignmentCenter:
+		r := text
+		left := true
+		for len(r) < width {
+			if left {
+				r = " " + r
+			} else {
+				r = r + " "
+			}
+			left = !left
+		}
+		return r
+
+	default: // same as AlignmentLeft
+		r := text + pad
+		return r[:width]
+	}
 }
