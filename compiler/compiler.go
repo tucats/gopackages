@@ -9,6 +9,7 @@ import (
 	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
+	"github.com/tucats/gopackages/util"
 )
 
 const (
@@ -246,7 +247,7 @@ func (c *Compiler) AddPackageToSymbols(s *symbols.SymbolTable) {
 // the end-of-statement boundary
 func (c *Compiler) StatementEnd() bool {
 	next := c.t.Peek(1)
-	return next == tokenizer.EndOfTokens || (next == ";") || (next == "}")
+	return util.InList(next, tokenizer.EndOfTokens, ";", "}")
 }
 
 // Symbols returns the symbol table map from compilation
