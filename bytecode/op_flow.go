@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
@@ -129,6 +130,32 @@ func LocalCallImpl(c *Context, i interface{}) error {
 	c.PushFrame("defer", c.bc, util.GetInt(i))
 	return nil
 
+}
+
+func GoImpl(c *Context, i interface{}) error {
+
+	argc := i.(int) + c.argCountDelta
+	c.argCountDelta = 0
+
+	// Arguments are in reverse order on stack.
+	args := make([]interface{}, argc)
+	for n := 0; n < argc; n = n + 1 {
+		v, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		args[(argc-n)-1] = v
+	}
+
+	fName, err := c.Pop()
+	if err != nil {
+		return err
+	}
+
+	// Launch the function call as a separate thread.
+	ui.Debug(ui.ByteCodeLogger, "--> Launching go routine \"%s\"", fName)
+	go GoRoutine(util.GetString(fName), c, args)
+	return nil
 }
 
 // CallImpl instruction processor calls a function (which can have

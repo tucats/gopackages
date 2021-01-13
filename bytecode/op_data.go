@@ -200,23 +200,33 @@ func StoreImpl(c *Context, i interface{}) error {
 // StoreChan instruction processor
 func StoreChanImpl(c *Context, i interface{}) error {
 
+	// Get the value on the stack, and determine if it is a channel or a datum
 	v, err := c.Pop()
 	if err != nil {
 		return err
 	}
-
-	// Get the name.
-	varname := util.GetString(i)
-	x, ok := c.Get(varname)
-	if !ok {
-		return c.NewError(UnknownIdentifierError, x)
-	}
-
 	sourceChan := false
-	destChan := false
 	if _, ok := v.(chan interface{}); ok {
 		sourceChan = true
 	}
+
+	// Get the name that is to be used on the other side. If the other item is
+	// already known to be a channel, then create this variable (with a nil value)
+	// so it can receive the channel info regardless of its type
+	varname := util.GetString(i)
+	x, ok := c.Get(varname)
+	if !ok {
+		if sourceChan {
+			err = c.Create(varname)
+		} else {
+			err = c.NewError(UnknownIdentifierError, x)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	destChan := false
 	if _, ok := x.(chan interface{}); ok {
 		destChan = true
 	}
@@ -728,7 +738,7 @@ func RequiredTypeImpl(c *Context, i interface{}) error {
 				if _, ok := v.(map[string]interface{}); !ok {
 					return c.NewError(InvalidTypeError)
 				}
-			case UndefinedType:
+			case UndefinedType, ChanType:
 				// No work at all to do here.
 
 			default:

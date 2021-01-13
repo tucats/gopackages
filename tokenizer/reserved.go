@@ -4,22 +4,24 @@ import "github.com/tucats/gopackages/util"
 
 //ReservedWords is the list of reserved words in the _Ego_ language
 var ReservedWords []string = []string{
+	"bool",
 	"break",
 	"const",
 	"defer",
 	"else",
+	"float",
 	"for",
 	"func",
+	"go",
 	"if",
 	"import",
+	"int",
 	"nil",
 	"package",
 	"return",
-	"int",
-	"float",
 	"string",
-	"bool",
 	"struct",
+	"var",
 }
 
 var ExtendedReservedWords = []string{

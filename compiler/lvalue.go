@@ -30,6 +30,9 @@ func (c *Compiler) IsLValue() bool {
 		if util.InList(t, ":=", "=", "<-") {
 			return true
 		}
+		if tokenizer.IsReserved(t, c.extensionsEnabled) {
+			return false
+		}
 		if util.InList(t, "{", ";", tokenizer.EndOfTokens) {
 			return false
 		}

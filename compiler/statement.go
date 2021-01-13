@@ -91,6 +91,8 @@ func (c *Compiler) Statement() error {
 		}
 	case "for":
 		return c.For()
+	case "go":
+		return c.Go()
 	case "if":
 		return c.If()
 	case "import":
@@ -176,6 +178,7 @@ func (c *Compiler) IsFunctionCall() bool {
 			"exit",
 			"for",
 			"func",
+			"go",
 			"if",
 			"import",
 			"package",

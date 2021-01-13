@@ -1,6 +1,7 @@
 package bytecode
 
 import (
+	"errors"
 	"strconv"
 	"sync"
 
@@ -133,4 +134,43 @@ func (c *Context) RunFromAddress(addr int) error {
 	}
 
 	return err
+}
+
+// GoRoutine allows calling a named function as a go routine, using arguments. The invocation
+// of GoRoutine should be in a "go" statement to run the code.
+func GoRoutine(fName string, parentCtx *Context, args []interface{}) {
+
+	syms := parentCtx.symbols
+	err := errors.New(InvalidFunctionCallError)
+
+	ui.Debug(ui.ByteCodeLogger, "--> Starting Go routine \"%s\"", fName)
+	ui.Debug(ui.ByteCodeLogger, "--> Argument list: %#v\n", args)
+
+	// Locate the bytecode for the function. It must be a symbol defined as bytecode.
+	if fCode, ok := syms.Get(fName); ok {
+		if bc, ok := fCode.(*ByteCode); ok {
+
+			if true {
+				ui.DebugMode = true
+				bc.Disasm()
+			}
+			// Create a new stream whose job is to invoke it
+			callCode := New("call shell")
+			callCode.Emit(Load, fName)
+			for _, arg := range args {
+				callCode.Emit(Push, arg)
+			}
+			callCode.Emit(Call, len(args))
+
+			funcSyms := symbols.NewChildSymbolTable("Go routine "+fName, syms)
+			ctx := NewContext(funcSyms, callCode)
+			ctx.Tracing = true
+			ui.DebugMode = true
+			err = ctx.Run()
+		}
+
+	}
+	if err != nil {
+		ui.Debug(ui.ByteCodeLogger, "--> Go routine invocation ends with %v", err)
+	}
 }

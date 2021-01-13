@@ -42,6 +42,7 @@ const (
 	Flatten
 	FromFile
 	GetVarArgs
+	Go
 	GreaterThan
 	GreaterThanOrEqual
 	LessThan
@@ -122,6 +123,7 @@ var instructionNames = map[Instruction]string{
 	Flatten:            "Flatten",
 	FromFile:           "FromFile",
 	GetVarArgs:         "GetVarArgs",
+	Go:                 "Go",
 	GreaterThan:        "GreaterThan",
 	GreaterThanOrEqual: "GreaterThanOrEqual",
 	LessThan:           "LessThan",
@@ -193,6 +195,7 @@ func initializeDispatch() {
 			Flatten:            FlattenImpl,
 			FromFile:           FromFileImpl,
 			GetVarArgs:         GetVarArgsImpl,
+			Go:                 GoImpl,
 			GreaterThan:        GreaterThanImpl,
 			GreaterThanOrEqual: GreaterThanOrEqualImpl,
 			LessThan:           LessThanImpl,
