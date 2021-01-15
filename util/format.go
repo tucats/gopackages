@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/datatypes"
 )
 
 // LineColumnFormat describes the format string for the portion
@@ -40,6 +41,8 @@ func Format(arg interface{}) string {
 	}
 
 	switch v := arg.(type) {
+	case *datatypes.Channel:
+		return fmt.Sprintf("chan(%d)", v.GetSize())
 	case error:
 		return fmt.Sprintf("%v", v)
 	case int:

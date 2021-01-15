@@ -5,7 +5,6 @@ package ui
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -103,15 +102,15 @@ func Log(class string, format string, args ...interface{}) {
 
 // LogMessage displays a message to stdout
 func LogMessage(class string, format string, args ...interface{}) string {
-	pid := os.Getpid()
 	s := fmt.Sprintf(format, args...)
 
 	sequenceMux.Lock()
 	defer sequenceMux.Unlock()
 
 	sequence = sequence + 1
-	sequenceString := fmt.Sprintf("%d, %d", pid, sequence)
-	s = fmt.Sprintf("[%s] %-10s %-7s: %s", time.Now().Format(time.RFC3339), sequenceString, strings.ToUpper(class), s)
+	sequenceString := fmt.Sprintf("%d", sequence)
+	tf := "20060102150405"
+	s = fmt.Sprintf("[%s] %-5s %-7s: %s", time.Now().Format(tf), sequenceString, strings.ToUpper(class), s)
 	return s
 }
 

@@ -3,6 +3,7 @@ package compiler
 import (
 	"github.com/google/uuid"
 	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -45,7 +46,8 @@ func (c *Compiler) Var() error {
 			typename := c.t.Next()
 			switch typename {
 			case "chan":
-				c.b.Emit(bytecode.Push, make(chan interface{}))
+				channel := datatypes.NewChannel(1)
+				c.b.Emit(bytecode.Push, channel)
 			case "int":
 				c.b.Emit(bytecode.Push, int(0))
 			case "float", "double":

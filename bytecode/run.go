@@ -162,7 +162,12 @@ func GoRoutine(fName string, parentCtx *Context, args []interface{}) {
 			}
 			callCode.Emit(Call, len(args))
 
-			funcSyms := symbols.NewChildSymbolTable("Go routine "+fName, syms)
+			// Only the root symbol table is thread-safe, so each go routine is isolated from the
+			// symbol scope it was run from. But we need the function definitions, etc. so copy the
+			// function values from the previous symbol table.
+			funcSyms := symbols.NewChildSymbolTable("Go routine "+fName, &symbols.RootSymbolTable)
+			funcSyms.Merge(syms)
+
 			ctx := NewContext(funcSyms, callCode)
 			ctx.Tracing = true
 			ui.DebugMode = true

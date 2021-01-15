@@ -15,7 +15,7 @@
           //  "args": [ "logon", "-u", "admin", "-p", "password" ]
           //  "args": [ "-d", "bytecode", "run", "-d",  "test.ego"]
           // "args": [ "run" ]
-            "args": ["run", "test.ego"]
+            "args": ["run", "test.ego", "--disasm"]
           // "args": [ "--output-format", "json", "server", "add-user", "-u", "mary", "-p", "sam"]
           // "args": [ "server", "run", "-k", "--session-uuid", "1355085c-9b3d-4d16-bbd7-76831dfd7df3" ]
 

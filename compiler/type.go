@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -106,7 +107,8 @@ func (c *Compiler) compileType() error {
 		} else {
 			switch c.t.Next() {
 			case "chan":
-				c.b.Emit(bytecode.Push, make(chan interface{}))
+				channel := datatypes.NewChannel(1)
+				c.b.Emit(bytecode.Push, channel)
 			case "int":
 				c.b.Emit(bytecode.Push, 0)
 			case "float", "double":

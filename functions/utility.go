@@ -3,6 +3,7 @@ package functions
 import (
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"reflect"
 	"sort"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/tucats/gopackages/app-cli/persistence"
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -85,6 +87,10 @@ func Length(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 	}
 
 	switch arg := args[0].(type) {
+
+	// For a channel, it's length is bottomless....
+	case *datatypes.Channel:
+		return int(math.MaxInt32), nil
 
 	case error:
 		return len(arg.Error()), nil
@@ -277,7 +283,7 @@ func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	switch v := args[0].(type) {
 	case error:
 		return "error", nil
-	case chan interface{}:
+	case *datatypes.Channel:
 		return "chan", nil
 	case int:
 		return "int", nil

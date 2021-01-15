@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -206,7 +207,7 @@ func StoreChanImpl(c *Context, i interface{}) error {
 		return err
 	}
 	sourceChan := false
-	if _, ok := v.(chan interface{}); ok {
+	if _, ok := v.(*datatypes.Channel); ok {
 		sourceChan = true
 	}
 
@@ -227,7 +228,7 @@ func StoreChanImpl(c *Context, i interface{}) error {
 	}
 
 	destChan := false
-	if _, ok := x.(chan interface{}); ok {
+	if _, ok := x.(*datatypes.Channel); ok {
 		destChan = true
 	}
 
@@ -236,14 +237,15 @@ func StoreChanImpl(c *Context, i interface{}) error {
 	}
 
 	var datum interface{}
+
 	if sourceChan {
-		datum = <-v.(chan interface{})
+		datum, err = v.(*datatypes.Channel).Receive()
 	} else {
 		datum = v
 	}
 
 	if destChan {
-		x.(chan interface{}) <- datum
+		err = x.(*datatypes.Channel).Send(datum)
 	} else {
 		if varname != "_" {
 			err = c.Set(varname, datum)
@@ -456,6 +458,14 @@ func LoadIndexImpl(c *Context, i interface{}) error {
 
 	switch a := array.(type) {
 
+	// Reading from a channel ignores the index value
+	case *datatypes.Channel:
+		var datum interface{}
+		datum, err = a.Receive()
+		if err == nil {
+			err = c.Push(datum)
+		}
+
 	// Index into map is just member access
 	case map[string]interface{}:
 		subscript := util.GetString(index)
@@ -470,7 +480,7 @@ func LoadIndexImpl(c *Context, i interface{}) error {
 			}
 			return c.NewError(UnknownMemberError, subscript)
 		}
-		_ = c.Push(v)
+		err = c.Push(v)
 		c.lastStruct = a
 
 	case []interface{}:
@@ -479,13 +489,13 @@ func LoadIndexImpl(c *Context, i interface{}) error {
 			return c.NewError(InvalidArrayIndexError, subscript)
 		}
 		v := a[subscript]
-		_ = c.Push(v)
+		err = c.Push(v)
 
 	default:
-		return c.NewError(InvalidTypeError)
+		err = c.NewError(InvalidTypeError)
 	}
 
-	return nil
+	return err
 }
 
 // LoadSliceImpl instruction processor
