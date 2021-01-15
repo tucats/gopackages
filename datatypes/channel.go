@@ -15,6 +15,7 @@ type Channel struct {
 	mutex   sync.Mutex
 	size    int
 	isOpen  bool
+	count   int
 	id      string
 }
 
@@ -33,6 +34,7 @@ func NewChannel(size int) *Channel {
 		isOpen: true,
 		size:   size,
 		mutex:  sync.Mutex{},
+		count:  0,
 		id:     uuid.New().String(),
 	}
 	c.channel = make(chan interface{}, size)
@@ -49,6 +51,7 @@ func (c *Channel) Send(datum interface{}) error {
 
 	if c.isOpen {
 		ui.Debug(ui.ByteCodeLogger, "--> Sending on %s", c.String())
+		c.count++
 		c.channel <- datum
 		return nil
 	}
@@ -56,14 +59,17 @@ func (c *Channel) Send(datum interface{}) error {
 }
 
 // Receive accepts an arbitrary data object through the channel, waiting
-// if there is no information avaialble yet.
+// if there is no information avaialble yet. If it's not open, we also
+// check to see if the messages have all been drained by looking at the
+// counter.
 func (c *Channel) Receive() (interface{}, error) {
 
-	if !c.isOpen {
+	if !c.isOpen && c.count == 0 {
 		return nil, errors.New(ChannelNotOpenError)
 	}
 	ui.Debug(ui.ByteCodeLogger, "--> Receiving on %s", c.String())
 	datum := <-c.channel
+	c.count--
 	return datum, nil
 }
 
@@ -73,6 +79,12 @@ func (c *Channel) IsOpen() bool {
 	return c.isOpen
 }
 
+// IsEmpty checks to see if a channel has been drained (i.e. it is
+// closed and there are no more items). This is used by the len()
+// function, for example
+func (c *Channel) IsEmpty() bool {
+	return !c.isOpen && c.count == 0
+}
 func (c *Channel) GetSize() int {
 	return c.size
 }
@@ -95,6 +107,6 @@ func (c *Channel) String() string {
 	if !c.isOpen {
 		state = "closed"
 	}
-	return fmt.Sprintf("channel, size %d, %s, id %s",
-		c.size, state, c.id)
+	return fmt.Sprintf("channel, size %d(%d), %s, id %s",
+		c.size, c.count, state, c.id)
 }

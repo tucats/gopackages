@@ -88,11 +88,11 @@ func Length(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 
 	switch arg := args[0].(type) {
 
-	// For a channel, it's length either zero if it's closed, or bottomless
+	// For a channel, it's length either zero if it's drained, or bottomless
 	case *datatypes.Channel:
-		size := 0
-		if arg.IsOpen() {
-			size = int(math.MaxInt32)
+		size := int(math.MaxInt32)
+		if arg.IsEmpty() {
+			size = 0
 		}
 		return size, nil
 
