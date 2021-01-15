@@ -4,6 +4,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/tucats/gopackages/tokenizer"
 	"github.com/tucats/gopackages/util"
 )
 
@@ -32,10 +33,14 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 
 	// Now iterate over the keys in sorted order
 	for _, k := range keys {
+		// reserved words are not valid symbol names
+		if tokenizer.IsReserved(k, false) {
+			continue
+		}
+
 		v := s.Symbols[k]
 		skip := false
 		typeString := "package"
-
 		switch actual := v.(type) {
 		case func(*SymbolTable, []interface{}) (interface{}, error):
 			if !includeBuiltins {

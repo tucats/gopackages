@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
 	"github.com/tucats/gopackages/util"
@@ -338,4 +339,18 @@ func ReadDir(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		result = append(result, entry)
 	}
 	return result, nil
+}
+
+// This is the generic close() which can be used to close a channel, and maybe
+// later other items as well.
+func CloseAny(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	switch arg := args[0].(type) {
+
+	case *datatypes.Channel:
+		return arg.Close(), nil
+
+	default:
+		return nil, NewError("close", InvalidTypeError)
+	}
 }

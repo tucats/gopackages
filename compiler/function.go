@@ -241,6 +241,12 @@ func (c *Compiler) Function(literal bool) error {
 	if err != nil {
 		return err
 	}
+	// Generate the deferal invocations, if any, in reverse order
+	// that they were defined.
+	for i := len(cx.deferQueue) - 1; i >= 0; i = i - 1 {
+		cx.b.Emit(bytecode.LocalCall, cx.deferQueue[i])
+	}
+
 	// Add trailing return to ensure we close out the scope correctly
 	cx.b.Emit(bytecode.Return)
 

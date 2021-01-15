@@ -460,6 +460,7 @@ func LoadIndexImpl(c *Context, i interface{}) error {
 
 	// Reading from a channel ignores the index value
 	case *datatypes.Channel:
+		//ui.Debug(ui.ByteCodeLogger, "--> Planning to read %s", a.String())
 		var datum interface{}
 		datum, err = a.Receive()
 		if err == nil {

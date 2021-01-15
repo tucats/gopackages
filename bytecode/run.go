@@ -2,6 +2,8 @@ package bytecode
 
 import (
 	"errors"
+	"fmt"
+	"os"
 	"strconv"
 	"sync"
 
@@ -154,8 +156,8 @@ func GoRoutine(fName string, parentCtx *Context, args []interface{}) {
 				ui.DebugMode = true
 				bc.Disasm()
 			}
-			// Create a new stream whose job is to invoke it
-			callCode := New("call shell")
+			// Create a new stream whose job is to invoke the function by name
+			callCode := New("go " + fName)
 			callCode.Emit(Load, fName)
 			for _, arg := range args {
 				callCode.Emit(Push, arg)
@@ -165,7 +167,8 @@ func GoRoutine(fName string, parentCtx *Context, args []interface{}) {
 			// Only the root symbol table is thread-safe, so each go routine is isolated from the
 			// symbol scope it was run from. But we need the function definitions, etc. so copy the
 			// function values from the previous symbol table.
-			funcSyms := symbols.NewChildSymbolTable("Go routine "+fName, &symbols.RootSymbolTable)
+			funcSyms := symbols.NewChildSymbolTable("Go routine "+fName, syms)
+			//funcSyms.ScopeBoundary = true
 			funcSyms.Merge(syms)
 
 			ctx := NewContext(funcSyms, callCode)
@@ -175,7 +178,9 @@ func GoRoutine(fName string, parentCtx *Context, args []interface{}) {
 		}
 
 	}
-	if err != nil {
+	if err != nil && err.Error() != "stop" {
+		fmt.Printf("%v\n", err)
 		ui.Debug(ui.ByteCodeLogger, "--> Go routine invocation ends with %v", err)
+		os.Exit(55)
 	}
 }

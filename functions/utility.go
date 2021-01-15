@@ -88,9 +88,13 @@ func Length(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 
 	switch arg := args[0].(type) {
 
-	// For a channel, it's length is bottomless....
+	// For a channel, it's length either zero if it's closed, or bottomless
 	case *datatypes.Channel:
-		return int(math.MaxInt32), nil
+		size := 0
+		if arg.IsOpen() {
+			size = int(math.MaxInt32)
+		}
+		return size, nil
 
 	case error:
 		return len(arg.Error()), nil
@@ -382,4 +386,52 @@ func GetArgs(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		r = []interface{}{}
 	}
 	return r, nil
+}
+
+// Make implements the make() function. The first argument must be a model of the
+// array type (using the Go native version), and the second argument is the size.
+func Make(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	kind := args[0]
+	size := util.GetInt(args[1])
+	array := make([]interface{}, size)
+
+	if v, ok := kind.([]interface{}); ok {
+		if len(v) > 0 {
+			kind = v[0]
+		}
+	}
+
+	// If the model is a type we know about, let's go ahead and populate the array
+	// with specific values.
+	switch kind.(type) {
+	case *datatypes.Channel:
+		return datatypes.NewChannel(size), nil
+
+	case []int, int:
+		for i := range array {
+			array[i] = 0
+		}
+	case []bool, bool:
+		for i := range array {
+			array[i] = false
+		}
+	case []string, string:
+		for i := range array {
+			array[i] = ""
+		}
+	case []float64, float64:
+		for i := range array {
+			array[i] = 0.0
+		}
+	case map[string]interface{}:
+		for i := range array {
+			array[i] = map[string]interface{}{}
+		}
+
+	default:
+		fmt.Printf("DEBUG: v = %#v\n", kind)
+	}
+	return array, nil
+
 }

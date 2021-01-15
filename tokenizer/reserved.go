@@ -6,6 +6,7 @@ import "github.com/tucats/gopackages/util"
 var ReservedWords []string = []string{
 	"bool",
 	"break",
+	"chan",
 	"const",
 	"defer",
 	"else",

@@ -2,6 +2,7 @@ package datatypes
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/google/uuid"
@@ -35,7 +36,7 @@ func NewChannel(size int) *Channel {
 		id:     uuid.New().String(),
 	}
 	c.channel = make(chan interface{}, size)
-	ui.Debug(ui.ByteCodeLogger, "--> Created channel %s", c.id)
+	ui.Debug(ui.ByteCodeLogger, "--> Created  %s", c.String())
 
 	return c
 }
@@ -43,8 +44,11 @@ func NewChannel(size int) *Channel {
 // Send transmits an arbitrary data object through the channel, if it
 // is open.
 func (c *Channel) Send(datum interface{}) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if c.isOpen {
-		ui.Debug(ui.ByteCodeLogger, "--> Sending on channel %s", c.id)
+		ui.Debug(ui.ByteCodeLogger, "--> Sending on %s", c.String())
 		c.channel <- datum
 		return nil
 	}
@@ -54,7 +58,11 @@ func (c *Channel) Send(datum interface{}) error {
 // Receive accepts an arbitrary data object through the channel, waiting
 // if there is no information avaialble yet.
 func (c *Channel) Receive() (interface{}, error) {
-	ui.Debug(ui.ByteCodeLogger, "--> Receiving on channel %s", c.id)
+
+	if !c.isOpen {
+		return nil, errors.New(ChannelNotOpenError)
+	}
+	ui.Debug(ui.ByteCodeLogger, "--> Receiving on %s", c.String())
 	datum := <-c.channel
 	return datum, nil
 }
@@ -73,9 +81,20 @@ func (c *Channel) GetSize() int {
 // the receiver can test for channel completion
 func (c *Channel) Close() bool {
 	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	ui.Debug(ui.ByteCodeLogger, "--> Closing %s", c.String())
 	wasActive := c.isOpen
 	close(c.channel)
 	c.isOpen = false
-	c.mutex.Unlock()
 	return wasActive
+}
+
+func (c *Channel) String() string {
+	state := "open"
+	if !c.isOpen {
+		state = "closed"
+	}
+	return fmt.Sprintf("channel, size %d, %s, id %s",
+		c.size, state, c.id)
 }
