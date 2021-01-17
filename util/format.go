@@ -42,7 +42,7 @@ func Format(arg interface{}) string {
 
 	switch v := arg.(type) {
 	case *datatypes.Channel:
-		return fmt.Sprintf("chan(%d)", v.GetSize())
+		return v.String()
 	case error:
 		return fmt.Sprintf("%v", v)
 	case int:

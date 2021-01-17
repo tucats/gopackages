@@ -107,6 +107,6 @@ func (c *Channel) String() string {
 	if !c.isOpen {
 		state = "closed"
 	}
-	return fmt.Sprintf("channel, size %d(%d), %s, id %s",
-		c.size, c.count, state, c.id)
+	return fmt.Sprintf("chan(%s, size %d(%d), id %s)",
+		state, c.size, c.count, c.id)
 }

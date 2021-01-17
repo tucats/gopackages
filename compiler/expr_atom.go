@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
@@ -12,6 +11,10 @@ func (c *Compiler) expressionAtom() error {
 
 	t := c.t.Peek(1)
 
+	// IS this the make() function?
+	if t == "make" && c.t.Peek(2) == "(" {
+		return c.Make()
+	}
 	// Is this the "nil" constant?
 	if t == "nil" {
 		c.t.Advance(1)
@@ -19,12 +22,6 @@ func (c *Compiler) expressionAtom() error {
 		return nil
 	}
 
-	// Is it the "chan" constant value?
-	if t == "chan" {
-		c.t.Advance(1)
-		c.b.Emit(bytecode.Push, &datatypes.Channel{})
-		return nil
-	}
 	// Is this a function definition?
 	if t == "func" && c.t.Peek(2) == "(" {
 		c.t.Advance(1)
