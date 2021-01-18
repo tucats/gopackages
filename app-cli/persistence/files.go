@@ -194,6 +194,21 @@ func GetBool(key string) bool {
 	return false
 }
 
+// Get a key value, and compare it to a list of provided values. If it
+// matches one of the items in the list, then the position in the list
+// (one-based) is returned. If the value is not in the list at all,
+// a result of 0 is returned.
+func GetUsingList(key string, values ...string) int {
+	v := strings.TrimSpace(strings.ToLower(Get(key)))
+
+	for position, value := range values {
+		if v == value {
+			return position + 1
+		}
+	}
+	return 0
+}
+
 // Delete removes a key from the map entirely. Also removes if from the
 // active defaults.
 func Delete(key string) {
