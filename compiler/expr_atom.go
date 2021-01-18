@@ -15,10 +15,25 @@ func (c *Compiler) expressionAtom() error {
 	if t == "make" && c.t.Peek(2) == "(" {
 		return c.Make()
 	}
+
 	// Is this the "nil" constant?
 	if t == "nil" {
 		c.t.Advance(1)
 		c.b.Emit(bytecode.Push, nil)
+		return nil
+	}
+
+	// Is an interface?
+	if t == "interface{}" {
+		c.t.Advance(1)
+		c.b.Emit(bytecode.Push, map[string]interface{}{"__type": "interface{}"})
+		return nil
+	}
+
+	// Is an empty struct?
+	if t == "{}" {
+		c.t.Advance(1)
+		c.b.Emit(bytecode.Push, map[string]interface{}{})
 		return nil
 	}
 
@@ -86,7 +101,14 @@ func (c *Compiler) expressionAtom() error {
 	if tokenizer.IsSymbol(t) {
 		c.t.Advance(1)
 		t = c.Normalize(t)
-		c.b.Emit(bytecode.Load, t)
+		// Is it a generator for a type?
+		if c.t.IsNext("{}") {
+			c.b.Emit(bytecode.Load, "new")
+			c.b.Emit(bytecode.Load, t)
+			c.b.Emit(bytecode.Call, 1)
+		} else {
+			c.b.Emit(bytecode.Load, t)
+		}
 		return nil
 
 	}

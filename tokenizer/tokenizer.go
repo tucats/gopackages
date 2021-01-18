@@ -50,6 +50,12 @@ func New(src string) *Tokenizer {
 			}
 		}
 
+		// Make {} a single token
+		if nextToken == "}" && previousToken == "{" {
+			t.Tokens = append(t.Tokens[:len(t.Tokens)-1], "{}")
+			continue
+		}
+
 		// Make "..." a single token
 		if nextToken == "." {
 			dots = dots + 1

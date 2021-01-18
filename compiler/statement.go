@@ -14,9 +14,13 @@ const (
 // Statement compiles a single statement
 func (c *Compiler) Statement() error {
 
-	// We just eat statement separators and we also terminate
-	// processing when we hit the end of the token stream.
+	// We just eat statement separators and empty blocks, and also
+	// terminate processing when we hit the end of the token stream
 	if c.t.IsNext(";") {
+		return nil
+	}
+	if c.t.IsNext("{}") {
+		c.b.Emit(bytecode.AtLine, c.t.Line[c.t.TokenP])
 		return nil
 	}
 	if c.t.IsNext(tokenizer.EndOfTokens) {
