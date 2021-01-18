@@ -116,24 +116,30 @@ func StructImpl(c *Context, i interface{}) error {
 		m["__static"] = true
 	}
 
-	// If were are doing static typing and this has a custom type, validate
-	// the fields against the fields in the type model.
-	if c.Static {
-		if kind, ok := m["__type"]; ok {
-			typeName, _ := kind.(string)
-			if model, ok := c.Get(kind.(string)); ok {
-				if modelMap, ok := model.(map[string]interface{}); ok {
-					for k := range m {
-						if _, found := modelMap[k]; !found {
-							return c.NewError(InvalidFieldError, k)
-						}
+	// If this has a custom type, validate the fields against the fields in the type model.
+	if kind, ok := m["__type"]; ok {
+		typeName, _ := kind.(string)
+		if model, ok := c.Get(kind.(string)); ok {
+			if modelMap, ok := model.(map[string]interface{}); ok {
+
+				// Check all the fields in the new value to ensure they are valid.
+				for k := range m {
+					if _, found := modelMap[k]; !found {
+						return c.NewError(InvalidFieldError, k)
 					}
-				} else {
-					return c.NewError(UnknownTypeError, typeName)
 				}
+				// Add in any fields from the model not present in the one we're creating.
+				for k, v := range modelMap {
+					if _, found := m[k]; !found {
+						m[k] = v
+					}
+				}
+			} else {
+				return c.NewError(UnknownTypeError, typeName)
 			}
 		}
 	}
+
 	_ = c.Push(m)
 	return nil
 }
