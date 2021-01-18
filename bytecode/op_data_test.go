@@ -18,11 +18,11 @@ func TestStructImpl(t *testing.T) {
 		static  bool
 	}{
 		{
-			name:    "two member invalid static test",
-			arg:     3,
-			stack:   []interface{}{"usertype", "__type", true, "valid", 123, "test"},
-			want:    map[string]interface{}{"active": true, "test": 123, "__static": true},
-			wantErr: true,
+			name:    "two member incomplete test",
+			arg:     2,
+			stack:   []interface{}{"usertype", "__type", true, "flag"},
+			want:    map[string]interface{}{"flag": true, "test": 0, "__static": true, "__type": "usertype"},
+			wantErr: false,
 			static:  true,
 		},
 		{
@@ -50,7 +50,7 @@ func TestStructImpl(t *testing.T) {
 		{
 			name:    "two member invalid static test",
 			arg:     3,
-			stack:   []interface{}{"usertype", "__type", true, "valid", 123, "test"},
+			stack:   []interface{}{"usertype", "__type", true, "invalid", 123, "test"},
 			want:    map[string]interface{}{"active": true, "test": 123, "__static": true},
 			wantErr: true,
 			static:  true,
@@ -64,9 +64,14 @@ func TestStructImpl(t *testing.T) {
 				Static:  tt.static,
 				symbols: symbols.NewSymbolTable("test bench"),
 			}
-			_ = ctx.symbols.SetAlways("usertype", map[string]interface{}{
-				"test":   0,
-				"static": false})
+
+			model := map[string]interface{}{
+				"test":     0,
+				"flag":     false,
+				"__type":   "usertype",
+				"__static": true,
+			}
+			_ = ctx.symbols.SetAlways("usertype", model)
 
 			err := StructImpl(ctx, tt.arg)
 			if (err != nil) != tt.wantErr {

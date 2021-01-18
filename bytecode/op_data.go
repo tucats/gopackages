@@ -124,7 +124,7 @@ func StructImpl(c *Context, i interface{}) error {
 
 				// Check all the fields in the new value to ensure they are valid.
 				for k := range m {
-					if _, found := modelMap[k]; !found {
+					if _, found := modelMap[k]; k != "__static" && !found {
 						return c.NewError(InvalidFieldError, k)
 					}
 				}
