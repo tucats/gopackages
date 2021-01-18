@@ -5,6 +5,7 @@ import (
 
 	"github.com/tucats/gopackages/bytecode"
 	"github.com/tucats/gopackages/tokenizer"
+	"github.com/tucats/gopackages/util"
 )
 
 func (c *Compiler) expressionAtom() error {
@@ -102,6 +103,21 @@ func (c *Compiler) expressionAtom() error {
 		c.t.Advance(1)
 		t = c.Normalize(t)
 		// Is it a generator for a type?
+		if c.t.Peek(1) == "{" && tokenizer.IsSymbol(c.t.Peek(2)) && c.t.Peek(3) == ":" {
+			c.b.Emit(bytecode.Load, t)
+			c.b.Emit(bytecode.Push, "__type")
+			c.b.Emit(bytecode.LoadIndex)
+			c.b.Emit(bytecode.Push, "__type")
+			err := c.expressionAtom()
+			if err != nil {
+				return err
+			}
+			i := c.b.Opcodes()
+			ix := i[len(i)-1]
+			ix.Operand = util.GetInt(ix.Operand) + 1
+			i[len(i)-1] = ix
+			return nil
+		}
 		if c.t.IsNext("{}") {
 			c.b.Emit(bytecode.Load, "new")
 			c.b.Emit(bytecode.Load, t)
