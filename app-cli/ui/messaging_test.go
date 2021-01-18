@@ -40,8 +40,9 @@ func TestLogMessage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			got := LogMessage(tt.args.class, tt.args.format, tt.args.args...)
-			// Mask out the parts that are variable and un-testable
-			got = got[39:]
+			// Mask out the parts that are variable and un-testable, which
+			// includes the current date/time and a sequence number
+			got = got[23:]
 
 			if got != tt.want {
 				t.Errorf("LogMessage() = %v, want %v", got, tt.want)

@@ -19,6 +19,7 @@ const (
 	InvalidBytecodeAddress        = "invalid bytecode address"
 	InvalidCallFrame              = "invalid call frame on stack"
 	InvalidChannel                = "neither source or destination is a channel"
+	InvalidFieldError             = "invalid field name for type"
 	InvalidFunctionCallError      = "invalid function call"
 	InvalidIdentifierError        = "invalid identifier"
 	InvalidSliceIndexError        = "invalid slice index"
@@ -35,6 +36,7 @@ const (
 	UnknownIdentifierError        = "unknown identifier"
 	UnknownMemberError            = "unknown structure member"
 	UnknownPackageMemberError     = "unknown package member"
+	UnknownTypeError              = "unknown structure type"
 	VarArgError                   = "invalid variable-argument operation"
 )
 
