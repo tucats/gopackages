@@ -118,7 +118,6 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	r := DeepCopy(args[0])
 
 	// IF there was a type in the source, make the clone point back to it
-
 	switch v := r.(type) {
 
 	case nil:
@@ -136,6 +135,28 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	case []interface{}:
 
 	case map[string]interface{}:
+
+		dropList := []string{}
+		for k, vv := range v {
+			// IF it's an internal function, we don't want to copy it; it can be found via the
+			// __parent link to the type
+
+			vx := reflect.ValueOf(vv)
+
+			if vx.Kind() == reflect.Ptr {
+				ts := vx.String()
+				if ts == "<*bytecode.ByteCode Value>" {
+					dropList = append(dropList, k)
+				}
+			} else {
+				if vx.Kind() == reflect.Func {
+					dropList = append(dropList, k)
+				}
+			}
+		}
+		for _, name := range dropList {
+			delete(r.(map[string]interface{}), name)
+		}
 		if _, found := v["__parent"]; found {
 			r.(map[string]interface{})["__parent"] = args[0]
 		}

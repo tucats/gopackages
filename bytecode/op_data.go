@@ -3,7 +3,9 @@ package bytecode
 import (
 	"errors"
 	"reflect"
+	"strings"
 
+	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
@@ -119,17 +121,27 @@ func StructImpl(c *Context, i interface{}) error {
 	// If this has a custom type, validate the fields against the fields in the type model.
 	if kind, ok := m["__type"]; ok {
 		typeName, _ := kind.(string)
-		if model, ok := c.Get(kind.(string)); ok {
+		if model, ok := c.Get(typeName); ok {
 			if modelMap, ok := model.(map[string]interface{}); ok {
 
 				// Check all the fields in the new value to ensure they are valid.
 				for k := range m {
-					if _, found := modelMap[k]; k != "__static" && !found {
+					if _, found := modelMap[k]; !strings.HasPrefix(k, "__") && !found {
 						return c.NewError(InvalidFieldError, k)
 					}
 				}
 				// Add in any fields from the model not present in the one we're creating.
 				for k, v := range modelMap {
+					if k == "__type" {
+						continue
+					}
+					vx := reflect.ValueOf(v)
+					if vx.Kind() == reflect.Ptr {
+						ts := vx.String()
+						if ts == "<*bytecode.ByteCode Value>" {
+							continue
+						}
+					}
 					if _, found := m[k]; !found {
 						m[k] = v
 					}
@@ -380,7 +392,7 @@ func MemberImpl(c *Context, i interface{}) error {
 		if t, found := mv["__type"]; found {
 			isPackage = (t == "package")
 		}
-		v, found = mv[name]
+		v, found = findMember(mv, name)
 		if !found {
 			if isPackage {
 				return c.NewError(UnknownPackageMemberError, name)
@@ -393,6 +405,19 @@ func MemberImpl(c *Context, i interface{}) error {
 	}
 	_ = c.Push(v)
 	return nil
+}
+
+func findMember(m map[string]interface{}, name string) (interface{}, bool) {
+
+	if v, ok := m[name]; ok {
+		return v, true
+	}
+	if p, ok := m["__parent"]; ok {
+		if pmap, ok := p.(map[string]interface{}); ok {
+			return findMember(pmap, name)
+		}
+	}
+	return nil, false
 }
 
 // ClassMemberImpl instruction processor. This pops two values from
@@ -680,17 +705,16 @@ func ThisImpl(c *Context, i interface{}) error {
 	if i == nil {
 		c.this = c.lastStruct
 		c.lastStruct = nil
+		ui.Debug(ui.ByteCodeLogger, "->- update this to laststruct: %v", c.this)
 		return nil
 	}
-	c.this = util.GetString(i)
-	v, err := c.Pop()
-	if err != nil {
-		return err
+	this := util.GetString(i)
+	v, ok := c.Get("__this")
+	if !ok {
+		v = c.this
 	}
-	if this, ok := c.this.(string); ok {
-		return c.SetAlways(this, v)
-	}
-	return c.NewError(InvalidThisError)
+	ui.Debug(ui.ByteCodeLogger, "->- update this: \"%s\" to value: %v", this, v)
+	return c.SetAlways(this, v)
 }
 
 func FlattenImpl(c *Context, i interface{}) error {

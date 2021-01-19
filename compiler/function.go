@@ -24,16 +24,35 @@ func (c *Compiler) Function(literal bool) error {
 	parameters := []parameter{}
 	this := ""
 	fname := ""
+	class := ""
 
 	// If it's not a literal, there will be a function name, which must be a valid
 	// symbol name. It might also be an object-oriented (a->b()) call.
 	if !literal {
 		fname = c.t.Next()
+
+		// Is this receiver notation?
+		if fname == "(" {
+			this = c.t.Next()
+			class = c.t.Next()
+			if !tokenizer.IsSymbol(this) {
+				return c.NewError(InvalidSymbolError, this)
+			}
+			if !tokenizer.IsSymbol(class) {
+				return c.NewError(InvalidSymbolError, class)
+			}
+			if !c.t.IsNext(")") {
+				return c.NewError(MissingParenthesisError)
+			}
+			fname = c.t.Next()
+		}
+
 		if !tokenizer.IsSymbol(fname) {
 			return c.NewError(InvalidFunctionName, fname)
 		}
 		fname = c.Normalize(fname)
 
+		/* ---- Atrophy this non-standard item for now ----
 		// Was it really the function name, or the "this" variable name?
 		if c.t.Peek(1) == "->" {
 			c.t.Advance(1)
@@ -44,6 +63,7 @@ func (c *Compiler) Function(literal bool) error {
 			}
 			fname = c.Normalize(fname)
 		}
+		*/
 	}
 
 	// Process the function parameter specification
@@ -165,14 +185,14 @@ func (c *Compiler) Function(literal bool) error {
 			coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
 			c.t.Advance(2)
 		} else {
-			if c.t.Peek(1) == "{" && c.t.Peek(2) == "}" {
+			if c.t.Peek(1) == "{}" {
 				coercion.Emit(bytecode.Coerce, bytecode.StructType)
-				c.t.Advance(2)
+				c.t.Advance(1)
 			} else {
 				switch c.t.Peek(1) {
 				// Start of block means no more types here.
 				case "{":
-					break
+					wasVoid = true
 				case "error":
 					c.t.Advance(1)
 					coercion.Emit(bytecode.Coerce, bytecode.ErrorType)
@@ -249,6 +269,14 @@ func (c *Compiler) Function(literal bool) error {
 
 	// Add trailing return to ensure we close out the scope correctly
 	cx.b.Emit(bytecode.Return)
+
+	// If there was a receiver, make sure this function is added to the type structure
+	if class != "" {
+		c.b.Emit(bytecode.Push, b)
+		c.b.Emit(bytecode.Load, class)
+		c.b.Emit(bytecode.Push, fname)
+		c.b.Emit(bytecode.StoreIndex, true)
+	}
 
 	// If it was a literal, push the body of the function (really, a bytecode expression
 	// of the function code) on the stack. Otherwise, let's store it in the symbol table

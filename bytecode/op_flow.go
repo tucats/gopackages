@@ -207,7 +207,7 @@ func CallImpl(c *Context, i interface{}) error {
 		funcSymbols := symbols.NewChildSymbolTable("function "+af.Name, parentTable)
 		funcSymbols.ScopeBoundary = true
 
-		// Make a new symbol table for the fucntion to run with,
+		// Make a new symbol table for the function to run with,
 		// and a new execution context. Note that this table has no
 		// visibility into the current scope of symbol values.
 		c.PushFrame("function "+af.Name, af, 0)
