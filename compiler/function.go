@@ -25,6 +25,7 @@ func (c *Compiler) Function(literal bool) error {
 	this := ""
 	fname := ""
 	class := ""
+	byValue := true
 
 	// If it's not a literal, there will be a function name, which must be a valid
 	// symbol name. It might also be an object-oriented (a->b()) call.
@@ -34,6 +35,9 @@ func (c *Compiler) Function(literal bool) error {
 		// Is this receiver notation?
 		if fname == "(" {
 			this = c.t.Next()
+			if c.t.IsNext("*") {
+				byValue = false
+			}
 			class = c.t.Next()
 			if !tokenizer.IsSymbol(this) {
 				return c.NewError(InvalidSymbolError, this)
@@ -51,19 +55,6 @@ func (c *Compiler) Function(literal bool) error {
 			return c.NewError(InvalidFunctionName, fname)
 		}
 		fname = c.Normalize(fname)
-
-		/* ---- Atrophy this non-standard item for now ----
-		// Was it really the function name, or the "this" variable name?
-		if c.t.Peek(1) == "->" {
-			c.t.Advance(1)
-			this = fname
-			fname = c.t.Next()
-			if !tokenizer.IsSymbol(fname) {
-				return c.NewError(InvalidFunctionName, fname)
-			}
-			fname = c.Normalize(fname)
-		}
-		*/
 	}
 
 	// Process the function parameter specification
@@ -144,6 +135,15 @@ func (c *Compiler) Function(literal bool) error {
 	// If there was a "this" variable defined, process it now.
 	if this != "" {
 		b.Emit(bytecode.This, this)
+
+		// If it was by value, make a copy of that so the function can't
+		// modify the actual value.
+		if byValue {
+			b.Emit(bytecode.Load, "new")
+			b.Emit(bytecode.Load, this)
+			b.Emit(bytecode.Call, 1)
+			b.Emit(bytecode.Store, this)
+		}
 	}
 
 	// Generate the parameter assignments. These are extracted from the automatic
