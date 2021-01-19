@@ -12,11 +12,10 @@ func (c *Compiler) expressionAtom() error {
 
 	t := c.t.Peek(1)
 
-	// IS this the make() function?
+	// Is this the make() function?
 	if t == "make" && c.t.Peek(2) == "(" {
 		return c.Make()
 	}
-
 	// Is this the "nil" constant?
 	if t == "nil" {
 		c.t.Advance(1)

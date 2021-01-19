@@ -124,6 +124,8 @@ func StructImpl(c *Context, i interface{}) error {
 		if model, ok := c.Get(typeName); ok {
 			if modelMap, ok := model.(map[string]interface{}); ok {
 
+				// Store a pointer to the model object now.
+				m["__parent"] = model
 				// Check all the fields in the new value to ensure they are valid.
 				for k := range m {
 					if _, found := modelMap[k]; !strings.HasPrefix(k, "__") && !found {
@@ -132,9 +134,6 @@ func StructImpl(c *Context, i interface{}) error {
 				}
 				// Add in any fields from the model not present in the one we're creating.
 				for k, v := range modelMap {
-					if k == "__type" {
-						continue
-					}
 					vx := reflect.ValueOf(v)
 					if vx.Kind() == reflect.Ptr {
 						ts := vx.String()

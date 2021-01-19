@@ -276,6 +276,7 @@ func (c *Compiler) Function(literal bool) error {
 		c.b.Emit(bytecode.Load, class)
 		c.b.Emit(bytecode.Push, fname)
 		c.b.Emit(bytecode.StoreIndex, true)
+		return nil
 	}
 
 	// If it was a literal, push the body of the function (really, a bytecode expression
