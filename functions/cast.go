@@ -115,7 +115,7 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	}
 
 	// Otherwise, make a deep copy of the item.
-	r := DeepCopy(args[0])
+	r := DeepCopy(args[0], 10)
 
 	// IF there was a type in the source, make the clone point back to it
 	switch v := r.(type) {
@@ -177,8 +177,11 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 }
 
 // DeepCopy makes a deep copy of an Ego data type
-func DeepCopy(source interface{}) interface{} {
+func DeepCopy(source interface{}, depth int) interface{} {
 
+	if depth < 0 {
+		return nil
+	}
 	switch v := source.(type) {
 
 	case int:
@@ -194,14 +197,14 @@ func DeepCopy(source interface{}) interface{} {
 
 		r := make([]interface{}, 0)
 		for _, d := range v {
-			r = append(r, DeepCopy(d))
+			r = append(r, DeepCopy(d, depth-1))
 		}
 		return r
 
 	case map[string]interface{}:
 		r := map[string]interface{}{}
 		for k, d := range v {
-			r[k] = DeepCopy(d)
+			r[k] = DeepCopy(d, depth-1)
 		}
 		return r
 

@@ -82,9 +82,9 @@ func (c *Compiler) Function(literal bool) error {
 			if c.t.Peek(1) == "[" && c.t.Peek(2) == "]" {
 				p.kind = bytecode.ArrayType
 				c.t.Advance(2)
-			} else if c.t.Peek(1) == "{" && c.t.Peek(2) == "}" {
-				p.kind = bytecode.ArrayType
-				c.t.Advance(2)
+			} else if c.t.Peek(1) == "{}" {
+				p.kind = bytecode.StructType
+				c.t.Advance(1)
 			} else if util.InList(c.t.Peek(1), "chan", "interface{}", "int", "string", "bool", "double", "float", "array", "struct") {
 				switch c.t.Next() {
 				case "int":
@@ -273,7 +273,12 @@ func (c *Compiler) Function(literal bool) error {
 	// If there was a receiver, make sure this function is added to the type structure
 	if class != "" {
 		c.b.Emit(bytecode.Push, b)
-		c.b.Emit(bytecode.Load, class)
+		if c.PackageName != "" {
+			c.b.Emit(bytecode.Load, c.PackageName)
+			c.b.Emit(bytecode.Member, class)
+		} else {
+			c.b.Emit(bytecode.Load, class)
+		}
 		c.b.Emit(bytecode.Push, fname)
 		c.b.Emit(bytecode.StoreIndex, true)
 		return nil

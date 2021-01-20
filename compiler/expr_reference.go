@@ -1,7 +1,10 @@
 package compiler
 
 import (
+	"github.com/tucats/gopackages/bytecode"
 	bc "github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/tokenizer"
+	"github.com/tucats/gopackages/util"
 )
 
 // reference parses a structure or array reference
@@ -13,20 +16,35 @@ func (c *Compiler) reference() error {
 		return err
 	}
 
+	lastName := ""
+	parsing := true
 	// is there a trailing structure or array reference?
-	for !c.t.AtEnd() {
+	for parsing && !c.t.AtEnd() {
 
 		op := c.t.Peek(1)
 		switch op {
 
-		// Struct reference
-		case "->":
-			c.t.Advance(1)
-			name := c.t.Next()
-			c.b.Emit(bc.Dup)
-			c.b.Emit(bc.Push, name)
-			c.b.Emit(bc.ClassMember)
-
+		// Structure initialization
+		case "{":
+			name := c.t.Peek(2)
+			colon := c.t.Peek(3)
+			if tokenizer.IsSymbol(name) && colon == ":" {
+				// c.b.Emit(bytecode.Load, lastName)
+				c.b.Emit(bytecode.Push, "__type")
+				c.b.Emit(bytecode.LoadIndex)
+				c.b.Emit(bytecode.Push, "__type")
+				err := c.expressionAtom()
+				if err != nil {
+					return err
+				}
+				i := c.b.Opcodes()
+				ix := i[len(i)-1]
+				ix.Operand = util.GetInt(ix.Operand) + 1
+				i[len(i)-1] = ix
+			} else {
+				parsing = false
+				break
+			}
 		// Function invocation
 		case "(":
 			c.t.Advance(1)
@@ -38,8 +56,8 @@ func (c *Compiler) reference() error {
 		// Map member reference
 		case ".":
 			c.t.Advance(1)
-			name := c.t.Next()
-			c.b.Emit(bc.Push, name)
+			lastName = c.t.Next()
+			c.b.Emit(bc.Push, lastName)
 			c.b.Emit(bc.Member)
 
 		// Array index reference

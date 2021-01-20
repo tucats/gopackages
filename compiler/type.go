@@ -14,15 +14,9 @@ func (c *Compiler) Type() error {
 		return c.NewError(InvalidSymbolError)
 	}
 	name = c.Normalize(name)
-
 	parent := name
-	if c.t.Peek(1) == "->" {
-		c.t.Advance(1)
-		parent = c.t.Next()
-		if !tokenizer.IsSymbol(parent) {
-			return c.NewError(InvalidSymbolError)
-		}
-		c.Normalize(parent)
+	if c.PackageName != "" {
+		parent = c.PackageName
 	}
 
 	// Make sure this is a legit type definition
@@ -33,7 +27,7 @@ func (c *Compiler) Type() error {
 		return c.NewError(MissingBlockError)
 	}
 
-	// If there is not parent, seal the chain by making the link point to a string of our own name.
+	// If there is no parent, seal the chain by making the link point to a string of our own name.
 	// If there is a parent, load it so it can be linked after type creation.
 	if parent == name {
 		c.b.Emit(bytecode.Push, parent)
@@ -53,10 +47,8 @@ func (c *Compiler) Type() error {
 	// member if it is NOT a string.
 	c.b.Emit(bytecode.Push, "__parent")
 	c.b.Emit(bytecode.StoreIndex, true)
-	c.b.Emit(bytecode.SymbolCreate, name)
 	c.b.Emit(bytecode.Dup)
 	c.b.Emit(bytecode.Dup)
-	c.b.Emit(bytecode.Store, name)
 
 	// Use the name as the type.
 	c.b.Emit(bytecode.Push, name)
@@ -70,6 +62,15 @@ func (c *Compiler) Type() error {
 	c.b.Emit(bytecode.Swap)
 	c.b.Emit(bytecode.Push, "__static")
 	c.b.Emit(bytecode.StoreIndex, true)
+
+	if c.PackageName != "" {
+		c.b.Emit(bytecode.Load, c.PackageName)
+		c.b.Emit(bytecode.Push, name)
+		c.b.Emit(bytecode.StoreIndex, true)
+	} else {
+		c.b.Emit(bytecode.SymbolCreate, name)
+		c.b.Emit(bytecode.Store, name)
+	}
 
 	return nil
 }

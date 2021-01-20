@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
@@ -408,7 +407,13 @@ func MemberImpl(c *Context, i interface{}) error {
 			}
 			return c.NewError(UnknownMemberError, name)
 		}
-		c.lastStruct = m // Remember where we loaded this from
+
+		// Remember where we loaded this from unless it was a package name
+		if !isPackage {
+			c.lastStruct = m
+		} else {
+			c.lastStruct = nil
+		}
 	} else {
 		return c.NewError(InvalidTypeError)
 	}
@@ -714,7 +719,7 @@ func ThisImpl(c *Context, i interface{}) error {
 	if i == nil {
 		c.this = c.lastStruct
 		c.lastStruct = nil
-		ui.Debug(ui.ByteCodeLogger, "->- update this to laststruct: %v", c.this)
+		//ui.Debug(ui.ByteCodeLogger, "->- update this to laststruct: %v", c.this)
 		return nil
 	}
 	this := util.GetString(i)
@@ -722,7 +727,7 @@ func ThisImpl(c *Context, i interface{}) error {
 	if !ok {
 		v = c.this
 	}
-	ui.Debug(ui.ByteCodeLogger, "->- update this: \"%s\" to value: %v", this, v)
+	//ui.Debug(ui.ByteCodeLogger, "->- update this: \"%s\" to value: %v", this, v)
 	return c.SetAlways(this, v)
 }
 
