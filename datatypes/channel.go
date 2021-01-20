@@ -110,3 +110,35 @@ func (c *Channel) String() string {
 	return fmt.Sprintf("chan(%s, size %d(%d), id %s)",
 		state, c.size, c.count, c.id)
 }
+
+func SetMetadata(value interface{}, key string, v interface{}) bool {
+
+	m, ok := value.(map[string]interface{})
+	if !ok {
+		return false
+	}
+	mdx, ok := m["__metadata"]
+	if !ok {
+		m["__metadata"] = map[string]interface{}{key: v}
+		return true
+	}
+	mdxx, ok := mdx.(map[string]interface{})
+	if !ok {
+		return false
+	}
+	mdxx[key] = v
+	return true
+}
+
+func GetMetadata(value interface{}, key string) (interface{}, bool) {
+
+	if m, ok := value.(map[string]interface{}); ok {
+		if md, ok := m["__metadata"]; ok {
+			if mdx, ok := md.(map[string]interface{}); ok {
+				v, ok := mdx[key]
+				return v, ok
+			}
+		}
+	}
+	return nil, false
+}
