@@ -2,12 +2,15 @@ package datatypes
 
 // Common metadata keys
 const (
-	MetadataKey   = "__metadata"
-	StaticMDKey   = "static"
-	ReadonlyMDKey = "readonly"
-	TypeMDKey     = "type"
-	ParentMDKey   = "parent"
-	ReplicaMDKey  = "replica"
+	MetadataKey = "__metadata"
+
+	ElementTypesMDKey = "elements"
+	ParentMDKey       = "parent"
+	ReplicaMDKey      = "replica"
+	ReadonlyMDKey     = "readonly"
+	SizeMDKey         = "size"
+	StaticMDKey       = "static"
+	TypeMDKey         = "type"
 )
 
 // For a given structure, set a key/value in the metadata. The

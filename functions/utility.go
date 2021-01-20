@@ -285,6 +285,8 @@ func FormatSymbols(syms *symbols.SymbolTable, args []interface{}) (interface{}, 
 func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	switch v := args[0].(type) {
+	case nil:
+		return "nil", nil
 	case error:
 		return "error", nil
 	case *datatypes.Channel:
@@ -445,4 +447,35 @@ func Make(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	}
 	return array, nil
 
+}
+
+func Reflect(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	if m, ok := args[0].(map[string]interface{}); ok {
+		return m[datatypes.MetadataKey], nil
+	}
+
+	typeString, err := Type(s, args)
+	if err == nil {
+		result := map[string]interface{}{
+			datatypes.TypeMDKey: typeString,
+		}
+		if array, ok := args[0].([]interface{}); ok {
+			result[datatypes.SizeMDKey] = len(array)
+			types := "nil"
+			for _, a := range array {
+				ts, _ := Type(s, []interface{}{a})
+				tsx := util.GetString(ts)
+				if types == "nil" {
+					types = tsx
+				} else if types != tsx {
+					types = "mixed"
+					break
+				}
+			}
+			result[datatypes.ElementTypesMDKey] = types
+		}
+		return result, nil
+	}
+	return map[string]interface{}{}, err
 }

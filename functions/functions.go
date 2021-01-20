@@ -55,6 +55,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"members":              {Min: 1, Max: 1, F: Members},
 	"min":                  {Min: 1, Max: Any, F: Min},
 	"new":                  {Min: 1, Max: 1, F: New},
+	"reflect":              {Min: 1, Max: 1, F: Reflect},
 	"sort":                 {Min: 1, Max: Any, F: Sort},
 	"string":               {Min: 1, Max: 1, F: String},
 	"sum":                  {Min: 1, Max: Any, F: Sum},
