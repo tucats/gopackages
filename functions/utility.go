@@ -300,9 +300,18 @@ func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	case []interface{}:
 		return "array", nil
 	case map[string]interface{}:
+
+		// IF the parent is a string instead of a map, this is the actual type object
+		if _, ok := v["__parent"].(string); ok {
+			return "type", nil
+		}
+
+		// Otherewise, if there is a type specification, return that.
 		if sv, ok := v["__type"]; ok {
 			return util.GetString(sv), nil
 		}
+
+		// Finally, just a generic struct then.
 		return "struct", nil
 
 	default:

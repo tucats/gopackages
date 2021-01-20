@@ -136,6 +136,14 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	case map[string]interface{}:
 
+		// Create the replica count if needed, and update it.
+		replica := 0
+		if replicaX, ok := v["__replica"]; ok {
+			replica = util.GetInt(replicaX) + 1
+		}
+		v["__replica"] = replica
+
+		// Organize the new item by removing things that are handled via the parent.
 		dropList := []string{}
 		for k, vv := range v {
 			// IF it's an internal function, we don't want to copy it; it can be found via the

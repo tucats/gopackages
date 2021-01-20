@@ -118,6 +118,8 @@ func StructImpl(c *Context, i interface{}) error {
 		m["__static"] = true
 	}
 
+	m["__replica"] = 0
+
 	// If this has a custom type, validate the fields against the fields in the type model.
 	if kind, ok := m["__type"]; ok {
 		typeName, _ := kind.(string)
@@ -126,6 +128,14 @@ func StructImpl(c *Context, i interface{}) error {
 
 				// Store a pointer to the model object now.
 				m["__parent"] = model
+
+				// Update the replica if needed
+				if replica, ok := m["__replica"]; ok {
+					m["__replica"] = util.GetInt(replica) + 1
+				} else {
+					m["__replica"] = 1
+				}
+
 				// Check all the fields in the new value to ensure they are valid.
 				for k := range m {
 					if _, found := modelMap[k]; !strings.HasPrefix(k, "__") && !found {
