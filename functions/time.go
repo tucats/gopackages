@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/tucats/ego/defs"
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -134,7 +135,8 @@ func makeTime(t *time.Time) interface{} {
 		"SleepUntil": TimeSleep,
 		"String":     TimeString,
 		"Sub":        TimeSub,
-		"__type":     "time",
 	}
+	datatypes.SetMetadata(r, datatypes.TypeMDKey, "time")
+
 	return r
 }

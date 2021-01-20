@@ -121,12 +121,12 @@ func Open(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		"WriteString": WriteString,
 		"Write":       Write,
 		"WriteAt":     WriteAt,
-
-		"f":          f,
-		"valid":      true,
-		"name":       fname,
-		"__readonly": true,
+		"f":           f,
+		"valid":       true,
+		"name":        fname,
 	}
+	datatypes.SetMetadata(fobj, datatypes.ReadonlyMDKey, true)
+
 	return fobj, nil
 }
 

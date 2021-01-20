@@ -189,7 +189,6 @@ func (c *Compiler) Test() error {
 	}
 
 	test := map[string]interface{}{}
-	//test["__readonly"] = true
 	test["assert"] = TestAssert
 	test["fail"] = TestFail
 	test["isType"] = TestIsType

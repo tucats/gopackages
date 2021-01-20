@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/tokenizer"
 	"github.com/tucats/gopackages/util"
 )
@@ -26,7 +27,10 @@ func (c *Compiler) expressionAtom() error {
 	// Is an interface?
 	if t == "interface{}" {
 		c.t.Advance(1)
-		c.b.Emit(bytecode.Push, map[string]interface{}{"__type": "interface{}"})
+		c.b.Emit(bytecode.Push, map[string]interface{}{
+			datatypes.MetadataKey: map[string]interface{}{
+				datatypes.TypeMDKey: "interface{}",
+			}})
 		return nil
 	}
 

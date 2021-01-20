@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 )
 
@@ -144,9 +145,8 @@ func AddBuiltins(symbols *symbols.SymbolTable) {
 				_ = symbols.SetAlways(d.Pkg, p)
 			} else {
 				p.(map[string]interface{})[n] = d.F
-				p.(map[string]interface{})["__type"] = "package"
-				p.(map[string]interface{})["__readonly"] = true
-
+				datatypes.SetMetadata(p, datatypes.TypeMDKey, "package")
+				datatypes.SetMetadata(p, datatypes.ReadonlyMDKey, true)
 				ui.Debug(ui.CompilerLogger, "    adding builtin %s to %s", n, d.Pkg)
 				_ = symbols.SetAlways(d.Pkg, p)
 			}

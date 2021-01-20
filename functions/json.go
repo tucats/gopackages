@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -28,7 +29,7 @@ func Seal(i interface{}) interface{} {
 		for k, v := range ii {
 			ii[k] = Seal(v)
 		}
-		ii["__static"] = true
+		datatypes.SetMetadata(ii, datatypes.StaticMDKey, true)
 		return ii
 
 	case []interface{}:

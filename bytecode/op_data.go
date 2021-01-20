@@ -101,38 +101,45 @@ func StructImpl(c *Context, i interface{}) error {
 	m := map[string]interface{}{}
 
 	for n := 0; n < count; n++ {
-		name, err := c.Pop()
+		nx, err := c.Pop()
 		if err != nil {
 			return err
 		}
+		name := util.GetString(nx)
+
 		value, err := c.Pop()
 		if err != nil {
 			return err
 		}
-		m[util.GetString(name)] = value
+
+		if strings.HasPrefix(name, "__") {
+			datatypes.SetMetadata(m, name[2:], value)
+		} else {
+			m[name] = value
+		}
 	}
 	// If we are in static mode, or this is a non-empty definition,
 	// mark the structure as having static members.
 	if c.Static || count > 0 {
-		m["__static"] = true
+		datatypes.SetMetadata(m, datatypes.StaticMDKey, true)
 	}
 
-	m["__replica"] = 0
+	datatypes.SetMetadata(m, datatypes.ReplicaMDKey, 0)
 
 	// If this has a custom type, validate the fields against the fields in the type model.
-	if kind, ok := m["__type"]; ok {
+	if kind, ok := datatypes.GetMetadata(m, datatypes.TypeMDKey); ok {
 		typeName, _ := kind.(string)
 		if model, ok := c.Get(typeName); ok {
 			if modelMap, ok := model.(map[string]interface{}); ok {
 
 				// Store a pointer to the model object now.
-				m["__parent"] = model
+				datatypes.SetMetadata(m, datatypes.ParentMDKey, model)
 
 				// Update the replica if needed
-				if replica, ok := m["__replica"]; ok {
-					m["__replica"] = util.GetInt(replica) + 1
+				if replica, ok := datatypes.GetMetadata(m, datatypes.ReadonlyMDKey); ok {
+					datatypes.SetMetadata(m, datatypes.ReplicaMDKey, util.GetInt(replica)+1)
 				} else {
-					m["__replica"] = 1
+					datatypes.SetMetadata(m, datatypes.ReplicaMDKey, 1)
 				}
 
 				// Check all the fields in the new value to ensure they are valid.
@@ -237,7 +244,7 @@ func StoreImpl(c *Context, i interface{}) error {
 	if len(varname) > 1 && varname[0:1] == "_" {
 		switch a := v.(type) {
 		case map[string]interface{}:
-			a["__readonly"] = true
+			datatypes.SetMetadata(a, datatypes.ReadonlyMDKey, true)
 		}
 	}
 	return err
@@ -320,7 +327,7 @@ func StoreGlobalImpl(c *Context, i interface{}) error {
 	if len(varname) > 1 && varname[0:1] == "_" {
 		switch a := v.(type) {
 		case map[string]interface{}:
-			a["__readonly"] = true
+			datatypes.SetMetadata(a, datatypes.ReadonlyMDKey, true)
 		}
 	}
 	return err
@@ -346,7 +353,7 @@ func StoreAlwaysImpl(c *Context, i interface{}) error {
 	if len(varname) > 1 && varname[0:1] == "_" {
 		switch a := v.(type) {
 		case map[string]interface{}:
-			a["__readonly"] = true
+			datatypes.SetMetadata(a, datatypes.ReadonlyMDKey, true)
 		}
 	}
 	return err
@@ -397,7 +404,7 @@ func MemberImpl(c *Context, i interface{}) error {
 	mv, ok := m.(map[string]interface{})
 	if ok {
 		isPackage := false
-		if t, found := mv["__type"]; found {
+		if t, found := datatypes.GetMetadata(mv, datatypes.TypeMDKey); found {
 			isPackage = (t == "package")
 		}
 		v, found = findMember(mv, name)
@@ -426,7 +433,7 @@ func findMember(m map[string]interface{}, name string) (interface{}, bool) {
 	if v, ok := m[name]; ok {
 		return v, true
 	}
-	if p, ok := m["__parent"]; ok {
+	if p, ok := datatypes.GetMetadata(m, datatypes.ParentMDKey); ok {
 		if pmap, ok := p.(map[string]interface{}); ok {
 			return findMember(pmap, name)
 		}
@@ -465,7 +472,7 @@ func ClassMemberImpl(c *Context, i interface{}) error {
 	switch mv := m.(type) {
 	case map[string]interface{}:
 
-		if _, found := mv["__parent"]; !found {
+		if _, found := datatypes.GetMetadata(mv, datatypes.ParentMDKey); found {
 			return c.NewError(NotATypeError)
 		}
 		v, found := mv[name]
@@ -488,7 +495,7 @@ func ClassMemberImpl(c *Context, i interface{}) error {
 func searchParents(mv map[string]interface{}, name string) (interface{}, bool) {
 
 	// Is there a parent we should check?
-	if t, found := mv["__parent"]; found {
+	if t, found := datatypes.GetMetadata(mv, datatypes.ParentMDKey); found {
 		switch tv := t.(type) {
 		case map[string]interface{}:
 			v, found := tv[name]
@@ -535,10 +542,18 @@ func LoadIndexImpl(c *Context, i interface{}) error {
 	case map[string]interface{}:
 		subscript := util.GetString(index)
 		isPackage := false
-		if t, found := a["__type"]; found {
+		if t, found := datatypes.GetMetadata(a, datatypes.TypeMDKey); found {
 			isPackage = (t == "package")
 		}
-		v, f := a[subscript]
+
+		var v interface{}
+		var f bool
+		// If it's a metadata key name, redirect
+		if strings.HasPrefix(subscript, "__") {
+			v, f = datatypes.GetMetadata(a, subscript[2:])
+		} else {
+			v, f = a[subscript]
+		}
 		if !f {
 			if isPackage {
 				return c.NewError(UnknownPackageMemberError, subscript)
@@ -603,6 +618,37 @@ func LoadSliceImpl(c *Context, i interface{}) error {
 	return nil
 }
 
+// StoreMetadataImpl instruction processor
+func StoreMetadataImpl(c *Context, i interface{}) error {
+
+	var key string
+
+	if i != nil {
+		key = util.GetString(i)
+	} else {
+		keyx, err := c.Pop()
+		if err != nil {
+			return err
+		}
+		key = util.GetString(keyx)
+	}
+
+	value, err := c.Pop()
+	if err != nil {
+		return err
+	}
+	m, err := c.Pop()
+	if err != nil {
+		return err
+	}
+	_, ok := m.(map[string]interface{})
+	if !ok {
+		return c.NewError(InvalidTypeError)
+	}
+	_ = datatypes.SetMetadata(m, key, value)
+	return c.Push(m)
+}
+
 // StoreIndexImpl instruction processor
 func StoreIndexImpl(c *Context, i interface{}) error {
 	storeAlways := util.GetBool(i)
@@ -629,38 +675,34 @@ func StoreIndexImpl(c *Context, i interface{}) error {
 	case map[string]interface{}:
 		subscript := util.GetString(index)
 
-		// You can always update the __static item
-		if subscript != "__static" {
-			// Does this member have a flag marking it as readonly?
-			old, found := a["__readonly"]
-			if found && !storeAlways {
-				if util.GetBool(old) {
-					return c.NewError(ReadOnlyError)
-				}
+		// Does this member have a flag marking it as readonly?
+		old, found := datatypes.GetMetadata(a, datatypes.ReadonlyMDKey)
+		if found && !storeAlways {
+			if util.GetBool(old) {
+				return c.NewError(ReadOnlyError)
+			}
+		}
+
+		// Does this item already exist and is readonly?
+		old, found = a[subscript]
+		if found {
+			if subscript[0:1] == "_" {
+				return c.NewError(ReadOnlyError)
 			}
 
-			// Does this item already exist and is readonly?
-			old, found = a[subscript]
-			if found {
-				if subscript[0:1] == "_" {
-					return c.NewError(ReadOnlyError)
-				}
+			// Check to be sure this isn't a restricted (function code) type
 
-				// Check to be sure this isn't a restricted (function code) type
-
-				switch old.(type) {
-
-				case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
-					return c.NewError(ReadOnlyError)
-				}
+			switch old.(type) {
+			case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
+				return c.NewError(ReadOnlyError)
 			}
+		}
 
-			// Is this a static (i.e. no new members) struct? The __static entry must be
-			// present, with a value that is true, and we are not doing the "store always"
-			if staticFlag, ok := a["__static"]; ok && util.GetBool(staticFlag) && !storeAlways {
-				if _, ok := a[subscript]; !ok {
-					return c.NewError(UnknownMemberError, subscript)
-				}
+		// Is this a static (i.e. no new members) struct? The __static entry must be
+		// present, with a value that is true, and we are not doing the "store always"
+		if staticFlag, ok := datatypes.GetMetadata(a, datatypes.StaticMDKey); ok && util.GetBool(staticFlag) && !storeAlways {
+			if _, ok := a[subscript]; !ok {
+				return c.NewError(UnknownMemberError, subscript)
 			}
 		}
 
@@ -671,7 +713,11 @@ func StoreIndexImpl(c *Context, i interface{}) error {
 				}
 			}
 		}
-		a[subscript] = v
+		if strings.HasPrefix(subscript, "__") {
+			datatypes.SetMetadata(a, subscript[2:], v)
+		} else {
+			a[subscript] = v
+		}
 
 		// If we got a true argument, push the result back on the stack also. This
 		// is needed to create TYPE definitions.

@@ -45,23 +45,20 @@ func (c *Compiler) Type() error {
 	// a string that is the name of the type. When a member dereference on a struct
 	// happens that includes a __parent, the __parent object is also checked for the
 	// member if it is NOT a string.
-	c.b.Emit(bytecode.Push, "__parent")
-	c.b.Emit(bytecode.StoreIndex, true)
+	c.b.Emit(bytecode.Swap)
+	c.b.Emit(bytecode.StoreMetadata, datatypes.ParentMDKey)
 	c.b.Emit(bytecode.Dup)
 	c.b.Emit(bytecode.Dup)
 
-	// Use the name as the type.
+	// Use the name as the type. Note that StoreIndex will intercept the __
+	// prefix of the index and redirect it into the metadata.
 	c.b.Emit(bytecode.Push, name)
-	c.b.Emit(bytecode.Swap)
-	c.b.Emit(bytecode.Push, "__type")
-	c.b.Emit(bytecode.StoreIndex, true)
+	c.b.Emit(bytecode.StoreMetadata, datatypes.TypeMDKey)
 
 	// Finally, make it a static value now.
 	c.b.Emit(bytecode.Dup) // One more needed for type statement
 	c.b.Emit(bytecode.Push, true)
-	c.b.Emit(bytecode.Swap)
-	c.b.Emit(bytecode.Push, "__static")
-	c.b.Emit(bytecode.StoreIndex, true)
+	c.b.Emit(bytecode.StoreMetadata, datatypes.StaticMDKey)
 
 	if c.PackageName != "" {
 		c.b.Emit(bytecode.Load, c.PackageName)

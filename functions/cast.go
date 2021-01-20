@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -138,10 +139,10 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 		// Create the replica count if needed, and update it.
 		replica := 0
-		if replicaX, ok := v["__replica"]; ok {
+		if replicaX, ok := datatypes.GetMetadata(v, datatypes.ReplicaMDKey); ok {
 			replica = util.GetInt(replicaX) + 1
 		}
-		v["__replica"] = replica
+		datatypes.SetMetadata(v, datatypes.ReplicaMDKey, replica)
 
 		// Organize the new item by removing things that are handled via the parent.
 		dropList := []string{}
@@ -165,8 +166,9 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		for _, name := range dropList {
 			delete(r.(map[string]interface{}), name)
 		}
-		if _, found := v["__parent"]; found {
-			r.(map[string]interface{})["__parent"] = args[0]
+		// If there is a parent key, override it with this item.
+		if _, ok := datatypes.GetMetadata(r, datatypes.ParentMDKey); ok {
+			datatypes.SetMetadata(r, datatypes.ParentMDKey, args[0])
 		}
 
 	default:

@@ -8,6 +8,7 @@ import (
 
 	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
 )
@@ -32,10 +33,11 @@ func (c *Compiler) Package() error {
 	// active table.
 	tmp := symbols.NewSymbolTable("")
 	_ = tmp.SetAlways(name, map[string]interface{}{
-		"__parent":   name,
-		"__readonly": true,
-		"__type":     "package",
-	})
+		datatypes.MetadataKey: map[string]interface{}{
+			datatypes.ParentMDKey:   name,
+			datatypes.ReadonlyMDKey: true,
+			datatypes.TypeMDKey:     "package",
+		}})
 	c.s.Merge(tmp)
 
 	return nil

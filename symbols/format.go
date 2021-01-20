@@ -4,6 +4,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/tokenizer"
 	"github.com/tucats/gopackages/util"
 )
@@ -48,10 +49,10 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 			}
 
 		case map[string]interface{}:
-			for kk, k2 := range actual {
-				if kk == "__type" {
-					typeString, _ = k2.(string)
-				}
+			if tsx, ok := datatypes.GetMetadata(actual, datatypes.TypeMDKey); ok {
+				typeString = util.GetString(tsx)
+			}
+			for _, k2 := range actual {
 				if _, ok := k2.(func(*SymbolTable, []interface{}) (interface{}, error)); ok {
 					skip = true
 				}

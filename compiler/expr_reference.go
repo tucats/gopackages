@@ -29,7 +29,6 @@ func (c *Compiler) reference() error {
 			name := c.t.Peek(2)
 			colon := c.t.Peek(3)
 			if tokenizer.IsSymbol(name) && colon == ":" {
-				// c.b.Emit(bytecode.Load, lastName)
 				c.b.Emit(bytecode.Push, "__type")
 				c.b.Emit(bytecode.LoadIndex)
 				c.b.Emit(bytecode.Push, "__type")

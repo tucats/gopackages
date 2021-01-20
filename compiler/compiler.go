@@ -6,6 +6,7 @@ import (
 
 	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
@@ -184,8 +185,8 @@ func (c *Compiler) AddPackageFunction(pkgname string, name string, function inte
 	fd, found := c.packages[pkgname]
 	if !found {
 		fd = FunctionDictionary{}
-		fd["__type"] = "package"
-		fd["__readonly"] = true
+		datatypes.SetMetadata(fd, datatypes.TypeMDKey, "package")
+		datatypes.SetMetadata(fd, datatypes.ReadonlyMDKey, true)
 	}
 
 	if _, found := fd[name]; found {
@@ -205,8 +206,8 @@ func (c *Compiler) AddPackageValue(pkgname string, name string, value interface{
 	fd, found := c.packages[pkgname]
 	if !found {
 		fd = FunctionDictionary{}
-		fd["__type"] = "package"
-		fd["__readonly"] = true
+		datatypes.SetMetadata(fd, datatypes.TypeMDKey, "package")
+		datatypes.SetMetadata(fd, datatypes.ReadonlyMDKey, true)
 	}
 
 	if _, found := fd[name]; found {
@@ -236,7 +237,7 @@ func (c *Compiler) AddPackageToSymbols(s *symbols.SymbolTable) {
 		}
 		// Make sure the package is marked as readonly so the user can't modify
 		// any function definitions, etc. that are built in.
-		m["__readonly"] = true
+		datatypes.SetMetadata(m, datatypes.ReadonlyMDKey, true)
 		if pkgname != "" {
 			_ = s.SetConstant(pkgname, m)
 		}

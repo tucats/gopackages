@@ -302,12 +302,14 @@ func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	case map[string]interface{}:
 
 		// IF the parent is a string instead of a map, this is the actual type object
-		if _, ok := v["__parent"].(string); ok {
-			return "type", nil
+		if typeName, ok := datatypes.GetMetadata(v, datatypes.ParentMDKey); ok {
+			if _, ok := typeName.(string); ok {
+				return "type", nil
+			}
 		}
 
 		// Otherewise, if there is a type specification, return that.
-		if sv, ok := v["__type"]; ok {
+		if sv, ok := datatypes.GetMetadata(v, datatypes.TypeMDKey); ok {
 			return util.GetString(sv), nil
 		}
 

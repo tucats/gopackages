@@ -256,7 +256,12 @@ func TestNew(t *testing.T) {
 		{
 			name: "add two maps",
 			expr: "{name:\"Tom\"} + { age:50}",
-			want: map[string]interface{}{"__static": true, "name": "Tom", "age": 50},
+			want: map[string]interface{}{
+				"__metadata": map[string]interface{}{
+					"static":  true,
+					"replica": 0,
+				}, "name": "Tom",
+				"age": 50},
 		},
 		{
 			name: "len of string function",

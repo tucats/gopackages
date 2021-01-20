@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/symbols"
 )
 
@@ -18,40 +19,77 @@ func TestStructImpl(t *testing.T) {
 		static  bool
 	}{
 		{
-			name:    "two member incomplete test",
-			arg:     2,
-			stack:   []interface{}{"usertype", "__type", true, "flag"},
-			want:    map[string]interface{}{"flag": true, "test": 0, "__static": true, "__type": "usertype"},
+			name:  "two member incomplete test",
+			arg:   2,
+			stack: []interface{}{"usertype", "__type", true, "flag"},
+			want: map[string]interface{}{
+				"flag": true,
+				"test": 0,
+				"__metadata": map[string]interface{}{
+					"static":  true,
+					"type":    "usertype",
+					"replica": 1,
+					"parent": map[string]interface{}{
+						"__metadata": map[string]interface{}{
+							"static": true,
+							"type":   "usertype",
+						},
+						"flag": false,
+						"test": 0,
+					},
+				}},
 			wantErr: false,
 			static:  true,
 		},
 		{
-			name:    "one member test",
-			arg:     1,
-			stack:   []interface{}{123, "test"},
-			want:    map[string]interface{}{"test": 123, "__static": true},
+			name:  "one member test",
+			arg:   1,
+			stack: []interface{}{123, "test"},
+			want: map[string]interface{}{
+				"test": 123,
+				"__metadata": map[string]interface{}{
+					"replica": 0,
+					"static":  true,
+				}},
 			wantErr: false,
 		},
 		{
-			name:    "two member test",
-			arg:     2,
-			stack:   []interface{}{true, "active", 123, "test"},
-			want:    map[string]interface{}{"active": true, "test": 123, "__static": true},
+			name:  "two member test",
+			arg:   2,
+			stack: []interface{}{true, "active", 123, "test"},
+			want: map[string]interface{}{
+				"active": true,
+				"test":   123,
+				"__metadata": map[string]interface{}{
+					"static":  true,
+					"replica": 0,
+				}},
 			wantErr: false,
 		},
 		{
-			name:    "two member valid static test",
-			arg:     2,
-			stack:   []interface{}{true, "active", 123, "test"},
-			want:    map[string]interface{}{"active": true, "test": 123, "__static": true},
+			name:  "two member valid static test",
+			arg:   2,
+			stack: []interface{}{true, "active", 123, "test"},
+			want: map[string]interface{}{
+				"active": true,
+				"test":   123,
+				"__metadata": map[string]interface{}{
+					"static":  true,
+					"replica": 0,
+				}},
 			wantErr: false,
 			static:  true,
 		},
 		{
-			name:    "two member invalid static test",
-			arg:     3,
-			stack:   []interface{}{"usertype", "__type", true, "invalid", 123, "test"},
-			want:    map[string]interface{}{"active": true, "test": 123, "__static": true},
+			name:  "two member invalid static test",
+			arg:   3,
+			stack: []interface{}{"usertype", "__type", true, "invalid", 123, "test"},
+			want: map[string]interface{}{
+				"active": true,
+				"test":   123,
+				"__metadata": map[string]interface{}{
+					"static": true,
+				}},
 			wantErr: true,
 			static:  true,
 		},
@@ -66,10 +104,12 @@ func TestStructImpl(t *testing.T) {
 			}
 
 			model := map[string]interface{}{
-				"test":     0,
-				"flag":     false,
-				"__type":   "usertype",
-				"__static": true,
+				"test": 0,
+				"flag": false,
+				datatypes.MetadataKey: map[string]interface{}{
+					datatypes.TypeMDKey:   "usertype",
+					datatypes.StaticMDKey: true,
+				},
 			}
 			_ = ctx.symbols.SetAlways("usertype", model)
 
