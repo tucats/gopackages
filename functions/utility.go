@@ -474,6 +474,7 @@ func Reflect(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 				}
 			}
 			result[datatypes.ElementTypesMDKey] = types
+
 		}
 		return result, nil
 	}

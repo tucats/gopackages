@@ -405,7 +405,7 @@ func MemberImpl(c *Context, i interface{}) error {
 	if ok {
 		isPackage := false
 		if t, found := datatypes.GetMetadata(mv, datatypes.TypeMDKey); found {
-			isPackage = (t == "package")
+			isPackage = (util.GetString(t) == "package")
 		}
 		v, found = findMember(mv, name)
 		if !found {
@@ -543,7 +543,7 @@ func LoadIndexImpl(c *Context, i interface{}) error {
 		subscript := util.GetString(index)
 		isPackage := false
 		if t, found := datatypes.GetMetadata(a, datatypes.TypeMDKey); found {
-			isPackage = (t == "package")
+			isPackage = (util.GetString(t) == "package")
 		}
 
 		var v interface{}

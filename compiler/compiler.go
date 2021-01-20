@@ -185,8 +185,10 @@ func (c *Compiler) AddPackageFunction(pkgname string, name string, function inte
 	fd, found := c.packages[pkgname]
 	if !found {
 		fd = FunctionDictionary{}
-		datatypes.SetMetadata(fd, datatypes.TypeMDKey, "package")
-		datatypes.SetMetadata(fd, datatypes.ReadonlyMDKey, true)
+		fd[datatypes.MetadataKey] = map[string]interface{}{
+			datatypes.TypeMDKey:     "dictionary",
+			datatypes.ReadonlyMDKey: true,
+		}
 	}
 
 	if _, found := fd[name]; found {
@@ -237,7 +239,9 @@ func (c *Compiler) AddPackageToSymbols(s *symbols.SymbolTable) {
 		}
 		// Make sure the package is marked as readonly so the user can't modify
 		// any function definitions, etc. that are built in.
+		datatypes.SetMetadata(m, datatypes.TypeMDKey, "package")
 		datatypes.SetMetadata(m, datatypes.ReadonlyMDKey, true)
+
 		if pkgname != "" {
 			_ = s.SetConstant(pkgname, m)
 		}
