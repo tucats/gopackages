@@ -213,3 +213,24 @@ func Template(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	}
 	return r.String(), err
 }
+
+func Truncate(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+
+	name := util.GetString(args[0])
+	maxWidth := util.GetInt(args[1])
+	if len(name) <= maxWidth {
+		return name, nil
+	}
+	result := name
+	chars := 0
+	limit := maxWidth - 3 // name + `...`
+	// iterating over strings is based on runes, not bytes.
+	for i := range name {
+		if chars >= limit {
+			result = name[:i] + `...`
+			break
+		}
+		chars++
+	}
+	return result, nil
+}

@@ -100,6 +100,7 @@ var FunctionDictionary = map[string]FunctionDefinition{
 	"strings.Template":     {Min: 1, Max: 2, F: Template, ErrReturn: true},
 	"strings.Tokenize":     {Min: 1, Max: 1, F: Tokenize},
 	"strings.ToUpper":      {Min: 1, Max: 1, F: Upper},
+	"strings.Truncate":     {Min: 2, Max: 2, F: Truncate},
 	"time.Now":             {Min: 0, Max: 0, F: TimeNow},
 	"time.Parse":           {Min: 1, Max: 2, F: TimeParse, ErrReturn: true},
 	"time.reference":       {V: "Mon Jan 2 15:04:05 -0700 MST 2006"},
