@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/datatypes"
 	"github.com/tucats/gopackages/tokenizer"
 	"github.com/tucats/gopackages/util"
 )
@@ -65,7 +66,7 @@ func (c *Compiler) Function(literal bool) error {
 				break
 			}
 			name := c.t.Next()
-			p := parameter{kind: bytecode.UndefinedType}
+			p := parameter{kind: datatypes.UndefinedType}
 			if tokenizer.IsSymbol(name) {
 				p.name = name
 			} else {
@@ -80,31 +81,31 @@ func (c *Compiler) Function(literal bool) error {
 			// as two differnt tokens. Also note that you can use the word array or struct
 			// instead if you wish.
 			if c.t.Peek(1) == "[" && c.t.Peek(2) == "]" {
-				p.kind = bytecode.ArrayType
+				p.kind = datatypes.ArrayType
 				c.t.Advance(2)
 			} else if c.t.Peek(1) == "{}" {
-				p.kind = bytecode.StructType
+				p.kind = datatypes.StructType
 				c.t.Advance(1)
 			} else if util.InList(c.t.Peek(1), "chan", "interface{}", "int", "string", "bool", "double", "float", "array", "struct") {
 				switch c.t.Next() {
 				case "int":
-					p.kind = bytecode.IntType
+					p.kind = datatypes.IntType
 				case "string":
-					p.kind = bytecode.StringType
+					p.kind = datatypes.StringType
 				case "bool":
-					p.kind = bytecode.BoolType
+					p.kind = datatypes.BoolType
 				case "float", "double":
-					p.kind = bytecode.FloatType
+					p.kind = datatypes.FloatType
 				case "struct":
-					p.kind = bytecode.StructType
+					p.kind = datatypes.StructType
 				case "array":
-					p.kind = bytecode.ArrayType
+					p.kind = datatypes.ArrayType
 				case "chan":
-					p.kind = bytecode.ChanType
+					p.kind = datatypes.ChanType
 				}
 			}
 			if varargs {
-				p.kind = bytecode.VarArgs
+				p.kind = datatypes.VarArgs
 			}
 			parameters = append(parameters, p)
 			_ = c.t.IsNext(",")
@@ -154,7 +155,7 @@ func (c *Compiler) Function(literal bool) error {
 		// up the remaining arguments and stores them as an array value.
 		//
 		// Otherwise, generate code to extract the argument value by index number.
-		if p.kind == bytecode.VarArgs {
+		if p.kind == datatypes.VarArgs {
 			b.Emit(bytecode.GetVarArgs, n)
 		} else {
 			b.Emit(bytecode.Load, "__args")
@@ -164,7 +165,7 @@ func (c *Compiler) Function(literal bool) error {
 
 		// If this argumnet is not interface{} or a variable argument item,
 		// generaet code to validate/coerce the value to a given type.
-		if p.kind != bytecode.UndefinedType && p.kind != bytecode.VarArgs {
+		if p.kind != datatypes.UndefinedType && p.kind != datatypes.VarArgs {
 			b.Emit(bytecode.RequiredType, p.kind)
 		}
 		// Generate code to store the value on top of the stack into the local
@@ -182,11 +183,11 @@ func (c *Compiler) Function(literal bool) error {
 	for {
 		coercion := bytecode.New(fmt.Sprintf("%s return item %d", fname, returnValueCount))
 		if c.t.Peek(1) == "[" && c.t.Peek(2) == "]" {
-			coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
+			coercion.Emit(bytecode.Coerce, datatypes.ArrayType)
 			c.t.Advance(2)
 		} else {
 			if c.t.Peek(1) == "{}" {
-				coercion.Emit(bytecode.Coerce, bytecode.StructType)
+				coercion.Emit(bytecode.Coerce, datatypes.StructType)
 				c.t.Advance(1)
 			} else {
 				switch c.t.Peek(1) {
@@ -195,30 +196,30 @@ func (c *Compiler) Function(literal bool) error {
 					wasVoid = true
 				case "error":
 					c.t.Advance(1)
-					coercion.Emit(bytecode.Coerce, bytecode.ErrorType)
+					coercion.Emit(bytecode.Coerce, datatypes.ErrorType)
 				case "chan":
-					coercion.Emit(bytecode.Coerce, bytecode.ChanType)
+					coercion.Emit(bytecode.Coerce, datatypes.ChanType)
 					c.t.Advance(1)
 				case "int":
-					coercion.Emit(bytecode.Coerce, bytecode.IntType)
+					coercion.Emit(bytecode.Coerce, datatypes.IntType)
 					c.t.Advance(1)
 				case "float", "double":
-					coercion.Emit(bytecode.Coerce, bytecode.FloatType)
+					coercion.Emit(bytecode.Coerce, datatypes.FloatType)
 					c.t.Advance(1)
 				case "string":
-					coercion.Emit(bytecode.Coerce, bytecode.StringType)
+					coercion.Emit(bytecode.Coerce, datatypes.StringType)
 					c.t.Advance(1)
 				case "bool":
-					coercion.Emit(bytecode.Coerce, bytecode.BoolType)
+					coercion.Emit(bytecode.Coerce, datatypes.BoolType)
 					c.t.Advance(1)
 				case "struct":
-					coercion.Emit(bytecode.Coerce, bytecode.StructType)
+					coercion.Emit(bytecode.Coerce, datatypes.StructType)
 					c.t.Advance(1)
 				case "array":
-					coercion.Emit(bytecode.Coerce, bytecode.ArrayType)
+					coercion.Emit(bytecode.Coerce, datatypes.ArrayType)
 					c.t.Advance(1)
 				case "interface{}":
-					coercion.Emit(bytecode.Coerce, bytecode.UndefinedType)
+					coercion.Emit(bytecode.Coerce, datatypes.UndefinedType)
 					c.t.Advance(1)
 				case "void":
 					// Do nothing, there is no result.

@@ -179,27 +179,27 @@ func CoerceImpl(c *Context, i interface{}) error {
 		return err
 	}
 	switch t {
-	case ErrorType:
+	case datatypes.ErrorType:
 		v = errors.New(util.GetString(v))
-	case IntType:
+	case datatypes.IntType:
 		v = util.GetInt(v)
-	case FloatType:
+	case datatypes.FloatType:
 		v = util.GetFloat(v)
-	case StringType:
+	case datatypes.StringType:
 		v = util.GetString(v)
-	case BoolType:
+	case datatypes.BoolType:
 		v = util.GetBool(v)
-	case ArrayType:
+	case datatypes.ArrayType:
 		// If it's  not already an array, wrap it in one.
 		if _, ok := v.([]interface{}); !ok {
 			v = []interface{}{v}
 		}
-	case StructType:
+	case datatypes.StructType:
 		// If it's not a struct, we can't do anything so fail
 		if _, ok := v.(map[string]interface{}); !ok {
 			return c.NewError(InvalidTypeError)
 		}
-	case UndefinedType:
+	case datatypes.UndefinedType:
 		// No work at all to do here.
 
 	default:
@@ -817,13 +817,13 @@ func RequiredTypeImpl(c *Context, i interface{}) error {
 				} else {
 					if t, ok := i.(int); ok {
 						switch t {
-						case IntType:
+						case datatypes.IntType:
 							_, ok = v.(int)
-						case FloatType:
+						case datatypes.FloatType:
 							_, ok = v.(float64)
-						case BoolType:
+						case datatypes.BoolType:
 							_, ok = v.(bool)
-						case StringType:
+						case datatypes.StringType:
 							_, ok = v.(string)
 
 						default:
@@ -838,27 +838,27 @@ func RequiredTypeImpl(c *Context, i interface{}) error {
 		} else {
 			t := util.GetInt(i)
 			switch t {
-			case ErrorType:
+			case datatypes.ErrorType:
 				v = errors.New(util.GetString(v))
-			case IntType:
+			case datatypes.IntType:
 				v = util.GetInt(v)
-			case FloatType:
+			case datatypes.FloatType:
 				v = util.GetFloat(v)
-			case StringType:
+			case datatypes.StringType:
 				v = util.GetString(v)
-			case BoolType:
+			case datatypes.BoolType:
 				v = util.GetBool(v)
-			case ArrayType:
+			case datatypes.ArrayType:
 				// If it's  not already an array, wrap it in one.
 				if _, ok := v.([]interface{}); !ok {
 					v = []interface{}{v}
 				}
-			case StructType:
+			case datatypes.StructType:
 				// If it's not a struct, we can't do anything so fail
 				if _, ok := v.(map[string]interface{}); !ok {
 					return c.NewError(InvalidTypeError)
 				}
-			case UndefinedType, ChanType:
+			case datatypes.UndefinedType, datatypes.ChanType:
 				// No work at all to do here.
 
 			default:

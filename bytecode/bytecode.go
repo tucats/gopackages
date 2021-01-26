@@ -27,21 +27,6 @@ const BranchInstruction = 2000
 // are added between 1 and this value.
 const BuiltinInstructions = BranchInstruction - 1000
 
-// Define data types as abstract identifiers
-const (
-	UndefinedType = iota
-	IntType
-	FloatType
-	StringType
-	BoolType
-	ArrayType
-	StructType
-	ErrorType
-	ChanType
-	VarArgs // pseudo type used for varible argument list items
-
-)
-
 // I contains the information about a single bytecode instruction.
 type I struct {
 	Operation Instruction
