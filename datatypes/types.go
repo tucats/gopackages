@@ -13,11 +13,16 @@ const (
 	ErrorType
 	ChanType
 	MapType
-	VarArgs // pseudo type used for varible argument list items
+	InterfaceType // alias for "any"
+	VarArgs       // pseudo type used for varible argument list items
+	UserType      // something defined by a type statement
 )
 
 func IsType(v interface{}, kind int) bool {
 
+	if kind == InterfaceType {
+		return true
+	}
 	switch v.(type) {
 	case int, int32, int64:
 		return kind == IntType
@@ -35,6 +40,9 @@ func IsType(v interface{}, kind int) bool {
 		return kind == ArrayType
 
 	case map[string]interface{}:
+		if _, ok := GetMetadata(v, TypeMDKey); ok {
+			return kind == UserType
+		}
 		return kind == StructType
 
 	case EgoMap:
@@ -42,7 +50,6 @@ func IsType(v interface{}, kind int) bool {
 
 	case error:
 		return kind == ErrorType
-
 	}
 
 	return false
