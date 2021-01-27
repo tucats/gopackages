@@ -228,6 +228,7 @@ func TestNotEqual(s *symbols.SymbolTable, args []interface{}) (interface{}, erro
 
 // Assert implements the @assert directive
 func (c *Compiler) Assert() error {
+	_ = c.modeCheck("test", true)
 
 	c.b.Emit(bytecode.Load, "T")
 	c.b.Emit(bytecode.Push, "assert")
