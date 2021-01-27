@@ -72,6 +72,20 @@ func TestAssert(s *symbols.SymbolTable, args []interface{}) (interface{}, error)
 		}
 	}
 
+	// The argument could be an array with the boolean value and the
+	// messaging string, or it might just be the boolean.
+	if array, ok := args[0].([]interface{}); ok && len(array) == 2 {
+		b := util.GetBool(array[0])
+		if !b {
+			msg := util.GetString(array[1])
+			return nil, fmt.Errorf("@assert, %s in %s", msg, name)
+		} else {
+			return true, nil
+		}
+	}
+
+	// Just the boolean; the string is optionally in the second
+	// argument.
 	b := util.GetBool(args[0])
 	if !b {
 		msg := TestingAssertError
@@ -139,54 +153,82 @@ func TestFail(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 // TestNil implements the T.Nil() function
 func TestNil(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	if len(args) != 1 {
+	if len(args) < 1 || len(args) > 2 {
 		return nil, functions.NewError("Nil", functions.ArgumentCountError)
+	}
+	if len(args) == 2 {
+		return []interface{}{args[0] == nil, util.GetString(args[1])}, nil
 	}
 	return args[0] == nil, nil
 }
 
 // TestNotNil implements the T.NotNil() function
 func TestNotNil(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	if len(args) != 1 {
+	if len(args) < 1 || len(args) > 2 {
 		return nil, functions.NewError("NotNil", functions.ArgumentCountError)
 	}
+	if len(args) == 2 {
+		return []interface{}{args[0] != nil, util.GetString(args[1])}, nil
+	}
+
 	return args[0] != nil, nil
 }
 
 // TestTrue implements the T.True() function
 func TestTrue(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	if len(args) != 1 {
+	if len(args) < 1 || len(args) > 2 {
 		return nil, functions.NewError("True", functions.ArgumentCountError)
 	}
+	if len(args) == 2 {
+		return []interface{}{util.GetBool(args[0]), util.GetString(args[1])}, nil
+	}
+
 	return util.GetBool(args[0]), nil
 }
 
 // TestFalse implements the T.False() function
 func TestFalse(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	if len(args) != 1 {
+	if len(args) < 1 || len(args) > 2 {
 		return nil, functions.NewError("False", functions.ArgumentCountError)
+	}
+
+	if len(args) == 2 {
+		return []interface{}{!util.GetBool(args[0]), util.GetString(args[1])}, nil
 	}
 	return !util.GetBool(args[0]), nil
 }
 
 // TestEqual implements the T.Equal() function
 func TestEqual(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	if len(args) != 2 {
+	if len(args) < 2 || len(args) > 3 {
 		return nil, functions.NewError("Equal", functions.ArgumentCountError)
 	}
-	return reflect.DeepEqual(args[0], args[1]), nil
+
+	b := reflect.DeepEqual(args[0], args[1])
+	if len(args) == 3 {
+		return []interface{}{b, util.GetString(args[2])}, nil
+	}
+
+	return b, nil
 }
 
 // TestNotEqual implements the T.NotEqual() function
 func TestNotEqual(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	if len(args) != 1 {
+	if len(args) < 2 || len(args) > 3 {
 		return nil, functions.NewError("NotEqual", functions.ArgumentCountError)
 	}
-	return !reflect.DeepEqual(args[0], args[1]), nil
+	b := !reflect.DeepEqual(args[0], args[1])
+	if len(args) == 3 {
+		return []interface{}{b, util.GetString(args[2])}, nil
+	}
+
+	return b, nil
+
 }
 
 // Assert implements the @assert directive
 func (c *Compiler) Assert() error {
+	_ = c.modeCheck("test", true)
 
 	c.b.Emit(bytecode.Load, "T")
 	c.b.Emit(bytecode.Push, "assert")
@@ -198,17 +240,6 @@ func (c *Compiler) Assert() error {
 		return err
 	}
 	c.b.Append(code)
-
-	next := c.t.Peek(1)
-	if !tokenizer.IsReserved(next, false) && !util.InList(next, "@", "}", "{", ";", tokenizer.EndOfTokens) {
-		code, err := c.Expression()
-		if err != nil {
-			return err
-		}
-		c.b.Append(code)
-		argCount = 2
-	}
-
 	c.b.Emit(bytecode.Call, argCount)
 
 	return nil

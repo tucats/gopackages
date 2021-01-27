@@ -18,7 +18,7 @@ const (
 	InvalidArrayIndexError        = "invalid array index"
 	InvalidBytecodeAddress        = "invalid bytecode address"
 	InvalidFileIdentifierError    = "invalid file identifier"
-	InvalidFunctionCallError      = "invalid function call"
+	InvalidFunctionCallError      = "invalid function"
 	InvalidIdentifierError        = "invalid identifier"
 	InvalidNewValueError          = "invalid argument to new()"
 	InvalidSliceIndexError        = "invalid slice index"

@@ -26,7 +26,7 @@ const (
 	InvalidConstantError           = "invalid constant expression"
 	InvalidDirectiveError          = "invalid directive name"
 	InvalidFunctionArgument        = "invalid function argument"
-	InvalidFunctionCall            = "invalid function call"
+	InvalidFunctionCall            = "invalid function invocation"
 	InvalidFunctionName            = "invalid function name"
 	InvalidImportError             = "import not permitted inside a block or loop"
 	InvalidListError               = "invalid list"

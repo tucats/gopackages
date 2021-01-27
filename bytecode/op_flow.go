@@ -190,6 +190,9 @@ func CallImpl(c *Context, i interface{}) error {
 	if err != nil {
 		return err
 	}
+	if funcPointer == nil {
+		return c.NewError(InvalidFunctionCallError, "<nil>")
+	}
 	var result interface{}
 
 	// Depends on the type here as to what we call...
