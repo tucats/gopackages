@@ -452,7 +452,17 @@ func Make(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 func Reflect(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if m, ok := args[0].(map[string]interface{}); ok {
-		return m[datatypes.MetadataKey], nil
+		members := []interface{}{}
+		for k := range m {
+			if !strings.HasPrefix(k, "__") {
+				members = append(members, k)
+			}
+		}
+		result := m[datatypes.MetadataKey]
+		if mm, ok := result.(map[string]interface{}); ok {
+			mm["members"] = members
+		}
+		return result, nil
 	}
 
 	typeString, err := Type(s, args)
@@ -474,7 +484,6 @@ func Reflect(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 				}
 			}
 			result[datatypes.ElementTypesMDKey] = types
-
 		}
 		return result, nil
 	}
