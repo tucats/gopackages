@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	"github.com/tucats/gopackages/datatypes"
 )
 
 // SymbolTable contains an abstract symbol table
@@ -27,6 +28,9 @@ var RootSymbolTable = SymbolTable{
 		"_config": map[string]interface{}{
 			"disassemble": false,
 			"trace":       false,
+			datatypes.MetadataKey: map[string]interface{}{
+				datatypes.TypeMDKey: "config",
+			},
 		},
 	},
 }
