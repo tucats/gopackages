@@ -459,8 +459,17 @@ func Reflect(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 			}
 		}
 		result := m[datatypes.MetadataKey]
-		if mm, ok := result.(map[string]interface{}); ok {
-			mm["members"] = members
+		if result == nil {
+			result = map[string]interface{}{
+				datatypes.MembersMDKey:  members,
+				datatypes.TypeMDKey:     "struct",
+				datatypes.BasetypeMDKey: "map[string]interface{}",
+			}
+		} else {
+			if mm, ok := result.(map[string]interface{}); ok {
+				mm[datatypes.MembersMDKey] = members
+				mm[datatypes.BasetypeMDKey] = "map[string]interface{}"
+			}
 		}
 		return result, nil
 	}
@@ -468,7 +477,8 @@ func Reflect(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	typeString, err := Type(s, args)
 	if err == nil {
 		result := map[string]interface{}{
-			datatypes.TypeMDKey: typeString,
+			datatypes.TypeMDKey:     typeString,
+			datatypes.BasetypeMDKey: typeString,
 		}
 		if array, ok := args[0].([]interface{}); ok {
 			result[datatypes.SizeMDKey] = len(array)
@@ -483,6 +493,7 @@ func Reflect(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 					break
 				}
 			}
+			result[datatypes.BasetypeMDKey] = "[]interface{}"
 			result[datatypes.ElementTypesMDKey] = types
 		}
 		return result, nil

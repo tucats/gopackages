@@ -4,7 +4,9 @@ package datatypes
 const (
 	MetadataKey = "__metadata"
 
+	BasetypeMDKey     = "basetype"
 	ElementTypesMDKey = "elements"
+	MembersMDKey      = "members"
 	ParentMDKey       = "parent"
 	ReplicaMDKey      = "replica"
 	ReadonlyMDKey     = "readonly"

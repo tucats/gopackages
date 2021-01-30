@@ -3,6 +3,8 @@ package functions
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tucats/gopackages/symbols"
 )
 
 func TestFunctionLen(t *testing.T) {
@@ -195,6 +197,79 @@ func TestFunctionMembers(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionMembers() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestReflect(t *testing.T) {
+	type args struct {
+		s    *symbols.SymbolTable
+		args []interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name: "simple struct",
+			args: args{s: nil, args: []interface{}{
+				map[string]interface{}{
+					"name": "Tom",
+					"age":  55,
+				},
+			}},
+			want: map[string]interface{}{
+				"basetype": "map[string]interface{}",
+				"type":     "struct",
+				"members":  []interface{}{"age", "name"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "simple integer value",
+			args: args{s: nil, args: []interface{}{33}},
+			want: map[string]interface{}{
+				"basetype": "int",
+				"type":     "int",
+			},
+			wantErr: false,
+		},
+		{
+			name: "simple string value",
+			args: args{s: nil, args: []interface{}{"stuff"}},
+			want: map[string]interface{}{
+				"basetype": "string",
+				"type":     "string",
+			},
+			wantErr: false,
+		},
+		{
+			name: "array of ints",
+			args: args{s: nil, args: []interface{}{
+				[]interface{}{1, 2, 3},
+			}},
+			want: map[string]interface{}{
+				"basetype": "[]interface{}",
+				"type":     "array",
+				"elements": "int",
+				"size":     3,
+			},
+			wantErr: false,
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Reflect(tt.args.s, tt.args.args)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Reflect() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Reflect() = %v, want %v", got, tt.want)
 			}
 		})
 	}

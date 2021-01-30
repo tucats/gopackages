@@ -26,6 +26,7 @@ const (
 	InvalidThisError              = "invalid _this_ identifier"
 	InvalidTypeError              = "invalid or unsupported data type for this operation"
 	InvalidValueError             = "invalid value for this operation"
+	NoFunctionReceiver            = "no function receiver"
 	NotATypeError                 = "not a type"
 	OpcodeAlreadyDefinedError     = "opcode already defined: %d"
 	ReadOnlyError                 = "invalid write to read-only item"
