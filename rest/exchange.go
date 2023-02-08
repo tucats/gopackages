@@ -14,9 +14,9 @@ import (
 	"github.com/go-resty/resty"
 	"github.com/tucats/gopackages/app-cli/settings"
 	"github.com/tucats/gopackages/app-cli/ui"
-	"github.com/tucats/gopackages/data"
 	"github.com/tucats/gopackages/defs"
 	"github.com/tucats/gopackages/errors"
+	"github.com/tucats/gopackages/expressions/data"
 	"github.com/tucats/gopackages/util"
 )
 
@@ -61,10 +61,7 @@ func Exchange(endpoint, method string, body interface{}, response interface{}, a
 
 	var err error
 
-	url := settings.Get(defs.ApplicationServerSetting)
-	if url == "" {
-		url = settings.Get(defs.LogonServerSetting)
-	}
+	url := settings.Get(defs.LogonServerSetting)
 
 	if url == "" {
 		url = "http://localhost:8080"
@@ -169,7 +166,7 @@ func Exchange(endpoint, method string, body interface{}, response interface{}, a
 		// If there was an error, and the runtime rest automatic error handling is enabled,
 		// try to find the message text in the response, and if found, form an error response
 		// to the local caller using that text.
-		if (status < 200 || status > 299) && settings.GetBool(defs.RestClientErrorSetting) {
+		if status < 200 || status > 299 {
 			errorResponse := map[string]interface{}{}
 
 			err := json.Unmarshal(resp.Body(), &errorResponse)
@@ -237,7 +234,7 @@ func GetTLSConfiguration() (*tls.Config, error) {
 		kind := "using certificate file"
 
 		// If insecure is specified, then skip verification for TLS
-		if os.Getenv("APP_INSECURE_CLIENT") == defs.True {
+		if allowInsecure || os.Getenv("APP_INSECURE_CLIENT") == defs.True {
 			tlsConfiguration = &tls.Config{InsecureSkipVerify: true}
 			kind = "skipping server verification"
 		} else {
@@ -250,13 +247,7 @@ func GetTLSConfiguration() (*tls.Config, error) {
 
 			b, err = os.ReadFile(filename)
 			if err != nil {
-				path := ""
-				if libpath := settings.Get(defs.EgoLibPathSetting); libpath != "" {
-					path = libpath
-				} else {
-					path = filepath.Join(settings.Get(defs.EgoPathSetting), defs.LibPathName)
-				}
-
+				path := filepath.Join(settings.Get(defs.PathSetting), defs.LibPathName)
 				filename = filepath.Join(path, ServerCertificateFile)
 				b, err = os.ReadFile(filename)
 			}

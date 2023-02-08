@@ -1,6 +1,6 @@
 package expressions
 
-import "github.com/tucats/gopackages/tokenizer"
+import "github.com/tucats/gopackages/expressions/tokenizer"
 
 // Parse parses a text expression
 func (e *Expression) Parse(s string) error {

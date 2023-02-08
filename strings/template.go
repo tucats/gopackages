@@ -5,9 +5,9 @@ import (
 	"text/template"
 	"text/template/parse"
 
-	"github.com/tucats/gopackages/data"
 	"github.com/tucats/gopackages/errors"
-	"github.com/tucats/gopackages/symbols"
+	"github.com/tucats/gopackages/expressions/data"
+	"github.com/tucats/gopackages/expressions/symbols"
 )
 
 // evaluateTemplate implements the strings.template() function.

@@ -3,9 +3,9 @@ package strings
 import (
 	"strings"
 
-	"github.com/tucats/gopackages/data"
-	"github.com/tucats/gopackages/symbols"
-	"github.com/tucats/gopackages/tokenizer"
+	"github.com/tucats/gopackages/expressions/data"
+	"github.com/tucats/gopackages/expressions/symbols"
+	"github.com/tucats/gopackages/expressions/tokenizer"
 )
 
 // Wrapper around strings.fields().

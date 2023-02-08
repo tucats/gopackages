@@ -85,6 +85,11 @@ func (t *Table) SetSpacing(s int) error {
 	return nil
 }
 
+// SetFilter stores a string expression used to filter rows.
+func (t *Table) SetFilter(s string) {
+	t.where = s
+}
+
 // SetIndent specifies the spaces to indent each heading and row.
 func (t *Table) SetIndent(s int) error {
 	var buffer strings.Builder

@@ -24,10 +24,10 @@
 package expressions
 
 import (
-	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/compiler"
-	"github.com/tucats/gopackages/symbols"
-	"github.com/tucats/gopackages/tokenizer"
+	"github.com/tucats/gopackages/expressions/bytecode"
+	"github.com/tucats/gopackages/expressions/compiler"
+	"github.com/tucats/gopackages/expressions/symbols"
+	"github.com/tucats/gopackages/expressions/tokenizer"
 )
 
 // Expression is the type for an instance of the expresssion evaluator.

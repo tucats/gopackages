@@ -13,10 +13,10 @@ import (
 	"github.com/tucats/gopackages/app-cli/cli"
 	"github.com/tucats/gopackages/app-cli/settings"
 	"github.com/tucats/gopackages/app-cli/ui"
-	"github.com/tucats/gopackages/data"
 	"github.com/tucats/gopackages/defs"
 	"github.com/tucats/gopackages/errors"
-	"github.com/tucats/gopackages/symbols"
+	"github.com/tucats/gopackages/expressions/data"
+	"github.com/tucats/gopackages/expressions/symbols"
 )
 
 // App is the wrapper type for information needed for a command line application.
@@ -174,7 +174,7 @@ func (app *App) Run(grammar []cli.Option, args []string) error {
 // Enable the loggers that are set using the APP_DEFAULT_LOOGGERS
 // environment variable.
 func SetDefaultLoggers() error {
-	logList := os.Getenv(defs.EgoDefaultLogging)
+	logList := os.Getenv(defs.DefaultLogging)
 	if strings.TrimSpace(logList) == "" {
 		return nil
 	}

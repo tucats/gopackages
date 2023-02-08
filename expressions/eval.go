@@ -1,8 +1,8 @@
 package expressions
 
 import (
-	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/symbols"
+	"github.com/tucats/gopackages/expressions/bytecode"
+	"github.com/tucats/gopackages/expressions/symbols"
 )
 
 // Eval evaluates the parsed expression. This can be called multiple times

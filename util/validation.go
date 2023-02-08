@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tucats/gopackages/data"
 	"github.com/tucats/gopackages/defs"
 	"github.com/tucats/gopackages/errors"
+	"github.com/tucats/gopackages/expressions/data"
 )
 
 const (

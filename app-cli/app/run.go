@@ -54,14 +54,14 @@ func runFromContext(context *cli.Context) error {
 			Description:         "global.log",
 			OptionType:          cli.StringListType,
 			Action:              LogAction,
-			EnvironmentVariable: defs.EgoDefaultLogging,
+			EnvironmentVariable: defs.DefaultLogging,
 		},
 		{
 			LongName:            "log-file",
 			Description:         "global.log.file",
 			OptionType:          cli.StringType,
 			Action:              LogFileAction,
-			EnvironmentVariable: defs.EgoDefaultLogFileName,
+			EnvironmentVariable: defs.DefaultLogFileName,
 		},
 		{
 			LongName:            "format",

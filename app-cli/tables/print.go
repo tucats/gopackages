@@ -9,7 +9,10 @@ import (
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/defs"
 	"github.com/tucats/gopackages/errors"
+	"github.com/tucats/gopackages/expressions"
+	"github.com/tucats/gopackages/expressions/symbols"
 	"github.com/tucats/gopackages/i18n"
+	"github.com/tucats/gopackages/util"
 )
 
 // Print will output a table using current rows and format specifications.
@@ -401,6 +404,12 @@ func (t *Table) FormatText() []string {
 		rowLimit = len(t.rows)
 	}
 
+	var e *expressions.Expression
+
+	if t.where != "" {
+		e = expressions.New().WithText(t.where)
+	}
+
 	if t.showHeadings {
 		buffer.WriteString(t.indent)
 
@@ -446,6 +455,24 @@ func (t *Table) FormatText() []string {
 
 		if i >= t.startingRow+rowLimit {
 			break
+		}
+
+		if e != nil {
+			// Load up the symbol tables with column values and the row number
+			syms := symbols.NewSymbolTable("rowset")
+			syms.SetAlways("_row_", i+1)
+			for i, n := range t.names {
+				syms.SetAlways(strings.ToLower(n), r[i])
+			}
+
+			v, err := e.Eval(syms)
+			if err != nil {
+				output = append(output, fmt.Sprintf("*** where clause error: %s", err.Error()))
+				break
+			}
+			if !util.GetBool(v) {
+				continue
+			}
 		}
 
 		buffer.Reset()

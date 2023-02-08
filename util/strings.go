@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/tucats/gopackages/data"
+	"github.com/tucats/gopackages/expressions/data"
 )
 
 // Unquote removes quotation marks from a string if present.
