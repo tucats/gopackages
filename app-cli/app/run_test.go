@@ -4,12 +4,12 @@
 package app
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"testing"
 
 	"github.com/tucats/gopackages/app-cli/cli"
+	"github.com/tucats/gopackages/errors"
 )
 
 var testGrammar1 = []cli.Option{
@@ -52,20 +52,24 @@ func testAction0(c *cli.Context) error {
 }
 
 func testAction1(c *cli.Context) error {
-	v, _ := c.GetString("explode")
+	v, _ := c.String("explode")
 	fmt.Printf("Found the option value %s\n", v)
+
 	if v != "bob" {
-		return errors.New("Invalid explode name: " + v)
+		return errors.NewMessage("Invalid explode name: " + v)
 	}
+
 	return nil
 }
 
 func testAction2(c *cli.Context) error {
-	v, _ := c.GetInteger("count")
+	v, _ := c.Integer("count")
 	fmt.Printf("Found the option value %v\n", v)
+
 	if v != 42 {
-		return errors.New("Invalid count: " + strconv.Itoa(v))
+		return errors.NewMessage("Invalid count: " + strconv.Itoa(v))
 	}
+
 	return nil
 }
 
@@ -75,6 +79,7 @@ func TestRun(t *testing.T) {
 		args    []string
 		appName string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -84,7 +89,7 @@ func TestRun(t *testing.T) {
 			name: "Invalid global option",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "--booboo"},
+				[]string{"test-driver", "--log", "debug", "--booboo"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -93,7 +98,7 @@ func TestRun(t *testing.T) {
 			name: "Valid global option",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "--stuff"},
+				[]string{"test-driver", "--log", "debug", "--stuff"},
 				"testing: the test app",
 			},
 			wantErr: false,
@@ -102,7 +107,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "sub1"},
+				[]string{"test-driver", "--log", "debug", "sub1"},
 				"testing: the test app",
 			},
 			wantErr: false,
@@ -111,7 +116,7 @@ func TestRun(t *testing.T) {
 			name: "Invalid subcommand",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "subzero"},
+				[]string{"test-driver", "--log", "debug", "subzero"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -120,7 +125,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid short option name",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "sub2", "-x", "bob"},
+				[]string{"test-driver", "--log", "debug", "sub2", "-x", "bob"},
 				"testing: the test app",
 			},
 			wantErr: false,
@@ -129,7 +134,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid long option",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "sub2", "--explode", "bob"},
+				[]string{"test-driver", "--log", "debug", "sub2", "--explode", "bob"},
 				"testing: the test app",
 			},
 			wantErr: false,
@@ -138,7 +143,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid option but invalid value",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "sub2", "-x", "bob2"},
+				[]string{"test-driver", "--log", "debug", "sub2", "-x", "bob2"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -147,7 +152,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid option but missing value",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "sub2", "-x"},
+				[]string{"test-driver", "--log", "debug", "sub2", "-x"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -156,7 +161,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with invalid int valid option ",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "sub2", "--count", "42F"},
+				[]string{"test-driver", "--log", "debug", "sub2", "--count", "42F"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -165,7 +170,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid option ",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "sub2", "--count", "42"},
+				[]string{"test-driver", "--log", "debug", "sub2", "--count", "42"},
 				"testing: the test app",
 			},
 			wantErr: false,
@@ -174,7 +179,7 @@ func TestRun(t *testing.T) {
 			name: "Valid subcommand with valid option with wrong value",
 			args: args{
 				testGrammar1,
-				[]string{"test-driver", "-d", "debug", "sub2", "--count", "43"},
+				[]string{"test-driver", "--log", "debug", "sub2", "--count", "43"},
 				"testing: the test app",
 			},
 			wantErr: true,
@@ -184,7 +189,6 @@ func TestRun(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			app := New("tt.args.appName")
 			app.SetCopyright("(c) 2020 Tom Cole. All rights reserved.")
 			app.SetVersion(1, 1, 0)

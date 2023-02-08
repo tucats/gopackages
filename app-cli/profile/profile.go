@@ -81,7 +81,7 @@ func ShowAction(c *cli.Context) error {
 	}
 	_ = t.SetOrderBy("key")
 	t.ShowUnderlines(false)
-	t.Print(ui.TextTableFormat)
+	t.Print(ui.TextFormat)
 
 	return nil
 }
@@ -96,7 +96,7 @@ func ListAction(c *cli.Context) error {
 	}
 	_ = t.SetOrderBy("name")
 	t.ShowUnderlines(false)
-	t.Print(ui.TextTableFormat)
+	t.Print(ui.TextFormat)
 
 	return nil
 }
@@ -104,8 +104,8 @@ func ListAction(c *cli.Context) error {
 // SetOutputAction is the action handler for the set-output subcommand.
 func SetOutputAction(c *cli.Context) error {
 
-	if c.GetParameterCount() == 1 {
-		outputType := c.GetParameter(0)
+	if c.ParameterCount() == 1 {
+		outputType := c.Parameter(0)
 		if outputType == "text" || outputType == "json" {
 			persistence.Set("ego.output-format", outputType)
 			return nil
@@ -119,7 +119,7 @@ func SetOutputAction(c *cli.Context) error {
 func SetAction(c *cli.Context) error {
 
 	// Generic --key and --value specification
-	key := c.GetParameter(0)
+	key := c.Parameter(0)
 	value := "true"
 
 	if equals := strings.Index(key, "="); equals >= 0 {
@@ -135,7 +135,7 @@ func SetAction(c *cli.Context) error {
 // DeleteAction deletes a named key value
 func DeleteAction(c *cli.Context) error {
 
-	key := c.GetParameter(0)
+	key := c.Parameter(0)
 	persistence.Delete(key)
 	ui.Say("Profile key %s deleted", key)
 
@@ -144,7 +144,7 @@ func DeleteAction(c *cli.Context) error {
 
 // DeleteProfileAction deletes a named profile.
 func DeleteProfileAction(c *cli.Context) error {
-	key := c.GetParameter(0)
+	key := c.Parameter(0)
 	err := persistence.DeleteProfile(key)
 	if err == nil {
 		ui.Say("Profile %s deleted", key)
@@ -157,7 +157,7 @@ func DeleteProfileAction(c *cli.Context) error {
 func SetDescriptionAction(c *cli.Context) error {
 
 	config := persistence.Configurations[persistence.ProfileName]
-	config.Description = c.GetParameter(0)
+	config.Description = c.Parameter(0)
 	persistence.Configurations[persistence.ProfileName] = config
 	persistence.ProfileDirty = true
 

@@ -2,19 +2,13 @@ package tables
 
 import (
 	"testing"
+
+	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/defs"
 )
 
 func TestTable_FormatJSON(t *testing.T) {
 	type fields struct {
-		showUnderlines bool
-		showHeadings   bool
-		showRowNumbers bool
-		rowLimit       int
-		startingRow    int
-		columnCount    int
-		rowCount       int
-		orderBy        int
-		ascending      bool
 		rows           [][]string
 		columns        []string
 		alignment      []int
@@ -22,7 +16,17 @@ func TestTable_FormatJSON(t *testing.T) {
 		columnOrder    []int
 		spacing        string
 		indent         string
+		rowLimit       int
+		startingRow    int
+		columnCount    int
+		rowCount       int
+		orderBy        int
+		ascending      bool
+		showUnderlines bool
+		showHeadings   bool
+		showRowNumbers bool
 	}
+
 	tests := []struct {
 		name   string
 		fields fields
@@ -43,7 +47,7 @@ func TestTable_FormatJSON(t *testing.T) {
 			fields: fields{
 				columnCount: 3,
 				columns:     []string{"one", "two", "three"},
-				rows:        [][]string{{"1", "true", "Tom"}},
+				rows:        [][]string{{"1", defs.True, "Tom"}},
 				columnOrder: []int{0, 1, 2},
 			},
 			want: "[{\"one\":1,\"two\":true,\"three\":\"Tom\"}]",
@@ -63,6 +67,7 @@ func TestTable_FormatJSON(t *testing.T) {
 		},
 		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tx := &Table{
@@ -76,7 +81,7 @@ func TestTable_FormatJSON(t *testing.T) {
 				orderBy:        tt.fields.orderBy,
 				ascending:      tt.fields.ascending,
 				rows:           tt.fields.rows,
-				columns:        tt.fields.columns,
+				names:          tt.fields.columns,
 				columnOrder:    tt.fields.columnOrder,
 				alignment:      tt.fields.alignment,
 				maxWidth:       tt.fields.maxWidth,
@@ -96,6 +101,7 @@ func TestAlignText(t *testing.T) {
 		width     int
 		alignment int
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -131,8 +137,14 @@ func TestAlignText(t *testing.T) {
 			args: args{text: "hello", width: 3, alignment: AlignmentCenter},
 			want: "ell",
 		},
-		// TODO: Add test cases.
+		{
+			// Note the text has a multibyte first character.
+			name: "multibyte unicode left alignment",
+			args: args{text: "Ąnswer", width: 10, alignment: AlignmentLeft},
+			want: "Ąnswer    ",
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := AlignText(tt.args.text, tt.args.width, tt.args.alignment); got != tt.want {
@@ -140,4 +152,37 @@ func TestAlignText(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTable_paginateText(t *testing.T) {
+	t.Run("header test", func(t *testing.T) {
+		tb, _ := New([]string{
+			"First",
+			"Last",
+			"Address",
+			"Description",
+			"Relation",
+		})
+
+		tb.SetPagination(20, 50)
+		tb.ShowRowNumbers(true)
+
+		_ = tb.AddRowItems(
+			"Tom",
+			"Stephanofphalosfis",
+			"100 North Wakualewaka Lake Drive, Primrose NC 28391",
+			"Software inventor",
+			"Self",
+		)
+
+		_ = tb.AddRowItems(
+			"Donna",
+			"Wilson",
+			"100 Main St, Primrose NC 28391",
+			"iPhone Developer",
+			"Sister",
+		)
+
+		_ = tb.Print(ui.TextFormat)
+	})
 }

@@ -1,19 +1,22 @@
 package cli
 
-import "strings"
+import (
+	"strings"
+)
 
-// GetParameter returns the ith parameter string parsed, or an
+// Parameter returns the ith parameter string parsed, or an
 // empty string if not found.
-func (c *Context) GetParameter(i int) string {
+func (c *Context) Parameter(index int) string {
 	g := c.FindGlobal()
-	if i < g.GetParameterCount() {
-		return g.Parameters[i]
+	if index < g.ParameterCount() {
+		return g.Parameters[index]
 	}
+
 	return ""
 }
 
-// GetParameterCount returns the number of parameters processed.
-func (c *Context) GetParameterCount() int {
+// ParameterCount returns the number of parameters processed.
+func (c *Context) ParameterCount() int {
 	return len(c.FindGlobal().Parameters)
 }
 
@@ -21,100 +24,138 @@ func (c *Context) GetParameterCount() int {
 // the processed command line.
 func (c *Context) WasFound(name string) bool {
 	for _, entry := range c.Grammar {
-
 		if entry.OptionType == Subcommand && entry.Found {
 			subgrammar := entry.Value.(Context)
+
 			return subgrammar.WasFound(name)
 		}
+
 		if entry.Found && name == entry.LongName {
 			return true
 		}
 	}
+
 	return false
 }
 
-// GetInteger returns the value of a named integer from the
+// Integer returns the value of a named integer from the
 // parsed grammar, or a zero if not found. The boolean return
 // value confirms if the value was specified on the command line.
-func (c *Context) GetInteger(name string) (int, bool) {
-
+func (c *Context) Integer(name string) (int, bool) {
 	for _, entry := range c.Grammar {
-
 		if entry.OptionType == Subcommand && entry.Found {
 			subContext := entry.Value.(Context)
-			return subContext.GetInteger(name)
+
+			return subContext.Integer(name)
 		}
+
 		if entry.Found && entry.OptionType == IntType && name == entry.LongName {
 			return entry.Value.(int), true
 		}
 	}
+
 	return 0, false
 }
 
-// GetBool returns the value of a named boolean. If the boolean option
+// Boolean returns the value of a named boolean. If the boolean option
 // was found during processing, this routine returns true. Otherwise it
 // returns false.
-func (c *Context) GetBool(name string) bool {
-
+func (c *Context) Boolean(name string) bool {
 	for _, entry := range c.Grammar {
-
 		if entry.OptionType == Subcommand && entry.Found {
 			subContext := entry.Value.(Context)
-			return subContext.GetBool(name)
+
+			return subContext.Boolean(name)
 		}
+
 		if entry.Found && (entry.OptionType == BooleanType || entry.OptionType == BooleanValueType) && name == entry.LongName {
 			return entry.Value.(bool)
 		}
 	}
+
 	return false
 }
 
-// GetString returns the value of a named string parameter from the
+// String returns the value of a named string parameter from the
 // parsed grammar, or an empty string if not found. The second return
 // value indicates if the value was explicitly specified. This is used
 // to differentiate between "not specified" and "specified as empty".
-func (c *Context) GetString(name string) (string, bool) {
-
+func (c *Context) String(name string) (string, bool) {
 	for _, entry := range c.Grammar {
-
 		if entry.OptionType == Subcommand && entry.Found {
 			subContext := entry.Value.(Context)
-			return subContext.GetString(name)
-		}
-		if entry.Found && (entry.OptionType == StringListType || entry.OptionType == UUIDType || entry.OptionType == StringType) && name == entry.LongName {
 
-			if entry.OptionType == StringType || entry.OptionType == UUIDType {
+			return subContext.String(name)
+		}
+
+		if entry.Found && (entry.OptionType == StringListType || entry.OptionType == KeywordType || entry.OptionType == UUIDType || entry.OptionType == StringType) && name == entry.LongName {
+			if entry.OptionType == StringType || entry.OptionType == KeywordType || entry.OptionType == UUIDType {
 				return entry.Value.(string), true
 			}
+
 			var b strings.Builder
+
 			var v = entry.Value.([]string)
+
 			for i, n := range v {
 				if i > 0 {
 					b.WriteRune(',')
 				}
+
 				b.WriteString(n)
 			}
-			return b.String(), true
 
+			return b.String(), true
 		}
 	}
+
 	return "", false
 }
 
-// GetStringList returns the array of strings that are the value of
+// Keyword returns the value of a named string parameter from the
+// parsed grammar. The result is the ordinal position (zero-based)
+// on the keyword from the list. If the value is not in the list,
+// it returns -1.
+func (c *Context) Keyword(name string) (int, bool) {
+	for _, entry := range c.Grammar {
+		if entry.OptionType == Subcommand && entry.Found {
+			subContext := entry.Value.(Context)
+
+			return subContext.Keyword(name)
+		}
+
+		if entry.Found && (entry.OptionType == KeywordType) && name == entry.LongName {
+			if value, ok := entry.Value.(string); ok {
+				for n, k := range entry.Keywords {
+					if strings.EqualFold(value, k) {
+						return n, true
+					}
+				}
+
+				return -1, false
+			}
+		}
+	}
+
+	return 0, false
+}
+
+// StringList returns the array of strings that are the value of
 // the named item. If the item is not found, an empty array is returned.
 // The second value in the result indicates of the option was explicitly
 // specified in the command line.
-func (c *Context) GetStringList(name string) ([]string, bool) {
+func (c *Context) StringList(name string) ([]string, bool) {
 	for _, entry := range c.Grammar {
-
 		if entry.OptionType == Subcommand && entry.Found {
 			subContext := entry.Value.(Context)
-			return subContext.GetStringList(name)
+
+			return subContext.StringList(name)
 		}
+
 		if entry.Found && entry.OptionType == StringListType && name == entry.LongName {
 			return entry.Value.([]string), true
 		}
 	}
+
 	return make([]string, 0), false
 }

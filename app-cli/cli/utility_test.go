@@ -3,6 +3,8 @@ package cli
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tucats/gopackages/defs"
 )
 
 func TestValidKeyword(t *testing.T) {
@@ -10,6 +12,7 @@ func TestValidKeyword(t *testing.T) {
 		test  string
 		valid []string
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -48,9 +51,10 @@ func TestValidKeyword(t *testing.T) {
 			want: false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ValidKeyword(tt.args.test, tt.args.valid); got != tt.want {
+			if got := validKeyword(tt.args.test, tt.args.valid); got != tt.want {
 				t.Errorf("ValidKeyword() = %v, want %v", got, tt.want)
 			}
 		})
@@ -62,6 +66,7 @@ func TestFindKeyword(t *testing.T) {
 		test  string
 		valid []string
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -108,9 +113,10 @@ func TestFindKeyword(t *testing.T) {
 			want: -1,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := FindKeyword(tt.args.test, tt.args.valid); got != tt.want {
+			if got := findKeyword(tt.args.test, tt.args.valid); got != tt.want {
 				t.Errorf("FindKeyword() = %v, want %v", got, tt.want)
 			}
 		})
@@ -121,6 +127,7 @@ func TestValidateBoolean(t *testing.T) {
 	type args struct {
 		value string
 	}
+
 	tests := []struct {
 		name  string
 		args  args
@@ -134,7 +141,7 @@ func TestValidateBoolean(t *testing.T) {
 			name: "Valid2", args: args{value: "f"}, want: false, want1: true,
 		},
 		{
-			name: "Valid3", args: args{value: "fAlse"}, want: false, want1: true,
+			name: "Valid3", args: args{value: defs.False}, want: false, want1: true,
 		},
 		{
 			name: "Valid4", args: args{value: "n"}, want: false, want1: true,
@@ -149,7 +156,7 @@ func TestValidateBoolean(t *testing.T) {
 			name: "Valid7", args: args{value: "T"}, want: true, want1: true,
 		},
 		{
-			name: "Valid8", args: args{value: "truE"}, want: true, want1: true,
+			name: "Valid8", args: args{value: defs.True}, want: true, want1: true,
 		},
 		{
 			name: "Valid9", args: args{value: "Y"}, want: true, want1: true,
@@ -179,9 +186,10 @@ func TestValidateBoolean(t *testing.T) {
 			name: "Invalid7", args: args{value: "00"}, want: false, want1: false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := ValidateBoolean(tt.args.value)
+			got, got1 := validateBoolean(tt.args.value)
 			if got != tt.want {
 				t.Errorf("ValidateBoolean() got = %v, want %v", got, tt.want)
 			}
@@ -196,6 +204,7 @@ func TestMakeList(t *testing.T) {
 	type args struct {
 		value string
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -230,9 +239,10 @@ func TestMakeList(t *testing.T) {
 			want: []string{},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := MakeList(tt.args.value); !reflect.DeepEqual(got, tt.want) {
+			if got := makeList(tt.args.value); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MakeList() = %v, want %v", got, tt.want)
 			}
 		})

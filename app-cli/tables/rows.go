@@ -1,26 +1,35 @@
 package tables
 
 import (
-	"errors"
 	"fmt"
-	"strconv"
+
+	"github.com/tucats/gopackages/errors"
 )
 
 // AddRow adds a row to an existing table using an array of string objects,
 // where each object represents a column of the data.
 func (t *Table) AddRow(row []string) error {
-
 	if len(row) != t.columnCount {
-		return errors.New("Invalid column count in added row")
+		return errors.ErrColumnCount.Context(len(row))
 	}
 
+	// Update the maximum row width based on this new row info. Count
+	// the runes explicitly since len() of a string is really the byte
+	// count, not the character count.
 	for n, h := range row {
-		if len(h) > t.maxWidth[n] {
-			t.maxWidth[n] = len(h)
+		realLength := 0
+
+		for range h {
+			realLength++
+		}
+
+		if realLength > t.maxWidth[n] {
+			t.maxWidth[n] = realLength
 		}
 	}
 
 	t.rows = append(t.rows, row)
+
 	return nil
 }
 
@@ -28,33 +37,14 @@ func (t *Table) AddRow(row []string) error {
 // Each parameter is converted to a string representation, and the set of all
 // formatted values are added to the table as a row.
 func (t *Table) AddRowItems(items ...interface{}) error {
-
 	if len(items) != t.columnCount {
-		return errors.New("Invalid column count in added row")
+		return errors.ErrColumnCount.Context(len(items))
 	}
 
 	row := make([]string, t.columnCount)
-	buffer := ""
 
 	for n, item := range items {
-
-		switch v := item.(type) {
-		case int:
-			buffer = strconv.Itoa(v)
-
-		case string:
-			buffer = v
-
-		case bool:
-			if v {
-				buffer = "true"
-			} else {
-				buffer = "false"
-			}
-		default:
-			buffer = fmt.Sprintf("%v", item)
-		}
-		row[n] = buffer
+		row[n] = fmt.Sprintf("%v", item)
 	}
 
 	return t.AddRow(row)

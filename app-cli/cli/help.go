@@ -2,9 +2,19 @@ package cli
 
 import (
 	"fmt"
+	"runtime"
+	"strings"
 
 	"github.com/tucats/gopackages/app-cli/tables"
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/i18n"
+)
+
+// Default indentation for subordinate text, and default
+// spacing between columns.
+const (
+	helpIndent  = 3
+	helpSpacing = 3
 )
 
 // ShowHelp displays help text for the grammar, using a standardized format.
@@ -13,13 +23,14 @@ import (
 //
 // This function uses the tables package to create uniform columns of output.
 func ShowHelp(c *Context) {
-
 	if c.Copyright != "" {
 		fmt.Printf("%s\n", c.Copyright)
 	}
 
+	// Prepare a composed version of the command string, which chains
+	// together the root, subverbs, and representations of parameters
+	// and options.
 	composedCommand := c.MainProgram + " " + c.Command
-
 	hasSubcommand := false
 	hasOptions := false
 
@@ -30,98 +41,186 @@ func ShowHelp(c *Context) {
 			hasOptions = true
 		}
 	}
+
 	if hasOptions {
-		composedCommand = composedCommand + "[options] "
+		composedCommand = composedCommand + "[" + i18n.L("options") + "] "
 	}
+
 	if hasSubcommand {
-		composedCommand = composedCommand + "[command] "
+		composedCommand = composedCommand + "[" + i18n.L("command") + "] "
 	}
 
 	g := c.FindGlobal()
-	e := g.ExpectedParameterCount
+	e := g.Expected
+
 	if g.ParameterDescription > "" {
-		composedCommand = composedCommand + " [" + g.ParameterDescription + "]"
+		parmDesc := i18n.T(g.ParameterDescription)
+		if g.Expected < 1 {
+			parmDesc = "[" + parmDesc + "]"
+		}
+
+		composedCommand = composedCommand + " " + parmDesc
 	} else if e == 1 {
-		composedCommand = composedCommand + " [parameter]"
+		composedCommand = composedCommand + " [" + i18n.L("parameter") + "]"
 	} else if e > 1 {
-		composedCommand = composedCommand + " [parameters]"
+		composedCommand = composedCommand + " [" + i18n.L("parameters") + "]"
 	}
 
 	minimumFirstColumnWidth := len(composedCommand)
 	if minimumFirstColumnWidth < 26 {
 		minimumFirstColumnWidth = 26
 	}
-	if c.Parent == nil && c.Version != "" {
-		c.Description = c.Description + ", " + c.Version
+
+	commandDescription := i18n.T(c.Description)
+	if commandDescription == c.Description {
+		commandDescription = i18n.T("opt." + c.Description)
 	}
 
-	fmt.Printf("\nUsage:\n   %-26s   %s\n\n", composedCommand, c.Description)
+	if c.Parent == nil && c.Version != "" {
+		commandDescription = commandDescription + ", " + c.Version
+	}
+
+	fmt.Printf("\n%s:\n   %-26s   %s\n\n", i18n.L("Usage"), composedCommand, commandDescription)
+
+	// Now prepare the descriptions of the subcommands. This is done using a
+	// table format, where the headings are not printed. But this lets the
+	// sucommands and their descriptions line up nicely.
 	headerShown := false
 
 	tc, _ := tables.New([]string{"subcommand", "description"})
+
 	tc.ShowHeadings(false)
-	_ = tc.SetIndent(3)
-	_ = tc.SetSpacing(3)
+	tc.SetPagination(0, 0)
+
+	_ = tc.SetIndent(helpIndent)
+	_ = tc.SetSpacing(helpSpacing)
 	_ = tc.SetMinimumWidth(0, minimumFirstColumnWidth)
+
+	hadDefaultVerb := false
 
 	for _, option := range c.Grammar {
 		if option.OptionType == Subcommand && !option.Private {
-			if !headerShown {
-				headerShown = true
-				fmt.Printf("Commands:\n")
-				_ = tc.AddRow([]string{"help", "Display help text"})
+
+			unsupported := false
+			for _, platform := range option.Unsupported {
+				if runtime.GOOS == platform {
+					unsupported = true
+
+					break
+				}
 			}
-			_ = tc.AddRow([]string{option.LongName, option.Description})
+
+			if unsupported {
+				continue
+			}
+
+			if !headerShown {
+				fmt.Printf("%s:\n", i18n.L("Commands"))
+
+				_ = tc.AddRow([]string{" help", i18n.T("opt.help.text")})
+				headerShown = true
+			}
+
+			optionDescription := i18n.T(option.Description)
+			if optionDescription == c.Description {
+				optionDescription = i18n.T("opt." + option.Description)
+			}
+
+			defaultFlag := " "
+			if option.DefaultVerb {
+				defaultFlag = "*"
+				hadDefaultVerb = true
+			}
+
+			_ = tc.AddRow([]string{defaultFlag + option.LongName, optionDescription})
 		}
 	}
+
 	if headerShown {
 		_ = tc.SortRows(0, true)
-		tc.Print(ui.TextTableFormat)
+
+		tc.Print(ui.TextFormat)
 		fmt.Printf("\n")
+	}
+
+	if hadDefaultVerb {
+		fmt.Printf("%s\n\n", i18n.L("had.default.verb"))
 	}
 
 	headerShown = false
 	tc, _ = tables.New([]string{"Parameter"})
+
 	tc.ShowHeadings(false)
-	_ = tc.SetIndent(3)
+	tc.SetPagination(0, 0)
+
+	_ = tc.SetIndent(helpIndent)
 	_ = tc.SetMinimumWidth(0, minimumFirstColumnWidth)
+
 	for _, option := range c.Grammar {
 		if option.OptionType == ParameterType {
 			if !headerShown {
-				fmt.Printf("Parameters:\n")
-				headerShown = true
-				_ = tc.AddRowItems(option.Description)
-			}
+				fmt.Printf("%s:\n", i18n.L("Parameters"))
 
+				headerShown = true
+
+				optionDescription := i18n.T(option.Description)
+				if optionDescription == c.Description {
+					optionDescription = i18n.T("opt." + option.Description)
+				}
+
+				_ = tc.AddRowItems(optionDescription)
+			}
 		}
 	}
+
 	if headerShown {
-		tc.Print("text")
+		tc.Print(ui.TextFormat)
 		fmt.Printf("\n")
 	}
 
+	// Now, use tables again to format the list of options
+	// and their descriptions.
 	to, _ := tables.New([]string{"option", "description"})
+
 	to.ShowHeadings(false)
-	_ = to.SetIndent(3)
-	_ = to.SetSpacing(3)
+	to.SetPagination(0, 0)
+
+	_ = to.SetIndent(helpIndent)
+	_ = to.SetSpacing(helpSpacing)
 	_ = to.SetMinimumWidth(0, minimumFirstColumnWidth)
 
 	for _, option := range c.Grammar {
 		if option.Private {
 			continue
 		}
-		if option.OptionType != Subcommand {
 
+		unsupported := false
+		for _, platform := range option.Unsupported {
+			if runtime.GOOS == platform {
+				unsupported = true
+
+				break
+			}
+		}
+
+		if unsupported {
+			continue
+		}
+
+		if option.OptionType != Subcommand {
 			name := ""
 			if option.LongName > "" {
 				name = "--" + option.LongName
 			}
+
 			if option.ShortName > "" {
 				if name > "" {
 					name = name + ", "
 				}
+
 				name = name + "-" + option.ShortName
 			}
+
 			switch option.OptionType {
 			case IntType:
 				name = name + " <integer>"
@@ -134,18 +233,27 @@ func ShowHelp(c *Context) {
 
 			case StringListType:
 				name = name + " <list>"
+
+			case KeywordType:
+				name = name + " " + strings.Join(option.Keywords, "|")
 			}
 
-			fullDescription := option.Description
+			fullDescription := i18n.T(option.Description)
+			if fullDescription == option.Description {
+				fullDescription = i18n.T("opt." + option.Description)
+			}
+
 			if option.EnvironmentVariable != "" {
 				fullDescription = fullDescription + " [" + option.EnvironmentVariable + "]"
 			}
+
 			_ = to.AddRow([]string{name, fullDescription})
 		}
 	}
 
 	fmt.Printf("Options:\n")
-	_ = to.AddRow([]string{"--help, -h", "Show this help text"})
+
+	_ = to.AddRow([]string{"--help, -h", i18n.T("opt.help.text")})
 	_ = to.SortRows(0, true)
-	_ = to.Print(ui.TextTableFormat)
+	_ = to.Print(ui.TextFormat)
 }

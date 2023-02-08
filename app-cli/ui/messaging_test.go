@@ -3,7 +3,9 @@
 // whether those messages are displayed or not.
 package ui
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestLogMessage(t *testing.T) {
 	type args struct {
@@ -11,6 +13,7 @@ func TestLogMessage(t *testing.T) {
 		format string
 		args   []interface{}
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -19,33 +22,33 @@ func TestLogMessage(t *testing.T) {
 		{
 			name: "simple message",
 			args: args{
-				class:  "TEST",
+				class:  "USER",
 				format: "string text",
 				args:   []interface{}{},
 			},
-			want: "TEST   : string text",
+			want: "     USER   : string text",
 		},
 		{
 			name: "parameterized message",
 			args: args{
-				class:  "TEST",
+				class:  "USER",
 				format: "digits %d",
 				args:   []interface{}{42},
 			},
-			want: "TEST   : digits 42",
+			want: "     USER   : digits 42",
 		},
 		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			got := LogMessage(tt.args.class, tt.args.format, tt.args.args...)
+			logger := LoggerByName(tt.args.class)
+			got := formatLogMessage(logger, tt.args.format, tt.args.args...)
 			// Mask out the parts that are variable and un-testable, which
 			// includes the current date/time and a sequence number
 			got = got[23:]
-
 			if got != tt.want {
-				t.Errorf("LogMessage() = %v, want %v", got, tt.want)
+				t.Errorf("LogMessage() got\n %v\nwant\n %v", got, tt.want)
 			}
 		})
 	}

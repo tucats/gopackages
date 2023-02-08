@@ -4,94 +4,123 @@ import (
 	"os"
 
 	"github.com/tucats/gopackages/app-cli/cli"
-	"github.com/tucats/gopackages/app-cli/persistence"
-	"github.com/tucats/gopackages/app-cli/profile"
+	"github.com/tucats/gopackages/app-cli/config"
+	"github.com/tucats/gopackages/app-cli/settings"
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/defs"
 )
 
-// Run sets up required data structures and executes the parse.
-// When completed, the command line functionality will have been
-// run. It is up to the caller (typically the main() function)
-// to handle any post-processing cleanup, etc.
+// Run sets up required data structures and parses the command line. It then
+// automatically calls any action routines specfied in the grammar, which do
+// the work of the command.
 func runFromContext(context *cli.Context) error {
-
 	// Create a new grammar which prepends the default supplied options
 	// to the caller's grammar definition.
 	grammar := []cli.Option{
 		{
-			LongName:    "profile",
-			Aliases:     []string{"prof"},
+			LongName:            "insecure",
+			ShortName:           "k",
+			OptionType:          cli.BooleanType,
+			Description:         "insecure",
+			Action:              InsecureAction,
+			EnvironmentVariable: "APP_INSECURE_CLIENT",
+		},
+		{
+			LongName:    "config",
+			Aliases:     []string{"configuration", "profile", "prof"},
 			OptionType:  cli.Subcommand,
-			Description: "Manage the default profile",
-			Value:       profile.Grammar,
+			Description: "ego.config",
+			Value:       config.Grammar,
 		},
 		{
 			LongName:    "logon",
 			Aliases:     []string{"login"},
 			OptionType:  cli.Subcommand,
-			Description: "Log on to a remote server",
+			Description: "ego.logon",
 			Action:      Logon,
 			Value:       LogonGrammar,
 		},
 		{
 			ShortName:           "p",
 			LongName:            "profile",
-			Description:         "Name of profile to use",
+			Description:         "global.profile",
 			OptionType:          cli.StringType,
 			Action:              UseProfileAction,
-			EnvironmentVariable: "CLI_PROFILE",
+			EnvironmentVariable: "APP_PROFILE",
 		},
 		{
-			ShortName:   "d",
-			LongName:    "debug",
-			Description: "Debug loggers to enable",
-			OptionType:  cli.StringListType,
-			Action:      DebugAction,
+			LongName:            "log",
+			ShortName:           "l",
+			Description:         "global.log",
+			OptionType:          cli.StringListType,
+			Action:              LogAction,
+			EnvironmentVariable: defs.EgoDefaultLogging,
 		},
 		{
-			LongName:            "output-format",
-			Description:         "Specify text or json output format",
+			LongName:            "log-file",
+			Description:         "global.log.file",
 			OptionType:          cli.StringType,
+			Action:              LogFileAction,
+			EnvironmentVariable: defs.EgoDefaultLogFileName,
+		},
+		{
+			LongName:            "format",
+			ShortName:           "f",
+			Description:         "global.format",
+			OptionType:          cli.KeywordType,
+			Keywords:            []string{ui.JSONFormat, ui.JSONIndentedFormat, ui.TextFormat},
 			Action:              OutputFormatAction,
-			EnvironmentVariable: "CLI_OUTPUT_FORMAT",
+			EnvironmentVariable: "APP_OUTPUT_FORMAT",
 		},
 		{
 			ShortName:   "v",
 			LongName:    "version",
-			Description: "Show version number of command line tool",
+			Description: "global.version",
 			OptionType:  cli.BooleanType,
 			Action:      ShowVersionAction,
 		},
 		{
 			ShortName:           "q",
 			LongName:            "quiet",
-			Description:         "If specified, suppress extra messaging",
+			Description:         "global.quiet",
 			OptionType:          cli.BooleanType,
 			Action:              QuietAction,
-			EnvironmentVariable: "CLI_QUIET",
+			EnvironmentVariable: "APP_QUIET",
+		},
+		{
+			LongName:    "version",
+			Description: "global.version",
+			OptionType:  cli.Subcommand,
+			Action:      VersionAction,
 		},
 	}
 
-	// Add the user-provided grammar
+	// Add the user-provided grammar.
 	grammar = append(grammar, context.Grammar...)
 
 	// Load the active profile, if any from the profile for this application.
-	_ = persistence.Load(context.AppName, "default")
+	_ = settings.Load(context.AppName, "default")
 
-	// If the CLI_DEBUG environment variable is set, then turn on
-	// debugging now, so messages will come out before that particular
-	// option is processed.
-	ui.SetLogger(ui.DebugLogger, os.Getenv("CLI_DEBUG") != "")
-
-	// Parse the grammar and call the actions (essentially, execute
-	// the function of the CLI)
 	context.Grammar = grammar
-	err := context.Parse()
 
-	// If no errors, then write out an updated profile as needed.
-	if err == nil {
-		err = persistence.Save()
+	// If we are to dump the grammar (a diagnostic function) do that,
+	// then just pack it in and go home.
+	if os.Getenv("APP_DUMP_GRAMMAR") != "" {
+		cli.DumpGrammar(context)
+		os.Exit(0)
 	}
 
-	return err
+	// Parse the grammar and call the actions (essentially, execute
+	// the function of the CLI). If it goes poorly, error out.
+	if err := context.Parse(); err != nil {
+		return err
+	} else {
+		// If no errors, then write out an updated profile as needed.
+		err = settings.Save()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

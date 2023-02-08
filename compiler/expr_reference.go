@@ -2,14 +2,13 @@ package compiler
 
 import (
 	"github.com/tucats/gopackages/bytecode"
-	bc "github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/data"
+	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/tokenizer"
-	"github.com/tucats/gopackages/util"
 )
 
-// reference parses a structure or array reference
+// reference parses a structure or array reference.
 func (c *Compiler) reference() error {
-
 	// Parse the function call or exprssion atom
 	err := c.expressionAtom()
 	if err != nil {
@@ -20,69 +19,132 @@ func (c *Compiler) reference() error {
 	parsing := true
 	// is there a trailing structure or array reference?
 	for parsing && !c.t.AtEnd() {
-
 		op := c.t.Peek(1)
-		switch op {
 
+		switch op {
 		// Structure initialization
-		case "{":
+		case tokenizer.DataBeginToken:
+			// If this is during switch statement processing, it can't be
+			// a structure initialization.
+			if c.flags.disallowStructInits {
+				return nil
+			}
+
 			name := c.t.Peek(2)
 			colon := c.t.Peek(3)
-			if tokenizer.IsSymbol(name) && colon == ":" {
-				c.b.Emit(bytecode.Push, "__type")
-				c.b.Emit(bytecode.LoadIndex)
-				c.b.Emit(bytecode.Push, "__type")
+
+			if name.IsIdentifier() && colon == tokenizer.ColonToken {
+				c.b.Emit(bytecode.Push, data.TypeMDKey)
+
 				err := c.expressionAtom()
 				if err != nil {
 					return err
 				}
+
 				i := c.b.Opcodes()
 				ix := i[len(i)-1]
-				ix.Operand = util.GetInt(ix.Operand) + 1
+				ix.Operand = data.Int(ix.Operand) + 1 // __type
 				i[len(i)-1] = ix
 			} else {
 				parsing = false
-				break
 			}
 		// Function invocation
-		case "(":
+		case tokenizer.StartOfListToken:
 			c.t.Advance(1)
+
 			err := c.functionCall()
 			if err != nil {
 				return err
 			}
 
 		// Map member reference
-		case ".":
+		case tokenizer.DotToken:
 			c.t.Advance(1)
-			lastName = c.t.Next()
-			c.b.Emit(bc.Push, lastName)
-			c.b.Emit(bc.Member)
 
-		// Array index reference
-		case "[":
-			c.t.Advance(1)
-			err := c.conditional()
-			if err != nil {
-				return err
+			lastName = c.t.NextText()
+			if !tokenizer.IsSymbol(lastName) {
+				return c.error(errors.ErrInvalidIdentifier)
 			}
 
-			// is it a slice instead of an index?
-			if c.t.IsNext(":") {
+			lastName = c.normalize(lastName)
+
+			// Peek ahead. is this a chained call? If so, set the This
+			// value
+			if c.t.Peek(1) == tokenizer.StartOfListToken {
+				c.b.Emit(bytecode.SetThis)
+			}
+
+			c.b.Emit(bytecode.Member, lastName)
+
+			if c.t.IsNext(tokenizer.EmptyInitializerToken) {
+				c.b.Emit(bytecode.Load, "$new")
+				c.b.Emit(bytecode.Swap)
+				c.b.Emit(bytecode.Call, 1)
+			} else {
+				// Is it a generator for a type?
+				if c.t.Peek(1) == tokenizer.DataBeginToken && c.t.Peek(2).IsIdentifier() && c.t.Peek(3) == tokenizer.ColonToken {
+					c.b.Emit(bytecode.Push, data.TypeMDKey)
+
+					err := c.expressionAtom()
+					if err != nil {
+						return err
+					}
+
+					i := c.b.Opcodes()
+					ix := i[len(i)-1]
+					ix.Operand = data.Int(ix.Operand) + 1 // __type and
+					i[len(i)-1] = ix
+
+					return nil
+				}
+			}
+
+		// Array index reference
+		case tokenizer.StartOfArrayToken:
+			c.t.Advance(1)
+
+			// If there is an slice with an implied start of 0,
+			// handle that here.
+			t := c.t.Peek(1)
+			if t == tokenizer.ColonToken {
+				c.b.Emit(bytecode.Push, 0)
+			} else {
 				err := c.conditional()
 				if err != nil {
 					return err
 				}
-				c.b.Emit(bc.LoadSlice)
-				if c.t.Next() != "]" {
-					return c.NewError(MissingBracketError)
+			}
+
+			// is it a slice instead of an index?
+			if c.t.IsNext(tokenizer.ColonToken) {
+				// IS this the case of the assumed end being the
+				// length of the item? If so, add code to use the
+				// length of the item below current ToS. The actual
+				// displacement is 2, since before executing it we
+				// also already pushed the length fuction on stack.
+				if c.t.Peek(1) == tokenizer.EndOfArrayToken {
+					c.b.Emit(bytecode.Load, "len")
+					c.b.Emit(bytecode.ReadStack, -2)
+					c.b.Emit(bytecode.Call, 1)
+				} else {
+					err := c.conditional()
+					if err != nil {
+						return err
+					}
+				}
+
+				c.b.Emit(bytecode.LoadSlice)
+
+				if c.t.Next() != tokenizer.EndOfArrayToken {
+					return c.error(errors.ErrMissingBracket)
 				}
 			} else {
 				// Nope, singular index
-				if c.t.Next() != "]" {
-					return c.NewError(MissingBracketError)
+				if c.t.Next() != tokenizer.EndOfArrayToken {
+					return c.error(errors.ErrMissingBracket)
 				}
-				c.b.Emit(bc.LoadIndex)
+
+				c.b.Emit(bytecode.LoadIndex)
 			}
 
 		// Nothing else, term is complete
@@ -90,5 +152,6 @@ func (c *Compiler) reference() error {
 			return nil
 		}
 	}
+
 	return nil
 }

@@ -1,70 +1,155 @@
 package app
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/cli"
-	"github.com/tucats/gopackages/app-cli/persistence"
+	"github.com/tucats/gopackages/app-cli/settings"
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/defs"
+	"github.com/tucats/gopackages/errors"
+	"github.com/tucats/gopackages/i18n"
+	"github.com/tucats/gopackages/rest"
+	"github.com/tucats/gopackages/util"
 )
 
-// OutputFormatAction sets the default output format to use.
+func InsecureAction(c *cli.Context) error {
+	rest.AllowInsecure(true)
+
+	return nil
+}
+
+// OutputFormatAction sets the default output format to use. This must be one of
+// the supported types "test"", "json"", or "indented").
 func OutputFormatAction(c *cli.Context) error {
-
-	if formatString, present := c.FindGlobal().GetString("ego.output-format"); present {
-		switch strings.ToLower(formatString) {
-		case "text":
-			ui.OutputFormat = ui.TextTableFormat
-
-		case "json":
-			ui.OutputFormat = ui.JSONTableFormat
-
-		default:
-			return errors.New("Invalid output format specified: " + formatString)
+	if formatString, present := c.FindGlobal().String("format"); present {
+		if util.InList(strings.ToLower(formatString),
+			ui.JSONIndentedFormat, ui.JSONFormat, ui.TextFormat) {
+			ui.OutputFormat = formatString
+		} else {
+			return errors.ErrInvalidOutputFormat.Context(formatString)
 		}
-		persistence.SetDefault("ego.output-format", strings.ToLower(formatString))
+
+		settings.SetDefault(defs.OutputFormatSetting, strings.ToLower(formatString))
 	}
+
 	return nil
 }
 
-// DebugAction is an action routine to set the global debug status if specified
-func DebugAction(c *cli.Context) error {
-
-	loggers, mode := c.FindGlobal().GetStringList("debug")
-	ui.DebugMode = mode
-
-	for _, v := range loggers {
-		valid := ui.SetLogger(strings.ToUpper(v), true)
-		if !valid {
-			return fmt.Errorf("invalid logger name: %s", v)
-		}
+func LanguageAction(c *cli.Context) error {
+	if language, ok := c.FindGlobal().String("language"); ok {
+		i18n.Language = strings.ToLower(language)[0:2]
 	}
+
 	return nil
 }
 
-// QuietAction is an action routine to set the global debug status if specified
+// LogAction is an action routine to set the loggers that will get debug messages
+// during execution. This must be a string list, and each named logger is enabled.
+// If a logger name is not valid, an error is returned.
+func LogAction(c *cli.Context) error {
+	loggers, specified := c.FindGlobal().StringList("log")
+
+	if specified {
+		for _, v := range loggers {
+			name := strings.TrimSpace(v)
+			if name != "" {
+				logger := ui.LoggerByName(name)
+				if logger < 0 {
+					return errors.ErrInvalidLoggerName.Context(name)
+				}
+
+				ui.Active(logger, true)
+			}
+		}
+	}
+
+	return nil
+}
+
+// LogFileAction is an action routine to set the name of the output log file.
+func LogFileAction(c *cli.Context) error {
+	logFile, specified := c.FindGlobal().String("log-file")
+
+	if specified {
+		return ui.OpenLogFile(logFile, false)
+	}
+
+	return nil
+}
+
+// QuietAction is an action routine to set the global debug status if specified.
 func QuietAction(c *cli.Context) error {
-	ui.QuietMode = c.FindGlobal().GetBool("quiet")
+	ui.QuietMode = c.FindGlobal().Boolean("quiet")
+
+	return nil
+}
+
+func VersionAction(c *cli.Context) error {
+	arch := fmt.Sprintf("%s, %s", runtime.GOOS, runtime.GOARCH)
+	if arch == "darwin, arm64" {
+		arch = "Apple Silicon"
+	}
+
+	if ui.OutputFormat == ui.TextFormat {
+		fmt.Printf("%s %s %s (%s, %s)\n",
+			c.FindGlobal().AppName,
+			i18n.L("version"),
+			c.FindGlobal().Version,
+			runtime.Version(),
+			arch)
+	} else {
+		type VersionInfo struct {
+			Name      string `json:"name"`
+			Version   string `json:"version"`
+			GoVersion string `json:"go"`
+			OS        string `json:"os"`
+			Arch      string `json:"arch"`
+			File      string `json:"file"`
+		}
+
+		fullPath, _ := filepath.Abs(os.Args[0])
+		v := VersionInfo{
+			Name:      c.FindGlobal().AppName,
+			Version:   c.FindGlobal().Version,
+			GoVersion: runtime.Version(),
+			OS:        runtime.GOOS,
+			Arch:      runtime.GOARCH,
+			File:      fullPath,
+		}
+		if ui.OutputFormat == ui.JSONFormat {
+			b, _ := json.Marshal(v)
+			fmt.Println(string(b))
+		} else {
+			b, _ := json.MarshalIndent(v, "", "  ")
+			fmt.Println(string(b))
+		}
+	}
+
 	return nil
 }
 
 // UseProfileAction is the action routine when --profile is specified as a global
-// option. It's string value is used as the name of the active profile.
+// option. Its string value is used as the name of the active profile.
 func UseProfileAction(c *cli.Context) error {
-	name, _ := c.GetString("profile")
-	ui.Debug(ui.AppLogger, "Using profile %s", name)
-	persistence.UseProfile(name)
+	name, _ := c.String("profile")
+	settings.UseProfile(name)
+
+	ui.Log(ui.AppLogger, "Using profile %s", name)
+
 	return nil
 }
 
 // ShowVersionAction is the action routine called when --version is specified.
 // It prints the version number information and then exits the application.
 func ShowVersionAction(c *cli.Context) error {
-
 	fmt.Printf("%s %s\n", c.MainProgram, c.Version)
 	os.Exit(0)
+
 	return nil
 }

@@ -7,27 +7,29 @@ import (
 
 func TestTable_SetAlignment(t *testing.T) {
 	type fields struct {
-		showUnderlines bool
-		showHeadings   bool
-		showRowNumbers bool
+		rows           [][]string
+		columns        []string
+		alignment      []int
+		maxWidth       []int
+		active         []bool
+		spacing        string
+		indent         string
 		rowLimit       int
 		startingRow    int
 		columnCount    int
 		rowCount       int
 		orderBy        int
+		showUnderlines bool
+		showHeadings   bool
+		showRowNumbers bool
 		ascending      bool
-		rows           [][]string
-		columns        []string
-		active         []bool
-		alignment      []int
-		maxWidth       []int
-		spacing        string
-		indent         string
 	}
+
 	type args struct {
 		column    int
 		alignment int
 	}
+
 	tests := []struct {
 		name          string
 		fields        fields
@@ -49,7 +51,7 @@ func TestTable_SetAlignment(t *testing.T) {
 			wantAlignment: []int{AlignmentLeft},
 		},
 		{
-			name: "Set formatting for non-existant column",
+			name: "Set formatting for non-existent column",
 			fields: fields{
 				columnCount: 1,
 				alignment:   make([]int, 1),
@@ -118,7 +120,7 @@ func TestTable_SetAlignment(t *testing.T) {
 				orderBy:        tt.fields.orderBy,
 				ascending:      tt.fields.ascending,
 				rows:           tt.fields.rows,
-				columns:        tt.fields.columns,
+				names:          tt.fields.columns,
 				alignment:      tt.fields.alignment,
 				maxWidth:       tt.fields.maxWidth,
 				spacing:        tt.fields.spacing,
@@ -137,25 +139,27 @@ func TestTable_SetAlignment(t *testing.T) {
 
 func TestTable_SetSpacing(t *testing.T) {
 	type fields struct {
-		showUnderlines bool
-		showHeadings   bool
-		showRowNumbers bool
-		rowLimit       int
-		startingRow    int
-		columnCount    int
-		rowCount       int
-		orderBy        int
-		ascending      bool
 		rows           [][]string
 		columns        []string
 		alignment      []int
 		maxWidth       []int
 		spacing        string
 		indent         string
+		rowLimit       int
+		startingRow    int
+		columnCount    int
+		rowCount       int
+		orderBy        int
+		showUnderlines bool
+		showHeadings   bool
+		showRowNumbers bool
+		ascending      bool
 	}
+
 	type args struct {
 		s int
 	}
+
 	tests := []struct {
 		name        string
 		fields      fields
@@ -181,6 +185,7 @@ func TestTable_SetSpacing(t *testing.T) {
 		},
 		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tb := &Table{
@@ -194,7 +199,7 @@ func TestTable_SetSpacing(t *testing.T) {
 				orderBy:        tt.fields.orderBy,
 				ascending:      tt.fields.ascending,
 				rows:           tt.fields.rows,
-				columns:        tt.fields.columns,
+				names:          tt.fields.columns,
 				alignment:      tt.fields.alignment,
 				maxWidth:       tt.fields.maxWidth,
 				spacing:        tt.fields.spacing,
@@ -212,25 +217,27 @@ func TestTable_SetSpacing(t *testing.T) {
 
 func TestTable_SetIndent(t *testing.T) {
 	type fields struct {
-		showUnderlines bool
-		showHeadings   bool
-		showRowNumbers bool
-		rowLimit       int
-		startingRow    int
-		columnCount    int
-		rowCount       int
-		orderBy        int
-		ascending      bool
 		rows           [][]string
 		columns        []string
 		alignment      []int
 		maxWidth       []int
 		spacing        string
 		indent         string
+		rowLimit       int
+		startingRow    int
+		columnCount    int
+		rowCount       int
+		orderBy        int
+		ascending      bool
+		showUnderlines bool
+		showHeadings   bool
+		showRowNumbers bool
 	}
+
 	type args struct {
 		s int
 	}
+
 	tests := []struct {
 		name        string
 		fields      fields
@@ -256,6 +263,7 @@ func TestTable_SetIndent(t *testing.T) {
 		},
 		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tb := &Table{
@@ -269,7 +277,7 @@ func TestTable_SetIndent(t *testing.T) {
 				orderBy:        tt.fields.orderBy,
 				ascending:      tt.fields.ascending,
 				rows:           tt.fields.rows,
-				columns:        tt.fields.columns,
+				names:          tt.fields.columns,
 				alignment:      tt.fields.alignment,
 				maxWidth:       tt.fields.maxWidth,
 				spacing:        tt.fields.spacing,

@@ -1,7 +1,6 @@
 package functions
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -13,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/tucats/gopackages/app-cli/persistence"
 	"github.com/tucats/gopackages/datatypes"
+	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -37,14 +37,6 @@ func ProfileGet(symbols *symbols.SymbolTable, args []interface{}) (interface{}, 
 func ProfileSet(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	key := util.GetString(args[0])
 
-	// Quick check here. The key must already exist if it's one of the
-	// "system" settings. That is, you can't create an ego.* setting that
-	// doesn't exist yet, for example
-	if strings.HasPrefix(key, "ego.") {
-		if !persistence.Exists(key) {
-			return nil, NewError("Set", "cannot create reserved setting", key)
-		}
-	}
 	// If the value is an empty string, delete the key else
 	// store the value for the key.
 	value := util.GetString(args[1])
@@ -143,7 +135,7 @@ func Array(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error
 				array = append(v, make([]interface{}, count-len(v))...)
 			}
 		default:
-			return nil, NewError("array", InvalidTypeError)
+			return nil, errors.ErrInvalidType
 		}
 	} else {
 		count = util.GetInt(args[0])
@@ -188,7 +180,7 @@ func Members(symbols *symbols.SymbolTable, args []interface{}) (interface{}, err
 		return a, nil
 
 	default:
-		return nil, NewError("members", InvalidTypeError)
+		return nil, errors.ErrInvalidType
 	}
 }
 
@@ -249,7 +241,7 @@ func Sort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error)
 		return resultArray, nil
 
 	default:
-		return nil, NewError("sort", InvalidTypeError)
+		return nil, errors.ErrInvalidType
 	}
 }
 
@@ -267,10 +259,10 @@ func Exit(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error)
 		os.Exit(v)
 
 	case string:
-		return nil, errors.New(v)
+		return nil, errors.NewMessage(v)
 
 	default:
-		return nil, NewError("exit", InvalidTypeError)
+		return nil, errors.ErrInvalidType
 	}
 
 	return nil, nil
@@ -334,12 +326,6 @@ func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	}
 }
 
-// Signal creates an error object based on the
-// parameters
-func Signal(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	return NewError("error", util.GetString(args[0]), args[1:]...), nil
-}
-
 // Append implements the builtin append() function, which concatenates all the items
 // together as an array. The first argument is flattened into the result, and then each
 // additional argument is added to the array as-is.
@@ -362,16 +348,16 @@ func Append(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 func Delete(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if _, ok := args[0].(string); ok && len(args) != 1 {
-		return nil, errors.New(ArgumentCountError)
+		return nil, errors.ErrArgumentCount
 	} else {
 		if len(args) != 2 {
-			return nil, errors.New(ArgumentCountError)
+			return nil, errors.ErrArgumentCount
 		}
 	}
 	switch v := args[0].(type) {
 
 	case string:
-		return nil, s.Delete(v)
+		return nil, s.Delete(v, true)
 
 	case map[string]interface{}:
 		key := util.GetString(args[1])
@@ -381,13 +367,13 @@ func Delete(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	case []interface{}:
 		i := util.GetInt(args[1])
 		if i < 0 || i >= len(v) {
-			return nil, errors.New(InvalidArrayIndexError)
+			return nil, errors.ErrArrayIndex
 		}
 		r := append(v[:i], v[i+1:]...)
 		return r, nil
 
 	default:
-		return nil, errors.New(InvalidTypeError)
+		return nil, errors.ErrArgumentCount
 	}
 }
 

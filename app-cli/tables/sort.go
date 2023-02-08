@@ -1,9 +1,10 @@
 package tables
 
 import (
-	"errors"
 	"sort"
 	"strings"
+
+	"github.com/tucats/gopackages/errors"
 )
 
 // SortRows sorts the existing table rows. The column to sort by is specified by
@@ -11,13 +12,14 @@ import (
 // in ascending order, and false if a descending sort is required.
 func (t *Table) SortRows(column int, ascending bool) error {
 	if column < 0 || column >= t.columnCount {
-		return errors.New("Invalid column number for sort")
+		return errors.ErrInvalidColumnNumber.Context(column)
 	}
 
 	sort.SliceStable(t.rows, func(i, j int) bool {
 		if ascending {
 			return t.rows[i][column] < t.rows[j][column]
 		}
+
 		return t.rows[i][column] > t.rows[j][column]
 	})
 
@@ -28,6 +30,7 @@ func (t *Table) SortRows(column int, ascending bool) error {
 // sorting the output data.
 func (t *Table) SetOrderBy(name string) error {
 	ascending := true
+
 	if name[0] == '~' {
 		name = name[1:]
 		ascending = false
@@ -37,8 +40,10 @@ func (t *Table) SetOrderBy(name string) error {
 		if strings.EqualFold(name, v) {
 			t.orderBy = n
 			t.ascending = ascending
+
 			return nil
 		}
 	}
-	return errors.New("Invalid order-by column name: " + name)
+
+	return errors.ErrInvalidColumnName.Context(name)
 }

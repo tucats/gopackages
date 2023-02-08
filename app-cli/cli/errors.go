@@ -1,12 +1,20 @@
 package cli
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 // Exit codes passed to the operating system.
 const (
-	ExitSuccess      = 0
+	// The application exited without error.
+	ExitSuccess = 0
+
+	// The applicaation incurred an error during execution.
 	ExitGeneralError = 1
-	ExitUsageError   = 2
+
+	// The application had an error in command line specification or environment.
+	ExitUsageError = 2
 )
 
 // ExitError is a wrapped error code structure used to return a message
@@ -21,7 +29,7 @@ func (e ExitError) Error() string {
 	return e.Message
 }
 
-// NewExitError constructs an ExitError
+// NewExitError constructs an ExitError.
 func NewExitError(msg string, code int) ExitError {
 	return ExitError{ExitStatus: code, Message: msg}
 }
@@ -29,4 +37,37 @@ func NewExitError(msg string, code int) ExitError {
 // Exit exits the program, returning the given exit status code to the operating system.
 func (e ExitError) Exit() {
 	os.Exit(e.ExitStatus)
+}
+
+// CLI error message strings.
+const (
+	CLIErrorPrefix            = "during command line processing"
+	InvalidBooleanValueError  = "option --%s invalid boolean value: %s"
+	InvalidIntegerError       = "option --%s invalid integer value: %s"
+	InvalidKeywordError       = "option --%s has no such keyword: %s"
+	RequiredNotFoundError     = "required option %s not found"
+	TooManyParametersError    = "too many parameters on command line"
+	UnexpectedParametersError = "unexpected parameters or invalid subcommand"
+	UnknownOptionError        = "unknown option: %s"
+	WrongParameterCountError  = "incorrect number of parameters"
+)
+
+// Wrapper for CLI errors.
+type Error struct {
+	err error
+}
+
+// NewCLIError generates a new CLIError object using the message string and optional
+// values that are formatted using the message string.
+func NewCLIError(msg string, args ...interface{}) Error {
+	e := Error{
+		err: fmt.Errorf(msg, args...),
+	}
+
+	return e
+}
+
+// Error returns a string representation of the CLIError.
+func (ce Error) Error() string {
+	return fmt.Sprintf("%s, %s", CLIErrorPrefix, ce.err.Error())
 }

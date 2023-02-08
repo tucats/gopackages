@@ -1,6 +1,8 @@
 package tables
 
-import "strings"
+import (
+	"strings"
+)
 
 // NewCSV creates a new table using a single string with comma-separated
 // heading names. These typically correspond to the first row in a CSV
@@ -20,24 +22,31 @@ func (t *Table) AddCSVRow(items string) error {
 // values are trimmed of extra spaces.
 func CsvSplit(data string) []string {
 	var headings []string
+
 	var inQuote = false
+
 	var currentHeading strings.Builder
 
 	for _, c := range data {
 		if c == '"' {
 			inQuote = !inQuote
+
 			continue
 		}
+
 		if !inQuote && c == ',' {
 			headings = append(headings, strings.TrimSpace(currentHeading.String()))
 			currentHeading.Reset()
+
 			continue
 		}
-		currentHeading.WriteRune(rune(c))
+
+		currentHeading.WriteRune(c)
 	}
 
 	if currentHeading.Len() > 0 {
 		headings = append(headings, strings.TrimSpace(currentHeading.String()))
 	}
+
 	return headings
 }

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/tucats/gopackages/datatypes"
+	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -14,7 +15,7 @@ import (
 func Int(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], 1)
 	if v == nil {
-		return nil, NewError("int", InvalidTypeError)
+		return nil, errors.ErrInvalidType.Context("int")
 	}
 	return v.(int), nil
 }
@@ -23,7 +24,7 @@ func Int(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 func Float(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], 1.0)
 	if v == nil {
-		return nil, NewError("float", InvalidValueError, args[0])
+		return nil, errors.ErrInvalidType.Context("float")
 	}
 	return v.(float64), nil
 }
@@ -60,7 +61,7 @@ func String(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 func Bool(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v := util.Coerce(args[0], true)
 	if v == nil {
-		return nil, NewError("bool", InvalidValueError, args[0])
+		return nil, errors.ErrInvalidType.Context("bool")
 	}
 	return v.(bool), nil
 }
@@ -122,13 +123,13 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	switch v := r.(type) {
 
 	case nil:
-		return nil, NewError("new", InvalidNewValueError)
+		return nil, errors.ErrInvalidValue.In("new")
 
 	case symbols.SymbolTable:
-		return nil, NewError("new", InvalidNewValueError)
+		return nil, errors.ErrInvalidValue.In("new")
 
 	case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
-		return nil, NewError("new", InvalidNewValueError)
+		return nil, errors.ErrInvalidValue.In("new")
 
 	case int:
 	case string:
@@ -172,7 +173,7 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		}
 
 	default:
-		return nil, NewError("new", InvalidTypeError)
+		return nil, errors.ErrInvalidType.In("new")
 	}
 
 	return r, nil

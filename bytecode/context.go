@@ -1,312 +1,458 @@
 package bytecode
 
 import (
-	"errors"
+	"fmt"
 	"reflect"
 	"strings"
+	"sync"
+	"sync/atomic"
+	"time"
 
+	"github.com/tucats/gopackages/app-cli/settings"
 	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/data"
+	"github.com/tucats/gopackages/defs"
+	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/symbols"
-	sym "github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
-	"github.com/tucats/gopackages/util"
 )
+
+type this struct {
+	name  string
+	value interface{}
+}
+
+type tryInfo struct {
+	addr    int
+	catches []error
+}
+
+// This value is updated atomically during context creation.
+var nextThreadID int32 = 0
+
+// MaxStackSize records the largest stack size encountered during a
+// stack push operation. This can be used to determine if the initial
+// stack size is adequate.
+var MaxStackSize int32
+
+// InstructionsExecuted counts the number of byte code instructions
+// executed.
+var InstructionsExecuted int64
 
 // Context holds the runtime information about an instance of bytecode being
 // executed.
 type Context struct {
-	Name            string
-	bc              *ByteCode
-	pc              int
-	stack           []interface{}
-	sp              int
-	fp              int
-	running         bool
-	Static          bool
-	debugging       bool
-	singleStep      bool
-	stepOver        bool
-	tracing         bool
-	line            int
-	fullSymbolScope bool
-	symbols         *sym.SymbolTable
-	Tracing         bool
-	tokenizer       *tokenizer.Tokenizer
-	try             []int
-	output          *strings.Builder
-	this            interface{}
-	lastStruct      interface{}
-	result          interface{}
-	argCountDelta   int
+	name                 string
+	pkg                  string
+	bc                   *ByteCode
+	symbols              *symbols.SymbolTable
+	tokenizer            *tokenizer.Tokenizer
+	stack                []interface{}
+	tryStack             []tryInfo
+	rangeStack           []*rangeDefinition
+	timerStack           []time.Time
+	thisStack            []this
+	packageStack         []packageDef
+	output               *strings.Builder
+	lastStruct           interface{}
+	result               interface{}
+	this                 interface{}
+	mux                  sync.RWMutex
+	programCounter       int
+	stackPointer         int
+	framePointer         int
+	line                 int
+	lastLine             int
+	blockDepth           int
+	argCountDelta        int
+	threadID             int32
+	fullSymbolScope      bool
+	running              bool
+	typeStrictness       int
+	debugging            bool
+	singleStep           bool
+	breakOnReturn        bool
+	stepOver             bool
+	throwUncheckedErrors bool
+	fullStackTrace       bool
+	tracing              bool
+	extensions           bool
 }
 
 // NewContext generates a new context. It must be passed a symbol table and a bytecode
 // array. A context holds the runtime state of a given execution unit (program counter,
 // runtime stack, symbol table) and is used to actually run bytecode. The bytecode
 // can continue to be modified after it is associated with a context.
-// @TOMCOLE Is this a good idea? Should a context take a snapshot of the bytecode at
-// the time so it is immutable?
 func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
-
 	name := ""
 	if b != nil {
-		name = b.Name
+		name = b.name
 	}
 
-	static := false
-	if s, ok := s.Get("__static_data_types"); ok {
-		static = util.GetBool(s)
+	// Determine whether static data typing is in effect. This is
+	// normally off, but can be set by a global variable (which is
+	// ultimately set by a profile setting or CLI option).
+	static := defs.NoTypeEnforcement
+	if s, found := s.Get(defs.TypeCheckingVariable); found {
+		static = data.Int(s)
+		if static < defs.StrictTypeEnforcement || static > defs.NoTypeEnforcement {
+			static = defs.NoTypeEnforcement
+		}
 	}
-	ctx := Context{
-		Name:            name,
-		bc:              b,
-		pc:              0,
-		stack:           make([]interface{}, InitialStackSize),
-		sp:              0,
-		fp:              0,
-		running:         false,
-		Static:          static,
-		line:            0,
-		symbols:         s,
-		fullSymbolScope: true,
-		Tracing:         false,
-		this:            "",
-		try:             make([]int, 0),
-	}
-	ctxp := &ctx
-	ctxp.SetByteCode(b)
 
 	// If we weren't given a table, create an empty temp table.
 	if s == nil {
 		s = symbols.NewSymbolTable("")
 	}
 
-	// Append any bytecode symbols into the symbol table.
-	if b.Symbols != nil {
-		for k, v := range b.Symbols.Symbols {
-			_ = s.SetAlways(k, v)
-		}
+	extensions := false
+	if v, ok := s.Root().Get(defs.ExtensionsVariable); ok {
+		extensions = data.Bool(v)
 	}
 
-	return ctxp
+	// Create the context object.
+	ctx := Context{
+		name:                 name,
+		threadID:             atomic.AddInt32(&nextThreadID, 1),
+		bc:                   b,
+		programCounter:       0,
+		stack:                make([]interface{}, initialStackSize),
+		stackPointer:         0,
+		framePointer:         0,
+		running:              false,
+		typeStrictness:       static,
+		line:                 0,
+		symbols:              s,
+		fullSymbolScope:      true,
+		thisStack:            nil,
+		throwUncheckedErrors: settings.GetBool(defs.ThrowUncheckedErrorsSetting),
+		fullStackTrace:       settings.GetBool(defs.FullStackTraceSetting),
+		packageStack:         make([]packageDef, 0),
+		tryStack:             make([]tryInfo, 0),
+		rangeStack:           make([]*rangeDefinition, 0),
+		timerStack:           make([]time.Time, 0),
+		tracing:              false,
+		extensions:           extensions,
+	}
+	contextPointer := &ctx
+	contextPointer.SetByteCode(b)
+
+	return contextPointer
 }
 
+// GetLine retrieves the current line number from the
+// original source being executed. This is stored in the
+// context every time an AtLine instruction is executed.
 func (c *Context) GetLine() int {
+	c.mux.RLock()
+	defer c.mux.RUnlock()
+
 	return c.line
 }
 
+// SetDebug turns debugging mode on or off for the current
+// context.
 func (c *Context) SetDebug(b bool) *Context {
 	c.debugging = b
 	c.singleStep = true
+
 	return c
 }
+
+// SetFullSymbolScope sets the flag that indicates if a
+// symbol table read can "see" a symbol outside the current
+// function. The default is off, which means symbols are not
+// visible outside the function unless they are in the global
+// symbol table. If true, then a symbol can be read from any
+// level of the symbol table parentage chain.
 func (c *Context) SetFullSymbolScope(b bool) *Context {
 	c.fullSymbolScope = b
+
 	return c
 }
 
-func (c *Context) SetPC(pc int) {
-	c.pc = pc
+// SetPC sets the program counter (PC) which indicates the
+// next instruction number to execute.
+func (c *Context) SetPC(pc int) *Context {
+	c.programCounter = pc
+
+	return c
 }
 
+// SetGlobal stores a value in a the global symbol table that is
+// at the top of the symbol table chain.
 func (c *Context) SetGlobal(name string, value interface{}) error {
-	return c.symbols.SetGlobal(name, value)
+	return c.symbols.Root().Set(name, value)
 }
 
 // EnableConsoleOutput tells the context to begin capturing all output normally generated
-// from Print and Newline into a buffer instead of going to stdout
+// from Print and Newline into a buffer instead of going to stdout.
 func (c *Context) EnableConsoleOutput(flag bool) *Context {
+	ui.Log(ui.AppLogger, ">>> Console output set to %v", flag)
 
-	ui.Debug(ui.AppLogger, ">>> Console output set to %v", flag)
 	if !flag {
-		var b strings.Builder
-		c.output = &b
+		c.output = &strings.Builder{}
 	} else {
 		c.output = nil
 	}
+
 	return c
 }
 
-// GetOutput retrieves the output buffer
+// GetOutput retrieves the output buffer. This is the buffer that
+// contains all Print and related bytecode instruction output. This
+// is used when output capture is enabled, which typically happens
+// when a program is running as a Web service.
 func (c *Context) GetOutput() string {
 	if c.output != nil {
 		return c.output.String()
 	}
+
 	return ""
 }
 
-func (c *Context) SetTracing(b bool) {
-	c.tracing = b
+// Tracing returns the trace status of the current context. When
+// tracing is on, each time an instruction is executed, the current
+// instruction and the top few items on the stack are printed to
+// the console.
+func (c *Context) Tracing() bool {
+	return ui.IsActive(ui.TraceLogger)
 }
 
-// SetTokenizer sets a tokenizer in the current context for tracing and debugging.
+// SetTokenizer sets a tokenizer in the current context for use by
+// tracing and debugging operations. This gives those functions
+// access to the token stream used to compile the bytecode in this
+// context.
 func (c *Context) SetTokenizer(t *tokenizer.Tokenizer) *Context {
 	c.tokenizer = t
+
 	return c
 }
 
-// GetTokenizer gets the tokenizer in the current context for tracing and debugging.
+// GetTokenizer gets the tokenizer in the current context for
+// tracing and debugging.
 func (c *Context) GetTokenizer() *tokenizer.Tokenizer {
 	return c.tokenizer
 }
 
-func (c *Context) SetDugging(b bool) *Context {
-	c.debugging = b
+// AppendSymbols appends a symbol table to the current context.
+// This is used to add in compiler maps, for example.
+func (c *Context) AppendSymbols(s *symbols.SymbolTable) *Context {
+	for _, name := range s.Names() {
+		value, _ := s.Get(name)
+		c.symbols.SetAlways(name, value)
+	}
+
 	return c
 }
 
-func (c *Context) Debugging() bool {
-	return c.debugging
-}
-
-// AppendSymbols appends a symbol table to the current
-// context. This is used to add in compiler maps, for
-// example.
-func (c *Context) AppendSymbols(s symbols.SymbolTable) {
-	for k, v := range s.Symbols {
-		_ = c.symbols.SetAlways(k, v)
-	}
-}
-
 // SetByteCode attaches a new bytecode object to the current run context.
-func (c *Context) SetByteCode(b *ByteCode) {
+func (c *Context) SetByteCode(b *ByteCode) *Context {
 	c.bc = b
+
+	return c
 }
 
-func (c *Context) SetSingleStep(b bool) {
+// SetSingleStep enables or disables single-step mode. This has no
+// effect if debugging is not active.
+func (c *Context) SetSingleStep(b bool) *Context {
 	c.singleStep = b
+
+	return c
 }
+
+// SingleStep retrieves the current single-step setting for this
+// context. This is used in the debugger to know how to handle
+// break operations.
 func (c *Context) SingleStep() bool {
 	return c.singleStep
 }
 
-func (c *Context) SetStepOver(b bool) {
+// SetStepOver determines if single step operations step over a
+// function call, or step into it.
+func (c *Context) SetStepOver(b bool) *Context {
 	c.stepOver = b
+
+	return c
 }
 
+// GetModuleName returns the name of the current module (typically
+// the function name or program name).
 func (c *Context) GetModuleName() string {
-	return c.bc.Name
+	return c.bc.name
 }
 
-// SetConstant is a helper function to define a constant value
-func (c *Context) SetConstant(name string, v interface{}) error {
+// Pop removes the top-most item from the stack.
+func (c *Context) Pop() (interface{}, error) {
+	if c.stackPointer <= 0 || len(c.stack) < c.stackPointer {
+		return nil, c.error(errors.ErrStackUnderflow)
+	}
+
+	c.stackPointer = c.stackPointer - 1
+	value := c.stack[c.stackPointer]
+
+	return value, nil
+}
+
+// formatStack formats the stack for tracing output.
+func (c *Context) formatStack(syms *symbols.SymbolTable, newlines bool) string {
+	var result strings.Builder
+
+	stack := c.stack
+
+	if c.stackPointer == 0 {
+		return ""
+	}
+
+	first := true
+	for stackIndex := c.stackPointer - 1; stackIndex >= 0; stackIndex = stackIndex - 1 {
+		if !first && !newlines {
+			result.WriteString(", ")
+		}
+
+		if newlines && !first {
+			result.WriteString("\n")
+			result.WriteString(fmt.Sprintf("%95s      [%2d]: ", " ", stackIndex+1))
+		}
+
+		first = false
+
+		// If it's a string, escape the newlines for readability.
+
+		result.WriteString(data.FormatWithType(stack[stackIndex]))
+
+		if !newlines && result.Len() > 79 {
+			return result.String()[:76] + "..."
+		}
+	}
+
+	return result.String()
+}
+
+// setConstant is a helper function to define a constant value.
+func (c *Context) setConstant(name string, v interface{}) error {
 	return c.symbols.SetConstant(name, v)
 }
 
-// IsConstant is a helper function to define a constant value
-func (c *Context) IsConstant(name string) bool {
+// isConstant is a helper function to define a constant value.
+func (c *Context) isConstant(name string) bool {
 	return c.symbols.IsConstant(name)
 }
 
-// Get is a helper function that retrieves a symbol value from the associated
-// symbol table
-func (c *Context) Get(name string) (interface{}, bool) {
-
-	v, found := c.symbols.Get(name)
-	return v, found
+// get is a helper function that retrieves a symbol value from the associated
+// symbol table.
+func (c *Context) get(name string) (interface{}, bool) {
+	return c.symbols.Get(name)
 }
 
-// Set is a helper function that sets a symbol value in the associated
-// symbol table
-func (c *Context) Set(name string, value interface{}) error {
+// set is a helper function that sets a symbol value in the associated
+// symbol table.
+func (c *Context) set(name string, value interface{}) error {
 	return c.symbols.Set(name, value)
 }
 
-// SetAlways is a helper function that sets a symbol value in the associated
-// symbol table
-func (c *Context) SetAlways(name string, value interface{}) error {
-	return c.symbols.SetAlways(name, value)
+// setAlways is a helper function that sets a symbol value in the associated
+// symbol table.
+func (c *Context) setAlways(name string, value interface{}) {
+	c.symbols.SetAlways(name, value)
 }
 
-// Delete deletes a symbol from the current context
-func (c *Context) Delete(name string) error {
-	return c.symbols.Delete(name)
+// delete deletes a symbol from the current context.
+func (c *Context) delete(name string) error {
+	return c.symbols.Delete(name, false)
 }
 
-// Create creates a symbol
-func (c *Context) Create(name string) error {
+// create creates a symbol.
+func (c *Context) create(name string) error {
 	return c.symbols.Create(name)
 }
 
-// Pop removes the top-most item from the stack
-func (c *Context) Pop() (interface{}, error) {
-	if c.sp <= 0 || len(c.stack) < c.sp {
-		return nil, c.NewError(StackUnderflowError)
+// push puts a new items on the stack.
+func (c *Context) push(value interface{}) error {
+	if c.stackPointer >= len(c.stack) {
+		c.stack = append(c.stack, make([]interface{}, growStackBy)...)
 	}
 
-	c.sp = c.sp - 1
-	v := c.stack[c.sp]
-	return v, nil
-}
+	c.stack[c.stackPointer] = value
+	c.stackPointer = c.stackPointer + 1
 
-// Push puts a new items on the stack
-func (c *Context) Push(v interface{}) error {
-
-	if c.sp >= len(c.stack) {
-		c.stack = append(c.stack, make([]interface{}, GrowStackBy)...)
+	if c.stackPointer > int(MaxStackSize) {
+		atomic.StoreInt32(&MaxStackSize, int32(c.stackPointer))
 	}
-	c.stack[c.sp] = v
-	c.sp = c.sp + 1
+
 	return nil
 }
 
-// FormatStack formats the stack for tracing output
-func FormatStack(s []interface{}, newlines bool) string {
-
-	if len(s) == 0 {
-		return "<EOS>"
+// checkType is a utility function used to determine if a given value
+// could be stored in a named symbol. When the value is nil or dynamic
+// type checking is enabled (the default) then no action occurs.
+//
+// Otherwise, the symbol name is used to look up the current value (if
+// any) of the symbol. If it exists, then the type of the value being
+// proposed must match the type of the existing value.
+func (c *Context) checkType(name string, value interface{}) (interface{}, error) {
+	if c.typeStrictness > 1 || value == nil {
+		return value, nil
 	}
-	var b strings.Builder
-	if newlines {
-		b.WriteString("\n")
-	}
 
-	for n := len(s) - 1; n >= 0; n = n - 1 {
+	if existingValue, ok := c.get(name); ok {
+		if existingValue == nil {
+			return value, nil
+		}
 
-		if n < len(s)-1 {
-			b.WriteString(", ")
-			if newlines {
-				b.WriteString("\n")
+		if _, ok := existingValue.(symbols.UndefinedValue); ok {
+			return value, nil
+		}
+
+		if c.typeStrictness == 1 {
+			newT := data.TypeOf(value)
+			oldT := data.TypeOf(existingValue)
+
+			if newT.IsIntegerType() && oldT.IsIntegerType() {
+				value = data.Coerce(value, existingValue)
+			}
+
+			if newT.IsFloatType() && oldT.IsFloatType() {
+				value = data.Coerce(value, existingValue)
 			}
 		}
 
-		b.WriteString(util.Format(s[n]))
-		if !newlines && b.Len() > 50 {
-			return b.String()[:50] + "..."
+		if reflect.TypeOf(value) != reflect.TypeOf(existingValue) {
+			return nil, c.error(errors.ErrInvalidVarType)
 		}
 	}
-	return b.String()
+
+	return value, nil
 }
 
-// GetConfig retrieves a runtime configuration item from the
-// __config data structure. If not found, it also queries
-// the persistence layer.
-func (c *Context) GetConfig(name string) interface{} {
-	var i interface{}
-
-	if config, ok := c.Get("_config"); ok {
-		if cfgMap, ok := config.(map[string]interface{}); ok {
-			if cfgValue, ok := cfgMap[name]; ok {
-				i = cfgValue
-			}
-		}
-	}
-	return i
+func (c *Context) Result() interface{} {
+	return c.result
 }
 
-func (c *Context) checkType(name string, value interface{}) error {
+func (c *Context) popSymbolTable() error {
+	if c.symbols.IsRoot() {
+		ui.Log(ui.SymbolLogger, "(%d) nil symbol table parent of %s", c.threadID, c.symbols.Name)
 
-	var err error
-	if !c.Static || value == nil {
-		return err
+		return errors.ErrInternalCompiler.Context("Attempt to pop root table")
 	}
-	if oldValue, ok := c.Get(name); ok {
-		if oldValue == nil {
-			return err
-		}
-		if reflect.TypeOf(value) != reflect.TypeOf(oldValue) {
-			err = errors.New(InvalidVarTypeError)
-		}
+
+	if c.symbols == c.symbols.Parent() {
+		return errors.ErrInternalCompiler.Context("Symbol Table Cycle Error")
 	}
-	return err
+
+	name := c.symbols.Name
+	c.symbols = c.symbols.Parent()
+
+	for strings.HasPrefix(c.symbols.Name, "pkg func ") {
+		if c.symbols.IsRoot() {
+			break
+		}
+
+		c.symbols = c.symbols.Parent()
+	}
+
+	ui.Log(ui.SymbolLogger, "(%d) pop symbol table; \"%s\" => \"%s\"",
+		c.threadID, name, c.symbols.Name)
+
+	return nil
 }

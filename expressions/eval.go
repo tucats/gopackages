@@ -2,7 +2,6 @@ package expressions
 
 import (
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/functions"
 	"github.com/tucats/gopackages/symbols"
 )
 
@@ -22,7 +21,7 @@ func (e *Expression) Eval(s *symbols.SymbolTable) (interface{}, error) {
 	}
 
 	// Add the builtin functions
-	functions.AddBuiltins(s)
+	//functions.AddBuiltins(s)
 
 	// Run the generated code to get a result
 	ctx := bytecode.NewContext(s, e.b)

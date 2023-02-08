@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"syscall"
 
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 // Prompt prints a prompt string, and gets input from the console.
@@ -15,12 +14,13 @@ import (
 // returned as a string.
 func Prompt(p string) string {
 	reader := bufio.NewReader(os.Stdin)
+
 	if !IsConsolePipe() {
 		fmt.Printf("%s", p)
 	}
-	buffer, _ := reader.ReadString('\n')
 
 	//Remove any extra line endings (CRLF or LF)
+	buffer, _ := reader.ReadString('\n')
 	buffer = strings.Replace(buffer, "\r\n", "", -1)
 	buffer = strings.Replace(buffer, "\n", "", -1)
 
@@ -35,9 +35,10 @@ func PromptPassword(p string) string {
 	if !IsConsolePipe() {
 		fmt.Print(p)
 	}
-	bytePassword, _ := terminal.ReadPassword(int(syscall.Stdin))
 
+	bytePassword, _ := term.ReadPassword(int(os.Stdin.Fd()))
 	password := string(bytePassword)
+
 	fmt.Println() // it's necessary to add a new line after user's input
 
 	return password
@@ -47,5 +48,10 @@ func PromptPassword(p string) string {
 // is used to manage prompts, etc.
 func IsConsolePipe() bool {
 	fi, _ := os.Stdin.Stat() // get the FileInfo struct describing the standard input.
-	return (fi.Mode() & os.ModeCharDevice) == 0
+
+	isPipe := (fi.Mode() & os.ModeCharDevice) == 0
+
+	Log(AppLogger, "Console pipe: %v", isPipe)
+
+	return isPipe
 }

@@ -3,37 +3,30 @@ package compiler
 import (
 	"sort"
 	"strings"
+	"sync"
 
-	"github.com/tucats/gopackages/app-cli/persistence"
+	"github.com/google/uuid"
+	"github.com/tucats/gopackages/app-cli/settings"
+	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/builtins"
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/datatypes"
-	"github.com/tucats/gopackages/functions"
+	"github.com/tucats/gopackages/data"
+	"github.com/tucats/gopackages/defs"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/tokenizer"
-	"github.com/tucats/gopackages/util"
 )
 
-const (
-	indexLoopType       = 1
-	rangeLoopType       = 2
-	forLoopType         = 3
-	conditionalLoopType = 4
-
-	ExtensionsSetting = "ego.compiler.extensions"
-	EgoPathSetting    = "ego.path"
-)
-
-// RequiredPackages is the list of packages that are always imported, regardless
+// requiredPackages is the list of packages that are always imported, regardless
 // of user import statements or auto-import profile settings.
-var RequiredPackages []string = []string{
-	"util",
+var requiredPackages []string = []string{
+	"os",
 	"profile",
 }
 
-// Loop is a structure that defines a loop type.
-type Loop struct {
-	Parent *Loop
-	Type   int
+// loop is a structure that defines a loop type.
+type loop struct {
+	parent   *loop
+	loopType int
 	// Fixup locations for break or continue statements in a
 	// loop. These are the addresses that must be fixed up with
 	// a target address pointing to exit point or start of the loop.
@@ -41,125 +34,240 @@ type Loop struct {
 	continues []int
 }
 
-// FunctionDictionary is a list of functions and the bytecode or native function pointer
-type FunctionDictionary map[string]interface{}
-
-// PackageDictionary is a list of packages each with a FunctionDictionary
-type PackageDictionary map[string]FunctionDictionary
-
-// Compiler is a structure defining what we know about the compilation
-type Compiler struct {
-	PackageName          string
-	SourceFile           string
-	b                    *bytecode.ByteCode
-	t                    *tokenizer.Tokenizer
-	s                    *symbols.SymbolTable
-	loops                *Loop
-	coerce               []*bytecode.ByteCode
-	constants            []string
-	deferQueue           []int
-	packages             PackageDictionary
-	blockDepth           int
-	statementCount       int
-	LowercaseIdentifiers bool
-	extensionsEnabled    bool
-	exitEnabled          bool // Only true in interactive mode
+// flagSet contains flags that generally identify the state of
+// the compiler at any given moment. For example, when parsing
+// something like a switch conditional value, the value cannot
+// be a struct initializer, though that is allowed elsewhere.
+type flagSet struct {
+	disallowStructInits   bool
+	extensionsEnabled     bool
+	normalizedIdentifiers bool
+	strictTypes           bool
+	testMode              bool
+	mainSeen              bool
 }
 
-// New creates a new compiler instance
-func New() *Compiler {
-	cInstance := Compiler{
-		b:                    nil,
-		t:                    nil,
-		s:                    &symbols.SymbolTable{Name: "compile-unit"},
-		constants:            make([]string, 0),
-		deferQueue:           make([]int, 0),
-		packages:             PackageDictionary{},
-		LowercaseIdentifiers: false,
-		extensionsEnabled:    persistence.GetBool(ExtensionsSetting),
+// Compiler is a structure defining what we know about the compilation.
+type Compiler struct {
+	activePackageName string
+	sourceFile        string
+	id                string
+	b                 *bytecode.ByteCode
+	t                 *tokenizer.Tokenizer
+	s                 *symbols.SymbolTable
+	rootTable         *symbols.SymbolTable
+	loops             *loop
+	coercions         []*bytecode.ByteCode
+	constants         []string
+	deferQueue        []int
+	packages          map[string]*data.Package
+	packageMutex      sync.Mutex
+	types             map[string]*data.Type
+	functionDepth     int
+	blockDepth        int
+	statementCount    int
+	flags             flagSet // Use to hold parser state flags
+	exitEnabled       bool    // Only true in interactive mode
+}
+
+// New creates a new compiler instance.
+func New(name string) *Compiler {
+	extensions := settings.GetBool(defs.ExtensionsEnabledSetting)
+	if v, ok := symbols.RootSymbolTable.Get(defs.ExtensionsEnabledSetting); ok {
+		extensions = data.Bool(v)
 	}
+
+	typeChecking := settings.GetBool(defs.StaticTypesSetting)
+	if v, ok := symbols.RootSymbolTable.Get(defs.TypeCheckingVariable); ok {
+		typeChecking = (data.Int(v) == defs.StrictTypeEnforcement)
+	}
+
+	cInstance := Compiler{
+		b:            bytecode.New(name),
+		t:            nil,
+		s:            symbols.NewRootSymbolTable(name),
+		id:           uuid.NewString(),
+		constants:    make([]string, 0),
+		deferQueue:   make([]int, 0),
+		types:        map[string]*data.Type{},
+		packageMutex: sync.Mutex{},
+		packages:     map[string]*data.Package{},
+		flags: flagSet{
+			normalizedIdentifiers: false,
+			extensionsEnabled:     extensions,
+			strictTypes:           typeChecking,
+		},
+		rootTable: &symbols.RootSymbolTable,
+	}
+
 	return &cInstance
 }
 
-// If set to true, the compiler allows the EXIT statement
+// NormalizedIdentifiers returns true if this instance of the compiler is folding
+// all identifiers to a common (lower) case.
+func (c *Compiler) NormalizedIdentifiers() bool {
+	return c.flags.normalizedIdentifiers
+}
+
+// SetNormalizedIdentifiers sets the flag indicating if this compiler instance is
+// folding all identifiers to a common case. This function supports attribute
+// chaining for a compiler instance.
+func (c *Compiler) SetNormalizedIdentifiers(flag bool) *Compiler {
+	c.flags.normalizedIdentifiers = flag
+
+	return c
+}
+
+// Override the default root symbol table for this compilation. This determines
+// where package names are stored/found, for example. This is overridden by the
+// web service handlers as they have per-call instances of root. This function
+// supports attribute chaining for a compiler instance.
+func (c *Compiler) SetRoot(s *symbols.SymbolTable) *Compiler {
+	c.rootTable = s
+	c.s.SetParent(s)
+
+	return c
+}
+
+// If set to true, the compiler allows the "exit" statement. This function supports
+// attribute chaining for a compiler instance.
 func (c *Compiler) ExitEnabled(b bool) *Compiler {
 	c.exitEnabled = b
+
 	return c
 }
 
-// If set to true, the compiler allows the PRINT, TRY/CATCH, etc. statements
+// TesetMode returns whether the compiler is being used under control
+// of the Ego "test" command, which has slightly different rules for
+// block constructs.
+func (c *Compiler) TestMode() bool {
+	return c.flags.testMode
+}
+
+// MainSeen indicates if a "package main" has been seen in this
+// compilation.
+func (c *Compiler) MainSeen() bool {
+	return c.flags.mainSeen
+}
+
+// SetTestMode is used to set the test mode indicator for the compiler.
+// This is set to true only when running in Ego "test" mode. This
+// function supports attribute chaining for a compiler instance.
+func (c *Compiler) SetTestMode(b bool) *Compiler {
+	c.flags.testMode = b
+
+	return c
+}
+
+// Set the given symbol table as the default symbol table for
+// compilation. This mostly affects how builtins are processed.
+// This function supports attribute chaining for a compiler instance.
+func (c *Compiler) WithSymbols(s *symbols.SymbolTable) *Compiler {
+	c.s = s
+
+	return c
+}
+
+// If set to true, the compiler allows the PRINT, TRY/CATCH, etc. statements.
+// This function supports attribute chaining for a compiler instance.
 func (c *Compiler) ExtensionsEnabled(b bool) *Compiler {
-	c.extensionsEnabled = b
+	c.flags.extensionsEnabled = b
+
 	return c
 }
 
-// WithTokens supplies the token stream to a compiler
+// WithTokens supplies the token stream to a compiler. This function supports
+// attribute chaining for a compiler instance.
 func (c *Compiler) WithTokens(t *tokenizer.Tokenizer) *Compiler {
 	c.t = t
+
 	return c
 }
 
-// WithNormalization sets the normalization flag and can be chained
-// onto a compiler.New...() operation
+// WithNormalization sets the normalization flag. This function supports
+// attribute chaining for a compiler instance.
 func (c *Compiler) WithNormalization(f bool) *Compiler {
-	c.LowercaseIdentifiers = f
+	c.flags.normalizedIdentifiers = f
+
 	return c
-}
-
-// CompileString turns a string into a compilation unit. This is a helper function
-// around the Compile() operation that removes the need for the caller
-// to provide a tokenizer.
-func (c *Compiler) CompileString(name string, source string) (*bytecode.ByteCode, error) {
-	t := tokenizer.New(source)
-	return c.Compile(name, t)
-}
-
-// Compile starts a compilation unit, and returns a bytecode
-// of the compiled material.
-func (c *Compiler) Compile(name string, t *tokenizer.Tokenizer) (*bytecode.ByteCode, error) {
-
-	c.b = bytecode.New(name)
-	c.t = t
-
-	c.t.Reset()
-
-	for !c.t.AtEnd() {
-		err := c.Statement()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Merge in any package definitions
-	c.AddPackageToSymbols(c.b.Symbols)
-
-	// Also merge in any other symbols created for this function
-	c.b.Symbols.Merge(c.Symbols())
-
-	return c.b, nil
 }
 
 // AddBuiltins adds the builtins for the named package (or prebuilt builtins if the package name
-// is empty)
+// is empty).
 func (c *Compiler) AddBuiltins(pkgname string) bool {
-
 	added := false
-	for name, f := range functions.FunctionDictionary {
+
+	pkg, _ := bytecode.GetPackage(pkgname)
+	symV, _ := pkg.Get(data.SymbolsMDKey)
+	syms := symV.(*symbols.SymbolTable)
+
+	ui.Log(ui.CompilerLogger, "### Adding builtin packages to %s package", pkgname)
+
+	functionNames := make([]string, 0)
+	for k := range builtins.FunctionDictionary {
+		functionNames = append(functionNames, k)
+	}
+
+	sort.Strings(functionNames)
+
+	for _, name := range functionNames {
+		f := builtins.FunctionDictionary[name]
 
 		if dot := strings.Index(name, "."); dot >= 0 {
 			f.Pkg = name[:dot]
-			name = name[dot+1:]
+			f.Name = name[dot+1:]
+			name = f.Name
+		} else {
+			f.Name = name
 		}
 
 		if f.Pkg == pkgname {
-			if f.F != nil {
-				_ = c.AddPackageFunction(pkgname, name, f.F)
-				added = true
+			if ui.IsActive(ui.CompilerLogger) {
+				debugName := name
+				if f.Pkg != "" {
+					debugName = f.Pkg + "." + name
+				}
+
+				ui.Log(ui.CompilerLogger, "... processing builtin %s", debugName)
+			}
+
+			added = true
+
+			if pkgname == "" && c.s != nil {
+				syms.SetAlways(name, f.F)
+				pkg.Set(name, f.F)
 			} else {
-				_ = c.AddPackageValue(pkgname, name, f.V)
+				if f.F != nil {
+					syms.SetAlways(name, f.F)
+					pkg.Set(name, f.F)
+				} else {
+					syms.SetAlways(name, f.V)
+					pkg.Set(name, f.V)
+				}
 			}
 		}
 	}
+
+	return added
+}
+
+// AddStandard adds the package-independent standard functions (like len() or make()) to the
+// given symbol table.
+func (c *Compiler) AddStandard(s *symbols.SymbolTable) bool {
+	added := false
+
+	if s == nil {
+		return false
+	}
+
+	ui.Log(ui.CompilerLogger, "Adding standard functions to %s (%v)", s.Name, s.ID())
+
+	for name, f := range builtins.FunctionDictionary {
+		if dot := strings.Index(name, "."); dot < 0 {
+			_ = s.SetConstant(name, f.F)
+		}
+	}
+
 	return added
 }
 
@@ -168,150 +276,145 @@ func (c *Compiler) Get(name string) (interface{}, bool) {
 	return c.s.Get(name)
 }
 
-// Normalize performs case-normalization based on the current
-// compiler settings
-func (c *Compiler) Normalize(name string) string {
-	if c.LowercaseIdentifiers {
+// normalize performs case-normalization based on the current
+// compiler settings.
+func (c *Compiler) normalize(name string) string {
+	if c.flags.normalizedIdentifiers {
 		return strings.ToLower(name)
 	}
+
 	return name
 }
 
-// AddPackageFunction adds a new package function to the compiler's package dictionary. If the
-// package name does not yet exist, it is created. The function name and interface are then used
-// to add an entry for that package.
-func (c *Compiler) AddPackageFunction(pkgname string, name string, function interface{}) error {
+// normalizeToken performs case-normalization based on the current
+// compiler settings for an identifier token.
+func (c *Compiler) normalizeToken(t tokenizer.Token) tokenizer.Token {
+	if t.IsIdentifier() && c.flags.normalizedIdentifiers {
+		return tokenizer.NewIdentifierToken(strings.ToLower(t.Spelling()))
+	}
 
-	fd, found := c.packages[pkgname]
-	if !found {
-		fd = FunctionDictionary{}
-		fd[datatypes.MetadataKey] = map[string]interface{}{
-			datatypes.TypeMDKey:     "dictionary",
-			datatypes.ReadonlyMDKey: true,
+	return t
+}
+
+// SetInteractive indicates if the compilation is happening in interactive
+// (i.e. REPL) mode. This function supports attribute chaining for a compiler
+// instance.
+func (c *Compiler) SetInteractive(b bool) *Compiler {
+	if b {
+		c.functionDepth++
+	}
+
+	return c
+}
+
+var packageMerge sync.Mutex
+
+// AddPackageToSymbols adds all the defined packages for this compilation
+// to the given symbol table. This function supports attribute chaining
+// for a compiler instance.
+func (c *Compiler) AddPackageToSymbols(s *symbols.SymbolTable) *Compiler {
+	ui.Log(ui.CompilerLogger, "Adding compiler packages to %s(%v)", s.Name, s.ID())
+	packageMerge.Lock()
+	defer packageMerge.Unlock()
+
+	for packageName, packageDictionary := range c.packages {
+		// Skip over any metadata
+		if strings.HasPrefix(packageName, data.MetadataPrefix) {
+			continue
 		}
-	}
 
-	if _, found := fd[name]; found {
-		return c.NewError(FunctionAlreadyExistsError)
-	}
-	fd[name] = function
-	c.packages[pkgname] = fd
+		m := data.NewPackage(packageName)
 
-	return nil
-}
+		keys := packageDictionary.Keys()
+		if len(keys) == 0 {
+			continue
+		}
 
-// AddPackageFunction adds a new package function to the compiler's package dictionary. If the
-// package name does not yet exist, it is created. The function name and interface are then used
-// to add an entry for that package.
-func (c *Compiler) AddPackageValue(pkgname string, name string, value interface{}) error {
-
-	fd, found := c.packages[pkgname]
-	if !found {
-		fd = FunctionDictionary{}
-		datatypes.SetMetadata(fd, datatypes.TypeMDKey, "package")
-		datatypes.SetMetadata(fd, datatypes.ReadonlyMDKey, true)
-	}
-
-	if _, found := fd[name]; found {
-		return c.NewError(FunctionAlreadyExistsError)
-	}
-	fd[name] = value
-	c.packages[pkgname] = fd
-
-	return nil
-}
-
-// AddPackageToSymbols adds all the defined packages for this compilation to the named symbol table.
-func (c *Compiler) AddPackageToSymbols(s *symbols.SymbolTable) {
-
-	for pkgname, dict := range c.packages {
-
-		m := map[string]interface{}{}
-		for k, v := range dict {
+		for _, k := range keys {
+			v, _ := packageDictionary.Get(k)
+			// Do we already have a package of this name defined?
+			_, found := s.Get(k)
+			if found {
+				ui.Log(ui.CompilerLogger, "Duplicate package %s already in table", k)
+			}
 
 			// If the package name is empty, we add the individual items
-			if pkgname == "" {
+			if packageName == "" {
 				_ = s.SetConstant(k, v)
 			} else {
 				// Otherwise, copy the entire map
-				m[k] = v
+				m.Set(k, v)
 			}
 		}
 		// Make sure the package is marked as readonly so the user can't modify
 		// any function definitions, etc. that are built in.
-		datatypes.SetMetadata(m, datatypes.TypeMDKey, "package")
-		datatypes.SetMetadata(m, datatypes.ReadonlyMDKey, true)
+		m.Set(data.TypeMDKey, data.PackageType(packageName))
+		m.Set(data.ReadonlyMDKey, true)
 
-		if pkgname != "" {
-			_ = s.SetConstant(pkgname, m)
+		if packageName != "" {
+			s.SetAlways(packageName, m)
 		}
 	}
+
+	return c
 }
 
-// StatementEnd returns true when the next token is
-// the end-of-statement boundary
-func (c *Compiler) StatementEnd() bool {
+// isStatementEnd returns true when the next token is
+// the end-of-statement boundary.
+func (c *Compiler) isStatementEnd() bool {
 	next := c.t.Peek(1)
-	return util.InList(next, tokenizer.EndOfTokens, ";", "}")
+
+	return tokenizer.InList(next, tokenizer.EndOfTokens, tokenizer.SemicolonToken, tokenizer.BlockEndToken)
 }
 
-// Symbols returns the symbol table map from compilation
+// Symbols returns the symbol table map from compilation.
 func (c *Compiler) Symbols() *symbols.SymbolTable {
 	return c.s
 }
 
-// AutoImport arranges for the import of built-in packages. The
-// parameter indicates if all available packages (including those
-// found in the ego path) are imported, versus just essential
-// packages like "util".
-func (c *Compiler) AutoImport(all bool) error {
-
-	// Start by making a list of the packages. If we need all packages,
-	// scan all the built-in function names for package names. We ignore
-	// functions that don't have package names as those are already
-	// available.
-	//
-	// If we aren't loading all packages, at least always load "util"
-	// which is required for the exit command to function.
-	uniqueNames := map[string]bool{}
-	if all {
-		for fn := range functions.FunctionDictionary {
-			dot := strings.Index(fn, ".")
-			if dot > 0 {
-				fn = fn[:dot]
-				uniqueNames[fn] = true
-			}
-		}
-	} else {
-		for _, p := range RequiredPackages {
-			uniqueNames[p] = true
-			uniqueNames[p] = true
-		}
+// Clone makes a new copy of the current compiler. The withLock flag
+// indicates if the clone should respect symbol table locking. This
+// function supports attribute chaining for a compiler instance.
+func (c *Compiler) Clone(withLock bool) *Compiler {
+	cx := Compiler{
+		activePackageName: c.activePackageName,
+		sourceFile:        c.sourceFile,
+		b:                 c.b,
+		t:                 c.t,
+		s:                 c.s.Clone(withLock),
+		rootTable:         c.s.Clone(withLock),
+		coercions:         c.coercions,
+		constants:         c.constants,
+		packageMutex:      sync.Mutex{},
+		deferQueue:        []int{},
+		flags: flagSet{
+			normalizedIdentifiers: c.flags.normalizedIdentifiers,
+			extensionsEnabled:     c.flags.extensionsEnabled,
+		},
+		exitEnabled: c.exitEnabled,
 	}
 
-	// Make the order stable
-	sortedPackageNames := []string{}
-	for k := range uniqueNames {
-		sortedPackageNames = append(sortedPackageNames, k)
-	}
-	sort.Strings(sortedPackageNames)
+	packages := map[string]*data.Package{}
 
-	savedBC := c.b
-	savedT := c.t
-	savedSource := c.SourceFile
+	c.packageMutex.Lock()
+	defer c.packageMutex.Unlock()
 
-	var firstError error
-	for _, packageName := range sortedPackageNames {
-		text := "import " + packageName
-		_, err := c.CompileString(packageName, text)
-		if err == nil {
-			firstError = err
+	for n, m := range c.packages {
+		packageDef := data.NewPackage(n)
+
+		keys := m.Keys()
+		for _, k := range keys {
+			v, _ := m.Get(k)
+			packageDef.Set(k, v)
 		}
 
+		packages[n] = packageDef
 	}
-	c.b = savedBC
-	c.t = savedT
-	c.SourceFile = savedSource
 
-	return firstError
+	// Put the newly created data in the copy of the compiler, with
+	// it's own mutex
+	cx.packageMutex = sync.Mutex{}
+	cx.packages = packages
+
+	return &cx
 }

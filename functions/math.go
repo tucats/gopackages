@@ -3,6 +3,7 @@ package functions
 import (
 	"math"
 
+	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -19,7 +20,7 @@ func Min(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 	for _, v := range args[1:] {
 		v = util.Coerce(v, r)
 		if v == nil {
-			return nil, NewError("min", InvalidTypeError)
+			return nil, errors.ErrInvalidType
 		}
 		switch r.(type) {
 		case int:
@@ -42,7 +43,7 @@ func Min(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 				r = v
 			}
 		default:
-			return nil, NewError("min", InvalidTypeError)
+			return nil, errors.ErrInvalidType
 
 		}
 	}
@@ -61,7 +62,7 @@ func Max(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 	for _, v := range args[1:] {
 		v = util.Coerce(v, r)
 		if v == nil {
-			return nil, NewError("max", InvalidTypeError)
+			return nil, errors.ErrInvalidType
 		}
 		switch rr := r.(type) {
 		case int:
@@ -85,7 +86,7 @@ func Max(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 			}
 
 		default:
-			return nil, NewError("max", InvalidTypeError)
+			return nil, errors.ErrInvalidType
 		}
 	}
 	return r, nil
@@ -98,7 +99,7 @@ func Sum(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 	for _, addend := range args[1:] {
 		addend = util.Coerce(addend, base)
 		if addend == nil {
-			return nil, NewError("sum", InvalidTypeError)
+			return nil, errors.ErrInvalidType
 		}
 		switch addend.(type) {
 		case int:
@@ -111,7 +112,7 @@ func Sum(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 		case bool:
 			base = base.(bool) || addend.(bool)
 		default:
-			return nil, NewError("sum", InvalidTypeError)
+			return nil, errors.ErrInvalidType
 
 		}
 	}

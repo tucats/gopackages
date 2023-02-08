@@ -1,248 +1,448 @@
 package compiler
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/datatypes"
+	"github.com/tucats/gopackages/data"
+	"github.com/tucats/gopackages/defs"
+	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/tokenizer"
-	"github.com/tucats/gopackages/util"
 )
 
 func (c *Compiler) expressionAtom() error {
-
 	t := c.t.Peek(1)
 
-	// Is this the make() function?
-	if t == "make" && c.t.Peek(2) == "(" {
-		return c.Make()
-	}
-	// Is this the "nil" constant?
-	if t == "nil" {
+	// Is it a short-form try/catch?
+	if t == tokenizer.OptionalToken {
 		c.t.Advance(1)
-		c.b.Emit(bytecode.Push, nil)
-		return nil
+
+		return c.optional()
 	}
 
-	// Is an interface?
-	if t == "interface{}" {
+	// Is it a binary constant? If so, convert to decimal.
+	text := t.Spelling()
+	if strings.HasPrefix(strings.ToLower(text), "0b") {
+		binaryValue := 0
+		fmt.Sscanf(text[2:], "%b", &binaryValue)
+		t = tokenizer.NewIntegerToken(strconv.Itoa(binaryValue))
+	}
+
+	// Is it a hexadecimal constant? If so, convert to decimal.
+	if strings.HasPrefix(strings.ToLower(text), "0x") {
+		hexValue := 0
+		fmt.Sscanf(strings.ToLower(text[2:]), "%x", &hexValue)
+		t = tokenizer.NewIntegerToken(strconv.Itoa(hexValue))
+	}
+
+	// Is it an octal constant? If so, convert to decimal.
+	if strings.HasPrefix(strings.ToLower(text), "0o") {
+		octalValue := 0
+		fmt.Sscanf(strings.ToLower(text[2:]), "%o", &octalValue)
+		t = tokenizer.NewIntegerToken(strconv.Itoa(octalValue))
+	}
+
+	// Is this the "nil" constant?
+	if t == tokenizer.NilToken {
 		c.t.Advance(1)
-		c.b.Emit(bytecode.Push, map[string]interface{}{
-			datatypes.MetadataKey: map[string]interface{}{
-				datatypes.TypeMDKey: "interface{}",
-			}})
+		c.b.Emit(bytecode.Push, nil)
+
 		return nil
 	}
 
 	// Is an empty struct?
-	if t == "{}" {
+	if t == tokenizer.EmptyInitializerToken {
 		c.t.Advance(1)
-		c.b.Emit(bytecode.Push, map[string]interface{}{})
+		c.b.Emit(bytecode.Push, data.NewStruct(data.StructType).SetStatic(false))
+
 		return nil
 	}
 
-	// Is this a function definition?
-	if t == "func" && c.t.Peek(2) == "(" {
+	// Is this address-of?
+	if t == tokenizer.AddressToken {
 		c.t.Advance(1)
-		return c.Function(true)
-	}
 
-	// Is this a parenthesis expression?
-	if t == "(" {
-		c.t.Advance(1)
-		err := c.conditional()
-		if err != nil {
-			return err
-		}
-
-		if c.t.Next() != ")" {
-			return c.NewError(MissingParenthesisError)
-		}
-		return nil
-	}
-
-	// Is this an array constant?
-	if t == "[" {
-		return c.parseArray()
-	}
-
-	// Is it a map constant?
-	if t == "{" {
-		return c.parseStruct()
-	}
-	// If the token is a number, convert it
-	if i, err := strconv.Atoi(t); err == nil {
-		c.t.Advance(1)
-		c.b.Emit(bytecode.Push, i)
-		return nil
-	}
-
-	if i, err := strconv.ParseFloat(t, 64); err == nil {
-		c.t.Advance(1)
-		c.b.Emit(bytecode.Push, i)
-		return nil
-	}
-
-	if t == "true" || t == "false" {
-		c.t.Advance(1)
-		c.b.Emit(bytecode.Push, (t == "true"))
-		return nil
-	}
-
-	runeValue := t[0:1]
-	if runeValue == "\"" {
-		c.t.Advance(1)
-		s, err := strconv.Unquote(t)
-		c.b.Emit(bytecode.Push, s)
-		return err
-	}
-	if runeValue == "`" {
-		c.t.Advance(1)
-		s, err := c.unLit(t)
-		c.b.Emit(bytecode.Push, s)
-		return err
-	}
-	if tokenizer.IsSymbol(t) {
-		c.t.Advance(1)
-		t = c.Normalize(t)
-		// Is it a generator for a type?
-		if c.t.Peek(1) == "{" && tokenizer.IsSymbol(c.t.Peek(2)) && c.t.Peek(3) == ":" {
-			c.b.Emit(bytecode.Load, t)
-			c.b.Emit(bytecode.Push, "__type")
-			c.b.Emit(bytecode.LoadIndex)
-			c.b.Emit(bytecode.Push, "__type")
+		// If it's address of a symbol, short-circuit that
+		if c.t.Peek(1).IsIdentifier() {
+			c.b.Emit(bytecode.AddressOf, c.t.Next())
+		} else {
+			// Address of an expression requires creating a temp symbol
 			err := c.expressionAtom()
 			if err != nil {
 				return err
 			}
-			i := c.b.Opcodes()
-			ix := i[len(i)-1]
-			ix.Operand = util.GetInt(ix.Operand) + 1
-			i[len(i)-1] = ix
-			return nil
-		}
-		if c.t.IsNext("{}") {
-			c.b.Emit(bytecode.Load, "new")
-			c.b.Emit(bytecode.Load, t)
-			c.b.Emit(bytecode.Call, 1)
-		} else {
-			c.b.Emit(bytecode.Load, t)
-		}
-		return nil
 
+			tempName := data.GenerateName()
+
+			c.b.Emit(bytecode.StoreAlways, tempName)
+			c.b.Emit(bytecode.AddressOf, tempName)
+		}
+
+		return nil
 	}
 
-	return c.NewError(UnexpectedTokenError, t)
+	// Is this dereference?
+	if t == tokenizer.PointerToken {
+		c.t.Advance(1)
+
+		// If it's dereference of a symbol, short-circuit that
+		if c.t.Peek(1).IsIdentifier() {
+			name := c.t.Next()
+			c.b.Emit(bytecode.DeRef, name)
+		} else {
+			// Dereference of an expression requires creating a temp symbol
+			err := c.expressionAtom()
+			if err != nil {
+				return err
+			}
+
+			tempName := data.GenerateName()
+
+			c.b.Emit(bytecode.StoreAlways, tempName)
+			c.b.Emit(bytecode.DeRef, tempName)
+		}
+
+		return nil
+	}
+
+	// Is this a parenthesis expression?
+	if t == tokenizer.StartOfListToken {
+		c.t.Advance(1)
+
+		err := c.conditional()
+		if err != nil {
+			return err
+		}
+
+		if c.t.Next() != tokenizer.EndOfListToken {
+			return c.error(errors.ErrMissingParenthesis)
+		}
+
+		return nil
+	}
+
+	// Is this an array constant?
+	if t == tokenizer.StartOfArrayToken && c.t.Peek(2) != tokenizer.EndOfArrayToken {
+		return c.parseArray()
+	}
+
+	// Is it a map constant?
+	if t == tokenizer.DataBeginToken {
+		return c.parseStruct()
+	}
+
+	if t == tokenizer.StructToken && c.t.Peek(2) == tokenizer.DataBeginToken {
+		c.t.Advance(1)
+
+		return c.parseStruct()
+	}
+
+	// If the token is a number, convert it
+	if t.IsClass(tokenizer.IntegerTokenClass) {
+		if i, err := strconv.ParseInt(text, 10, 32); err == nil {
+			c.t.Advance(1)
+			c.b.Emit(bytecode.Push, int(i))
+
+			return nil
+		}
+
+		if i, err := strconv.ParseInt(text, 10, 64); err == nil {
+			c.t.Advance(1)
+			c.b.Emit(bytecode.Push, i)
+
+			return nil
+		}
+	}
+
+	if t.IsClass(tokenizer.FloatTokenClass) {
+		if i, err := strconv.ParseFloat(text, 64); err == nil {
+			c.t.Advance(1)
+			c.b.Emit(bytecode.Push, i)
+
+			return nil
+		}
+	}
+
+	if t.IsClass(tokenizer.BooleanTokenClass) {
+		if text == defs.True || text == defs.False {
+			c.t.Advance(1)
+			c.b.Emit(bytecode.Push, (text == defs.True))
+
+			return nil
+		}
+	}
+
+	if t.IsValue() {
+		c.t.Advance(1)
+		c.b.Emit(bytecode.Push, t)
+
+		return nil
+	}
+
+	// Is it a type cast?
+	if c.t.Peek(2) == tokenizer.StartOfListToken {
+		mark := c.t.Mark()
+
+		if typeSpec, err := c.parseType("", true); err == nil {
+			if c.t.IsNext(tokenizer.StartOfListToken) { // Skip the parentheses
+				b, err := c.Expression()
+				if err == nil {
+					for c.t.IsNext(tokenizer.CommaToken) {
+						b2, e2 := c.Expression()
+						if e2 == nil {
+							b.Append(b2)
+						} else {
+							err = e2
+
+							break
+						}
+					}
+				}
+
+				if err == nil && c.t.Peek(1) == tokenizer.EndOfListToken {
+					c.t.Next()
+					c.b.Emit(bytecode.Push, typeSpec)
+					c.b.Append(b)
+					c.b.Emit(bytecode.Call, 1)
+
+					return err
+				}
+			}
+		}
+
+		c.t.Set(mark)
+	}
+
+	// Watch out for function calls here.
+	isPanic := c.flags.extensionsEnabled && (c.t.Peek(1) == tokenizer.PanicToken)
+	if !isPanic && c.t.Peek(2) != tokenizer.StartOfListToken {
+		marker := c.t.Mark()
+
+		if typeSpec, err := c.parseType("", true); err == nil {
+			// Is there an initial value for the type?
+			if c.t.Peek(1) == tokenizer.DataBeginToken {
+				err = c.compileInitializer(typeSpec)
+
+				return err
+			}
+
+			if c.t.IsNext(tokenizer.EmptyInitializerToken) {
+				c.b.Emit(bytecode.Load, "$new")
+				c.b.Emit(bytecode.Push, typeSpec)
+				c.b.Emit(bytecode.Call, 1)
+			} else {
+				c.b.Emit(bytecode.Push, typeSpec)
+			}
+
+			return nil
+		}
+
+		c.t.Set(marker)
+	}
+
+	// Is it just a symbol needing a load?
+	if t.IsIdentifier() {
+		// Check for auto-increment or decrement
+		autoMode := bytecode.NoOperation
+
+		if c.t.Peek(2) == tokenizer.IncrementToken {
+			autoMode = bytecode.Add
+		}
+
+		if c.t.Peek(2) == tokenizer.DecrementToken {
+			autoMode = bytecode.Sub
+		}
+
+		// If language extensions are supported and this is an auto-increment
+		// or decrement operation, do it now. The modification is applied after
+		// the value is read; i.e. the atom is the pre-modified value.
+		if c.flags.extensionsEnabled && (autoMode != bytecode.NoOperation) {
+			c.b.Emit(bytecode.Load, t)
+			c.b.Emit(bytecode.Dup)
+			c.b.Emit(bytecode.Push, 1)
+			c.b.Emit(autoMode)
+			c.b.Emit(bytecode.Store, t)
+			c.t.Advance(2)
+		} else {
+			c.b.Emit(bytecode.Load, t)
+			c.t.Advance(1)
+		}
+
+		return nil
+	}
+
+	// Not something we know what to do with...
+	return c.error(errors.ErrUnexpectedToken, t)
 }
 
 func (c *Compiler) parseArray() error {
-
-	var listTerminator = ""
-	if c.t.Peek(1) == "(" {
-		listTerminator = ")"
-	}
-	if c.t.Peek(1) == "[" {
-		listTerminator = "]"
-	}
-	if listTerminator == "" {
-		return nil
-	}
-	c.t.Advance(1)
-	count := 0
-	t1 := 1
 	var err error
 
-	// Let's experimenally see if this is a range constant expression. This can be
-	// of the form [start:end] which creates an array of integers between the start
-	// and end values (inclusive). It can also be of the form [:end] which assumes
-	// a start number of 1.
+	var listTerminator = tokenizer.EmptyToken
 
-	if c.t.Peek(1) == ":" {
-		err = nil
-		c.t.Advance(-1)
-	} else {
-		t1, err = strconv.Atoi(c.t.Peek(1))
+	// Lets see if this is a type name. Remember where
+	// we came from, and back up over the previous "["
+	// already parsed in the expression atom.
+	marker := c.t.Mark()
+
+	kind, err := c.parseTypeSpec()
+	if err != nil {
+		return err
 	}
-	if err == nil {
-		if c.t.Peek(2) == ":" {
-			t2, err := strconv.Atoi(c.t.Peek(3))
-			if err == nil {
-				c.t.Advance(3)
-				count := t2 - t1 + 1
 
-				if count < 0 {
-					count = (-count) + 2
+	if !kind.IsUndefined() {
+		if !kind.IsArray() {
+			return c.error(errors.ErrInvalidTypeName)
+		}
 
-					for n := t1; n >= t2; n = n - 1 {
-						c.b.Emit(bytecode.Push, n)
+		// Is it an empty declaration, such as []int{} ?
+		if c.t.IsNext(tokenizer.EmptyInitializerToken) {
+			c.b.Emit(bytecode.Array, 0, kind)
+
+			return nil
+		}
+
+		// There better be at least the start of an initialization block then.
+		if !c.t.IsNext(tokenizer.DataBeginToken) {
+			return c.error(errors.ErrMissingBlock)
+		}
+
+		listTerminator = tokenizer.DataEndToken
+	} else {
+		c.t.Set(marker)
+
+		if c.t.Peek(1) == tokenizer.StartOfListToken {
+			listTerminator = tokenizer.EndOfListToken
+		} else {
+			if c.t.Peek(1) == tokenizer.StartOfArrayToken {
+				listTerminator = tokenizer.EndOfArrayToken
+			}
+		}
+
+		c.t.Advance(1)
+
+		// Let's experimentally see if this is a range constant expression. This can be
+		// of the form [start:end] which creates an array of integers between the start
+		// and end values (inclusive). It can also be of the form [:end] which assumes
+		// a start number of 1.
+		t1 := 1
+
+		var e2 error
+
+		if c.t.Peek(1) == tokenizer.ColonToken {
+			err = nil
+
+			c.t.Advance(-1)
+		} else {
+			t1, e2 = strconv.Atoi(c.t.PeekText(1))
+			if e2 != nil {
+				err = errors.NewError(e2)
+			}
+		}
+
+		if err == nil {
+			if c.t.Peek(2) == tokenizer.ColonToken {
+				t2, err := strconv.Atoi(c.t.PeekText(3))
+				if err == nil {
+					c.t.Advance(3)
+
+					count := t2 - t1 + 1
+					if count < 0 {
+						count = (-count) + 2
+
+						for n := t1; n >= t2; n = n - 1 {
+							c.b.Emit(bytecode.Push, n)
+						}
+					} else {
+						for n := t1; n <= t2; n = n + 1 {
+							c.b.Emit(bytecode.Push, n)
+						}
 					}
 
-				} else {
-					for n := t1; n <= t2; n = n + 1 {
-						c.b.Emit(bytecode.Push, n)
+					c.b.Emit(bytecode.Array, count)
+
+					if !c.t.IsNext(tokenizer.EndOfArrayToken) {
+						return c.error(errors.ErrInvalidRange)
 					}
+
+					return nil
 				}
-				c.b.Emit(bytecode.Array, count)
-				if !c.t.IsNext("]") {
-					return c.NewError(InvalidRangeError)
-				}
-				return nil
 			}
 		}
 	}
+
+	if listTerminator == tokenizer.EmptyToken {
+		return nil
+	}
+
+	count := 0
+
 	for c.t.Peek(1) != listTerminator {
 		err := c.conditional()
 		if err != nil {
 			return err
 		}
+
+		// If this is an array of a specific type, check to see
+		// if the previous value was a constant. If it wasn't, or
+		// was of the wrong type, emit a coerce...
+		if !kind.IsUndefined() {
+			if c.b.NeedsCoerce(kind) {
+				c.b.Emit(bytecode.Coerce, kind)
+			}
+		}
+
 		count = count + 1
+
 		if c.t.AtEnd() {
 			break
 		}
+
 		if c.t.Peek(1) == listTerminator {
 			break
 		}
-		if c.t.Peek(1) != "," {
-			return c.NewError(InvalidListError)
+
+		if c.t.Peek(1) != tokenizer.CommaToken {
+			return c.error(errors.ErrInvalidList)
 		}
+
 		c.t.Advance(1)
 	}
 
-	c.b.Emit(bytecode.Array, count)
+	if !kind.IsUndefined() {
+		c.b.Emit(bytecode.Array, count, kind)
+	} else {
+		c.b.Emit(bytecode.Array, count)
+	}
 
 	c.t.Advance(1)
+
 	return nil
 }
 
 func (c *Compiler) parseStruct() error {
+	var listTerminator = tokenizer.DataEndToken
 
-	var listTerminator = "}"
 	var err error
 
 	c.t.Advance(1)
+
 	count := 0
 
 	for c.t.Peek(1) != listTerminator {
-
 		// First element: name
-
 		name := c.t.Next()
-
-		if len(name) > 2 && name[0:1] == "\"" {
-			name, err = strconv.Unquote(name)
-			if err != nil {
-				return err
-			}
-		} else {
-			if !tokenizer.IsSymbol(name) {
-				return c.NewError(InvalidSymbolError, name)
-			}
+		if !name.IsString() && !name.IsIdentifier() {
+			return c.error(errors.ErrInvalidSymbolName, name)
 		}
-		name = c.Normalize(name)
+
+		name = c.normalizeToken(name)
 
 		// Second element: colon
-		if c.t.Next() != ":" {
-			return c.NewError(MissingColonError)
+		if c.t.Next() != tokenizer.ColonToken {
+			return c.error(errors.ErrMissingColon)
 		}
 
 		// Third element: value, which is emitted.
@@ -250,31 +450,75 @@ func (c *Compiler) parseStruct() error {
 		if err != nil {
 			return err
 		}
+
 		// Now write the name as a string.
 		c.b.Emit(bytecode.Push, name)
 
 		count = count + 1
+
 		if c.t.AtEnd() {
 			break
 		}
+
 		if c.t.Peek(1) == listTerminator {
 			break
 		}
-		if c.t.Peek(1) != "," {
-			return c.NewError(InvalidListError)
+
+		if c.t.Peek(1) != tokenizer.CommaToken {
+			return c.error(errors.ErrInvalidList)
 		}
+
 		c.t.Advance(1)
 	}
 
 	c.b.Emit(bytecode.Struct, count)
 	c.t.Advance(1)
+
+	if err != nil {
+		err = errors.NewError(err)
+	}
+
 	return err
 }
 
-func (c *Compiler) unLit(s string) (string, error) {
-	quote := s[0:1]
-	if s[len(s)-1:] != quote {
-		return s[1:], c.NewError(BlockQuoteError, quote)
+// Handle the ? optional operation. This precedes an expression
+// element. If the element causes an error then a default value is
+// provided following a ":" operator. This only works for specific
+// errors such as a nil object reference, invalid type, unknown
+// structure member, or divide-by-zero.
+//
+// This is only supported when extensions are enabled.
+func (c *Compiler) optional() error {
+	if !c.flags.extensionsEnabled {
+		return c.error(errors.ErrUnexpectedToken).Context("?")
 	}
-	return s[1 : len(s)-1], nil
+
+	catch := c.b.Mark()
+	c.b.Emit(bytecode.Try)
+
+	// What errors do we permit here?
+	c.b.Emit(bytecode.WillCatch, bytecode.OptionalCatchSet)
+
+	err := c.unary()
+	if err != nil {
+		return err
+	}
+
+	toEnd := c.b.Mark()
+	c.b.Emit(bytecode.Branch)
+	_ = c.b.SetAddressHere(catch)
+
+	if !c.t.IsNext(tokenizer.ColonToken) {
+		return c.error(errors.ErrMissingCatch)
+	}
+
+	err = c.unary()
+	if err != nil {
+		return err
+	}
+
+	_ = c.b.SetAddressHere(toEnd)
+	c.b.Emit(bytecode.TryPop)
+
+	return nil
 }

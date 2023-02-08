@@ -1,88 +1,37 @@
 package bytecode
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/tucats/gopackages/util"
+	"github.com/tucats/gopackages/errors"
 )
 
-// Runtime error messages
-const (
-	ArgumentCountError            = "incorrect function argument count"
-	ArgumentTypeError             = "incorrect function argument type"
-	DivisionByZeroError           = "division by zero"
-	IncorrectReturnValueCount     = "incorrect number of return values"
-	InvalidArgCheckError          = "invalid ArgCheck array"
-	InvalidArgTypeError           = "function argument is of wrong type"
-	InvalidArrayIndexError        = "invalid array index"
-	InvalidBytecodeAddress        = "invalid bytecode address"
-	InvalidCallFrame              = "invalid call frame on stack"
-	InvalidChannel                = "neither source or destination is a channel"
-	InvalidFieldError             = "invalid field name for type"
-	InvalidFunctionCallError      = "invalid function call"
-	InvalidIdentifierError        = "invalid identifier"
-	InvalidSliceIndexError        = "invalid slice index"
-	InvalidThisError              = "invalid _this_ identifier"
-	InvalidTypeError              = "invalid or unsupported data type for this operation"
-	InvalidVarTypeError           = "invalid type for this variable"
-	NotAServiceError              = "not running as a service"
-	NotATypeError                 = "not a type"
-	OpcodeAlreadyDefinedError     = "opcode already defined: %d"
-	ReadOnlyError                 = "invalid write to read-only item"
-	StackUnderflowError           = "stack underflow"
-	TryCatchMismatchError         = "try/catch stack error"
-	UnimplementedInstructionError = "unimplemented bytecode instruction"
-	UnknownIdentifierError        = "unknown identifier"
-	UnknownMemberError            = "unknown structure member"
-	UnknownPackageMemberError     = "unknown package member"
-	UnknownTypeError              = "unknown structure type"
-	VarArgError                   = "invalid variable-argument operation"
-)
-
-// Error contains an error generated from the execution context
-type Error struct {
-	text   string
-	module string
-	line   int
-	token  string
-}
-
-// NewError generates a new error
-func (c *Context) NewError(msg string, args ...interface{}) *Error {
-
-	token := ""
-	if len(args) > 0 {
-		token = util.GetString(args[0])
+// error is a helper function used to generate a new error based
+// on the runtime context. The current module name and line number
+// from the context are stored in the new error object, along with
+// the message and context.
+func (c *Context) error(err error, context ...interface{}) *errors.Error {
+	if err == nil {
+		return nil
 	}
-	return &Error{
-		text:   msg,
-		module: c.Name,
-		line:   c.line,
-		token:  token,
-	}
-}
 
-// Error produces an error string from this object.
-func (e Error) Error() string {
+	var r *errors.Error
 
-	var b strings.Builder
+	if e, ok := err.(*errors.Error); ok {
+		if !e.HasIn() {
+			e = e.In(c.name)
+		}
 
-	b.WriteString("execution error ")
+		if !e.HasAt() {
+			e = e.At(c.GetLine(), 0)
+		}
 
-	if len(e.module) > 0 {
-		b.WriteString("in ")
-		b.WriteString(e.module)
-		b.WriteString(" ")
+		r = e
+	} else {
+		r = errors.NewError(err).In(c.name).At(c.GetLine(), 0)
 	}
-	if e.line > 0 {
-		b.WriteString(fmt.Sprintf(util.LineFormat, e.line))
+
+	if len(context) > 0 {
+		r = r.Context(context[0])
 	}
-	b.WriteString(", ")
-	b.WriteString(e.text)
-	if len(e.token) > 0 {
-		b.WriteString(": ")
-		b.WriteString(e.token)
-	}
-	return b.String()
+
+	return r
 }

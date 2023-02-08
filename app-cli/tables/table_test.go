@@ -9,6 +9,7 @@ func TestNew(t *testing.T) {
 	type args struct {
 		headings []string
 	}
+
 	tests := []struct {
 		name      string
 		args      args
@@ -23,7 +24,7 @@ func TestNew(t *testing.T) {
 			want: &Table{
 				rowLimit:       -1,
 				columnCount:    1,
-				columns:        []string{"simple"},
+				names:          []string{"simple"},
 				maxWidth:       []int{6},
 				alignment:      []int{AlignmentLeft},
 				spacing:        "    ",
@@ -45,7 +46,7 @@ func TestNew(t *testing.T) {
 			want: &Table{
 				rowLimit:       -1,
 				columnCount:    3,
-				columns:        []string{"simple", "test", "table"},
+				names:          []string{"simple", "test", "table"},
 				maxWidth:       []int{6, 4, 5},
 				alignment:      []int{AlignmentLeft, AlignmentLeft, AlignmentLeft},
 				columnOrder:    []int{0, 1, 2},
@@ -69,12 +70,14 @@ func TestNew(t *testing.T) {
 		},
 		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := New(tt.args.headings)
 			if err != nil && !tt.wantError {
 				t.Errorf("New() resulted in unexpected error %v", err)
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("New() = %v, want %v", got, tt.want)
 			}
@@ -86,6 +89,7 @@ func TestNewCSV(t *testing.T) {
 	type args struct {
 		h string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -98,7 +102,7 @@ func TestNewCSV(t *testing.T) {
 				h: "First",
 			},
 			want: Table{
-				columns: []string{"First"},
+				names: []string{"First"},
 			},
 			wantErr: false,
 		},
@@ -108,7 +112,7 @@ func TestNewCSV(t *testing.T) {
 				h: "First,Second",
 			},
 			want: Table{
-				columns: []string{"First", "Second"},
+				names: []string{"First", "Second"},
 			},
 			wantErr: false,
 		},
@@ -118,7 +122,7 @@ func TestNewCSV(t *testing.T) {
 				h: "First,,Third",
 			},
 			want: Table{
-				columns: []string{"First", "", "Third"},
+				names: []string{"First", "", "Third"},
 			},
 			wantErr: false,
 		},
@@ -128,7 +132,7 @@ func TestNewCSV(t *testing.T) {
 				h: "First, Second  ",
 			},
 			want: Table{
-				columns: []string{"First", "Second"},
+				names: []string{"First", "Second"},
 			},
 			wantErr: false,
 		},
@@ -138,7 +142,7 @@ func TestNewCSV(t *testing.T) {
 				h: "\"Name,Age\",Size",
 			},
 			want: Table{
-				columns: []string{"Name,Age", "Size"},
+				names: []string{"Name,Age", "Size"},
 			},
 			wantErr: false,
 		},
@@ -148,9 +152,10 @@ func TestNewCSV(t *testing.T) {
 			got, err := NewCSV(tt.args.h)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewCSV() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
-			if !reflect.DeepEqual(got.columns, tt.want.columns) {
+			if !reflect.DeepEqual(got.names, tt.want.names) {
 				t.Errorf("NewCSV() = %v, want %v", got, tt.want)
 			}
 		})

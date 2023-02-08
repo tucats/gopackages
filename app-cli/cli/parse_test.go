@@ -1,10 +1,9 @@
 package cli
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/tucats/gopackages/app-cli/ui"
+	"github.com/tucats/gopackages/errors"
 )
 
 func dummyAction(c *Context) error {
@@ -12,57 +11,62 @@ func dummyAction(c *Context) error {
 }
 
 func integerAction(c *Context) error {
-	v, found := c.GetInteger("integer")
+	v, found := c.Integer("integer")
 	if !found {
-		return errors.New("No integer option found")
+		return errors.NewMessage("No integer option found")
 	}
+
 	if v != 42 {
-		return errors.New("Integer value not 42")
+		return errors.NewMessage("Integer value not 42")
 	}
+
 	return nil
 }
 
 func stringAction(c *Context) error {
-	v, found := c.GetString("string")
+	v, found := c.String("string")
 	if !found {
-		return errors.New("No string option found")
+		return errors.NewMessage("No string option found")
 	}
+
 	if v != "foobar" {
-		return errors.New("String value not foobar")
+		return errors.NewMessage("String value not foobar")
 	}
+
 	return nil
 }
 
 func booleanValueAction(c *Context) error {
-	v := c.GetBool("boolean")
-	if v != true {
-		return errors.New("Boolean value not true")
+	if v := c.Boolean("boolean"); v != true {
+		return errors.NewMessage("Boolean value not true")
 	}
+
 	return nil
 }
 
 func booleanAction(c *Context) error {
-	v := c.GetBool("flag")
-	if v != true {
-		return errors.New("Boolean not present")
+	if v := c.Boolean("flag"); !v {
+		return errors.NewMessage("Boolean not present")
 	}
+
 	return nil
 }
 
 func TestContext_ParseGrammar(t *testing.T) {
 	type fields struct {
-		AppName                string
-		MainProgram            string
-		Description            string
-		Command                string
-		Grammar                []Option
-		Args                   []string
-		Parent                 *Context
-		Parameters             []string
-		ParameterCount         int
-		ExpectedParameterCount int
-		ParameterDescription   string
+		AppName              string
+		MainProgram          string
+		Description          string
+		Command              string
+		Grammar              []Option
+		Args                 []string
+		Parent               *Context
+		Parameters           []string
+		Count                int
+		Expected             int
+		ParameterDescription string
 	}
+
 	type args struct {
 		args []string
 	}
@@ -142,6 +146,7 @@ func TestContext_ParseGrammar(t *testing.T) {
 			Action:      stringAction,
 		},
 	}
+
 	var fields1 = fields{
 		AppName:     "unit test",
 		MainProgram: "unit-test",
@@ -149,6 +154,7 @@ func TestContext_ParseGrammar(t *testing.T) {
 		Command:     "unit-test",
 		Grammar:     grammar1,
 	}
+
 	tests := []struct {
 		name    string
 		fields  fields
@@ -365,19 +371,18 @@ func TestContext_ParseGrammar(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Context{
-				AppName:                tt.fields.AppName,
-				MainProgram:            tt.fields.MainProgram,
-				Description:            tt.fields.Description,
-				Command:                tt.fields.Command,
-				Grammar:                tt.fields.Grammar,
-				Args:                   tt.fields.Args,
-				Parent:                 tt.fields.Parent,
-				Parameters:             tt.fields.Parameters,
-				ParameterCount:         tt.fields.ParameterCount,
-				ExpectedParameterCount: tt.fields.ExpectedParameterCount,
-				ParameterDescription:   tt.fields.ParameterDescription,
+				AppName:              tt.fields.AppName,
+				MainProgram:          tt.fields.MainProgram,
+				Description:          tt.fields.Description,
+				Command:              tt.fields.Command,
+				Grammar:              tt.fields.Grammar,
+				Args:                 tt.fields.Args,
+				Parent:               tt.fields.Parent,
+				Parameters:           tt.fields.Parameters,
+				Expected:             tt.fields.Expected,
+				ParameterDescription: tt.fields.ParameterDescription,
 			}
-			ui.DebugMode = true
+
 			if err := c.parseGrammar(tt.args.args); (err != nil) != tt.wantErr {
 				t.Errorf("Context.parseGrammar() error = %v, wantErr %v", err, tt.wantErr)
 			}

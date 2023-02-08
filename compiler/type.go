@@ -1,135 +1,194 @@
 package compiler
 
 import (
+	"fmt"
+
 	"github.com/tucats/gopackages/bytecode"
-	"github.com/tucats/gopackages/datatypes"
+	"github.com/tucats/gopackages/data"
+	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/tokenizer"
 )
 
-// Type compiles a type statement
-func (c *Compiler) Type() error {
+// compileTypeDefinition compiles a type statement which creates
+// a user-defined type specification.
+func (c *Compiler) compileTypeDefinition() error {
+	if c.t.AnyNext(tokenizer.SemicolonToken, tokenizer.EndOfTokens) {
+		return c.error(errors.ErrMissingType)
+	}
 
 	name := c.t.Next()
-	if !tokenizer.IsSymbol(name) {
-		return c.NewError(InvalidSymbolError)
-	}
-	name = c.Normalize(name)
-	parent := name
-	if c.PackageName != "" {
-		parent = c.PackageName
+	if !name.IsIdentifier() {
+		return c.error(errors.ErrInvalidSymbolName)
 	}
 
-	// Make sure this is a legit type definition
-	if c.t.Peek(1) == "struct" && c.t.Peek(2) == "{" {
-		c.t.Advance(1)
-	}
-	if c.t.Peek(1) != "{" {
-		return c.NewError(MissingBlockError)
+	name = c.normalizeToken(name)
+
+	if c.t.AnyNext(tokenizer.SemicolonToken, tokenizer.EndOfTokens) {
+		return c.error(errors.ErrMissingType)
 	}
 
-	// If there is no parent, seal the chain by making the link point to a string of our own name.
-	// If there is a parent, load it so it can be linked after type creation.
-	if parent == name {
-		c.b.Emit(bytecode.Push, parent)
-	} else {
-		c.b.Emit(bytecode.Load, parent)
-	}
-
-	// Compile a struct definition
-	err := c.compileType()
-	if err != nil {
-		return err
-	}
-
-	// Add in the type linkage, and store as the type name. The __parent for a type is
-	// a string that is the name of the type. When a member dereference on a struct
-	// happens that includes a __parent, the __parent object is also checked for the
-	// member if it is NOT a string.
-	c.b.Emit(bytecode.Swap)
-	c.b.Emit(bytecode.StoreMetadata, datatypes.ParentMDKey)
-	c.b.Emit(bytecode.Dup)
-	c.b.Emit(bytecode.Dup)
-
-	// Use the name as the type. Note that StoreIndex will intercept the __
-	// prefix of the index and redirect it into the metadata.
-	c.b.Emit(bytecode.Push, name)
-	c.b.Emit(bytecode.StoreMetadata, datatypes.TypeMDKey)
-
-	// Finally, make it a static value now.
-	c.b.Emit(bytecode.Dup) // One more needed for type statement
-	c.b.Emit(bytecode.Push, true)
-	c.b.Emit(bytecode.StoreMetadata, datatypes.StaticMDKey)
-
-	if c.PackageName != "" {
-		c.b.Emit(bytecode.Load, c.PackageName)
-		c.b.Emit(bytecode.Push, name)
-		c.b.Emit(bytecode.StoreIndex, true)
-	} else {
-		c.b.Emit(bytecode.SymbolCreate, name)
-		c.b.Emit(bytecode.Store, name)
-	}
-
-	return nil
+	return c.typeEmitter(name.Spelling())
 }
 
-func (c *Compiler) compileType() error {
+// Parses a token stream for a generic type declaration.
+func (c *Compiler) typeDeclaration() (interface{}, error) {
+	theType, err := c.parseType("", false)
+	if err != nil {
+		return nil, err
+	}
 
-	// Skip over the optional struct type keyword
-	if c.t.Peek(1) == "struct" && c.t.Peek(2) == "{" {
+	return data.InstanceOfType(theType), nil
+}
+
+func (c *Compiler) parseTypeSpec() (*data.Type, error) {
+	if c.t.Peek(1) == tokenizer.PointerToken {
 		c.t.Advance(1)
+		t, err := c.parseTypeSpec()
+
+		return data.PointerType(t), err
 	}
 
-	// Must start with {
-	if !c.t.IsNext("{") {
-		return c.NewError(MissingBlockError)
+	if c.t.Peek(1) == tokenizer.StartOfArrayToken && c.t.Peek(2) == tokenizer.EndOfArrayToken {
+		c.t.Advance(2)
+		t, err := c.parseTypeSpec()
+
+		return data.ArrayType(t), err
 	}
 
-	count := 0
-	for {
-		name := c.t.Next()
-		if !tokenizer.IsSymbol(name) {
-			return c.NewError(InvalidSymbolError, name)
-		}
-		name = c.Normalize(name)
+	if c.t.Peek(1) == tokenizer.MapToken && c.t.Peek(2) == tokenizer.StartOfArrayToken {
+		c.t.Advance(2)
 
-		count = count + 1
-		// Skip over the optional struct type keyword
-		if c.t.Peek(1) == "struct" && c.t.Peek(2) == "{" {
-			c.t.Advance(1)
+		keyType, err := c.parseTypeSpec()
+		if err != nil {
+			return data.UndefinedType, err
 		}
-		if c.t.Peek(1) == "{" {
-			err := c.compileType()
-			if err != nil {
-				return err
+
+		c.t.IsNext(tokenizer.EndOfArrayToken)
+
+		valueType, err := c.parseTypeSpec()
+		if err != nil {
+			return data.UndefinedType, err
+		}
+
+		return data.MapType(keyType, valueType), nil
+	}
+
+	for _, typeDef := range data.TypeDeclarations {
+		found := true
+
+		if c.t.PeekText(1) == "interface" {
+			fmt.Println("DEBUG")
+		}
+
+		for pos, token := range typeDef.Tokens {
+			eval := c.t.Peek(1 + pos)
+			if eval.Spelling() != token {
+				found = false
 			}
-		} else {
-			switch c.t.Next() {
-			case "chan":
-				channel := datatypes.NewChannel(1)
-				c.b.Emit(bytecode.Push, channel)
-			case "int":
-				c.b.Emit(bytecode.Push, 0)
-			case "float", "double":
-				c.b.Emit(bytecode.Push, 0.0)
-			case "bool":
-				c.b.Emit(bytecode.Push, false)
-			case "string":
-				c.b.Emit(bytecode.Push, "")
-			default:
-				return c.NewError(InvalidTypeNameError)
+		}
+
+		if found {
+			c.t.Advance(len(typeDef.Tokens))
+
+			return typeDef.Kind, nil
+		}
+	}
+
+	// Is it a type we already know about?
+	typeName := c.t.Peek(1)
+	if typeDef, ok := c.types[typeName.Spelling()]; ok {
+		c.t.Advance(1)
+
+		return typeDef, nil
+	}
+
+	return data.UndefinedType, nil
+}
+
+// Given a string expression of a type specification, compile it asn return the
+// type it represents, and an optional error if it was incorrectly formed. This
+// cannot reference user types as they are not visible to this function.
+//
+// If the string starts with the keyword `type` followed by a type name, then
+// the resulting value is a type definition of the given name.
+//
+// The dependent types map contains types from previous standalone type
+// compilations that the current spec is dependent upon. For example,
+// a type definition for a sub-structure that is then referenced in
+// the current type compilation. Passing nil just means there are no
+// dependent types.
+func CompileTypeSpec(source string, dependentTypes map[string]*data.Type) (*data.Type, error) {
+	typeCompiler := New("type compiler")
+	typeCompiler.t = tokenizer.New(source, true)
+
+	if dependentTypes != nil {
+		typeCompiler.types = dependentTypes
+	}
+
+	nameSpelling := ""
+	// Does it have a type <name> prefix? And is that a package.name style name?
+	if typeCompiler.t.IsNext(tokenizer.TypeToken) {
+		name := typeCompiler.t.Next()
+		if !name.IsIdentifier() {
+			return data.UndefinedType, errors.ErrInvalidSymbolName.Context(name)
+		}
+
+		nameSpelling = name.Spelling()
+
+		if typeCompiler.t.IsNext(tokenizer.DotToken) {
+			name2 := typeCompiler.t.Next()
+			if !name2.IsIdentifier() {
+				return data.UndefinedType, errors.ErrInvalidSymbolName.Context(name2)
+			}
+
+			nameSpelling = nameSpelling + "." + name2.Spelling()
+		}
+	}
+
+	t, err := typeCompiler.parseType("", true)
+	if err == nil && nameSpelling != "" {
+		t = data.TypeDefinition(nameSpelling, t)
+	}
+
+	return t, err
+}
+
+// For a given package and type name, get the underlying type.
+func (c *Compiler) GetPackageType(packageName, typeName string) (*data.Type, bool) {
+	if p, found := c.packages[packageName]; found {
+		if t, found := p.Get(typeName); found {
+			if theType, ok := t.(*data.Type); ok {
+				return theType, true
 			}
 		}
 
-		c.b.Emit(bytecode.Push, name)
+		// It was a package, but without a package body. Already moved to global storage?
+		if pkg, found := c.s.Root().Get(packageName); found {
+			if m, ok := pkg.(*data.Package); ok {
+				if t, found := m.Get(typeName); found {
+					if theType, ok := t.(*data.Type); ok {
+						return theType, true
+					}
+				}
 
-		// Eat any trailing commas, and the see if we're at the end
-		_ = c.t.IsNext(",")
-		if c.t.IsNext("}") {
-			c.b.Emit(bytecode.Struct, count)
-			return nil
-		}
-		if c.t.AtEnd() {
-			return c.NewError(MissingEndOfBlockError)
+				if t, found := m.Get(data.TypeMDKey); found {
+					if theType, ok := t.(*data.Type); ok {
+						return theType.BaseType(), true
+					}
+				}
+			}
 		}
 	}
+
+	// Is it a previously imported package type?
+	if bytecode.IsPackage(packageName) {
+		p, _ := bytecode.GetPackage(packageName)
+		if tV, ok := p.Get(typeName); ok {
+			if t, ok := tV.(*data.Type); ok {
+				return t, true
+			}
+		}
+	}
+
+	return nil, false
 }

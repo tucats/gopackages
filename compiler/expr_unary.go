@@ -1,33 +1,74 @@
 package compiler
 
-import bc "github.com/tucats/gopackages/bytecode"
+import (
+	"github.com/tucats/gopackages/bytecode"
+	"github.com/tucats/gopackages/tokenizer"
+)
 
 func (c *Compiler) unary() error {
-
 	// Check for unary negation or not before passing into top-level diadic operators.
-
 	t := c.t.Peek(1)
 	switch t {
-	case "-":
+	case tokenizer.NegateToken:
 		c.t.Advance(1)
-		err := c.functionOrReference()
-		if err != nil {
-			return err
-		}
-		c.b.Emit(bc.Negate, 0)
-		return nil
 
-	case "!":
-		c.t.Advance(1)
-		err := c.functionOrReference()
+		err := c.unary()
 		if err != nil {
 			return err
 		}
-		c.b.Emit(bc.Negate, 0)
-		return nil
+
+		// Optimization for numeric constant values; if it is an integer
+		// or a float64, then just update the instruction with the negative
+		// of it's value. Otherwise, we'll emit an explicit Negate.
+		addr := c.b.Mark() - 1
+		i := c.b.Instruction(c.b.Mark() - 1)
+
+		if i.Operation == bytecode.Push {
+			switch v := i.Operand.(type) {
+			case byte:
+				i.Operand = -v
+				c.b.Opcodes()[addr] = *i
+
+			case int32:
+				i.Operand = -v
+				c.b.Opcodes()[addr] = *i
+
+			case int:
+				i.Operand = -v
+				c.b.Opcodes()[addr] = *i
+
+			case int64:
+				i.Operand = -v
+				c.b.Opcodes()[addr] = *i
+
+			case float32:
+				i.Operand = -v
+				c.b.Opcodes()[addr] = *i
+
+			case float64:
+				i.Operand = -v
+				c.b.Opcodes()[addr] = *i
+
+			default:
+				c.b.Emit(bytecode.Negate, false)
+			}
+		} else {
+			c.b.Emit(bytecode.Negate, false)
+		}
+
+	case tokenizer.NotToken:
+		c.t.Advance(1)
+
+		err := c.unary()
+		if err != nil {
+			return err
+		}
+
+		c.b.Emit(bytecode.Negate, true)
 
 	default:
 		return c.functionOrReference()
-
 	}
+
+	return nil
 }

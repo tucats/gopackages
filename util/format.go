@@ -104,10 +104,10 @@ func Format(arg interface{}) string {
 		// IF it's an internal function, show it's name. If it is a standard builtin from the
 		// function library, show the short form of the name.
 		if vv.Kind() == reflect.Func {
-			if ui.DebugMode {
+			if ui.IsActive(ui.DebugLogger) {
 				name := runtime.FuncForPC(reflect.ValueOf(v).Pointer()).Name()
 				name = strings.Replace(name, "github.com/tucats/gopackages/", "", 1)
-				name = strings.Replace(name, "github.com/tucats/ego/runtime.", "", 1)
+				name = strings.Replace(name, "github.com/tucats/gopackages/runtime.", "", 1)
 				return "builtin " + name
 			} else {
 				return "builtin"
@@ -121,7 +121,7 @@ func Format(arg interface{}) string {
 			ts := vv.String()
 			if ts == "<*bytecode.ByteCode Value>" {
 				e := reflect.ValueOf(v).Elem()
-				if ui.DebugMode {
+				if ui.IsActive(ui.DebugLogger) {
 					name := GetString(e.Field(0).Interface())
 					return "func " + name
 				} else {
@@ -145,7 +145,7 @@ func Format(arg interface{}) string {
 			return fmt.Sprintf("<frame %s:%d>", module, line)
 		}
 
-		if ui.DebugMode {
+		if ui.IsActive(ui.DebugLogger) {
 			return fmt.Sprintf("kind %v %#v", vv.Kind(), v)
 		}
 		return fmt.Sprintf("kind %v %v", vv.Kind(), v)

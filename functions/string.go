@@ -8,6 +8,7 @@ import (
 	"text/template"
 	tparse "text/template/parse"
 
+	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/symbols"
 	"github.com/tucats/gopackages/util"
 )
@@ -162,11 +163,11 @@ func ToString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 				case string:
 					b.WriteString(util.GetString(c))
 				default:
-					return nil, NewError("string", InvalidTypeError)
+					return nil, errors.ErrInvalidValue.In("string")
 				}
 			}
 		default:
-			return nil, NewError("string", ArgumentCountError)
+			return nil, errors.ErrArgumentCount
 		}
 	}
 	return b.String(), nil
@@ -177,11 +178,11 @@ func ToString(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 func Template(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	var err error
 	if len(args) == 0 {
-		return nil, NewError("template", ArgumentCountError)
+		return nil, errors.ErrArgumentCount
 	}
 	tree, ok := args[0].(*template.Template)
 	if !ok {
-		return nil, NewError("string", InvalidTypeError)
+		return nil, errors.ErrArgumentCount
 	}
 
 	root := tree.Tree.Root
@@ -192,11 +193,11 @@ func Template(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 			// Get the named template and add it's tree here
 			tv, ok := s.Get(templateNode.Name)
 			if !ok {
-				return nil, NewError("template", InvalidTemplateNameError, templateNode.Name)
+				return nil, errors.ErrInvalidTemplateName.Context(templateNode.Name)
 			}
 			t, ok := tv.(*template.Template)
 			if !ok {
-				return nil, NewError("template", InvalidTypeError, templateNode.Name)
+				return nil, errors.ErrInvalidType
 			}
 			_, err = tree.AddParseTree(templateNode.Name, t.Tree)
 			if err != nil {

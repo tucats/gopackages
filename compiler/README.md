@@ -1,12 +1,12 @@
 # compiler
 
-The `compiler` package is used to compile text in the _Ego_ language into
+The `compiler` package is used to compile text in the _APP_ language into
 bytecode that can be executed using the `bytecode` package. This allows for
 compiled scripts to be integrated into the application, and run repeatedly
 without incurring the overhead of parsing and semantic analysis each time.
 
-The _Ego_ language is loosely based on _Go_ but with some important
-differences. Some important attributes of _Ego_ programs are:
+The _APP_ language is loosely based on _Go_ but with some important
+differences. Some important attributes of _APP_ programs are:
 
 * There are no pointer types, and no dynamic memory allocation.
 * All objects are passed by value in function calls.
@@ -20,10 +20,10 @@ set them. Functions defined within another function only exist as long as
 that function is running.
 
 ## Example
-Here is a trivial example of compiling and running some _Ego_ code in your
+Here is a trivial example of compiling and running some _APP_ code in your
 Go program.
 
-    // String containing arbitrary _Ego_ statements.
+    // String containing arbitrary _APP_ statements.
     src := "..."
 
     bc, err := compiler.CompileString(src)
@@ -58,7 +58,7 @@ you can use the util.Get*() functions to extract the integer, float,
 string, or bool object.
 
 ## Data types
-_Ego_ support six data types, plus limited support for function pointers
+_APP_ support six data types, plus limited support for function pointers
 as values.
 
 | type | description |
@@ -402,14 +402,14 @@ examples assume the quoted string contains a file path. If the suffix
 ".ego" is not included it is assumed.
 
 If the import name cannot be found in the current directory, then the
-compiler uses the environment variables EGO_PATH to form a directory
+compiler uses the environment variables APP_PATH to form a directory
 path, and adds the "lib" directory to that path to locate the import.
 So the above statement could resolve to `/Users/cole/ego/lib/factor.ego`
-if the EGO_PATH was set to "~/ego".
+if the APP_PATH was set to "~/ego".
 
 Finally, the `import` statement can read an entire directory of source
 files that all contribute to the same package. If the target of the
-import is a directory in the $EGO_PATH/lib location, then all the
+import is a directory in the $APP_PATH/lib location, then all the
 source files within that directory area read and processed as part
 of one package. 
 

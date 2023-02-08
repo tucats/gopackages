@@ -21,7 +21,7 @@ The command line tool developer:
   * Generate JSON tabular output
 * Support for general expression handling is also provided in the github.com/tucats/gopackages/expressions subpackage.
 This is also used to support filtering of table output when using the app-cli/tables package.
-* A compiler and bytecode interpreter for a Go-like language called _Ego_ is included
+* A compiler and bytecode interpreter for a Go-like expression evaluator is included
 * A library of built-in runtime functions is provided.
 
 See related repositories at github.com/tucats/csv and github.com/tucats/weather for sample

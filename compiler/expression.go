@@ -8,16 +8,29 @@ import (
 // returns a bytecode segment as it's result. This lets code compile
 // an expression, but save the generated code to emit later.
 //
-// The function grammer considers a conditional to be the top of the
+// The function grammar considers a conditional to be the top of the
 // parse tree, so we start evaluating there.
+//
+// From the golang doc, operator precedence is:
+//
+//	 Precedence    Operator
+//		5             *  /  %  <<  >>  &  &^
+//		4             +  -  |  ^
+//		3             ==  !=  <  <=  >  >=
+//		2             &&
+//		1             ||
 func (c *Compiler) Expression() (*bytecode.ByteCode, error) {
-	cx := New()
+	cx := New("expression eval")
 	cx.t = c.t
+	cx.flags = c.flags
 	cx.b = bytecode.New("subexpression")
+	cx.types = c.types
+	cx.sourceFile = c.sourceFile
 
 	err := cx.conditional()
 	if err == nil {
 		c.t = cx.t
 	}
+
 	return cx.b, err
 }
