@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/tucats/gopackages/errors"
-	"github.com/tucats/gopackages/expressions/data"
 	"github.com/tucats/gopackages/expressions/symbols"
 )
 
@@ -133,30 +132,6 @@ func Test_negateByteCode(t *testing.T) {
 			stack: []interface{}{int32(-12)},
 			want:  int32(12),
 		},
-		{
-			name: "negate (reverse) an array",
-			arg:  nil,
-			stack: []interface{}{data.NewArrayFromArray(
-				data.StringType,
-				[]interface{}{-1, 2})},
-			want: data.NewArrayFromArray(
-				data.StringType,
-				[]interface{}{2, -1}),
-		},
-		{
-			name: "negate (reverse) a map",
-			arg:  nil,
-			stack: []interface{}{data.NewMapFromMap(map[string]int32{
-				"foo": int32(5),
-				"bar": int32(-3),
-			})},
-			want: data.NewArrayFromArray(
-				data.StringType,
-				[]interface{}{2, -1}),
-			err: errors.ErrInvalidType,
-		},
-
-		// TODO: Add test cases.
 	}
 
 	for _, tt := range tests {
@@ -299,20 +274,6 @@ func Test_addByteCode(t *testing.T) {
 			want:  int32(12),
 			err:   errors.ErrStackUnderflow,
 		},
-		{
-			name: "add a string an array",
-			arg:  nil,
-			stack: []interface{}{
-				"xyzzy",
-				data.NewArrayFromArray(
-					data.StringType,
-					[]interface{}{"foo", "bar"}),
-			},
-			want: data.NewArrayFromArray(
-				data.StringType,
-				[]interface{}{"foo", "bar", "xyzzy"}),
-			err: errors.ErrInvalidType.Context("interface{}"),
-		},
 	}
 
 	for _, tt := range tests {
@@ -443,17 +404,6 @@ func Test_andByteCode(t *testing.T) {
 			arg:   nil,
 			stack: []interface{}{float32(1.0), float32(6.6)},
 			want:  true,
-		},
-		{
-			name: "add a string an array",
-			arg:  nil,
-			stack: []interface{}{
-				"xyzzy",
-				data.NewArrayFromArray(
-					data.StringType,
-					[]interface{}{"arrays are invalid but cast as", "false"}),
-			},
-			want: false,
 		},
 	}
 
@@ -586,17 +536,6 @@ func Test_orByteCode(t *testing.T) {
 			arg:   nil,
 			stack: []interface{}{float32(1.0), float32(6.6)},
 			want:  true,
-		},
-		{
-			name: "OR a string boolean value with an array",
-			arg:  nil,
-			stack: []interface{}{
-				"true",
-				data.NewArrayFromArray(
-					data.StringType,
-					[]interface{}{"arrays are invalid but cast as", "false"}),
-			},
-			want: true,
 		},
 	}
 

@@ -57,24 +57,6 @@ func equalByteCode(c *Context, i interface{}) error {
 	case *errors.Error:
 		result = actual.Equal(v2)
 
-	case *data.Struct:
-		str, ok := v2.(*data.Struct)
-		if ok {
-			result = reflect.DeepEqual(actual, str)
-		} else {
-			result = false
-		}
-
-	case *data.Map:
-		result = reflect.DeepEqual(v1, v2)
-
-	case *data.Array:
-		if array, ok := v2.(*data.Array); ok {
-			result = actual.DeepEqual(array)
-		} else {
-			result = false
-		}
-
 	default:
 		if c.typeStrictness > 0 {
 			v1, v2 = data.Normalize(v1, v2)
@@ -160,15 +142,6 @@ func notEqualByteCode(c *Context, i interface{}) error {
 	case error:
 		result = !reflect.DeepEqual(v1, v2)
 
-	case data.Map:
-		result = !reflect.DeepEqual(v1, v2)
-
-	case data.Array:
-		result = !reflect.DeepEqual(v1, v2)
-
-	case data.Struct:
-		result = !reflect.DeepEqual(v1, v2)
-
 	default:
 		if c.typeStrictness > 0 {
 			v1, v2 = data.Normalize(v1, v2)
@@ -241,36 +214,31 @@ func greaterThanByteCode(c *Context, i interface{}) error {
 
 	var result bool
 
+	if c.typeStrictness > 0 {
+		v1, v2 = data.Normalize(v1, v2)
+	} else {
+		if !data.TypeOf(v1).IsType(data.TypeOf(v2)) {
+			return c.error(errors.ErrTypeMismatch).
+				Context(data.TypeOf(v2).String() + ", " + data.TypeOf(v1).String())
+		}
+	}
+
 	switch v1.(type) {
-	case *data.Map, *data.Struct, *data.Package, *data.Array:
-		return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
+	case byte, int32, int, int64:
+		result = data.Int64(v1) > data.Int64(v2)
+
+	case float32:
+		result = v1.(float32) > v2.(float32)
+
+	case float64:
+		result = v1.(float64) > v2.(float64)
+
+	case string:
+		result = v1.(string) > v2.(string)
 
 	default:
-		if c.typeStrictness > 0 {
-			v1, v2 = data.Normalize(v1, v2)
-		} else {
-			if !data.TypeOf(v1).IsType(data.TypeOf(v2)) {
-				return c.error(errors.ErrTypeMismatch).
-					Context(data.TypeOf(v2).String() + ", " + data.TypeOf(v1).String())
-			}
-		}
+		return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
 
-		switch v1.(type) {
-		case byte, int32, int, int64:
-			result = data.Int64(v1) > data.Int64(v2)
-
-		case float32:
-			result = v1.(float32) > v2.(float32)
-
-		case float64:
-			result = v1.(float64) > v2.(float64)
-
-		case string:
-			result = v1.(string) > v2.(string)
-
-		default:
-			return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
-		}
 	}
 
 	_ = c.push(result)
@@ -316,36 +284,30 @@ func greaterThanOrEqualByteCode(c *Context, i interface{}) error {
 
 	var result bool
 
+	if c.typeStrictness > 0 {
+		v1, v2 = data.Normalize(v1, v2)
+	} else {
+		if !data.TypeOf(v1).IsType(data.TypeOf(v2)) {
+			return c.error(errors.ErrTypeMismatch).
+				Context(data.TypeOf(v2).String() + ", " + data.TypeOf(v1).String())
+		}
+	}
+
 	switch v1.(type) {
-	case *data.Map, *data.Struct, *data.Package, *data.Array:
-		return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
+	case byte, int32, int, int64:
+		result = data.Int64(v1) >= data.Int64(v2)
+
+	case float32:
+		result = v1.(float32) >= v2.(float32)
+
+	case float64:
+		result = v1.(float64) >= v2.(float64)
+
+	case string:
+		result = v1.(string) >= v2.(string)
 
 	default:
-		if c.typeStrictness > 0 {
-			v1, v2 = data.Normalize(v1, v2)
-		} else {
-			if !data.TypeOf(v1).IsType(data.TypeOf(v2)) {
-				return c.error(errors.ErrTypeMismatch).
-					Context(data.TypeOf(v2).String() + ", " + data.TypeOf(v1).String())
-			}
-		}
-
-		switch v1.(type) {
-		case byte, int32, int, int64:
-			result = data.Int64(v1) >= data.Int64(v2)
-
-		case float32:
-			result = v1.(float32) >= v2.(float32)
-
-		case float64:
-			result = v1.(float64) >= v2.(float64)
-
-		case string:
-			result = v1.(string) >= v2.(string)
-
-		default:
-			return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
-		}
+		return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
 	}
 
 	_ = c.push(result)
@@ -391,36 +353,30 @@ func lessThanByteCode(c *Context, i interface{}) error {
 	// Nope, going to have to do type-sensitive compares.
 	var result bool
 
+	if c.typeStrictness > 0 {
+		v1, v2 = data.Normalize(v1, v2)
+	} else {
+		if !data.TypeOf(v1).IsType(data.TypeOf(v2)) {
+			return c.error(errors.ErrTypeMismatch).
+				Context(data.TypeOf(v2).String() + ", " + data.TypeOf(v1).String())
+		}
+	}
+
 	switch v1.(type) {
-	case *data.Map, *data.Struct, *data.Package, *data.Array:
-		return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
+	case byte, int32, int, int64:
+		result = data.Int64(v1) < data.Int64(v2)
+
+	case float32:
+		result = v1.(float32) < v2.(float32)
+
+	case float64:
+		result = v1.(float64) < v2.(float64)
+
+	case string:
+		result = v1.(string) < v2.(string)
 
 	default:
-		if c.typeStrictness > 0 {
-			v1, v2 = data.Normalize(v1, v2)
-		} else {
-			if !data.TypeOf(v1).IsType(data.TypeOf(v2)) {
-				return c.error(errors.ErrTypeMismatch).
-					Context(data.TypeOf(v2).String() + ", " + data.TypeOf(v1).String())
-			}
-		}
-
-		switch v1.(type) {
-		case byte, int32, int, int64:
-			result = data.Int64(v1) < data.Int64(v2)
-
-		case float32:
-			result = v1.(float32) < v2.(float32)
-
-		case float64:
-			result = v1.(float64) < v2.(float64)
-
-		case string:
-			result = v1.(string) < v2.(string)
-
-		default:
-			return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
-		}
+		return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
 	}
 
 	_ = c.push(result)
@@ -465,36 +421,30 @@ func lessThanOrEqualByteCode(c *Context, i interface{}) error {
 
 	var result bool
 
+	if c.typeStrictness > 0 {
+		v1, v2 = data.Normalize(v1, v2)
+	} else {
+		if !data.TypeOf(v1).IsType(data.TypeOf(v2)) {
+			return c.error(errors.ErrTypeMismatch).
+				Context(data.TypeOf(v2).String() + ", " + data.TypeOf(v1).String())
+		}
+	}
+
 	switch v1.(type) {
-	case *data.Map, *data.Struct, *data.Package, *data.Array:
-		return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
+	case byte, int32, int, int64:
+		result = data.Int64(v1) <= data.Int64(v2)
+
+	case float32:
+		result = v1.(float32) <= v2.(float32)
+
+	case float64:
+		result = v1.(float64) <= v2.(float64)
+
+	case string:
+		result = v1.(string) <= v2.(string)
 
 	default:
-		if c.typeStrictness > 0 {
-			v1, v2 = data.Normalize(v1, v2)
-		} else {
-			if !data.TypeOf(v1).IsType(data.TypeOf(v2)) {
-				return c.error(errors.ErrTypeMismatch).
-					Context(data.TypeOf(v2).String() + ", " + data.TypeOf(v1).String())
-			}
-		}
-
-		switch v1.(type) {
-		case byte, int32, int, int64:
-			result = data.Int64(v1) <= data.Int64(v2)
-
-		case float32:
-			result = v1.(float32) <= v2.(float32)
-
-		case float64:
-			result = v1.(float64) <= v2.(float64)
-
-		case string:
-			result = v1.(string) <= v2.(string)
-
-		default:
-			return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
-		}
+		return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
 	}
 
 	_ = c.push(result)

@@ -2,8 +2,6 @@ package bytecode
 
 import (
 	"testing"
-
-	"github.com/tucats/gopackages/expressions/data"
 )
 
 func TestComparisons(t *testing.T) {
@@ -93,27 +91,6 @@ func TestComparisons(t *testing.T) {
 			name: "string promotion equality",
 			v1:   42, v2: "42", r: true,
 			f: equalByteCode, i: nil, err: false,
-		},
-		{
-			name: "array equality",
-			v1:   data.NewArrayFromArray(data.IntType, []interface{}{5, 2, 6}),
-			v2:   data.NewArrayFromArray(data.IntType, []interface{}{5, 2, 6}),
-			r:    true,
-			f:    equalByteCode, i: nil, err: false,
-		},
-		{
-			name: "array inequality due to type",
-			v1:   data.NewArrayFromArray(data.IntType, []interface{}{5, 2, 6}),
-			v2:   data.NewArrayFromArray(data.Float64Type, []interface{}{5, 2, 6}),
-			r:    false,
-			f:    equalByteCode, i: nil, err: false,
-		},
-		{
-			name: "array inequality due to values",
-			v1:   data.NewArrayFromArray(data.IntType, []interface{}{5, 2, 6}),
-			v2:   data.NewArrayFromArray(data.IntType, []interface{}{5, 6, 2}),
-			r:    false,
-			f:    equalByteCode, i: nil, err: false,
 		},
 	}
 

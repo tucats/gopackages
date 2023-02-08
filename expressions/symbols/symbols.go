@@ -426,19 +426,6 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 			v = data.DeepCopy(v)
 		}
 
-		switch actual := v.(type) {
-		case *data.Array:
-			actual.SetReadonly(true)
-			v = actual
-
-		case *data.Map:
-			actual.SetReadonly(true)
-			v = actual
-
-		case *data.Struct:
-			actual.SetReadonly(true)
-			v = actual
-		}
 	}
 
 	// Store the value in the slot, and if it was readonly, write

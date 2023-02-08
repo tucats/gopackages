@@ -854,21 +854,6 @@ func KindOf(i interface{}) int {
 	case string:
 		return StringKind
 
-	case Package:
-		return UndefinedKind
-
-	case *Package:
-		return PackageKind
-
-	case *Map:
-		return MapKind
-
-	case *Struct:
-		return StructKind
-
-	case *Channel:
-		return PointerKind
-
 	default:
 		return InterfaceKind
 	}
@@ -982,25 +967,6 @@ func TypeOf(i interface{}) *Type {
 	case *bool:
 		return PointerType(BoolType)
 
-	case *Package:
-		return PointerType(TypeOf(*v))
-
-	case *Map:
-		return v.Type()
-
-	case *Struct:
-		return v.typeDef
-
-	case *Array:
-		return &Type{
-			name:      "[]",
-			kind:      ArrayKind,
-			valueType: v.valueType,
-		}
-
-	case *Channel:
-		return PointerType(ChanType)
-
 	case *errors.Error, errors.Error:
 		return ErrorType
 
@@ -1023,8 +989,6 @@ func IsType(v interface{}, t *Type) bool {
 		for m := range t.functions {
 			found := true
 			switch mv := v.(type) {
-			case *Struct:
-				_, found = mv.Get(m)
 
 			case *Type:
 				_, found = mv.functions[m]

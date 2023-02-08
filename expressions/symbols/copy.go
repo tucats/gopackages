@@ -2,7 +2,6 @@ package symbols
 
 import (
 	"github.com/google/uuid"
-	"github.com/tucats/gopackages/expressions/data"
 )
 
 // Make a copy of the symbol table, retaining the same values
@@ -32,23 +31,4 @@ func (s *SymbolTable) Clone(withLock bool) *SymbolTable {
 	}
 
 	return &t
-}
-
-// For a given source table, find all the packages in the table and put them
-// in the current table.
-func (s *SymbolTable) GetPackages(source *SymbolTable) (count int) {
-	if source == nil {
-		return
-	}
-
-	for k, attributes := range source.symbols {
-		v := source.GetValue(attributes.slot)
-		if p, ok := v.(*data.Package); ok {
-			s.SetAlways(k, p)
-
-			count++
-		}
-	}
-
-	return count
 }

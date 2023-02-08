@@ -193,27 +193,6 @@ func coerceByteCode(c *Context, i interface{}) error {
 	switch t.Kind() {
 	case data.MapKind, data.ErrorKind, data.InterfaceKind, data.UndefinedKind:
 
-	case data.StructKind:
-		// Check all the fields in the struct to ensure they exist in the type.
-		vv := v.(*data.Struct)
-		for _, k := range vv.FieldNames(false) {
-			_, e2 := t.Field(k)
-			if e2 != nil {
-				return errors.NewError(e2)
-			}
-		}
-
-		// Verify that all the fields in the type are found in the object; if not,
-		// create a zero-value for that type.
-		for _, k := range t.FieldNames() {
-			if _, found := vv.Get(k); !found {
-				ft, _ := t.Field(k)
-				vv.SetAlways(k, data.InstanceOfType(ft))
-			}
-		}
-
-		v = vv
-
 	case data.IntKind:
 		v = data.Int(v)
 
@@ -244,23 +223,7 @@ func coerceByteCode(c *Context, i interface{}) error {
 			return c.push(v)
 		}
 
-		var base []interface{}
-
-		if a, ok := v.(*data.Array); ok {
-			base = a.BaseArray()
-		} else {
-			base = v.([]interface{})
-		}
-
-		elementType := t.BaseType()
-		array := data.NewArray(elementType, len(base))
-		model := data.InstanceOfType(elementType)
-
-		for i, element := range base {
-			_ = array.Set(i, data.Coerce(element, model))
-		}
-
-		v = array
+		return errors.ErrInvalidType
 	}
 
 	return c.push(v)

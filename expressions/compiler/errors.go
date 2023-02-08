@@ -26,8 +26,6 @@ func (c *Compiler) error(err error, args ...interface{}) *errors.Error {
 
 	if c.activePackageName != "" {
 		e = e.In(c.activePackageName)
-	} else if c.sourceFile != "" {
-		e = e.In(c.sourceFile)
 	}
 
 	// Get the context info if possible.

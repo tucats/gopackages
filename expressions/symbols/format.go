@@ -51,37 +51,6 @@ func (s *SymbolTable) Format(includeBuiltins bool) string {
 		typeString := dt.String()
 
 		switch actual := v.(type) {
-		case *data.Map:
-			typeString = actual.TypeString()
-
-		case *data.Array:
-			typeString = actual.TypeString()
-
-		case *data.Struct:
-			typeString = actual.TypeString()
-
-		case *data.Package:
-			if tsx, ok := actual.Get(data.TypeMDKey); ok {
-				typeString = data.String(tsx)
-			}
-
-			hasBuiltins := false
-			keys := actual.Keys()
-
-			for _, k := range keys {
-				k2, _ := actual.Get(k)
-				if _, ok := k2.(func(*SymbolTable, []interface{}) (interface{}, error)); ok {
-					hasBuiltins = true
-					omitType = true
-				}
-			}
-
-			if hasBuiltins && !includeBuiltins {
-				omitThisSymbol = true
-
-				continue
-			}
-
 		case func(*SymbolTable, []interface{}) (interface{}, error):
 			if !includeBuiltins {
 				omitThisSymbol = true
@@ -166,35 +135,6 @@ func (s *SymbolTable) FormattedData(includeBuiltins bool) [][]string {
 		typeString := dt.String()
 
 		switch actual := v.(type) {
-		case *data.Map:
-			typeString = actual.TypeString()
-
-		case *data.Array:
-			typeString = actual.TypeString()
-
-		case *data.Struct:
-			typeString = actual.TypeString()
-
-		case *data.Package:
-			if tsx, ok := actual.Get(data.TypeMDKey); ok {
-				typeString = data.String(tsx)
-			}
-
-			hasBuiltins := false
-			keys := actual.Keys()
-
-			for _, k := range keys {
-				k2, _ := actual.Get(k)
-				if _, ok := k2.(func(*SymbolTable, []interface{}) (interface{}, error)); ok {
-					hasBuiltins = true
-				}
-			}
-
-			if hasBuiltins && !includeBuiltins {
-				omitThisSymbol = true
-
-				continue
-			}
 
 		case func(*SymbolTable, []interface{}) (interface{}, error):
 			if !includeBuiltins {

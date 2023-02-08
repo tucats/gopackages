@@ -2,7 +2,6 @@ package builtins
 
 import (
 	"github.com/tucats/gopackages/errors"
-	"github.com/tucats/gopackages/expressions/data"
 	"github.com/tucats/gopackages/expressions/symbols"
 )
 
@@ -28,17 +27,6 @@ func Delete(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		}
 
 		return nil, s.Delete(v, false)
-
-	case *data.Map:
-		_, err := v.Delete(args[1])
-
-		return v, err
-
-	case *data.Array:
-		i := data.Int(args[1])
-		err := v.Delete(i)
-
-		return v, err
 
 	default:
 		return nil, errors.ErrInvalidType.In("delete")

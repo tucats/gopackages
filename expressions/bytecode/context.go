@@ -47,9 +47,7 @@ type Context struct {
 	symbols              *symbols.SymbolTable
 	tokenizer            *tokenizer.Tokenizer
 	stack                []interface{}
-	rangeStack           []*rangeDefinition
 	thisStack            []this
-	packageStack         []packageDef
 	output               *strings.Builder
 	lastStruct           interface{}
 	result               interface{}
@@ -124,8 +122,6 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 		thisStack:            nil,
 		throwUncheckedErrors: settings.GetBool(defs.ThrowUncheckedErrorsSetting),
 		fullStackTrace:       settings.GetBool(defs.FullStackTraceSetting),
-		packageStack:         make([]packageDef, 0),
-		rangeStack:           make([]*rangeDefinition, 0),
 		tracing:              false,
 		extensions:           extensions,
 	}

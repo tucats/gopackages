@@ -8,15 +8,6 @@ import (
 // model of that type. This only applies to base types.
 func InstanceOfType(t *Type) interface{} {
 	switch t.kind {
-	case StructKind:
-		return NewStruct(t)
-
-	case MapKind:
-		return NewMap(t.keyType, t.valueType)
-
-	case ArrayKind:
-		return NewArray(t.valueType, 0)
-
 	case TypeKind:
 		return t.InstanceOf(nil)
 
@@ -58,19 +49,6 @@ func (t Type) InstanceOf(superType *Type) interface{} {
 	switch t.kind {
 	case TypeKind:
 		return t.valueType.InstanceOf(&t)
-
-	case StructKind:
-		if superType == nil {
-			superType = StructType
-		}
-
-		return NewStruct(superType)
-
-	case ArrayKind:
-		return NewArray(t.valueType, 0)
-
-	case MapKind:
-		return NewMap(t.keyType, t.valueType)
 
 	case PointerKind:
 		return t.valueType.InstanceOf(nil)

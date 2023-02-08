@@ -1,8 +1,6 @@
 package builtins
 
 import (
-	"math"
-
 	"github.com/tucats/gopackages/defs"
 	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/expressions/data"
@@ -16,26 +14,8 @@ func Length(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	}
 
 	switch arg := args[0].(type) {
-	// For a channel, it's length either zero if it's drained, or bottomless
-	case *data.Channel:
-		size := int(math.MaxInt32)
-		if arg.IsEmpty() {
-			size = 0
-		}
-
-		return size, nil
-
-	case *data.Array:
-		return arg.Len(), nil
-
 	case error:
 		return len(arg.Error()), nil
-
-	case *data.Map:
-		return len(arg.Keys()), nil
-
-	case *data.Package:
-		return nil, errors.ErrInvalidType.Context(data.TypeOf(arg).String())
 
 	case nil:
 		return 0, nil

@@ -5,7 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/tucats/gopackages/defs"
 	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/expressions/data"
 	"github.com/tucats/gopackages/expressions/symbols"
@@ -93,33 +92,6 @@ func New(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		return data.InstanceOfType(data.WaitGroupType), nil
 	}
 
-	// If it's a Mutex, make a new one. We hae to do this as a swtich on the type, since a
-	// cast attempt will yield a warning on invalid mutex copy operation.
-	switch args[0].(type) {
-	case *sync.Mutex:
-		return data.InstanceOfType(data.MutexType), nil
-	}
-
-	// If it's a channel, just return the value
-	if typeValue, ok := args[0].(*data.Channel); ok {
-		return typeValue, nil
-	}
-
-	// Some native complex types work using the data package deep
-	// copy operation on that type.
-
-	switch actual := args[0].(type) {
-	case *data.Struct:
-		return data.DeepCopy(actual), nil
-
-	case *data.Array:
-		return data.DeepCopy(actual), nil
-
-	case *data.Map:
-		return data.DeepCopy(actual), nil
-	}
-
-	// Otherwise, make a deep copy of the item ourselves.
 	r := DeepCopy(args[0], MaxDeepCopyDepth)
 
 	// If there was a user-defined type in the source, make the clone point back to it
@@ -135,33 +107,6 @@ func New(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	// No action for this group
 	case byte, int32, int, int64, string, float32, float64:
-
-	case *data.Package:
-		dropList := []string{}
-
-		// Organize the new item by removing things that are handled via the parent.
-		keys := v.Keys()
-		for _, k := range keys {
-			vv, _ := v.Get(k)
-			// IF it's an internal function, we don't want to copy it; it can be found via the
-			// __parent link to the type
-			vx := reflect.ValueOf(vv)
-
-			if vx.Kind() == reflect.Ptr {
-				ts := vx.String()
-				if ts == defs.ByteCodeReflectionTypeString {
-					dropList = append(dropList, k)
-				}
-			} else {
-				if vx.Kind() == reflect.Func {
-					dropList = append(dropList, k)
-				}
-			}
-		}
-
-		for _, name := range dropList {
-			v.Delete(name)
-		}
 
 	default:
 		return nil, errors.ErrInvalidType.In("new").Context(v)

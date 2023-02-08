@@ -1,7 +1,5 @@
 package builtins
 
-import "github.com/tucats/gopackages/expressions/data"
-
 // MaxDeepCopyDepth specifies the maximum depth that a recursive
 // copy will go before failing. Setting this too small will
 // prevent complex structures from copying correctly. Setting it
@@ -50,41 +48,6 @@ func DeepCopy(source interface{}, depth int) interface{} {
 		}
 
 		return r
-
-	case *data.Struct:
-		return v.Copy()
-
-	case *data.Array:
-		r := data.NewArray(v.Type(), v.Len())
-
-		for i := 0; i < v.Len(); i++ {
-			vv, _ := v.Get(i)
-			vv = DeepCopy(vv, depth-1)
-			_ = v.Set(i, vv)
-		}
-
-		return r
-
-	case *data.Map:
-		r := data.NewMap(v.KeyType(), v.ElementType())
-
-		for _, k := range v.Keys() {
-			d, _, _ := v.Get(k)
-			_, _ = r.Set(k, DeepCopy(d, depth-1))
-		}
-
-		return r
-
-	case *data.Package:
-		r := data.Package{}
-		keys := v.Keys()
-
-		for _, k := range keys {
-			d, _ := v.Get(k)
-			r.Set(k, DeepCopy(d, depth-1))
-		}
-
-		return &r
 
 	default:
 		return v

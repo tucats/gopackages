@@ -27,16 +27,6 @@ func AddressOf(v interface{}) (interface{}, error) {
 		return &actual, nil
 	case string:
 		return &actual, nil
-	case Package:
-		return &actual, nil
-	case *Struct:
-		return &actual, nil
-	case *Map:
-		return &actual, nil
-	case *Array:
-		return &actual, nil
-	case *Channel:
-		return &actual, nil
 	default:
 		return &v, nil
 	}
@@ -67,14 +57,6 @@ func Dereference(v interface{}) (interface{}, error) {
 	case *float64:
 		return *actual, nil
 	case *string:
-		return *actual, nil
-	case *Package:
-		return *actual, nil
-	case **Map:
-		return *actual, nil
-	case **Array:
-		return *actual, nil
-	case **Channel:
 		return *actual, nil
 
 	default:

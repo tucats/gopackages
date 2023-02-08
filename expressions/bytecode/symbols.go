@@ -8,7 +8,6 @@ import (
 	"github.com/tucats/gopackages/errors"
 	"github.com/tucats/gopackages/expressions/data"
 	"github.com/tucats/gopackages/expressions/symbols"
-	"github.com/tucats/gopackages/util"
 )
 
 /******************************************\
@@ -29,42 +28,6 @@ func pushScopeByteCode(c *Context, i interface{}) error {
 
 	ui.Log(ui.SymbolLogger, "(%d) push symbol table \"%s\" <= \"%s\"",
 		c.threadID, c.symbols.Name, oldName)
-
-	return nil
-}
-
-// popScopeByteCode instruction processor. This drops the current
-// symbol table and reverts to its parent table. It also flushes
-// any pending "this" stack objects. A chain of receivers
-// cannot span a block, so this is a good time to clean up
-// any asymmetric pushes.
-//
-// Note special logic; if this was a package symbol table, take
-// time to update the readonly copies of the values in the package
-// object itself.
-func popScopeByteCode(c *Context, i interface{}) error {
-	count := 1
-	if i != nil {
-		count = data.Int(i)
-	}
-
-	for count > 0 {
-		// See if we're popping off a package table; if so there is work to do to
-		// copy the values back to the named package object.
-		if err := c.syncPackageSymbols(); err != nil {
-			return errors.NewError(err)
-		}
-
-		// Pop off the symbol table and clear up the "this" stack
-		if err := c.popSymbolTable(); err != nil {
-			return errors.NewError(err)
-		}
-
-		c.thisStack = nil
-		c.blockDepth--
-
-		count--
-	}
 
 	return nil
 }
@@ -104,17 +67,6 @@ func createAndStoreByteCode(c *Context, i interface{}) error {
 	// the given name.
 	if len(name) > 1 && name[0:1] == defs.ReadonlyVariablePrefix {
 		constantValue := data.DeepCopy(value)
-
-		switch a := constantValue.(type) {
-		case *data.Map:
-			a.SetReadonly(true)
-
-		case *data.Array:
-			a.SetReadonly(true)
-
-		case *data.Struct:
-			a.SetReadonly(true)
-		}
 
 		err = c.setConstant(name, constantValue)
 	} else {
@@ -190,30 +142,4 @@ func constantByteCode(c *Context, i interface{}) error {
 	}
 
 	return err
-}
-
-func (c *Context) syncPackageSymbols() error {
-	// Before we toss away this, check to see if there are package symbols
-	// that need updating in the package object.
-	if c.symbols.Parent() != nil && c.symbols.Parent().Package() != "" {
-		packageSymbols := c.symbols.Parent()
-		pkgname := c.symbols.Parent().Package()
-
-		if err := c.popSymbolTable(); err != nil {
-			return errors.NewError(err)
-		}
-
-		if pkg, ok := c.symbols.Root().Get(pkgname); ok {
-			if m, ok := pkg.(*data.Package); ok {
-				for _, k := range packageSymbols.Names() {
-					if util.HasCapitalizedName(k) {
-						v, _ := packageSymbols.Get(k)
-						m.Set(k, v)
-					}
-				}
-			}
-		}
-	}
-
-	return nil
 }

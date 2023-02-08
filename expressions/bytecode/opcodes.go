@@ -22,17 +22,13 @@ type Opcode int
 const (
 	Stop Opcode = iota // Stop must be the zero-th item.
 	Add
-	AddressOf
 	And
-	Array
 	BitAnd
 	BitOr
 	BitShift
 	Call
 	Coerce
 	Copy
-	CreateAndStore
-	DeRef
 	Div
 	Drop
 	DropToMarker
@@ -49,8 +45,6 @@ const (
 	LoadIndex
 	LoadSlice
 	LoadThis
-	MakeArray
-	MakeMap
 	Modulo
 	Mul
 	Negate
@@ -60,21 +54,10 @@ const (
 	Push
 	ReadStack
 	RequiredType
-	Return
 	SetThis
 	StaticTyping
-	Store
-	StoreAlways
-	StoreGlobal
-	StoreIndex
-	StoreInto
-	StoreViaPointer
-	Struct
 	Sub
 	Swap
-	SymbolCreate
-	SymbolDelete
-	SymbolOptCreate
 
 	// Everything from here on is a branch instruction, whose
 	// operand must be present and is an integer instruction
@@ -89,16 +72,11 @@ const (
 	Branch
 	BranchTrue
 	BranchFalse
-	LocalCall
-	RangeNext
-	Try
 )
 
 var opcodeNames = map[Opcode]string{
 	Add:                "Add",
-	AddressOf:          "AddressOf",
 	And:                "And",
-	Array:              "Array",
 	BitAnd:             "BitAnd",
 	BitOr:              "BitOr",
 	BitShift:           "BitShift",
@@ -108,8 +86,6 @@ var opcodeNames = map[Opcode]string{
 	Call:               "Call",
 	Coerce:             "Coerce",
 	Copy:               "Copy",
-	CreateAndStore:     "CreateAndStore",
-	DeRef:              "DeRef",
 	Div:                "Div",
 	Drop:               "Drop",
 	DropToMarker:       "DropToMarker",
@@ -126,9 +102,6 @@ var opcodeNames = map[Opcode]string{
 	LoadIndex:          "LoadIndex",
 	LoadSlice:          "LoadSlice",
 	LoadThis:           "LoadThis",
-	LocalCall:          "LocalCall",
-	MakeArray:          "MakeArray",
-	MakeMap:            "MakeMap",
 	Modulo:             "Modulo",
 	Mul:                "Mul",
 	Negate:             "Negate",
@@ -138,31 +111,17 @@ var opcodeNames = map[Opcode]string{
 	Push:               "Push",
 	ReadStack:          "ReadStack",
 	RequiredType:       "RequiredType",
-	Return:             "Return",
 	StaticTyping:       "StaticTyping",
 	Stop:               "Stop",
-	Store:              "Store",
-	StoreAlways:        "StoreAlways",
-	StoreGlobal:        "StoreGlobal",
-	StoreIndex:         "StoreIndex",
-	StoreInto:          "StoreInto",
-	StoreViaPointer:    "StorePointer",
-	Struct:             "Struct",
 	Sub:                "Sub",
 	Swap:               "Swap",
-	SymbolCreate:       "SymbolCreate",
-	SymbolDelete:       "SymbolDelete",
-	SymbolOptCreate:    "SymbolOptCreate",
-	Try:                "Try",
 }
 
 func initializeDispatch() {
 	if dispatch == nil {
 		dispatch = dispatchMap{
 			Add:                addByteCode,
-			AddressOf:          addressOfByteCode,
 			And:                andByteCode,
-			Array:              arrayByteCode,
 			BitAnd:             bitAndByteCode,
 			BitOr:              bitOrByteCode,
 			BitShift:           bitShiftByteCode,
@@ -171,8 +130,6 @@ func initializeDispatch() {
 			BranchTrue:         branchTrueByteCode,
 			Call:               callByteCode,
 			Coerce:             coerceByteCode,
-			CreateAndStore:     createAndStoreByteCode,
-			DeRef:              deRefByteCode,
 			Div:                divideByteCode,
 			Drop:               dropByteCode,
 			DropToMarker:       dropToMarkerByteCode,
@@ -180,17 +137,12 @@ func initializeDispatch() {
 			Equal:              equalByteCode,
 			Exp:                exponentByteCode,
 			Explode:            explodeByteCode,
-			Flatten:            flattenByteCode,
 			GreaterThan:        greaterThanByteCode,
 			GreaterThanOrEqual: greaterThanOrEqualByteCode,
 			LessThan:           lessThanByteCode,
 			LessThanOrEqual:    lessThanOrEqualByteCode,
 			Load:               loadByteCode,
-			LoadIndex:          loadIndexByteCode,
-			LoadSlice:          loadSliceByteCode,
 			LoadThis:           loadThisByteCode,
-			MakeArray:          makeArrayByteCode,
-			MakeMap:            makeMapByteCode,
 			Modulo:             moduloByteCode,
 			Mul:                multiplyByteCode,
 			Negate:             negateByteCode,
@@ -203,18 +155,8 @@ func initializeDispatch() {
 			SetThis:            setThisByteCode,
 			StaticTyping:       staticTypingByteCode,
 			Stop:               stopByteCode,
-			Store:              storeByteCode,
-			StoreAlways:        storeAlwaysByteCode,
-			StoreGlobal:        storeGlobalByteCode,
-			StoreIndex:         storeIndexByteCode,
-			StoreInto:          storeIntoByteCode,
-			StoreViaPointer:    storeViaPointerByteCode,
-			Struct:             structByteCode,
 			Sub:                subtractByteCode,
 			Swap:               swapByteCode,
-			SymbolCreate:       symbolCreateByteCode,
-			SymbolDelete:       symbolDeleteByteCode,
-			SymbolOptCreate:    symbolCreateIfByteCode,
 		}
 	}
 }

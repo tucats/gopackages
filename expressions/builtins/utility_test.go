@@ -3,8 +3,6 @@ package builtins
 import (
 	"reflect"
 	"testing"
-
-	"github.com/tucats/gopackages/expressions/data"
 )
 
 func TestFunctionLen(t *testing.T) {
@@ -33,21 +31,6 @@ func TestFunctionLen(t *testing.T) {
 			args:    args{[]interface{}{3.14}},
 			want:    0,
 			wantErr: true,
-		},
-		{
-			name: "array length",
-			args: args{
-				[]interface{}{
-					data.NewArrayFromArray(
-						data.InterfaceType,
-						[]interface{}{
-							true,
-							3.14,
-							"Tom",
-						}),
-				},
-			},
-			want: 3,
 		},
 	}
 
@@ -82,24 +65,6 @@ func TestLength(t *testing.T) {
 			name: "unicode string",
 			args: []interface{}{"\u2318foo\u2318"},
 			want: 9,
-		},
-		{
-			name: "simple array",
-			args: []interface{}{
-				data.NewArrayFromArray(data.IntType, []interface{}{1, 2, 3, 4}),
-			},
-			want: 4,
-		},
-		{
-			name: "simple map",
-			args: []interface{}{
-				data.NewMapFromMap(
-					map[string]interface{}{
-						"name": "Bob",
-						"age":  35,
-					}),
-			},
-			want: 2,
 		},
 		{
 			name: "int converted to string",

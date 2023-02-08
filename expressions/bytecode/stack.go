@@ -245,28 +245,3 @@ func copyByteCode(c *Context, i interface{}) error {
 
 	return err
 }
-
-func getVarArgsByteCode(c *Context, i interface{}) error {
-	err := c.error(errors.ErrInvalidVariableArguments)
-	argPos := data.Int(i)
-
-	if arrayV, ok := c.get(defs.ArgumentListVariable); ok {
-		if args, ok := arrayV.(*data.Array); ok {
-			// If no more args in the list to satisfy, push empty array
-			if args.Len() < argPos {
-				r := data.NewArray(data.InterfaceType, 0)
-
-				return c.push(r)
-			}
-
-			value, err := args.GetSlice(argPos, args.Len())
-			if err != nil {
-				return err
-			}
-
-			return c.push(data.NewArrayFromArray(data.InterfaceType, value))
-		}
-	}
-
-	return err
-}

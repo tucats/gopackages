@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"sort"
 	"strings"
-	"sync"
 
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/defs"
@@ -60,44 +59,6 @@ const Any = math.MaxInt32
 // ErrReturn:true flag to each function definition.
 var FunctionDictionary = map[string]FunctionDefinition{
 	"$new": {Min: 1, Max: 1, F: New},
-	"append": {Min: 2, Max: Any, F: Append, D: &data.Declaration{
-		Name: "append",
-		Parameters: []data.Parameter{
-			{
-				Name: "array",
-				Type: data.ArrayType(data.InterfaceType),
-			},
-			{
-				Name: "item",
-				Type: data.InterfaceType,
-			},
-		},
-		Variadic: true,
-		Returns:  []*data.Type{data.ArrayType(data.InterfaceType)},
-	}},
-	"close": {Min: 1, Max: 1, F: Close, D: &data.Declaration{
-		Name: "close",
-		Parameters: []data.Parameter{
-			{
-				Name: "any",
-				Type: data.InterfaceType,
-			},
-		},
-	}},
-	"delete": {Min: 1, Max: 2, F: Delete, FullScope: true, D: &data.Declaration{
-		Name: "delete",
-		Parameters: []data.Parameter{
-			{
-				Name: "item",
-				Type: data.InterfaceType,
-			},
-			{
-				Name: "index",
-				Type: data.InterfaceType,
-			},
-		},
-		ArgCount: data.Range{1, 2},
-	}},
 	"index": {Min: 2, Max: 2, F: Index, D: &data.Declaration{
 		Name: "index",
 		Parameters: []data.Parameter{
@@ -146,9 +107,6 @@ var FunctionDictionary = map[string]FunctionDefinition{
 		},
 		Returns: []*data.Type{data.IntType},
 	}},
-	"sync.__empty":   {Min: 0, Max: 0, F: stubFunction}, // Package auto imports, but has no functions
-	"sync.WaitGroup": {V: sync.WaitGroup{}},
-	"sync.Mutex":     {V: sync.Mutex{}},
 }
 
 // AddBuiltins adds or overrides the default function library in the symbol map.
@@ -176,40 +134,7 @@ func AddBuiltins(symbolTable *symbols.SymbolTable) {
 			n = n[dot+1:]
 		}
 
-		if d.Pkg == "" {
-			_ = symbolTable.SetWithAttributes(n, d.F, symbols.SymbolAttribute{Readonly: true})
-		} else {
-			// Does package already exist? If not, make it. The package
-			// is just a struct containing where each member is a function
-			// definition.
-			pkg := data.NewPackage(d.Pkg)
-
-			if p, found := symbolTable.Root().Get(d.Pkg); found {
-				if pp, ok := p.(*data.Package); ok {
-					pkg = pp
-				}
-			} else {
-				ui.Log(ui.CompilerLogger, "    AddBuiltins creating new package %s", d.Pkg)
-			}
-
-			root := symbolTable.Root()
-			// Is this a value bound to the package, or a function?
-			if d.V != nil {
-				pkg.Set(n, d.V)
-
-				_ = root.SetWithAttributes(d.Pkg, pkg, symbols.SymbolAttribute{Readonly: true})
-
-				ui.Log(ui.CompilerLogger, "    adding value %s to %s", n, d.Pkg)
-			} else {
-				pkg.Set(n, d.F)
-				pkg.Set(data.TypeMDKey, data.PackageType(d.Pkg))
-				pkg.Set(data.ReadonlyMDKey, true)
-
-				_ = root.SetWithAttributes(d.Pkg, pkg, symbols.SymbolAttribute{Readonly: true})
-
-				ui.Log(ui.CompilerLogger, "    adding builtin %s to %s", n, d.Pkg)
-			}
-		}
+		_ = symbolTable.SetWithAttributes(n, d.F, symbols.SymbolAttribute{Readonly: true})
 	}
 }
 
@@ -247,28 +172,6 @@ func FindName(f func(*symbols.SymbolTable, []interface{}) (interface{}, error)) 
 }
 
 func CallBuiltin(s *symbols.SymbolTable, name string, args ...interface{}) (interface{}, error) {
-	// See if it's a runtime package item (as opposed to a builtin)
-	if dot := strings.Index(name, "."); dot > 0 {
-		packageName := name[:dot]
-		functionName := name[dot+1:]
-
-		if v, ok := s.Get(packageName); ok {
-			if pkg, ok := v.(*data.Package); ok {
-				if v, ok := pkg.Get(functionName); ok {
-					if fd, ok := v.(data.Function); ok {
-						if fn, ok := fd.Value.(func(*symbols.SymbolTable, []interface{}) (interface{}, error)); ok {
-							v, e := fn(s, args)
-
-							return v, e
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// Nope, see if it's a builtin
-
 	var fdef = FunctionDefinition{}
 
 	found := false
@@ -304,13 +207,6 @@ func AddFunction(s *symbols.SymbolTable, fd FunctionDefinition) error {
 	}
 
 	FunctionDictionary[fd.Name] = fd
-
-	// Has the package already been constructed? If so, we need to add this to the package.
-	if pkg, ok := s.Get(fd.Pkg); ok {
-		if p, ok := pkg.(*data.Package); ok {
-			p.Set(fd.Name, fd.F)
-		}
-	}
 
 	return nil
 }

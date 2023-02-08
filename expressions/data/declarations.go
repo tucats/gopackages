@@ -22,7 +22,6 @@ var float64Model float64 = 0.0
 var float32Model float32 = 0.0
 var boolModel = false
 var stringModel = ""
-var chanModel = NewChannel(1)
 
 // These are instances of the zero value of each object, expressed
 // as an interface{}.
@@ -40,79 +39,9 @@ var stringInterface interface{} = ""
 // should be a type in InstanceOf to match each of these types.
 var TypeDeclarations = []TypeDeclaration{
 	{
-		[]string{"sync", ".", "WaitGroup"},
-		nil, // Model generated in instance-of
-		WaitGroupType,
-	},
-	{
-		[]string{"*", "sync", ".", "WaitGroup"},
-		nil, // Model generated in instance-of
-		PointerType(WaitGroupType),
-	},
-	{
-		[]string{"sync", ".", "Mutex"},
-		nil, // Model generated in instance-of
-		MutexType,
-	},
-	{
-		[]string{"*", "sync", ".", "Mutex"},
-		nil, // Model generated in instance-of
-		PointerType(MutexType),
-	},
-	{
-		[]string{"chan"},
-		chanModel,
-		ChanType,
-	},
-	{
 		[]string{ErrorTypeName},
 		&errors.Error{},
 		ErrorType,
-	},
-	{
-		[]string{"[", "]", ByteTypeName},
-		NewArray(ByteType, 0),
-		ArrayType(ByteType),
-	},
-	{
-		[]string{"[", "]", Int32TypeName},
-		NewArray(Int32Type, 0),
-		ArrayType(Int32Type),
-	},
-	{
-		[]string{"[", "]", IntTypeName},
-		NewArray(IntType, 0),
-		ArrayType(IntType),
-	},
-	{
-		[]string{"[", "]", Int64TypeName},
-		NewArray(Int64Type, 0),
-		ArrayType(Int64Type),
-	},
-	{
-		[]string{"[", "]", BoolTypeName},
-		NewArray(BoolType, 0),
-		ArrayType(BoolType),
-	},
-	{
-		[]string{"[", "]", Float64TypeName},
-		NewArray(Float64Type, 0),
-		ArrayType(Float64Type),
-	},
-	{
-		[]string{"[", "]", Float32TypeName},
-		NewArray(Float32Type, 0),
-		ArrayType(Float32Type),
-	},
-	{
-		[]string{"[", "]", StringTypeName},
-		NewArray(StringType, 0),
-		ArrayType(StringType),
-	},
-	{
-		[]string{"[", "]", InterfaceTypeName},
-		NewArray(InterfaceType, 0),
-		ArrayType(InterfaceType),
 	},
 	{
 		[]string{BoolTypeName},

@@ -7,7 +7,6 @@ package app
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"strings"
 
 	"github.com/tucats/gopackages/app-cli/cli"
@@ -15,7 +14,6 @@ import (
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/defs"
 	"github.com/tucats/gopackages/errors"
-	"github.com/tucats/gopackages/expressions/data"
 	"github.com/tucats/gopackages/expressions/symbols"
 )
 
@@ -134,35 +132,6 @@ func (app *App) Run(grammar []cli.Option, args []string) error {
 		Args:        args,
 		Action:      app.Action,
 	}
-
-	// Create the platform definition symbols
-	platformType := data.StructureType(
-		data.Field{
-			Name: "os",
-			Type: data.StringType,
-		},
-		data.Field{
-			Name: "arch",
-			Type: data.StringType,
-		},
-		data.Field{
-			Name: "go",
-			Type: data.StringType,
-		},
-		data.Field{
-			Name: "cpus",
-			Type: data.IntType,
-		},
-	)
-
-	platform := data.NewStruct(platformType)
-	_ = platform.Set("go", runtime.Version())
-	_ = platform.Set("os", runtime.GOOS)
-	_ = platform.Set("arch", runtime.GOARCH)
-	_ = platform.Set("cpus", runtime.NumCPU())
-	platform.SetReadonly(true)
-	_ = symbols.RootSymbolTable.SetWithAttributes(defs.PlatformVariable, platform,
-		symbols.SymbolAttribute{Readonly: true})
 
 	if err := SetDefaultLoggers(); err != nil {
 		return err

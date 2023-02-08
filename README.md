@@ -5,7 +5,7 @@ They allow for the definition of the command line grammar (including type checki
 values, missing arguments, etc) and a defined action routine called when a subcommand is
 processed successfully.
 
-A simple command line tool defines a grammar for the commands and subcommands, and their 
+A simple command line tool defines a grammar for the commands and subcommands, and their
 options. It then calls the app package Run() method which handles parsing and execution
 control from then on.
 

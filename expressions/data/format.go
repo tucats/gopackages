@@ -128,32 +128,8 @@ func Format(element interface{}) string {
 	case *Type:
 		return v.String() + v.FunctionNameList()
 
-	// Naked WaitGroup is a model for a type
-	case sync.WaitGroup:
-		return "T(sync.WaitGroup)"
-	// Pointer to WaitGroup is what an _APP_ WaitGroup is
-	case *sync.WaitGroup:
-		return "sync.WaitGroup{}"
-
-	// Naked WaitGroup is a model for a type
-	case sync.Mutex:
-		return "Mutex type"
-
-	// Pointer to sync.Mutex is what an _APP_ Mutex is
-	case *sync.Mutex:
-		return "sync.Mutex{}"
-
-	case **sync.Mutex:
-		return "*sync.Mutex{}"
-
 	case *time.Time:
 		return v.String()
-
-	case Channel:
-		return v.String()
-
-	case *Channel:
-		return "*" + v.String()
 
 	case error:
 		return fmt.Sprintf("%v", v)
@@ -190,60 +166,6 @@ func Format(element interface{}) string {
 		return v.String()
 
 	case Declaration:
-		return v.String()
-
-	case *Package:
-		var b strings.Builder
-
-		keys := v.Keys()
-
-		b.WriteString("Pkg<")
-
-		b.WriteString(strconv.Quote(v.Name))
-
-		if v.Builtins {
-			b.WriteString(", builtins")
-		}
-
-		if v.Source {
-			b.WriteString(", source")
-		}
-
-		if v.HasTypes() {
-			b.WriteString(", types")
-		}
-
-		if verbose {
-			for _, k := range keys {
-				// Skip over hidden values
-				if strings.HasPrefix(k, defs.InvisiblePrefix) {
-					continue
-				}
-
-				if !hasCapitalizedName(k) {
-					continue
-				}
-
-				i, _ := v.Get(k)
-
-				b.WriteRune(' ')
-				b.WriteString(k)
-				b.WriteString(": ")
-				b.WriteString(Format(i))
-			}
-		}
-
-		b.WriteString(">")
-
-		return b.String()
-
-	case *Struct:
-		return v.String()
-
-	case *Array:
-		return v.String()
-
-	case *Map:
 		return v.String()
 
 	case *interface{}:

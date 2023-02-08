@@ -6,8 +6,6 @@ import (
 	"sort"
 	"strings"
 	"unicode"
-
-	"github.com/tucats/gopackages/expressions/data"
 )
 
 // Unquote removes quotation marks from a string if present.
@@ -50,22 +48,6 @@ func Hostname() string {
 	} else {
 		return "<unknown hostname>"
 	}
-}
-
-// Given a list of strings, convert them to a sorted list in
-// Ego array format.
-func MakeSortedArray(array []string) *data.Array {
-	sort.Strings(array)
-
-	intermediateArray := make([]interface{}, len(array))
-
-	for i, v := range array {
-		intermediateArray[i] = v
-	}
-
-	result := data.NewArrayFromArray(data.StringType, intermediateArray)
-
-	return result
 }
 
 func InterfaceMapKeys(data map[string]interface{}) []string {

@@ -201,38 +201,6 @@ func DeepCopy(v interface{}) interface{} {
 	case string:
 		return actual
 
-	case *Array:
-		size := actual.Len()
-		result := NewArray(actual.valueType, size)
-
-		for i := 0; i < size; i++ {
-			v, _ := actual.Get(i)
-			_ = result.Set(i, DeepCopy(v))
-		}
-
-		return result
-
-	case *Map:
-		result := NewMap(actual.keyType, actual.elementType)
-		keys := actual.Keys()
-
-		for _, k := range keys {
-			v, _, _ := actual.Get(k)
-			_, _ = result.Set(k, DeepCopy(v))
-		}
-
-		return result
-
-	case *Struct:
-		result := actual.Copy()
-		result.fields = map[string]interface{}{}
-
-		for k, v := range actual.fields {
-			result.fields[k] = DeepCopy(v)
-		}
-
-		return result
-
 	default:
 		return nil // Unsupported type, (for example, pointers)
 	}
