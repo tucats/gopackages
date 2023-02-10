@@ -73,7 +73,7 @@ func ShowHelp(c *Context) {
 
 	commandDescription := i18n.T(c.Description)
 	if commandDescription == c.Description {
-		commandDescription = i18n.T("opt." + c.Description)
+		commandDescription = i18n.O(c.Description)
 	}
 
 	if c.Parent == nil && c.Version != "" {
@@ -117,13 +117,13 @@ func ShowHelp(c *Context) {
 			if !headerShown {
 				fmt.Printf("%s:\n", i18n.L("Commands"))
 
-				_ = tc.AddRow([]string{" help", i18n.T("opt.help.text")})
+				_ = tc.AddRow([]string{" help", i18n.O("help.text")})
 				headerShown = true
 			}
 
 			optionDescription := i18n.T(option.Description)
 			if optionDescription == c.Description {
-				optionDescription = i18n.T("opt." + option.Description)
+				optionDescription = i18n.O(option.Description)
 			}
 
 			defaultFlag := " "
@@ -165,7 +165,7 @@ func ShowHelp(c *Context) {
 
 				optionDescription := i18n.T(option.Description)
 				if optionDescription == c.Description {
-					optionDescription = i18n.T("opt." + option.Description)
+					optionDescription = i18n.O(option.Description)
 				}
 
 				_ = tc.AddRowItems(optionDescription)
@@ -240,7 +240,7 @@ func ShowHelp(c *Context) {
 
 			fullDescription := i18n.T(option.Description)
 			if fullDescription == option.Description {
-				fullDescription = i18n.T("opt." + option.Description)
+				fullDescription = i18n.O(option.Description)
 			}
 
 			if option.EnvironmentVariable != "" {
@@ -253,7 +253,7 @@ func ShowHelp(c *Context) {
 
 	fmt.Printf("Options:\n")
 
-	_ = to.AddRow([]string{"--help, -h", i18n.T("opt.help.text")})
+	_ = to.AddRow([]string{"--help, -h", i18n.O("help.text")})
 	_ = to.SortRows(0, true)
 	_ = to.Print(ui.TextFormat)
 }

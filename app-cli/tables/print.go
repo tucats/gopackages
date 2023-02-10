@@ -205,6 +205,12 @@ func (t *Table) paginateText() []string {
 
 	first := true
 
+	var e *expressions.Expression
+
+	if t.where != "" {
+		e = expressions.New().WithNormalization(true).WithText(t.where)
+	}
+
 	// Build the headings map.
 	for i, n := range t.columnOrder {
 		w := t.maxWidth[n]
@@ -334,6 +340,24 @@ func (t *Table) paginateText() []string {
 			break
 		}
 
+		if e != nil {
+			// Load up the symbol tables with column values and the row number
+			syms := symbols.NewSymbolTable("rowset")
+			syms.SetAlways("_row_", rx+1)
+			for i, n := range t.names {
+				syms.SetAlways(strings.ToLower(n), r[i])
+			}
+
+			v, err := e.Eval(syms)
+			if err != nil {
+				output = append(output, fmt.Sprintf("*** where clause error: %s", err.Error()))
+				break
+			}
+			if !util.GetBool(v) {
+				continue
+			}
+		}
+
 		// Loop over the elements of the row. Generate pre- or post-spacing as
 		// appropriate for the requested alignment, and any intra-column spacing.
 		for cx, n := range t.columnOrder {
@@ -407,7 +431,7 @@ func (t *Table) FormatText() []string {
 	var e *expressions.Expression
 
 	if t.where != "" {
-		e = expressions.New().WithText(t.where)
+		e = expressions.New().WithNormalization(true).WithText(t.where)
 	}
 
 	if t.showHeadings {

@@ -46,7 +46,7 @@ func T(key string, valueMap ...map[string]interface{}) string {
 
 // L returns a label with the given key.
 func L(key string, valueMap ...map[string]interface{}) string {
-	return T("label."+key, valueMap...)
+	return strings.TrimPrefix(T("label."+key, valueMap...), "label.")
 }
 
 // M returns a message with the given key.
@@ -56,5 +56,10 @@ func M(key string, valueMap ...map[string]interface{}) string {
 
 // E returns an error with the given key.
 func E(key string, valueMap ...map[string]interface{}) string {
-	return T("error."+key, valueMap...)
+	return strings.TrimPrefix(T("error."+key, valueMap...), "error.")
+}
+
+// O returns an option description with the given key.
+func O(key string, valueMap ...map[string]interface{}) string {
+	return strings.TrimPrefix(T("opt."+key, valueMap...), "opt.")
 }
