@@ -4,104 +4,21 @@ import (
 	"os"
 
 	"github.com/tucats/gopackages/app-cli/cli"
-	"github.com/tucats/gopackages/app-cli/config"
 	"github.com/tucats/gopackages/app-cli/settings"
-	"github.com/tucats/gopackages/app-cli/ui"
-	"github.com/tucats/gopackages/defs"
 )
 
 // Run sets up required data structures and parses the command line. It then
 // automatically calls any action routines specfied in the grammar, which do
 // the work of the command.
 func runFromContext(context *cli.Context) error {
-	// Create a new grammar which prepends the default supplied options
-	// to the caller's grammar definition.
-	grammar := []cli.Option{
-		{
-			LongName:            "insecure",
-			ShortName:           "k",
-			OptionType:          cli.BooleanType,
-			Description:         "insecure",
-			Action:              InsecureAction,
-			EnvironmentVariable: "APP_INSECURE_CLIENT",
-		},
-		{
-			LongName:    "config",
-			Aliases:     []string{"configuration", "profile", "prof"},
-			OptionType:  cli.Subcommand,
-			Description: "ego.config",
-			Value:       config.Grammar,
-		},
-		{
-			LongName:    "logon",
-			Aliases:     []string{"login"},
-			OptionType:  cli.Subcommand,
-			Description: "ego.logon",
-			Action:      Logon,
-			Value:       LogonGrammar,
-		},
-		{
-			ShortName:           "p",
-			LongName:            "profile",
-			Description:         "global.profile",
-			OptionType:          cli.StringType,
-			Action:              UseProfileAction,
-			EnvironmentVariable: "APP_PROFILE",
-		},
-		{
-			LongName:            "log",
-			ShortName:           "l",
-			Description:         "global.log",
-			OptionType:          cli.StringListType,
-			Action:              LogAction,
-			EnvironmentVariable: defs.DefaultLogging,
-		},
-		{
-			LongName:            "log-file",
-			Description:         "global.log.file",
-			OptionType:          cli.StringType,
-			Action:              LogFileAction,
-			EnvironmentVariable: defs.DefaultLogFileName,
-		},
-		{
-			LongName:            "format",
-			ShortName:           "f",
-			Description:         "global.format",
-			OptionType:          cli.KeywordType,
-			Keywords:            []string{ui.JSONFormat, ui.JSONIndentedFormat, ui.TextFormat},
-			Action:              OutputFormatAction,
-			EnvironmentVariable: "APP_OUTPUT_FORMAT",
-		},
-		{
-			ShortName:   "v",
-			LongName:    "version",
-			Description: "global.version",
-			OptionType:  cli.BooleanType,
-			Action:      ShowVersionAction,
-		},
-		{
-			ShortName:           "q",
-			LongName:            "quiet",
-			Description:         "global.quiet",
-			OptionType:          cli.BooleanType,
-			Action:              QuietAction,
-			EnvironmentVariable: "APP_QUIET",
-		},
-		{
-			LongName:    "version",
-			Description: "global.version",
-			OptionType:  cli.Subcommand,
-			Action:      VersionAction,
-		},
-	}
 
 	// Add the user-provided grammar.
-	grammar = append(grammar, context.Grammar...)
+	applicationGrammar = append(applicationGrammar, context.Grammar...)
 
 	// Load the active profile, if any from the profile for this application.
 	_ = settings.Load(context.AppName, "default")
 
-	context.Grammar = grammar
+	context.Grammar = applicationGrammar
 
 	// If we are to dump the grammar (a diagnostic function) do that,
 	// then just pack it in and go home.

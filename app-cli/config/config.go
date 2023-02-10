@@ -22,13 +22,13 @@ const maxKeyValuePrintWidth = 60
 var Grammar = []cli.Option{
 	{
 		LongName:    "list",
-		Description: "ego.config.list",
+		Description: "app.config.list",
 		Action:      ListAction,
 		OptionType:  cli.Subcommand,
 	},
 	{
 		LongName:             "show",
-		Description:          "ego.config.show",
+		Description:          "app.config.show",
 		Action:               ShowAction,
 		ParameterDescription: "key",
 		ParametersExpected:   -1,
@@ -38,7 +38,7 @@ var Grammar = []cli.Option{
 	{
 		LongName:             "set-output",
 		OptionType:           cli.Subcommand,
-		Description:          "ego.config.set.output",
+		Description:          "app.config.set.output",
 		ParameterDescription: "type",
 		Action:               SetOutputAction,
 		ParametersExpected:   1,
@@ -46,7 +46,7 @@ var Grammar = []cli.Option{
 	{
 		LongName:             "set-description",
 		OptionType:           cli.Subcommand,
-		Description:          "ego.config.set.description",
+		Description:          "app.config.set.description",
 		ParameterDescription: "text",
 		ParametersExpected:   1,
 		Action:               SetDescriptionAction,
@@ -55,7 +55,7 @@ var Grammar = []cli.Option{
 		LongName:             "delete",
 		Aliases:              []string{"unset"},
 		OptionType:           cli.Subcommand,
-		Description:          "ego.config.delete",
+		Description:          "app.config.delete",
 		Action:               DeleteAction,
 		ParametersExpected:   1,
 		ParameterDescription: "parm.key",
@@ -71,14 +71,14 @@ var Grammar = []cli.Option{
 	{
 		LongName:             "remove",
 		OptionType:           cli.Subcommand,
-		Description:          "ego.config.remove",
+		Description:          "app.config.remove",
 		Action:               DeleteProfileAction,
 		ParametersExpected:   1,
 		ParameterDescription: "parm.name",
 	},
 	{
 		LongName:             "set",
-		Description:          "ego.config.set",
+		Description:          "app.config.set",
 		Action:               SetAction,
 		OptionType:           cli.Subcommand,
 		ParametersExpected:   1,
@@ -237,7 +237,7 @@ func SetDescriptionAction(c *cli.Context) error {
 }
 
 // Determine if a key is allowed to be updated by the CLI. This rule
-// applies to keys with the privileged key prefix ("ego.").
+// applies to keys with the privileged key prefix ("app.").
 func validateKey(key string) error {
 	if strings.HasPrefix(key, defs.PrivilegedKeyPrefix) {
 		allowed, found := defs.ValidSettings[key]

@@ -107,7 +107,7 @@ func SetOutputAction(c *cli.Context) error {
 	if c.ParameterCount() == 1 {
 		outputType := c.Parameter(0)
 		if outputType == "text" || outputType == "json" {
-			persistence.Set("ego.output-format", outputType)
+			persistence.Set("app.output-format", outputType)
 			return nil
 		}
 		return errors.New("Invalid output type: " + outputType)

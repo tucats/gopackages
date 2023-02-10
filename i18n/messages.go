@@ -8,6 +8,36 @@ package i18n
 // If the text isn't found in English either, the key is returned
 // as the unlocalizable result.
 var messages = map[string]map[string]string{
+	"app.config": {
+		"en": "View or set application configuration",
+	},
+	"app.config.delete": {
+		"en": "Delete an application configuration item",
+	},
+	"app.config.list": {
+		"en": "List the application configuration profiles",
+	},
+	"app.config.remove": {
+		"en": "Remove an application configuration profile",
+	},
+	"app.config.set": {
+		"en": "Set an application configuration item",
+	},
+	"app.config.set.description": {
+		"en": "Set the application configuration profile description",
+	},
+	"app.config.set.output": {
+		"en": "Set the default output format",
+	},
+	"app.config.show": {
+		"en": "Show the application configuration items in the current profile",
+	},
+	"app.logon": {
+		"en": "Log on to a remote server",
+	},
+	"global.version": {
+		"en": "Show application version",
+	},
 	"error.arg.count": {
 		"en": "incorrect function argument count",
 	},
