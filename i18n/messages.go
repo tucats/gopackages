@@ -14,53 +14,11 @@ var messages = map[string]map[string]string{
 	"error.arg.type": {
 		"en": "incorrect function argument type",
 	},
-	"error.argcheck.array": {
-		"en": "invalid ArgCheck array",
-	},
-	"error.array.bounds": {
-		"en": "array index out of bounds",
-	},
-	"error.array.bracket": {
-		"en": "missing array bracket",
-	},
-	"error.array.index": {
-		"en": "invalid array index",
-	},
-	"error.array.value.type": {
-		"en": "wrong array value type",
-	},
-	"error.assert": {
-		"en": "@assert error",
-	},
-	"error.assert.testing": {
-		"en": "testing @assert failure",
-	},
-	"error.asset": {
-		"en": "no such asset",
-	},
-	"error.assignment": {
-		"en": "missing '=' or ':='",
-	},
-	"error.auth.type": {
-		"en": "invalid authentication type",
-	},
-	"error.auto.import": {
-		"en": "Unable to auto-import: {{err}}",
-	},
 	"error.bit.shift": {
 		"en": "invalid bit shift specification",
 	},
-	"error.block": {
-		"en": "missing '{'",
-	},
-	"error.block.end": {
-		"en": "missing '}'",
-	},
 	"error.boolean.option": {
 		"en": "invalid boolean option value",
-	},
-	"error.break.clause": {
-		"en": "invalid break clause",
 	},
 	"error.bytecode.address": {
 		"en": "invalid bytecode address",
@@ -68,29 +26,11 @@ var messages = map[string]map[string]string{
 	"error.bytecode.not.found": {
 		"en": "unimplemented bytecode instruction",
 	},
-	"error.cache.not.spec": {
-		"en": "cache size not specified",
-	},
-	"error.call.frame": {
-		"en": "invalid call frame on stack",
-	},
 	"error.cannot.delete.profile": {
 		"en": "cannot delete active profile",
 	},
-	"error.case": {
-		"en": "missing 'case'",
-	},
-	"error.catch": {
-		"en": "missing 'catch' clause",
-	},
 	"cert.parse.err": {
 		"en": "error parsing certficate file",
-	},
-	"error.channel.assignment": {
-		"en": "invalid use of assignment list for channel",
-	},
-	"error.channel.not.open": {
-		"en": "channel not open",
 	},
 	"error.cli.command.not.found": {
 		"en": "unrecognized command",
@@ -137,30 +77,6 @@ var messages = map[string]map[string]string{
 	"error.credentials.missing": {
 		"en": "no credentials provided",
 	},
-	"error.db.closed": {
-		"en": "database client closed",
-	},
-	"error.db.column.def": {
-		"en": "invalid database column definition",
-	},
-	"error.db.result.type": {
-		"en": "invalid result set type",
-	},
-	"error.db.rowset": {
-		"en": "invalid rowset value",
-	},
-	"error.debug.service": {
-		"en": "cannot debug non-existent service",
-	},
-	"error.debugger.cmd": {
-		"en": "invalid debugger command",
-	},
-	"error.directive": {
-		"en": "invalid directive name",
-	},
-	"error.directive.mode": {
-		"en": "directive invalid for mode",
-	},
 	"error.div.zero": {
 		"en": "division by zero",
 		"fr": "division par zéro",
@@ -173,9 +89,6 @@ var messages = map[string]map[string]string{
 	},
 	"error.empty.column": {
 		"en": "empty column list",
-	},
-	"error.entry.not.found": {
-		"en": "undefined entrypoint name",
 	},
 	"error.equals": {
 		"en": "missing '='",
@@ -191,18 +104,6 @@ var messages = map[string]map[string]string{
 	},
 	"error.extension": {
 		"en": "unsupported language extension",
-	},
-	"error.field.for.type": {
-		"en": "invalid field name for type",
-	},
-	"error.field.not.found": {
-		"en": "unknown structure member",
-	},
-	"error.file.id": {
-		"en": "invalid file identifier",
-	},
-	"error.file.mode": {
-		"en": "invalid file open mode",
 	},
 	"error.filter.term.invalid": {
 		"en": "Unrecognized operator {{term}}",
@@ -315,12 +216,6 @@ var messages = map[string]map[string]string{
 	"error.invalid.blockquote": {
 		"en": "invalid block quote",
 	},
-	"error.invalid.catch.set": {
-		"en": "invalid catch set {{index}}",
-	},
-	"error.invalid.struct.or.package": {
-		"en": "invalid structure or package",
-	},
 	"error.keyword.option": {
 		"en": "invalid option keyword",
 	},
@@ -339,18 +234,6 @@ var messages = map[string]map[string]string{
 	"error.logon.server": {
 		"en": "no --logon-server specified",
 	},
-	"error.loop.control": {
-		"en": "loop control statement outside of for-loop",
-	},
-	"error.loop.index": {
-		"en": "invalid loop index variable",
-	},
-	"error.map.key.type": {
-		"en": "wrong map key type",
-	},
-	"error.map.value.type": {
-		"en": "wrong map value type",
-	},
 	"error.media.type": {
 		"en": "invalid media type",
 	},
@@ -360,26 +243,14 @@ var messages = map[string]map[string]string{
 	"error.no.info": {
 		"en": "no information for item",
 	},
-	"error.no.main.package": {
-		"en": "no main package found",
-	},
 	"error.no.symbol.table": {
 		"en": "no symbol table available",
 	},
 	"error.not.assignment.list": {
 		"en": "not an assignment list",
 	},
-	"error.not.channel": {
-		"en": "neither source or destination is a channel",
-	},
 	"error.not.found": {
 		"en": "not found",
-	},
-	"error.not.pointer": {
-		"en": "not a pointer",
-	},
-	"error.not.service": {
-		"en": "not running as a service",
 	},
 	"error.not.type": {
 		"en": "not a type",
@@ -393,18 +264,6 @@ var messages = map[string]map[string]string{
 	"error.option.value": {
 		"en": "missing option value",
 	},
-	"error.package.exists": {
-		"en": "cannot redefine existing package",
-	},
-	"error.package.member": {
-		"en": "unknown package member",
-	},
-	"error.package.name": {
-		"en": "invalid package name",
-	},
-	"error.package.stmt": {
-		"en": "missing package statement",
-	},
 	"error.panic": {
 		"en": "Panic",
 	},
@@ -416,9 +275,6 @@ var messages = map[string]map[string]string{
 	},
 	"error.parm.value.count": {
 		"en": "wrong number of parameter values",
-	},
-	"error.pointer.type": {
-		"en": "invalid pointer type",
 	},
 	"error.privilege": {
 		"en": "no privilege for operation",
@@ -444,29 +300,14 @@ var messages = map[string]map[string]string{
 	"error.reserved.name": {
 		"en": "reserved profile setting name",
 	},
-	"error.rest.closed": {
-		"en": "rest client closed",
-	},
-	"error.return.list": {
-		"en": "invalid return type list",
-	},
-	"error.return.void": {
-		"en": "invalid return value for void function",
-	},
 	"error.row.number": {
 		"en": "invalid row number",
 	},
 	"error.sandbox.path": {
 		"en": "invalid sandbox path",
 	},
-	"error.scope.invalid": {
-		"en": "invalid or non-existent symbol table scope",
-	},
 	"error.semicolon": {
 		"en": "missing ';'",
-	},
-	"error.server.running": {
-		"en": "server already running as pid",
 	},
 	"error.slice.index": {
 		"en": "invalid slice index",
@@ -486,20 +327,11 @@ var messages = map[string]map[string]string{
 	"error.step.type": {
 		"en": "invalid step type",
 	},
-	"error.struct": {
-		"en": "invalid struct",
-	},
-	"error.struct.type": {
-		"en": "unknown structure type",
-	},
 	"error.symbol.exists": {
 		"en": "symbol already exists",
 	},
 	"error.symbol.name": {
 		"en": "invalid symbol name",
-	},
-	"error.symbol.not.exported": {
-		"en": "symbol not exported from package",
 	},
 	"error.symbol.not.found": {
 		"en": "unknown symbol",
@@ -513,35 +345,14 @@ var messages = map[string]map[string]string{
 	"error.table.processing": {
 		"en": "table processing",
 	},
-	"error.template.name": {
-		"en": "invalid template name",
-	},
 	"error.terminated": {
 		"en": "terminated with errors",
-	},
-	"error.this": {
-		"en": "invalid _this_ identifier",
-	},
-	"error.timer": {
-		"en": "invalid timer operation",
 	},
 	"error.token.encryption": {
 		"en": "invalid token encryption",
 	},
 	"error.token.extra": {
 		"en": "unexpected token",
-	},
-	"error.try.stack": {
-		"en": "try/catch stack error",
-	},
-	"error.tx.actibe": {
-		"en": "transaction already active",
-	},
-	"error.tx.not.active": {
-		"en": "no transaction active",
-	},
-	"error.tx.not.found": {
-		"en": "no such transaction symbol",
 	},
 	"error.type": {
 		"en": "invalid or unsupported data type for this operation",
@@ -567,9 +378,6 @@ var messages = map[string]map[string]string{
 	"error.unsupported.on.os": {
 		"en": "command not implemented for this operating system",
 	},
-	"error.url": {
-		"en": "invalid URL path specification",
-	},
 	"error.user.defined": {
 		"en": "user-supplied error",
 	},
@@ -582,9 +390,6 @@ var messages = map[string]map[string]string{
 	"error.value.extra": {
 		"en": "unexpected value",
 	},
-	"error.var.args": {
-		"en": "invalid variable-argument operation",
-	},
 	"error.var.type": {
 		"en": "invalid type for this variable",
 	},
@@ -593,66 +398,6 @@ var messages = map[string]map[string]string{
 	},
 	"errors.terminated": {
 		"en": "terminated due to errors",
-	},
-	"help.break.at": {
-		"en": "Halt execution at a given line number",
-	},
-	"help.break.clear": {
-		"en": "Remove breakpoint for line number",
-	},
-	"help.break.clear.when": {
-		"en": "Remove breakpoint for expression",
-	},
-	"help.break.load": {
-		"en": "Load breakpoints from named file",
-	},
-	"help.break.save": {
-		"en": "Save breakpoint list to named file",
-	},
-	"help.break.when": {
-		"en": "Halt execution when expression is true",
-	},
-	"help.continue": {
-		"en": "Resume execution of the program",
-	},
-	"help.exit": {
-		"en": "Exit the debugger",
-	},
-	"help.help": {
-		"en": "Display this help text",
-	},
-	"help.print": {
-		"en": "Print the value of an expression",
-	},
-	"help.set": {
-		"en": "Set a variable to a value",
-	},
-	"help.show.breaks": {
-		"en": "Display list of breakpoints",
-	},
-	"help.show.calls": {
-		"en": "Display the call stack to the given depth",
-	},
-	"help.show.line": {
-		"en": "Display the current program line",
-	},
-	"help.show.scope": {
-		"en": "Display nested call scope",
-	},
-	"help.show.source": {
-		"en": "Display source of current module",
-	},
-	"help.show.symbols": {
-		"en": "Display the current symbol table",
-	},
-	"help.step": {
-		"en": "Execute the next line of the program",
-	},
-	"help.step.over": {
-		"en": "Step over a function call to the next line in this program",
-	},
-	"help.step.return": {
-		"en": "Execute until the next return operation",
 	},
 	"label.Active": {
 		"en": "Active",
@@ -1151,20 +896,5 @@ var messages = map[string]map[string]string{
 	},
 	"parm.name": {
 		"en": "name",
-	},
-	"parm.sql.text": {
-		"en": "sql-text",
-	},
-	"parm.table.create": {
-		"en": "table-name column:type [column:type...]",
-	},
-	"parm.table.insert": {
-		"en": "table-name [column=value...]",
-	},
-	"parm.table.name": {
-		"en": "table-name",
-	},
-	"parm.table.update": {
-		"en": "table-name column=value [column=value...]",
 	},
 }

@@ -13,6 +13,30 @@ import (
 // internal localization dictionaries.
 var Language string
 
+// Register adds additional localizations to the localization database
+// at runtime. This allows an application to extend the localizations
+// and still use the package i18n functions.
+//
+// The primary key for the map is the message code, which is the
+func Register(localizations map[string]map[string]string) {
+	for key, languages := range localizations {
+		for language, text := range languages {
+			if _, found := messages[key]; !found {
+				messages[key] = map[string]string{}
+			}
+
+			messages[key][language] = text
+		}
+	}
+}
+
+// T converts a key into the localized string, based on the current language
+// definition. If there is no localization in the given language, then "en"
+// is also searched to see if it has a value. Finally, if no localization exists,
+// the string is returned as-is.
+//
+// The second optional parameter is a map of string substitutions that should
+// be done within the message text before returning the formatted value.
 func T(key string, valueMap ...map[string]interface{}) string {
 	// If we haven't yet figure out what language, do that now.
 	if Language == "" {

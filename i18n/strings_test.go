@@ -2,7 +2,9 @@
 // functionality for Ego itself.
 package i18n
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestO(t *testing.T) {
 	type args struct {
@@ -37,4 +39,37 @@ func TestO(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRegister(t *testing.T) {
+	t.Run("Register", func(t *testing.T) {
+		localizations := map[string]map[string]string{
+			"test.key": {
+				"en": "test key",
+			},
+			"another.key": {
+				"en": "english",
+				"fr": "french",
+			},
+		}
+
+		Register(localizations)
+
+		want := "test key"
+		if m := T("test.key"); m != want {
+			t.Errorf("got %s, want %s", m, want)
+		}
+
+		want = "not a key"
+		if m := T("not a key"); m != want {
+			t.Errorf("got %s, want %s", m, want)
+		}
+
+		want = "incorrect function argument type"
+		if m := T("error.arg.type"); m != want {
+			t.Errorf("got %s, want %s", m, want)
+		}
+
+	})
+
 }
