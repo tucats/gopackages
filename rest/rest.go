@@ -3,11 +3,11 @@ package rest
 import (
 	"runtime"
 
-	"github.com/go-resty/resty"
 	"github.com/tucats/gopackages/app-cli/ui"
 	"github.com/tucats/gopackages/defs"
 	"github.com/tucats/gopackages/expressions/data"
 	"github.com/tucats/gopackages/expressions/symbols"
+	"gopkg.in/resty.v1"
 )
 
 var allowInsecure = false
