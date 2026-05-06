@@ -77,14 +77,12 @@ func Test_loadByteCode(t *testing.T) {
 
 			if err != nil {
 				e1 := nilError
-				e2 := nilError
 
 				if tt.err != nil {
 					e1 = tt.err.Error()
 				}
-				if err != nil {
-					e2 = err.Error()
-				}
+
+				e2 := err.Error()
 
 				if e1 == e2 {
 					return

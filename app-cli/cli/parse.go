@@ -186,7 +186,6 @@ func (c *Context) parseGrammar(args []string) error {
 				}
 
 				if (isAlias || entry.LongName == option) && entry.OptionType == Subcommand {
-
 					unsupported := false
 					for _, platform := range entry.Unsupported {
 						if runtime.GOOS == platform {
@@ -295,9 +294,11 @@ func (c *Context) parseGrammar(args []string) error {
 			}
 
 			unsupported := false
+
 			for _, platform := range location.Unsupported {
 				if runtime.GOOS == platform {
 					unsupported = true
+
 					ui.Log(ui.CLILogger, "Option value unsupported on platform %s", platform)
 
 					break
@@ -415,7 +416,7 @@ func doSubcommand(c *Context, entry Option, args []string, currentArg int) error
 
 	subContext.Command = c.Command + entry.LongName + " "
 	subContext.Description = entry.Description
-	entry.Found = true
+	
 	c.FindGlobal().Expected = entry.ParametersExpected
 	c.FindGlobal().ParameterDescription = entry.ParameterDescription
 

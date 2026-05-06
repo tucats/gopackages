@@ -15,8 +15,6 @@ import (
 	"github.com/tucats/gopackages/defs"
 )
 
-var verbose = false
-
 // FormatUnquoted formats a value but does not put quotes on strings.
 func FormatUnquoted(arg interface{}) string {
 	switch v := arg.(type) {

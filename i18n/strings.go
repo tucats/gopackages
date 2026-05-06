@@ -17,7 +17,7 @@ var Language string
 // at runtime. This allows an application to extend the localizations
 // and still use the package i18n functions.
 //
-// The primary key for the map is the message code, which is the
+// The primary key for the map is the message code.
 func Register(localizations map[string]map[string]string) {
 	for key, languages := range localizations {
 		for language, text := range languages {

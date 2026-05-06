@@ -16,16 +16,13 @@ func Cast(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	source := args[len(args)-1]
 
 	if t.IsString() {
-
 		// If the source is a []byte type, we can just fetch the bytes and do a direct convesion.
 		// If the source is a []int type, we can convert each integer to a rune and add it to a
 		// string builder. Otherwise, just format it as a string value.
 		return data.FormatUnquoted(source), nil
-
 	}
 
 	switch source.(type) {
-
 	case string:
 		return data.Coerce(source, data.InstanceOfType(t)), nil
 

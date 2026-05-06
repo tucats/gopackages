@@ -462,7 +462,7 @@ func (t Type) String() string {
 		b := strings.Builder{}
 		b.WriteString(StructTypeName)
 
-		if t.fields != nil && len(t.fields) > 0 {
+		if len(t.fields) > 0 {
 			b.WriteString("{")
 
 			keys := make([]string, 0)
@@ -989,7 +989,6 @@ func IsType(v interface{}, t *Type) bool {
 		for m := range t.functions {
 			found := true
 			switch mv := v.(type) {
-
 			case *Type:
 				_, found = mv.functions[m]
 			}

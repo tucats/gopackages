@@ -120,7 +120,6 @@ func TestTable_SortRows(t *testing.T) {
 			wantErr:     true,
 			width:       -3,
 		},
-		// TODO add tests
 	}
 
 	for _, tt := range tests {
@@ -135,6 +134,7 @@ func TestTable_SortRows(t *testing.T) {
 				if (err != nil) && !tt.wantErr {
 					t.Errorf("Unexpected SetOrderBy error result: %v", err)
 				}
+
 				err = table.SortRows(table.orderBy, table.ascending)
 				if (err != nil) && !tt.wantErr {
 					t.Errorf("Unexpected SortRows error result: %v", err)
@@ -144,6 +144,7 @@ func TestTable_SortRows(t *testing.T) {
 			if tt.hideLines {
 				table.ShowUnderlines(false)
 			}
+
 			if tt.hideHeaders {
 				table.ShowHeadings(false)
 			}
@@ -154,12 +155,14 @@ func TestTable_SortRows(t *testing.T) {
 					t.Errorf("Unexpected SetStartingRow error result: %v", err)
 				}
 			}
+
 			if tt.width != 0 {
 				err := table.SetMinimumWidth(1, tt.width)
 				if (err != nil) && !tt.wantErr {
 					t.Errorf("Unexpected SetMinimumWidth error result: %v", err)
 				}
 			}
+
 			x := table.FormatText()
 
 			if !reflect.DeepEqual(x, tt.result) {
@@ -286,17 +289,17 @@ func TestTable_AddRow(t *testing.T) {
 			},
 			wantErr: true,
 		},
-
-		// TODO: Add test cases.
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ttable := &tt.table
+
 			err := ttable.AddRow(tt.args.row)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Table.AddRow() error = %v, wantErr %v", err, tt.wantErr)
 			}
+			
 			if !reflect.DeepEqual(*ttable, tt.want) {
 				t.Errorf("Table.AddRow() got %v, want %v", ttable, tt.want)
 			}

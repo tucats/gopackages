@@ -18,12 +18,6 @@ const initialOpcodeSize = 20
 // initialStackSize is the initial stack size.
 const initialStackSize = 16
 
-// firstOptimizerLogMessage is a flag that indicates if this is the first time the
-// optimizer is being invoked, but has been turned off by configuration, and
-// the optimizer log is active. In this case, we put out (once) a message saying
-// logging is suppressed by configuration option.
-var firstOptimizerLogMessage = true
-
 // ByteCode contains the context of the execution of a bytecode stream. Note that
 // there is a dependency in format.go on the name of the "Declaration" variable.
 // PLEASE NOTE that Name must be exported because reflection is used to format
@@ -138,6 +132,7 @@ func (b *ByteCode) EmitAt(address int, opcode Opcode, operands ...interface{}) {
 // the bytecode object, which is then incremented.
 func (b *ByteCode) Emit(opcode Opcode, operands ...interface{}) {
 	b.EmitAt(b.nextAddress, opcode, operands...)
+
 	b.nextAddress++
 }
 

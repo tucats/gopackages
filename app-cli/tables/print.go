@@ -344,6 +344,7 @@ func (t *Table) paginateText() []string {
 			// Load up the symbol tables with column values and the row number
 			syms := symbols.NewSymbolTable("rowset")
 			syms.SetAlways("_row_", rx+1)
+
 			for i, n := range t.names {
 				syms.SetAlways(strings.ToLower(n), r[i])
 			}
@@ -351,8 +352,10 @@ func (t *Table) paginateText() []string {
 			v, err := e.Eval(syms)
 			if err != nil {
 				output = append(output, fmt.Sprintf("*** where clause error: %s", err.Error()))
+				
 				break
 			}
+
 			if !util.GetBool(v) {
 				continue
 			}
@@ -485,6 +488,7 @@ func (t *Table) FormatText() []string {
 			// Load up the symbol tables with column values and the row number
 			syms := symbols.NewSymbolTable("rowset")
 			syms.SetAlways("_row_", i+1)
+			
 			for i, n := range t.names {
 				syms.SetAlways(strings.ToLower(n), r[i])
 			}
@@ -492,8 +496,10 @@ func (t *Table) FormatText() []string {
 			v, err := e.Eval(syms)
 			if err != nil {
 				output = append(output, fmt.Sprintf("*** where clause error: %s", err.Error()))
+				
 				break
 			}
+
 			if !util.GetBool(v) {
 				continue
 			}

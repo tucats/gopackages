@@ -11,7 +11,7 @@ import (
 )
 
 // LineColumnFormat describes the format string for the portion
-// of formatted messages that include a line and column designation
+// of formatted messages that include a line and column designation.
 const LineColumnFormat = "at %d:%d"
 
 // LineFormat describes the format string for a message that contains
@@ -50,7 +50,9 @@ func Format(arg interface{}) string {
 		if v {
 			return "true"
 		}
+		
 		return "false"
+
 	case float64:
 		return fmt.Sprintf("%v", v)
 	case map[string]interface{}:
@@ -58,38 +60,49 @@ func Format(arg interface{}) string {
 		// Make a list of the keys, ignoring hidden members whose name
 		// starts with "__"
 		keys := make([]string, 0)
+
 		for k := range v {
 			if len(k) < 2 || k[0:2] != "__" {
 				keys = append(keys, k)
 			}
 		}
+
 		sort.Strings(keys)
 
 		b.WriteString("{")
+
 		for n, k := range keys {
 			i := v[k]
+
 			if n > 0 {
 				b.WriteString(",")
 			}
+
 			b.WriteRune(' ')
 			b.WriteString(k)
 			b.WriteString(": ")
 			b.WriteString(Format(i))
 		}
+
 		b.WriteString(" }")
+		
 		return b.String()
 
 	case []interface{}:
 		var b strings.Builder
+
 		b.WriteRune('[')
 
 		for n, i := range v {
 			if n > 0 {
 				b.WriteString(", ")
 			}
+
 			b.WriteString(Format(i))
 		}
+
 		b.WriteRune(']')
+
 		return b.String()
 
 	case string:
@@ -105,6 +118,7 @@ func Format(arg interface{}) string {
 				name := runtime.FuncForPC(reflect.ValueOf(v).Pointer()).Name()
 				name = strings.Replace(name, "github.com/tucats/gopackages/", "", 1)
 				name = strings.Replace(name, "github.com/tucats/gopackages/runtime.", "", 1)
+				
 				return "builtin " + name
 			} else {
 				return "builtin"
@@ -120,17 +134,20 @@ func Format(arg interface{}) string {
 				e := reflect.ValueOf(v).Elem()
 				if ui.IsActive(ui.DebugLogger) {
 					name := GetString(e.Field(0).Interface())
+
 					return "func " + name
 				} else {
 					return "func"
 				}
 			}
+
 			return fmt.Sprintf("ptr %s", ts)
 		}
 
 		if strings.HasPrefix(vv.String(), "<bytecode.StackMarker") {
 			e := reflect.ValueOf(v).Field(0)
 			name := GetString(e.Interface())
+
 			return fmt.Sprintf("<%s>", name)
 		}
 
@@ -139,12 +156,14 @@ func Format(arg interface{}) string {
 			module := GetString(e.Interface())
 			e = reflect.ValueOf(v).Field(1)
 			line := GetInt(e.Interface())
+
 			return fmt.Sprintf("<frame %s:%d>", module, line)
 		}
 
 		if ui.IsActive(ui.DebugLogger) {
 			return fmt.Sprintf("kind %v %#v", vv.Kind(), v)
 		}
+
 		return fmt.Sprintf("kind %v %v", vv.Kind(), v)
 	}
 }

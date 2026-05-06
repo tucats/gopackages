@@ -10,14 +10,14 @@ func TestLoad(t *testing.T) {
 		application string
 		name        string
 	}
+	
 	tests := []struct {
 		name    string
 		args    args
 		wantErr bool
 	}{
 		{"read existing config", args{application: "cli-driver", name: "default"}, false},
-		{"read non-existant config", args{application: "no-such-app", name: "default"}, true},
-		// TODO: Add test cases.
+		{"read non-existent config", args{application: "no-such-app", name: "default"}, true},
 	}
 
 	for _, tt := range tests {

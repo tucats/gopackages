@@ -196,7 +196,7 @@ func Test_addByteCode(t *testing.T) {
 			name:  "add string to error",
 			arg:   nil,
 			stack: []interface{}{errors.ErrAssert, "-thing"},
-			want:  "@assert error-thing",
+			want:  "assert-thing",
 		},
 		{
 			name:  "add with first nil",

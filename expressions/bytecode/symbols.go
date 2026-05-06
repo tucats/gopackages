@@ -45,6 +45,7 @@ func createAndStoreByteCode(c *Context, i interface{}) error {
 		value = operands[1]
 	} else {
 		name = data.String(i)
+
 		value, err = c.Pop()
 		if err != nil {
 			return err
@@ -71,21 +72,6 @@ func createAndStoreByteCode(c *Context, i interface{}) error {
 		err = c.setConstant(name, constantValue)
 	} else {
 		err = c.set(name, value)
-	}
-
-	return err
-}
-
-// symbolCreateByteCode instruction processor.
-func symbolCreateByteCode(c *Context, i interface{}) error {
-	n := data.String(i)
-	if c.isConstant(n) {
-		return c.error(errors.ErrReadOnly)
-	}
-
-	err := c.create(n)
-	if err != nil {
-		err = c.error(err)
 	}
 
 	return err

@@ -1,7 +1,6 @@
 package builtins
 
 import (
-	"fmt"
 	"math"
 	"reflect"
 	"sort"
@@ -193,8 +192,8 @@ func CallBuiltin(s *symbols.SymbolTable, name string, args ...interface{}) (inte
 
 	fn, ok := fdef.F.(func(*symbols.SymbolTable, []interface{}) (interface{}, error))
 	if !ok {
-		return nil, errors.ErrPanic.Context(fmt.Errorf(i18n.E("function.pointer",
-			map[string]interface{}{"ptr": fdef.F})))
+		return nil, errors.ErrPanic.Context(i18n.E("function.pointer",
+			map[string]interface{}{"ptr": fdef.F}))
 	}
 
 	return fn(s, args)
@@ -209,10 +208,6 @@ func AddFunction(s *symbols.SymbolTable, fd FunctionDefinition) error {
 	FunctionDictionary[fd.Name] = fd
 
 	return nil
-}
-
-func stubFunction(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	return nil, errors.ErrInvalidFunctionName
 }
 
 // extensions retrieves the boolean indicating if extensions are supported. This can

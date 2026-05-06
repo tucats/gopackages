@@ -2,7 +2,6 @@ package bytecode
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -19,11 +18,6 @@ import (
 type this struct {
 	name  string
 	value interface{}
-}
-
-type tryInfo struct {
-	addr    int
-	catches []error
 }
 
 // This value is updated atomically during context creation.
@@ -372,48 +366,6 @@ func (c *Context) push(value interface{}) error {
 	}
 
 	return nil
-}
-
-// checkType is a utility function used to determine if a given value
-// could be stored in a named symbol. When the value is nil or dynamic
-// type checking is enabled (the default) then no action occurs.
-//
-// Otherwise, the symbol name is used to look up the current value (if
-// any) of the symbol. If it exists, then the type of the value being
-// proposed must match the type of the existing value.
-func (c *Context) checkType(name string, value interface{}) (interface{}, error) {
-	if c.typeStrictness > 1 || value == nil {
-		return value, nil
-	}
-
-	if existingValue, ok := c.get(name); ok {
-		if existingValue == nil {
-			return value, nil
-		}
-
-		if _, ok := existingValue.(symbols.UndefinedValue); ok {
-			return value, nil
-		}
-
-		if c.typeStrictness == 1 {
-			newT := data.TypeOf(value)
-			oldT := data.TypeOf(existingValue)
-
-			if newT.IsIntegerType() && oldT.IsIntegerType() {
-				value = data.Coerce(value, existingValue)
-			}
-
-			if newT.IsFloatType() && oldT.IsFloatType() {
-				value = data.Coerce(value, existingValue)
-			}
-		}
-
-		if reflect.TypeOf(value) != reflect.TypeOf(existingValue) {
-			return nil, c.error(errors.ErrInvalidVarType)
-		}
-	}
-
-	return value, nil
 }
 
 func (c *Context) Result() interface{} {

@@ -68,7 +68,6 @@ func TestNew(t *testing.T) {
 			want:      &Table{},
 			wantError: true,
 		},
-		// TODO: Add test cases.
 	}
 
 	for _, tt := range tests {
@@ -155,6 +154,7 @@ func TestNewCSV(t *testing.T) {
 
 				return
 			}
+			
 			if !reflect.DeepEqual(got.names, tt.want.names) {
 				t.Errorf("NewCSV() = %v, want %v", got, tt.want)
 			}

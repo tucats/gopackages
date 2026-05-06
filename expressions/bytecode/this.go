@@ -57,20 +57,6 @@ func loadThisByteCode(c *Context, i interface{}) error {
 	return nil
 }
 
-// getThisByteCode implements the GetThis opcode. Given a value name,
-// get the top-most item from the "this" stack and store it in the
-// named value. This is done as part of prologue of a function that
-// has a receiver.
-func getThisByteCode(c *Context, i interface{}) error {
-	this := data.String(i)
-
-	if v, ok := c.popThis(); ok {
-		c.setAlways(this, v)
-	}
-
-	return nil
-}
-
 // pushThis adds a receiver value to the "this" stack.
 func (c *Context) pushThis(name string, v interface{}) {
 	if c.thisStack == nil {
@@ -82,7 +68,7 @@ func (c *Context) pushThis(name string, v interface{}) {
 
 // popThis removes a receiver value from this "this" stack.
 func (c *Context) popThis() (interface{}, bool) {
-	if c.thisStack == nil || len(c.thisStack) == 0 {
+	if len(c.thisStack) == 0 {
 		return nil, false
 	}
 

@@ -9,6 +9,7 @@ func TestFunctionLen(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -40,15 +41,17 @@ func TestFunctionLen(t *testing.T) {
 			args: args{[]interface{}{map[string]interface{}{"name": "Tom", "age": 33}}},
 			want: 2,
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Length(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionLen() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionLen() = %v, want %v", got, tt.want)
 			}
@@ -60,6 +63,7 @@ func TestFunctionProfile(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -84,20 +88,24 @@ func TestFunctionProfile(t *testing.T) {
 			want: nil,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			var got interface{}
+
 			var err error
 			if len(tt.args.args) > 1 {
 				got, err = ProfileSet(nil, tt.args.args)
 			} else {
 				got, err = ProfileGet(nil, tt.args.args)
 			}
+			
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionProfile() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionProfile() = %v, want %v", got, tt.want)
 			}
@@ -109,6 +117,7 @@ func TestFunctionSort(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -142,15 +151,17 @@ func TestFunctionSort(t *testing.T) {
 			args: args{[]interface{}{[]interface{}{"pony", "cake", "unicorn", 5}}},
 			want: []interface{}{"5", "cake", "pony", "unicorn"},
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Sort(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionSort() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionSort() = %v, want %v", got, tt.want)
 			}
@@ -162,6 +173,7 @@ func TestFunctionMembers(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -184,15 +196,17 @@ func TestFunctionMembers(t *testing.T) {
 			want:    nil,
 			wantErr: true,
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Members(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionMembers() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionMembers() = %v, want %v", got, tt.want)
 			}

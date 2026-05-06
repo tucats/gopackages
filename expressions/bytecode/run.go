@@ -117,9 +117,7 @@ func (c *Context) RunFromAddress(addr int) error {
 				ui.Log(ui.TraceLogger, "(%d)  *** Return error: %s", c.threadID, err)
 			}
 
-			if err != nil {
-				err = errors.NewError(err)
-			}
+			err = errors.NewError(err)
 
 			return err
 		}

@@ -147,12 +147,12 @@ func TestTokenize(t *testing.T) {
 				NewSpecialToken(";"),
 			},
 		},
-		// TODO: Add test cases.
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tk := New(tt.args.src, true)
+
 			got := tk.Tokens
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Tokenize() = %v, want %v", got, tt.want)
@@ -201,8 +201,6 @@ func TestIsSymbol(t *testing.T) {
 			args: args{"!foobar"},
 			want: false,
 		},
-
-		// TODO: Add test cases.
 	}
 
 	for _, tt := range tests {
@@ -230,7 +228,6 @@ func TestTokenizer_Remainder(t *testing.T) {
 			count: 1,
 			want:  "= 1/2/3",
 		},
-		// TODO: Add test cases.
 	}
 
 	for _, tt := range tests {

@@ -36,8 +36,8 @@ func TestFormat(t *testing.T) {
 			},
 			want: "{ age: 59, name: \"Tom\" }",
 		},
-		// TODO: Add test cases.
 	}
+	
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Format(tt.arg); got != tt.want {

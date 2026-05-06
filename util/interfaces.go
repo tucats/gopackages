@@ -6,27 +6,28 @@ import (
 )
 
 // GetMap extracts a struct from an abstract interface. Returns nil
-// if the interface did not contain a struct/map
+// if the interface did not contain a struct/map.
 func GetMap(v interface{}) map[string]interface{} {
 	if m, ok := v.(map[string]interface{}); ok {
 		return m
 	}
+
 	return nil
 }
 
 // GetArray extracts a struct from an abstract interface. Returns nil
-// if the interface did not contain a struct/map
+// if the interface did not contain a struct/map.
 func GetArray(v interface{}) []interface{} {
 	if m, ok := v.([]interface{}); ok {
 		return m
 	}
+
 	return nil
 }
 
 // GetInt64 takes a generic interface and returns the integer value, using
 // type coercion if needed.
 func GetInt64(v interface{}) int64 {
-
 	switch v.(type) {
 	case map[string]interface{}, []interface{}, nil:
 		return int64(0)
@@ -40,10 +41,10 @@ func GetInt64(v interface{}) int64 {
 // GetInt takes a generic interface and returns the integer value, using
 // type coercion if needed.
 func GetInt(v interface{}) int {
-
 	switch v.(type) {
 	case error:
 		return 0
+
 	case map[string]interface{}, []interface{}, nil:
 		return 0
 	}
@@ -57,9 +58,11 @@ func GetBool(v interface{}) bool {
 	switch v.(type) {
 	case error:
 		return false
+
 	case map[string]interface{}, []interface{}, nil:
 		return false
 	}
+
 	return Coerce(v, true).(bool)
 }
 
@@ -76,6 +79,7 @@ func GetString(v interface{}) string {
 	case []interface{}, nil:
 		return ""
 	}
+
 	return Coerce(v, "").(string)
 }
 
@@ -85,6 +89,7 @@ func GetFloat(v interface{}) float64 {
 	switch v.(type) {
 	case error:
 		return 0.0
+
 	case map[string]interface{}, []interface{}, nil:
 		return 0.0
 	}
@@ -95,13 +100,11 @@ func GetFloat(v interface{}) float64 {
 // Coerce returns the value after it has been converted to the type of the
 // model value.
 func Coerce(v interface{}, model interface{}) interface{} {
-
 	if e, ok := v.(error); ok {
 		return e
 	}
 
 	switch model.(type) {
-
 	case int64:
 		switch value := v.(type) {
 		case nil:
@@ -111,10 +114,12 @@ func Coerce(v interface{}, model interface{}) interface{} {
 			if value {
 				return int64(1)
 			}
+
 			return int64(0)
 
 		case int:
 			return int64(value)
+
 		case int64:
 			return value
 
@@ -126,6 +131,7 @@ func Coerce(v interface{}, model interface{}) interface{} {
 			if err != nil {
 				return nil
 			}
+
 			return int64(st)
 		}
 
@@ -138,6 +144,7 @@ func Coerce(v interface{}, model interface{}) interface{} {
 			if value {
 				return 1
 			}
+			
 			return 0
 
 		case int64:
@@ -154,6 +161,7 @@ func Coerce(v interface{}, model interface{}) interface{} {
 			if err != nil {
 				return nil
 			}
+
 			return st
 		}
 
@@ -165,6 +173,7 @@ func Coerce(v interface{}, model interface{}) interface{} {
 			if value {
 				return float64(1.0)
 			}
+
 			return float64(0.0)
 
 		case int:
@@ -178,6 +187,7 @@ func Coerce(v interface{}, model interface{}) interface{} {
 
 		case string:
 			st, _ := strconv.ParseFloat(value, 64)
+
 			return st
 		}
 
@@ -187,6 +197,7 @@ func Coerce(v interface{}, model interface{}) interface{} {
 			if value {
 				return "true"
 			}
+
 			return "false"
 
 		case int:
@@ -206,7 +217,6 @@ func Coerce(v interface{}, model interface{}) interface{} {
 		}
 
 	case bool:
-
 		switch vv := v.(type) {
 		case nil:
 			return false
@@ -239,11 +249,9 @@ func Coerce(v interface{}, model interface{}) interface{} {
 }
 
 // Normalize accepts two different values and promotes them to
-// the most compatable format
+// the most compatable format.
 func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
-
 	// Same type? we're done here
-
 	switch v1.(type) {
 	case nil:
 		switch v2.(type) {
@@ -289,6 +297,7 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 			if vv {
 				return v1, 1.0
 			}
+
 			return v1, 0.0
 		}
 
@@ -304,6 +313,7 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 			if vv {
 				return v1, 1
 			}
+
 			return v1, 0
 		}
 
@@ -321,6 +331,7 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 			if vv {
 				return v1, 1
 			}
+
 			return v1, 0
 		}
 
@@ -330,28 +341,32 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 			if v1.(bool) {
 				return "true", v2.(string)
 			}
+
 			return "false", v2.(string)
 
 		case int:
 			if v1.(bool) {
 				return 1, v2.(int)
 			}
+
 			return 0, v2.(int)
 
 		case float64:
 			if v1.(bool) {
 				return 1.0, v2.(float64)
 			}
+
 			return 0.0, v2.(float64)
 
 		case bool:
 			return v1, v2
 		}
 	}
+
 	return v1, v2
 }
 
-// CoerceType will coerce an interface to a given type by name
+// CoerceType will coerce an interface to a given type by name.
 func CoerceType(v interface{}, typeName string) interface{} {
 	switch typeName {
 	case "int":

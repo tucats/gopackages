@@ -123,7 +123,7 @@ func Logon(c *cli.Context) error {
 
 	// If the call was successful and the server responded with Success, remove any trailing
 	// newline from the result body and store the string as the new token value.
-	if err == nil && r.StatusCode() == http.StatusOK {
+	if r.StatusCode() == http.StatusOK {
 		payload := defs.LogonResponse{}
 
 		err := json.Unmarshal(r.Body(), &payload)
@@ -157,20 +157,18 @@ func Logon(c *cli.Context) error {
 	}
 
 	// If there was an HTTP error condition, let's report it now.
-	if err == nil {
-		switch r.StatusCode() {
-		case http.StatusUnauthorized:
-			err = errors.ErrNoCredentials
+	switch r.StatusCode() {
+	case http.StatusUnauthorized:
+		err = errors.ErrNoCredentials
 
-		case http.StatusForbidden:
-			err = errors.ErrInvalidCredentials
+	case http.StatusForbidden:
+		err = errors.ErrInvalidCredentials
 
-		case http.StatusNotFound:
-			err = errors.ErrLogonEndpoint
+	case http.StatusNotFound:
+		err = errors.ErrLogonEndpoint
 
-		default:
-			err = errors.ErrHTTP.Context(r.StatusCode())
-		}
+	default:
+		err = errors.ErrHTTP.Context(r.StatusCode())
 	}
 
 	if err != nil {

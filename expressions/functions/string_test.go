@@ -9,6 +9,7 @@ func TestFunctionLeft(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -30,15 +31,17 @@ func TestFunctionLeft(t *testing.T) {
 			args: args{[]interface{}{"Abraham", 50}},
 			want: "Abraham",
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Left(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionLeft() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionLeft() = %v, want %v", got, tt.want)
 			}
@@ -50,6 +53,7 @@ func TestFunctionRight(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -76,16 +80,17 @@ func TestFunctionRight(t *testing.T) {
 			args: args{[]interface{}{"", 3}},
 			want: "",
 		},
-
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Right(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionRight() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionRight() = %v, want %v", got, tt.want)
 			}
@@ -97,6 +102,7 @@ func TestFunctionLower(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -128,15 +134,17 @@ func TestFunctionLower(t *testing.T) {
 			args: args{[]interface{}{3.14}},
 			want: "3.14",
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Lower(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionLower() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionLower() = %v, want %v", got, tt.want)
 			}
@@ -148,6 +156,7 @@ func TestFunctionUpper(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -179,15 +188,17 @@ func TestFunctionUpper(t *testing.T) {
 			args: args{[]interface{}{3.14}},
 			want: "3.14",
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Upper(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionUpper() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionUpper() = %v, want %v", got, tt.want)
 			}
@@ -199,6 +210,7 @@ func TestFunctionSubstring(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -230,15 +242,17 @@ func TestFunctionSubstring(t *testing.T) {
 			args: args{[]interface{}{"simple", 1, 355}},
 			want: "simple",
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Substring(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionSubstring() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionSubstring() = %v, want %v", got, tt.want)
 			}
@@ -250,6 +264,7 @@ func TestFunctionIndex(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+	
 	tests := []struct {
 		name    string
 		args    args
@@ -301,15 +316,17 @@ func TestFunctionIndex(t *testing.T) {
 			args: args{[]interface{}{map[string]interface{}{"name": "tom", "age": 55}, "gender"}},
 			want: false,
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Index(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionIndex() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionIndex() = %v, want %v", got, tt.want)
 			}

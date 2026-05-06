@@ -11,6 +11,7 @@ func TestO(t *testing.T) {
 		key      string
 		valueMap []map[string]interface{}
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -30,8 +31,8 @@ func TestO(t *testing.T) {
 			},
 			want: "Do the things",
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := O(tt.args.key, tt.args.valueMap...); got != tt.want {
@@ -69,7 +70,5 @@ func TestRegister(t *testing.T) {
 		if m := T("error.arg.type"); m != want {
 			t.Errorf("got %s, want %s", m, want)
 		}
-
 	})
-
 }

@@ -77,7 +77,6 @@ func TestByteCode_Emit2(t *testing.T) {
 			},
 			emitPos: 4,
 		},
-		// TODO: Add test cases.
 	}
 
 	for _, tt := range tests {
@@ -207,7 +206,6 @@ func TestByteCode_Append(t *testing.T) {
 			},
 			wantPos: 4,
 		},
-		// TODO: Add test cases.
 	}
 
 	for _, tt := range tests {
@@ -218,6 +216,7 @@ func TestByteCode_Append(t *testing.T) {
 				nextAddress:  tt.fields.emitPos,
 			}
 			b.Append(tt.args.a)
+
 			if tt.wantPos != b.nextAddress {
 				t.Errorf("Append() wrong emitPos, got %d, want %d", b.nextAddress, tt.wantPos)
 			}

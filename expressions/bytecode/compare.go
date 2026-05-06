@@ -238,7 +238,6 @@ func greaterThanByteCode(c *Context, i interface{}) error {
 
 	default:
 		return c.error(errors.ErrInvalidType).Context(data.TypeOf(v1).String())
-
 	}
 
 	_ = c.push(result)

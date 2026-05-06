@@ -8,7 +8,7 @@
 // The compiler is a top-down, recursive-descent compiler that works on a stream
 // of tokens. Each token contains it's spelling and class (identifier, reserved,
 // integer, string, etc). In this way, the tokenizer owns a part of the parsing
-// of the code, to establish token meaning. The tokenizer is also reponsible for
+// of the code, to establish token meaning. The tokenizer is also responsible for
 // creating composite tokens. For example "<" followed by "=" is converted to a
 // single token "<=" by the tokenizer. Thus, the compiler can assume semantically
 // correct individual tokens.

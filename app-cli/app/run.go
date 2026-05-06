@@ -11,7 +11,6 @@ import (
 // automatically calls any action routines specfied in the grammar, which do
 // the work of the command.
 func runFromContext(context *cli.Context) error {
-
 	// Add the user-provided grammar.
 	applicationGrammar = append(applicationGrammar, context.Grammar...)
 

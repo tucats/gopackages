@@ -173,6 +173,7 @@ func PurgeLogs() int {
 			Log(ServerLogger, "Error purging log file, %v", err)
 		} else {
 			Log(ServerLogger, "Purged log file %s", fileName)
+			
 			count++
 		}
 	}

@@ -9,6 +9,7 @@ func TestFunctionInt(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -42,13 +43,16 @@ func TestFunctionInt(t *testing.T) {
 			wantErr: true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Int(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionInt() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionInt() = %v, want %v", got, tt.want)
 			}
@@ -60,6 +64,7 @@ func TestFunctionFloat(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -86,15 +91,17 @@ func TestFunctionFloat(t *testing.T) {
 			args: args{[]interface{}{true}},
 			want: 1.0,
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Float(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionFloat() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionFloat() = %v, want %v", got, tt.want)
 			}
@@ -106,6 +113,7 @@ func TestFunctionString(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -132,15 +140,17 @@ func TestFunctionString(t *testing.T) {
 			args: args{[]interface{}{true}},
 			want: "true",
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := String(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionString() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionString() = %v, want %v", got, tt.want)
 			}
@@ -152,6 +162,7 @@ func TestFunctionBool(t *testing.T) {
 	type args struct {
 		args []interface{}
 	}
+	
 	tests := []struct {
 		name    string
 		args    args
@@ -178,15 +189,17 @@ func TestFunctionBool(t *testing.T) {
 			args: args{[]interface{}{false}},
 			want: false,
 		},
-		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Bool(nil, tt.args.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FunctionBool() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FunctionBool() = %v, want %v", got, tt.want)
 			}

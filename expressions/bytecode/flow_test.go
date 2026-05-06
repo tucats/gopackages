@@ -62,18 +62,17 @@ func Test_typeCast(t *testing.T) {
 		_ = ctx.push(tt.t)
 		_ = ctx.push(tt.v)
 
+		ctx.bc.Emit(Call, 1)
+
 		err := callByteCode(ctx, 1)
 		if err != nil {
 			e1 := nilError
-			e2 := nilError
 
 			if tt.err != nil {
 				e1 = tt.err.Error()
 			}
 
-			if err != nil {
-				e2 = err.Error()
-			}
+			e2 := err.Error()
 
 			if e1 == e2 {
 				return

@@ -100,8 +100,8 @@ func ShowHelp(c *Context) {
 
 	for _, option := range c.Grammar {
 		if option.OptionType == Subcommand && !option.Private {
-
 			unsupported := false
+			
 			for _, platform := range option.Unsupported {
 				if runtime.GOOS == platform {
 					unsupported = true

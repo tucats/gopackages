@@ -135,7 +135,6 @@ func (s *SymbolTable) FormattedData(includeBuiltins bool) [][]string {
 		typeString := dt.String()
 
 		switch actual := v.(type) {
-
 		case func(*SymbolTable, []interface{}) (interface{}, error):
 			if !includeBuiltins {
 				omitThisSymbol = true

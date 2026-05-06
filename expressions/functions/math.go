@@ -8,7 +8,7 @@ import (
 	"github.com/tucats/gopackages/util"
 )
 
-// Min implements the min() function
+// Min implements the min() function.
 func Min(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) == 1 {
@@ -22,6 +22,7 @@ func Min(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 		if v == nil {
 			return nil, errors.ErrInvalidType
 		}
+
 		switch r.(type) {
 		case int:
 			if v.(int) < r.(int) {
@@ -44,13 +45,13 @@ func Min(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 			}
 		default:
 			return nil, errors.ErrInvalidType
-
 		}
 	}
+
 	return r, nil
 }
 
-// Max implements the max() function
+// Max implements the max() function.
 func Max(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	if len(args) == 1 {
@@ -64,6 +65,7 @@ func Max(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 		if v == nil {
 			return nil, errors.ErrInvalidType
 		}
+
 		switch rr := r.(type) {
 		case int:
 			if v.(int) > rr {
@@ -89,10 +91,11 @@ func Max(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 			return nil, errors.ErrInvalidType
 		}
 	}
+
 	return r, nil
 }
 
-// Sum implements the sum() function
+// Sum implements the sum() function.
 func Sum(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 	base := args[0]
@@ -101,6 +104,7 @@ func Sum(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 		if addend == nil {
 			return nil, errors.ErrInvalidType
 		}
+
 		switch addend.(type) {
 		case int:
 			base = base.(int) + addend.(int)
@@ -113,25 +117,27 @@ func Sum(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 			base = base.(bool) || addend.(bool)
 		default:
 			return nil, errors.ErrInvalidType
-
 		}
 	}
+
 	return base, nil
 }
 
-// Sqrt implements the sqrt() function
+// Sqrt implements the sqrt() function.
 func Sqrt(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	f := util.GetFloat(args[0])
+
 	return math.Sqrt(f), nil
 }
 
-// Abs implements the abs() function
+// Abs implements the abs() function.
 func Abs(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	f := util.GetFloat(args[0])
+
 	return math.Abs(f), nil
 }
 
-// Log is the log() function
+// Log is the log() function.
 func Log(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	return math.Log(util.GetFloat(args[0])), nil
 }

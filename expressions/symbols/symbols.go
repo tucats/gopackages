@@ -425,7 +425,6 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 		if _, ok := v.(data.Immutable); !ok {
 			v = data.DeepCopy(v)
 		}
-
 	}
 
 	// Store the value in the slot, and if it was readonly, write
@@ -516,6 +515,7 @@ func (s *SymbolTable) Create(name string) error {
 	}
 
 	s.SetValue(s.size, UndefinedValue{})
+	
 	s.size++
 
 	if ui.IsActive(ui.SymbolLogger) {

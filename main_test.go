@@ -25,6 +25,7 @@ func setTest(c *cli.Context) error {
 
 func defaultAction(c *cli.Context) error {
 	fmt.Println("In default action")
+	
 	if c.WasFound("test") {
 		fmt.Println(c.String("test"))
 	}
@@ -43,8 +44,8 @@ func defaultAction(c *cli.Context) error {
 
 func TestMain(t *testing.T) {
 	app := app.New("test driver").SetDefaultAction(defaultAction)
-
 	args := []string{"driver", "--test"}
+
 	err := app.Run(grammar, args[1:])
 	if err != nil {
 		fmt.Println(err)
