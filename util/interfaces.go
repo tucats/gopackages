@@ -195,10 +195,10 @@ func Coerce(v interface{}, model interface{}) interface{} {
 		switch value := v.(type) {
 		case bool:
 			if value {
-				return "true"
+				return True
 			}
 
-			return "false"
+			return False
 
 		case int:
 			return strconv.Itoa(value)

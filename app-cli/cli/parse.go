@@ -187,6 +187,7 @@ func (c *Context) parseGrammar(args []string) error {
 
 				if (isAlias || entry.LongName == option) && entry.OptionType == Subcommand {
 					unsupported := false
+					
 					for _, platform := range entry.Unsupported {
 						if runtime.GOOS == platform {
 							unsupported = true

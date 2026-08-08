@@ -82,6 +82,7 @@ func Coerce(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 // Normalize coerces a value to match the type of a model value.
 func Normalize(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	v1, v2 := util.Normalize(args[0], args[1])
+	
 	return []interface{}{v1, v2}, nil
 }
 

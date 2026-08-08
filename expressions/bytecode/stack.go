@@ -1,7 +1,6 @@
 package bytecode
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -126,24 +125,6 @@ func dropToMarkerByteCode(c *Context, i interface{}) error {
 	return nil
 }
 
-// stackCheckByteCode has an integer argument, and verifies
-// that there are this many items on the stack, which is
-// used to verify that multiple return-values on the stack
-// are present.
-func stackCheckByteCode(c *Context, i interface{}) error {
-	if count := data.Int(i); c.stackPointer <= count {
-		return c.error(errors.ErrReturnValueCount)
-	} else {
-		// The marker is an instance of a StackMarker object.
-		v := c.stack[c.stackPointer-(count+1)]
-		if isStackMarker(v) {
-			return nil
-		}
-	}
-
-	return c.error(errors.ErrReturnValueCount)
-}
-
 // pushByteCode instruction processor. This pushes the instruction operand
 // onto the runtime stack.
 func pushByteCode(c *Context, i interface{}) error {
@@ -219,29 +200,4 @@ func swapByteCode(c *Context, i interface{}) error {
 	_ = c.push(v2)
 
 	return nil
-}
-
-// copyByteCode instruction processor makes a copy of the topmost
-// object. This is different than duplicating, as it creates a
-// entire deep copy of the object.
-func copyByteCode(c *Context, i interface{}) error {
-	v, err := c.Pop()
-	if err != nil {
-		return err
-	}
-
-	_ = c.push(v)
-
-	// Use JSON as a reflection-based clone operation
-	var v2 interface{}
-
-	byt, _ := json.Marshal(v)
-	err = json.Unmarshal(byt, &v2)
-	_ = c.push(2)
-
-	if err != nil {
-		err = errors.NewError(err)
-	}
-
-	return err
 }

@@ -10,7 +10,6 @@ import (
 
 // Min implements the min() function.
 func Min(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
 	if len(args) == 1 {
 		return args[0], nil
 	}

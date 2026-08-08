@@ -195,6 +195,7 @@ func ShowHelp(c *Context) {
 		}
 
 		unsupported := false
+		
 		for _, platform := range option.Unsupported {
 			if runtime.GOOS == platform {
 				unsupported = true

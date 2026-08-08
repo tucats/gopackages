@@ -10,6 +10,11 @@ import (
 	"github.com/tucats/gopackages/app-cli/ui"
 )
 
+const (
+	True = "true"
+	False = "false"
+)
+
 // LineColumnFormat describes the format string for the portion
 // of formatted messages that include a line and column designation.
 const LineColumnFormat = "at %d:%d"
@@ -34,7 +39,6 @@ func FormatUnquoted(arg interface{}) string {
 // it puts commas in the array list output to match the syntax of an
 // array constant and puts quotes around string values.
 func Format(arg interface{}) string {
-
 	if arg == nil {
 		return "<nil>"
 	}
@@ -48,10 +52,10 @@ func Format(arg interface{}) string {
 		return fmt.Sprintf("%d", v)
 	case bool:
 		if v {
-			return "true"
+			return True
 		}
 		
-		return "false"
+		return False
 
 	case float64:
 		return fmt.Sprintf("%v", v)

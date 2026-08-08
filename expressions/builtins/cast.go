@@ -13,7 +13,7 @@ import (
 func Cast(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	// Target t is the last parameter
 	t := data.TypeOf(args[len(args)-1])
-	source := args[len(args)-1]
+	source := args[0]
 
 	if t.IsString() {
 		// If the source is a []byte type, we can just fetch the bytes and do a direct convesion.

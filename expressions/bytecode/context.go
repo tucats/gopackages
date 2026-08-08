@@ -314,16 +314,6 @@ func (c *Context) formatStack(syms *symbols.SymbolTable, newlines bool) string {
 	return result.String()
 }
 
-// setConstant is a helper function to define a constant value.
-func (c *Context) setConstant(name string, v interface{}) error {
-	return c.symbols.SetConstant(name, v)
-}
-
-// isConstant is a helper function to define a constant value.
-func (c *Context) isConstant(name string) bool {
-	return c.symbols.IsConstant(name)
-}
-
 // get is a helper function that retrieves a symbol value from the associated
 // symbol table.
 func (c *Context) get(name string) (interface{}, bool) {
@@ -340,11 +330,6 @@ func (c *Context) set(name string, value interface{}) error {
 // symbol table.
 func (c *Context) setAlways(name string, value interface{}) {
 	c.symbols.SetAlways(name, value)
-}
-
-// delete deletes a symbol from the current context.
-func (c *Context) delete(name string) error {
-	return c.symbols.Delete(name, false)
 }
 
 // create creates a symbol.
@@ -370,32 +355,4 @@ func (c *Context) push(value interface{}) error {
 
 func (c *Context) Result() interface{} {
 	return c.result
-}
-
-func (c *Context) popSymbolTable() error {
-	if c.symbols.IsRoot() {
-		ui.Log(ui.SymbolLogger, "(%d) nil symbol table parent of %s", c.threadID, c.symbols.Name)
-
-		return errors.ErrInternalCompiler.Context("Attempt to pop root table")
-	}
-
-	if c.symbols == c.symbols.Parent() {
-		return errors.ErrInternalCompiler.Context("Symbol Table Cycle Error")
-	}
-
-	name := c.symbols.Name
-	c.symbols = c.symbols.Parent()
-
-	for strings.HasPrefix(c.symbols.Name, "pkg func ") {
-		if c.symbols.IsRoot() {
-			break
-		}
-
-		c.symbols = c.symbols.Parent()
-	}
-
-	ui.Log(ui.SymbolLogger, "(%d) pop symbol table; \"%s\" => \"%s\"",
-		c.threadID, name, c.symbols.Name)
-
-	return nil
 }
