@@ -11,13 +11,13 @@ import (
 
 // String retrieves the string value of the argument, converting the
 // underlying value if needed.
-func String(v interface{}) string {
+func String(v any) string {
 	return fmt.Sprintf("%v", v)
 }
 
 // Byte retrieves the byte value of the argument, converting the
 // underlying value if needed.
-func Byte(v interface{}) byte {
+func Byte(v any) byte {
 	i := Int(v)
 
 	return byte(i & math.MaxInt8)
@@ -25,7 +25,7 @@ func Byte(v interface{}) byte {
 
 // Int32 retrieves the int32 value of the argument, converting the
 // underlying value if needed.
-func Int32(v interface{}) int32 {
+func Int32(v any) int32 {
 	i := Int(v)
 
 	return int32(i & math.MaxInt32)
@@ -33,7 +33,7 @@ func Int32(v interface{}) int32 {
 
 // Int retrieves the int value of the argument, converting the
 // underlying value if needed.
-func Int(v interface{}) int {
+func Int(v any) int {
 	result := 0
 
 	switch actual := v.(type) {
@@ -69,7 +69,7 @@ func Int(v interface{}) int {
 
 // Int64 retrieves the int64 value of the argument, converting the
 // underlying value if needed.
-func Int64(v interface{}) int64 {
+func Int64(v any) int64 {
 	var result int64
 
 	switch actual := v.(type) {
@@ -105,7 +105,7 @@ func Int64(v interface{}) int64 {
 
 // Float64 retrieves the float64 value of the argument, converting the
 // underlying value if needed.
-func Float64(v interface{}) float64 {
+func Float64(v any) float64 {
 	var result float64
 
 	switch actual := v.(type) {
@@ -138,7 +138,7 @@ func Float64(v interface{}) float64 {
 
 // Float32 retrieves the float32 value of the argument, converting the
 // underlying value if needed.
-func Float32(v interface{}) float32 {
+func Float32(v any) float32 {
 	f := Float64(v)
 
 	return float32(f)
@@ -146,7 +146,7 @@ func Float32(v interface{}) float32 {
 
 // GetString retrieves the boolean value of the argument, converting the
 // underlying value if needed.
-func Bool(v interface{}) bool {
+func Bool(v any) bool {
 	switch actual := v.(type) {
 	case byte, int32, int, int64:
 		return Int64(v) != 0
@@ -171,7 +171,7 @@ func Bool(v interface{}) bool {
 // DeepCopy creates a new copy of the interface. This includes recursively copying
 // any member elements of arrays, maps, or structures. This cannot be used on a
 // pointer value.
-func DeepCopy(v interface{}) interface{} {
+func DeepCopy(v any) any {
 	if v == nil {
 		return nil
 	}

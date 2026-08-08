@@ -26,8 +26,8 @@ func Test_typeCast(t *testing.T) {
 	tests := []struct {
 		name string
 		t    *data.Type
-		v    interface{}
-		want interface{}
+		v    any
+		want any
 		err  error
 	}{
 		{
@@ -46,7 +46,7 @@ func Test_typeCast(t *testing.T) {
 
 	for _, tt := range tests {
 		ctx := &Context{
-			stack:          make([]interface{}, 5),
+			stack:          make([]any, 5),
 			stackPointer:   0,
 			running:        true,
 			symbols:        symbols.NewSymbolTable("cast test"),
@@ -96,7 +96,7 @@ func Test_typeCast(t *testing.T) {
 
 func Test_branchFalseByteCode(t *testing.T) {
 	ctx := &Context{
-		stack:          make([]interface{}, 5),
+		stack:          make([]any, 5),
 		stackPointer:   0,
 		running:        true,
 		programCounter: 1,
@@ -145,7 +145,7 @@ func Test_branchFalseByteCode(t *testing.T) {
 
 func Test_branchTrueByteCode(t *testing.T) {
 	ctx := &Context{
-		stack:          make([]interface{}, 5),
+		stack:          make([]any, 5),
 		stackPointer:   0,
 		running:        true,
 		programCounter: 1,

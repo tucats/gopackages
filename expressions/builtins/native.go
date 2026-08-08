@@ -20,7 +20,7 @@ import (
 
 // NativeFunction defines the signature of native (i.e. builtin) runtime
 // functions.
-type NativeFunction func(s *symbols.SymbolTable, args []interface{}) (interface{}, error)
+type NativeFunction func(s *symbols.SymbolTable, args []any) (any, error)
 
 type nativeFunctionDef struct {
 	Kind *data.Type
@@ -102,13 +102,13 @@ func FindNativeFunction(kind *data.Type, name string) NativeFunction {
 // symbol table. It doesn't require it to be of any specific type, as
 // that will be handled via mapping within the individual native
 // function shims.
-func getNativeThis(s *symbols.SymbolTable) interface{} {
+func getNativeThis(s *symbols.SymbolTable) any {
 	t, ok := s.Get(defs.ThisVariable)
 	if !ok {
 		return nil
 	}
 
-	if p, ok := t.(*interface{}); ok {
+	if p, ok := t.(*any); ok {
 		return *p
 	}
 

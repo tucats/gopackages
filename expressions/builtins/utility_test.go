@@ -7,28 +7,28 @@ import (
 
 func TestFunctionLen(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "string length",
-			args: args{[]interface{}{"hamster"}},
+			args: args{[]any{"hamster"}},
 			want: 7,
 		},
 		{
 			name: "empty string length",
-			args: args{[]interface{}{""}},
+			args: args{[]any{""}},
 			want: 0,
 		},
 		{
 			name:    "numeric value length",
-			args:    args{[]interface{}{3.14}},
+			args:    args{[]any{3.14}},
 			want:    0,
 			wantErr: true,
 		},
@@ -53,23 +53,23 @@ func TestFunctionLen(t *testing.T) {
 func TestLength(t *testing.T) {
 	tests := []struct {
 		name    string
-		args    []interface{}
-		want    interface{}
+		args    []any
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "simple string",
-			args: []interface{}{"foo"},
+			args: []any{"foo"},
 			want: 3,
 		},
 		{
 			name: "unicode string",
-			args: []interface{}{"\u2318foo\u2318"},
+			args: []any{"\u2318foo\u2318"},
 			want: 9,
 		},
 		{
 			name: "int converted to string",
-			args: []interface{}{"123456"},
+			args: []any{"123456"},
 			want: 6,
 		},
 	}

@@ -65,8 +65,8 @@ var (
 	// "{}" token.
 	EmptyInitializerToken = NewSpecialToken("{}")
 
-	// "interface{}" token.
-	EmptyInterfaceToken = NewTypeToken("interface{}")
+	// "any" token.
+	EmptyInterfaceToken = NewTypeToken("any")
 
 	// "error" token.
 	ErrorToken = NewIdentifierToken("error")

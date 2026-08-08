@@ -9,7 +9,7 @@ import (
 // instruction contains the information about a single bytecode.
 type instruction struct {
 	Operation Opcode
-	Operand   interface{}
+	Operand   any
 }
 
 func (i instruction) String() string {

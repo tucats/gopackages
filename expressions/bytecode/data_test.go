@@ -16,10 +16,10 @@ func Test_loadByteCode(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		arg          interface{}
-		initialValue interface{}
-		stack        []interface{}
-		want         interface{}
+		arg          any
+		initialValue any
+		stack        []any
+		want         any
 		err          error
 		static       int
 		debug        bool
@@ -28,7 +28,7 @@ func Test_loadByteCode(t *testing.T) {
 			name:         "simple integer load",
 			arg:          "a",
 			initialValue: int32(55),
-			stack:        []interface{}{},
+			stack:        []any{},
 			static:       2,
 			err:          nil,
 			want:         int32(55),
@@ -36,7 +36,7 @@ func Test_loadByteCode(t *testing.T) {
 		{
 			name:   "variable not found",
 			arg:    "a",
-			stack:  []interface{}{},
+			stack:  []any{},
 			static: 2,
 			err:    errors.ErrUnknownIdentifier.Context("a"),
 			want:   int32(55),
@@ -44,7 +44,7 @@ func Test_loadByteCode(t *testing.T) {
 		{
 			name:   "variable name invalid",
 			arg:    "",
-			stack:  []interface{}{},
+			stack:  []any{},
 			static: 2,
 			err:    errors.ErrInvalidIdentifier.Context(""),
 			want:   int32(55),

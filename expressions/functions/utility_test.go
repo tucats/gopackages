@@ -7,38 +7,38 @@ import (
 
 func TestFunctionLen(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "string length",
-			args: args{[]interface{}{"hamster"}},
+			args: args{[]any{"hamster"}},
 			want: 7,
 		},
 		{
 			name: "empty string length",
-			args: args{[]interface{}{""}},
+			args: args{[]any{""}},
 			want: 0,
 		},
 		{
 			name: "numeric value length",
-			args: args{[]interface{}{3.14}},
+			args: args{[]any{3.14}},
 			want: 4,
 		},
 		{
 			name: "array length",
-			args: args{[]interface{}{[]interface{}{true, 3.14, "Tom"}}},
+			args: args{[]any{[]any{true, 3.14, "Tom"}}},
 			want: 3,
 		},
 		{
 			name: "struct value length",
-			args: args{[]interface{}{map[string]interface{}{"name": "Tom", "age": 33}}},
+			args: args{[]any{map[string]any{"name": "Tom", "age": 33}}},
 			want: 2,
 		},
 	}
@@ -61,37 +61,37 @@ func TestFunctionLen(t *testing.T) {
 
 func TestFunctionProfile(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 
 		// Tests create an arbitrary key using a static UUID
 		{
 			name: "crete a key",
-			args: args{[]interface{}{"b306e250-6e07-4a05-abf4-e6a64d64cb72", "cookies"}},
+			args: args{[]any{"b306e250-6e07-4a05-abf4-e6a64d64cb72", "cookies"}},
 			want: nil,
 		},
 		{
 			name: "read a key",
-			args: args{[]interface{}{"b306e250-6e07-4a05-abf4-e6a64d64cb72"}},
+			args: args{[]any{"b306e250-6e07-4a05-abf4-e6a64d64cb72"}},
 			want: "cookies",
 		},
 		{
 			name: "delete a key",
-			args: args{[]interface{}{"b306e250-6e07-4a05-abf4-e6a64d64cb72", ""}},
+			args: args{[]any{"b306e250-6e07-4a05-abf4-e6a64d64cb72", ""}},
 			want: nil,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var got interface{}
+			var got any
 
 			var err error
 			if len(tt.args.args) > 1 {
@@ -115,41 +115,41 @@ func TestFunctionProfile(t *testing.T) {
 
 func TestFunctionSort(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name:    "scalar args",
-			args:    args{[]interface{}{66, 55}},
-			want:    []interface{}{55, 66},
+			args:    args{[]any{66, 55}},
+			want:    []any{55, 66},
 			wantErr: false,
 		},
 		{
 			name:    "mixed scalar args",
-			args:    args{[]interface{}{"tom", 3}},
-			want:    []interface{}{"3", "tom"},
+			args:    args{[]any{"tom", 3}},
+			want:    []any{"3", "tom"},
 			wantErr: false,
 		},
 		{
 			name: "integer sort",
-			args: args{[]interface{}{[]interface{}{55, 2, 18}}},
-			want: []interface{}{2, 18, 55},
+			args: args{[]any{[]any{55, 2, 18}}},
+			want: []any{2, 18, 55},
 		},
 		{
 			name: "float sort",
-			args: args{[]interface{}{[]interface{}{55.0, 2, "18.5"}}},
-			want: []interface{}{2.0, 18.5, 55.0},
+			args: args{[]any{[]any{55.0, 2, "18.5"}}},
+			want: []any{2.0, 18.5, 55.0},
 		},
 		{
 			name: "string sort",
-			args: args{[]interface{}{[]interface{}{"pony", "cake", "unicorn", 5}}},
-			want: []interface{}{"5", "cake", "pony", "unicorn"},
+			args: args{[]any{[]any{"pony", "cake", "unicorn", 5}}},
+			want: []any{"5", "cake", "pony", "unicorn"},
 		},
 	}
 
@@ -171,28 +171,28 @@ func TestFunctionSort(t *testing.T) {
 
 func TestFunctionMembers(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "simple struct",
-			args: args{[]interface{}{map[string]interface{}{"name": "Tom", "age": 55}}},
-			want: []interface{}{"age", "name"},
+			args: args{[]any{map[string]any{"name": "Tom", "age": 55}}},
+			want: []any{"age", "name"},
 		},
 		{
 			name: "empty struct",
-			args: args{[]interface{}{map[string]interface{}{}}},
-			want: []interface{}{},
+			args: args{[]any{map[string]any{}}},
+			want: []any{},
 		},
 		{
 			name:    "wrong type struct",
-			args:    args{[]interface{}{55}},
+			args:    args{[]any{55}},
 			want:    nil,
 			wantErr: true,
 		},

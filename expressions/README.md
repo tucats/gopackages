@@ -93,11 +93,11 @@ See the README.md file in the `functions` package for a description of each func
 ### User Supplied Functions
 The caller of the expressions package can supply additional functions to
 supplement the built-in functions.  The function must be declared as a
-function of type func([]interface{})(interface{}, error).  For example,
+function of type func([]any)(any, error).  For example,
 this is a simplified function that creates a floating point sum of all
 the supplied values (which will be type-coerced to be floats):
     
-    func sum( args []interface{})(interface{}, error) {
+    func sum( args []any)(any, error) {
         result := 0
         for _, v := range args {
             result = result + util.GetInt(v)

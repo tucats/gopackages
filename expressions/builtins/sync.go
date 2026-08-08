@@ -11,7 +11,7 @@ import (
 // Mutex functions.
 
 // sync.Mutex.Lock() function.
-func mutexLock(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func mutexLock(s *symbols.SymbolTable, args []any) (any, error) {
 	if len(args) != 0 {
 		return nil, errors.ErrArgumentCount.In("Lock")
 	}
@@ -27,7 +27,7 @@ func mutexLock(s *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 }
 
 // sync.Mutex.Unlock() function.
-func mutexUnlock(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func mutexUnlock(s *symbols.SymbolTable, args []any) (any, error) {
 	if len(args) != 0 {
 		return nil, errors.ErrArgumentCount.In("Unock")
 	}
@@ -45,7 +45,7 @@ func mutexUnlock(s *symbols.SymbolTable, args []interface{}) (interface{}, error
 // Waitgroup functions.
 
 // sync.WaitGroup Add() function.
-func waitGroupAdd(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func waitGroupAdd(s *symbols.SymbolTable, args []any) (any, error) {
 	if len(args) != 1 {
 		return nil, errors.ErrArgumentCount.In("Add")
 	}
@@ -62,7 +62,7 @@ func waitGroupAdd(s *symbols.SymbolTable, args []interface{}) (interface{}, erro
 }
 
 // sync.WaitGroup Done() function.
-func waitGroupDone(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func waitGroupDone(s *symbols.SymbolTable, args []any) (any, error) {
 	if len(args) != 0 {
 		return nil, errors.ErrArgumentCount.In("Done")
 	}
@@ -78,7 +78,7 @@ func waitGroupDone(s *symbols.SymbolTable, args []interface{}) (interface{}, err
 }
 
 // sync.WaitGroup Wait() function.
-func waitGroupWait(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func waitGroupWait(s *symbols.SymbolTable, args []any) (any, error) {
 	if len(args) != 0 {
 		return nil, errors.ErrArgumentCount.In("Wait")
 	}

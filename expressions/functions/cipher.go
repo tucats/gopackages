@@ -24,12 +24,12 @@ type Token struct {
 }
 
 // Hash implements the _cipher.hash() function.
-func Hash(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Hash(s *symbols.SymbolTable, args []any) (any, error) {
 	return util.Hash(util.GetString(args[0])), nil
 }
 
 // Encrypt implements the _cipher.hash() function.
-func Encrypt(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Encrypt(s *symbols.SymbolTable, args []any) (any, error) {
 	b, err := util.Encrypt(util.GetString(args[0]), util.GetString(args[1]))
 	if err != nil {
 		return b, err
@@ -39,7 +39,7 @@ func Encrypt(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 }
 
 // Decrypt implements the _cipher.hash() function.
-func Decrypt(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Decrypt(s *symbols.SymbolTable, args []any) (any, error) {
 	b, err := hex.DecodeString(util.GetString(args[0]))
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func Decrypt(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 }
 
 // Validate creates a new token with a username and a data payload.
-func Validate(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Validate(s *symbols.SymbolTable, args []any) (any, error) {
 	var err error
 
 	reportErr := false
@@ -108,7 +108,7 @@ func Validate(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 }
 
 // Extract extracts the data from a token and returns it as a struct.
-func Extract(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Extract(s *symbols.SymbolTable, args []any) (any, error) {
 	var err error
 
 	// Take the token value, and de-hexify it.
@@ -143,7 +143,7 @@ func Extract(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		return nil, errors.New("token expired")
 	}
 
-	r := map[string]interface{}{}
+	r := map[string]any{}
 	r["expires"] = t.Expires.String()
 	r["name"] = t.Name
 	r["data"] = t.Data
@@ -154,7 +154,7 @@ func Extract(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 }
 
 // CreateToken creates a new token with a username and a data payload.
-func CreateToken(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func CreateToken(s *symbols.SymbolTable, args []any) (any, error) {
 	var err error
 
 	// Create a new token object, with the username and an ID. If there was a

@@ -53,7 +53,7 @@ executed multiple times on multiple threads, each with it's own context.
 Finally, the context is run, which executes the bytecode instructions.
 If the instructions are meant to return a value, that value is left on
 the stack for the context, and you can use `ctx.Pop()` to remove items
-from the stack. The return values are opaque `interface{}` objects, and
+from the stack. The return values are opaque `any` objects, and
 you can use the util.Get*() functions to extract the integer, float,
 string, or bool object.
 

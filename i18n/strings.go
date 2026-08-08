@@ -37,7 +37,7 @@ func Register(localizations map[string]map[string]string) {
 //
 // The second optional parameter is a map of string substitutions that should
 // be done within the message text before returning the formatted value.
-func T(key string, valueMap ...map[string]interface{}) string {
+func T(key string, valueMap ...map[string]any) string {
 	// If we haven't yet figure out what language, do that now.
 	if Language == "" {
 		Language = os.Getenv("APP_LANG")
@@ -69,21 +69,21 @@ func T(key string, valueMap ...map[string]interface{}) string {
 }
 
 // L returns a label with the given key.
-func L(key string, valueMap ...map[string]interface{}) string {
+func L(key string, valueMap ...map[string]any) string {
 	return strings.TrimPrefix(T("label."+key, valueMap...), "label.")
 }
 
 // M returns a message with the given key.
-func M(key string, valueMap ...map[string]interface{}) string {
+func M(key string, valueMap ...map[string]any) string {
 	return T("msg."+key, valueMap...)
 }
 
 // E returns an error with the given key.
-func E(key string, valueMap ...map[string]interface{}) string {
+func E(key string, valueMap ...map[string]any) string {
 	return strings.TrimPrefix(T("error."+key, valueMap...), "error.")
 }
 
 // O returns an option description with the given key.
-func O(key string, valueMap ...map[string]interface{}) string {
+func O(key string, valueMap ...map[string]any) string {
 	return strings.TrimPrefix(T("opt."+key, valueMap...), "opt.")
 }

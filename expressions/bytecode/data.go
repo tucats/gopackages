@@ -6,7 +6,7 @@ import (
 )
 
 // loadByteCode instruction processor.
-func loadByteCode(c *Context, i interface{}) error {
+func loadByteCode(c *Context, i any) error {
 	name := data.String(i)
 	if len(name) == 0 {
 		return c.error(errors.ErrInvalidIdentifier).Context(name)
@@ -23,10 +23,10 @@ func loadByteCode(c *Context, i interface{}) error {
 // explodeByteCode implements Explode. This accepts a struct on the top of
 // the stack, and creates local variables for each of the members of the
 // struct by their name.
-func explodeByteCode(c *Context, i interface{}) error {
+func explodeByteCode(c *Context, i any) error {
 	var err error
 
-	var v interface{}
+	var v any
 
 	v, err = c.Pop()
 	if err != nil {

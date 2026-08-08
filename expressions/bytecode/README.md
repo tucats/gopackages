@@ -47,7 +47,7 @@ be added by a parser. The `Emit()` function emits an instruction with only one v
 
 The stream puts arguments to a function on a stack, and then calls the function. The
 result is left on the stack, and can be popped off after execution completes. The result (which is always
-an abstract interface{}) is then converted to a string and printed.
+an abstract any) is then converted to a string and printed.
 
 ## ByteCodes
 This table enumerates the bytecode values in the `bytecode` package, and what they do.

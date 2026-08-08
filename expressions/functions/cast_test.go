@@ -7,38 +7,38 @@ import (
 
 func TestFunctionInt(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "int(int)",
-			args: args{[]interface{}{33}},
+			args: args{[]any{33}},
 			want: 33,
 		},
 		{
 			name: "int(float64)",
-			args: args{[]interface{}{15.2}},
+			args: args{[]any{15.2}},
 			want: 15,
 		},
 		{
 			name: "int(string)",
-			args: args{[]interface{}{"42"}},
+			args: args{[]any{"42"}},
 			want: 42,
 		},
 		{
 			name: "int(bool)",
-			args: args{[]interface{}{true}},
+			args: args{[]any{true}},
 			want: 1,
 		},
 		{
 			name:    "int(error)",
-			args:    args{[]interface{}{"nescafe"}},
+			args:    args{[]any{"nescafe"}},
 			want:    nil,
 			wantErr: true,
 		},
@@ -62,33 +62,33 @@ func TestFunctionInt(t *testing.T) {
 
 func TestFunctionFloat(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "float(int)",
-			args: args{[]interface{}{33}},
+			args: args{[]any{33}},
 			want: 33.0,
 		},
 		{
 			name: "float(float64)",
-			args: args{[]interface{}{15.2}},
+			args: args{[]any{15.2}},
 			want: 15.2,
 		},
 		{
 			name: "float(string)",
-			args: args{[]interface{}{"3.14"}},
+			args: args{[]any{"3.14"}},
 			want: 3.14,
 		},
 		{
 			name: "float(bool)",
-			args: args{[]interface{}{true}},
+			args: args{[]any{true}},
 			want: 1.0,
 		},
 	}
@@ -111,33 +111,33 @@ func TestFunctionFloat(t *testing.T) {
 
 func TestFunctionString(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "string(int)",
-			args: args{[]interface{}{33}},
+			args: args{[]any{33}},
 			want: "33",
 		},
 		{
 			name: "string(float64)",
-			args: args{[]interface{}{15.2}},
+			args: args{[]any{15.2}},
 			want: "15.2",
 		},
 		{
 			name: "string(string)",
-			args: args{[]interface{}{"3.14"}},
+			args: args{[]any{"3.14"}},
 			want: "3.14",
 		},
 		{
 			name: "string(bool)",
-			args: args{[]interface{}{true}},
+			args: args{[]any{true}},
 			want: "true",
 		},
 	}
@@ -160,33 +160,33 @@ func TestFunctionString(t *testing.T) {
 
 func TestFunctionBool(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 	
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "bool(int)",
-			args: args{[]interface{}{0}},
+			args: args{[]any{0}},
 			want: false,
 		},
 		{
 			name: "bool(float64)",
-			args: args{[]interface{}{15.2}},
+			args: args{[]any{15.2}},
 			want: true,
 		},
 		{
 			name: "bool(string)",
-			args: args{[]interface{}{"true"}},
+			args: args{[]any{"true"}},
 			want: true,
 		},
 		{
 			name: "bool(bool)",
-			args: args{[]interface{}{false}},
+			args: args{[]any{false}},
 			want: false,
 		},
 	}

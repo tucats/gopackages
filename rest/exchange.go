@@ -56,7 +56,7 @@ func envDefault(name, defaultValue string) string {
 // Exchange is a helper wrapper around a rest call. This is generally used by all the
 // CLI client operations _except_ the logon operation, since at that point the token
 // is not known (or used).
-func Exchange(endpoint, method string, body interface{}, response interface{}, agentType string, mediaTypes ...string) error {
+func Exchange(endpoint, method string, body any, response any, agentType string, mediaTypes ...string) error {
 	var resp *resty.Response
 
 	var err error
@@ -167,7 +167,7 @@ func Exchange(endpoint, method string, body interface{}, response interface{}, a
 		// try to find the message text in the response, and if found, form an error response
 		// to the local caller using that text.
 		if status < 200 || status > 299 {
-			errorResponse := map[string]interface{}{}
+			errorResponse := map[string]any{}
 
 			err := json.Unmarshal(resp.Body(), &errorResponse)
 			if err == nil {
@@ -205,7 +205,7 @@ func Exchange(endpoint, method string, body interface{}, response interface{}, a
 				}
 
 				if err == nil && status != http.StatusOK {
-					if m, ok := response.(map[string]interface{}); ok {
+					if m, ok := response.(map[string]any); ok {
 						if msg, ok := m["Message"]; ok {
 							err = errors.NewMessage(data.String(msg))
 						}

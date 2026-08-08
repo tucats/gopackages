@@ -9,7 +9,7 @@ import (
 func TestO(t *testing.T) {
 	type args struct {
 		key      string
-		valueMap []map[string]interface{}
+		valueMap []map[string]any
 	}
 
 	tests := []struct {

@@ -7,7 +7,7 @@ import (
 
 // Eval evaluates the parsed expression. This can be called multiple times
 // with the same scanned string, but with different symbols.
-func (e *Expression) Eval(s *symbols.SymbolTable) (interface{}, error) {
+func (e *Expression) Eval(s *symbols.SymbolTable) (any, error) {
 	// If the compile failed, bail out now.
 	if e.err != nil {
 		return nil, e.err

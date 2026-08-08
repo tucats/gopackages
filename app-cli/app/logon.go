@@ -141,7 +141,7 @@ func Logon(c *cli.Context) error {
 
 		err = settings.Save()
 		if err == nil {
-			msg := i18n.M("logged.in", map[string]interface{}{
+			msg := i18n.M("logged.in", map[string]any{
 				"user":    user,
 				"expires": payload.Expiration,
 			})

@@ -10,48 +10,48 @@ import (
 
 func TestFunctionIndex(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "index found",
-			args: args{[]interface{}{"string of text", "of"}},
+			args: args{[]any{"string of text", "of"}},
 			want: 8,
 		},
 		{
 			name: "index not found",
-			args: args{[]interface{}{"string of text", "burp"}},
+			args: args{[]any{"string of text", "burp"}},
 			want: 0,
 		},
 		{
 			name: "empty source string",
-			args: args{[]interface{}{"", "burp"}},
+			args: args{[]any{"", "burp"}},
 			want: 0,
 		},
 		{
 			name: "empty test string",
-			args: args{[]interface{}{"string of text", ""}},
+			args: args{[]any{"string of text", ""}},
 			want: 1,
 		},
 		{
 			name: "non-string test",
-			args: args{[]interface{}{"A1B2C3D4", 3}},
+			args: args{[]any{"A1B2C3D4", 3}},
 			want: 6,
 		},
 		{
 			name: "array index",
-			args: args{[]interface{}{[]interface{}{"tom", 3.14, true}, 3.14}},
+			args: args{[]any{[]any{"tom", 3.14, true}, 3.14}},
 			want: 1,
 		},
 		{
 			name: "array not found",
-			args: args{[]interface{}{[]interface{}{"tom", 3.14, true}, false}},
+			args: args{[]any{[]any{"tom", 3.14, true}, false}},
 			want: -1,
 		},
 	}

@@ -50,7 +50,7 @@ func Hostname() string {
 	}
 }
 
-func InterfaceMapKeys(data map[string]interface{}) []string {
+func InterfaceMapKeys(data map[string]any) []string {
 	keys := make([]string, 0)
 
 	for key := range data {

@@ -11,7 +11,7 @@ import (
 // model value. If the value passed in is non-nil but cannot be converted
 // to the type of the model object, the function returns nil. Note that the
 // model is an _instance_ of the type to convert to, not a type iteself.
-func Coerce(v interface{}, model interface{}) interface{} {
+func Coerce(v any, model any) any {
 	if e, ok := v.(error); ok {
 		return e
 	}
@@ -320,7 +320,7 @@ func Coerce(v interface{}, model interface{}) interface{} {
 //
 // For example, passing in an int32 and a float64 returns the
 // values both converted to float64.
-func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
+func Normalize(v1 any, v2 any) (any, any) {
 	kind1 := KindOf(v1)
 	kind2 := KindOf(v2)
 
@@ -340,7 +340,7 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 // For a given Type, coverce the given value to the same
 // type. This only works for builtin scalar values like
 // int or string.
-func (t Type) Coerce(v interface{}) interface{} {
+func (t Type) Coerce(v any) any {
 	switch t.kind {
 	case ByteKind:
 		return Byte(v)

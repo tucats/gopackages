@@ -19,7 +19,7 @@ var rootNames = map[string]*SymbolAttribute{
 	},
 }
 
-var rootBaseValues = []interface{}{
+var rootBaseValues = []any{
 	"(c) Copyright 2020, 2021, 2022",
 	uuid.NewString(),
 }
@@ -29,11 +29,11 @@ var rootBaseValues = []interface{}{
 // the designated maximum symbol table size. Note that this size
 // is set at initialization time, so the max slots cannot be changed
 // at runtime for this table.
-var rootGrowthValues = make([]interface{}, SymbolAllocationSize-len(rootNames))
+var rootGrowthValues = make([]any, SymbolAllocationSize-len(rootNames))
 
 var rootInitialBin = append(rootBaseValues, rootGrowthValues...)
 
-var rootValues = []*[]interface{}{
+var rootValues = []*[]any{
 	&rootInitialBin,
 }
 
@@ -51,7 +51,7 @@ var RootSymbolTable = SymbolTable{
 }
 
 // SetGlobal sets a symbol value in the global symbol table.
-func (s *SymbolTable) SetGlobal(name string, value interface{}) error {
+func (s *SymbolTable) SetGlobal(name string, value any) error {
 	err := RootSymbolTable.Create(name)
 
 	RootSymbolTable.SetAlways(name, value)

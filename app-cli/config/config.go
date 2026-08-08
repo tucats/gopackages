@@ -179,7 +179,7 @@ func SetAction(c *cli.Context) error {
 
 	settings.Set(key, value)
 
-	msg := i18n.M("config.written", map[string]interface{}{"key": key})
+	msg := i18n.M("config.written", map[string]any{"key": key})
 
 	ui.Say("%s", msg)
 
@@ -218,7 +218,7 @@ func DeleteProfileAction(c *cli.Context) error {
 
 	err := settings.DeleteProfile(name)
 	if err == nil {
-		ui.Say("%s", i18n.M("config.deleted", map[string]interface{}{"name": name}))
+		ui.Say("%s", i18n.M("config.deleted", map[string]any{"name": name}))
 
 		return nil
 	}

@@ -15,7 +15,7 @@ import (
 // number or a string type name is given, the "zero value" for
 // that type is returned. For an array, struct, or map, a recursive
 // copy is done of the members to a new object which is returned.
-func New(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func New(s *symbols.SymbolTable, args []any) (any, error) {
 	// Is the type an integer? If so it's a type kind from the native
 	// reflection package.
 	if typeValue, ok := args[0].(int); ok {
@@ -84,7 +84,7 @@ func New(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	}
 
 	// If it's a WaitGroup, make a new one. Note, have to use the switch statement
-	// form here to prevent Go from complaining that the interface{} is being copied.
+	// form here to prevent Go from complaining that the any is being copied.
 	// In reality, we don't care as we don't actually make a copy anyway but instead
 	// make a new waitgroup object.
 	switch args[0].(type) {
@@ -102,7 +102,7 @@ func New(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	case symbols.SymbolTable:
 		return nil, errors.ErrInvalidValue.In("new").Context("symbol table")
 
-	case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
+	case func(*symbols.SymbolTable, []any) (any, error):
 		return v, nil
 
 	// No action for this group

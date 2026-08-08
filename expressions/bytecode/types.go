@@ -10,7 +10,7 @@ import (
 
 // StaticTypeOpcode implements the StaticType opcode, which
 // sets the static typing flag for the current context.
-func staticTypingByteCode(c *Context, i interface{}) error {
+func staticTypingByteCode(c *Context, i any) error {
 	v, err := c.Pop()
 	if err == nil {
 		if isStackMarker(v) {
@@ -29,7 +29,7 @@ func staticTypingByteCode(c *Context, i interface{}) error {
 	return err
 }
 
-func requiredTypeByteCode(c *Context, i interface{}) error {
+func requiredTypeByteCode(c *Context, i any) error {
 	v, err := c.Pop()
 	if err == nil {
 		if isStackMarker(v) {
@@ -154,7 +154,7 @@ func requiredTypeByteCode(c *Context, i interface{}) error {
 }
 
 // coerceByteCode instruction processor.
-func coerceByteCode(c *Context, i interface{}) error {
+func coerceByteCode(c *Context, i any) error {
 	t := data.TypeOf(i)
 
 	v, err := c.Pop()

@@ -37,8 +37,8 @@ type UndefinedValue struct {
 
 // Get retrieves a symbol from the current table or any parent
 // table that exists.
-func (s *SymbolTable) Get(name string) (interface{}, bool) {
-	var v interface{}
+func (s *SymbolTable) Get(name string) (any, bool) {
+	var v any
 
 	if s == nil {
 		return nil, false
@@ -83,8 +83,8 @@ func (s *SymbolTable) Get(name string) (interface{}, bool) {
 }
 
 // Get retrieves a symbol from the current table.
-func (s *SymbolTable) GetLocal(name string) (interface{}, bool) {
-	var v interface{}
+func (s *SymbolTable) GetLocal(name string) (any, bool) {
+	var v any
 
 	if s == nil {
 		return nil, false
@@ -121,8 +121,8 @@ func (s *SymbolTable) GetLocal(name string) (interface{}, bool) {
 
 // Get retrieves a symbol from the current table or any parent
 // table that exists.
-func (s *SymbolTable) GetWithAttributes(name string) (interface{}, *SymbolAttribute, bool) {
-	var v interface{}
+func (s *SymbolTable) GetWithAttributes(name string) (any, *SymbolAttribute, bool) {
+	var v any
 
 	if s == nil {
 		return nil, nil, false
@@ -161,8 +161,8 @@ func (s *SymbolTable) GetWithAttributes(name string) (interface{}, *SymbolAttrib
 
 // GetAddress retrieves the address of a symbol values from the
 // current table or any parent table that exists.
-func (s *SymbolTable) GetAddress(name string) (interface{}, bool) {
-	var v interface{}
+func (s *SymbolTable) GetAddress(name string) (any, bool) {
+	var v any
 
 	if s == nil {
 		return nil, false
@@ -193,7 +193,7 @@ func (s *SymbolTable) GetAddress(name string) (interface{}, bool) {
 
 // SetConstant stores a constant for readonly use in the symbol table. Because this could be
 // done from many different threads in a REST server mode, use a lock to serialize writes.
-func (s *SymbolTable) SetConstant(name string, v interface{}) error {
+func (s *SymbolTable) SetConstant(name string, v any) error {
 	if s == nil {
 		return errors.ErrNoSymbolTable.In("SetConstant")
 	}
@@ -271,7 +271,7 @@ func (s *SymbolTable) SetReadOnly(name string, flag bool) error {
 // SetAlways stores a symbol value in the local table. No value in
 // any parent table is affected. This can be used for functions and
 // readonly values.
-func (s *SymbolTable) SetAlways(name string, v interface{}) {
+func (s *SymbolTable) SetAlways(name string, v any) {
 	if s == nil {
 		return
 	}
@@ -323,7 +323,7 @@ func (s *SymbolTable) SetAlways(name string, v interface{}) {
 // SetAlways stores a symbol value in the local table. No value in
 // any parent table is affected. This can be used for functions and
 // readonly values.
-func (s *SymbolTable) SetWithAttributes(name string, v interface{}, newAttr SymbolAttribute) error {
+func (s *SymbolTable) SetWithAttributes(name string, v any, newAttr SymbolAttribute) error {
 	if s == nil {
 		return errors.ErrNoSymbolTable.In("SetWithAttributes")
 	}
@@ -378,8 +378,8 @@ func (s *SymbolTable) SetWithAttributes(name string, v interface{}, newAttr Symb
 }
 
 // Set stores a symbol value in the table where it was found.
-func (s *SymbolTable) Set(name string, v interface{}) error {
-	var old interface{}
+func (s *SymbolTable) Set(name string, v any) error {
+	var old any
 
 	if s == nil {
 		return errors.ErrNoSymbolTable.In("Set")
@@ -400,7 +400,7 @@ func (s *SymbolTable) Set(name string, v interface{}) error {
 
 		// Check to be sure this isn't a restricted (function code) type
 		// that we are not allowed to write over, ever.
-		if _, ok := old.(func(*SymbolTable, []interface{}) (interface{}, error)); ok {
+		if _, ok := old.(func(*SymbolTable, []any) (any, error)); ok {
 			return errors.ErrReadOnlyValue.Context(name)
 		}
 	}

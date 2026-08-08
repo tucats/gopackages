@@ -17,7 +17,7 @@ import (
 
 type this struct {
 	name  string
-	value interface{}
+	value any
 }
 
 // This value is updated atomically during context creation.
@@ -40,12 +40,12 @@ type Context struct {
 	bc                   *ByteCode
 	symbols              *symbols.SymbolTable
 	tokenizer            *tokenizer.Tokenizer
-	stack                []interface{}
+	stack                []any
 	thisStack            []this
 	output               *strings.Builder
-	lastStruct           interface{}
-	result               interface{}
-	this                 interface{}
+	lastStruct           any
+	result               any
+	this                 any
 	mux                  sync.RWMutex
 	programCounter       int
 	stackPointer         int
@@ -105,7 +105,7 @@ func NewContext(s *symbols.SymbolTable, b *ByteCode) *Context {
 		threadID:             atomic.AddInt32(&nextThreadID, 1),
 		bc:                   b,
 		programCounter:       0,
-		stack:                make([]interface{}, initialStackSize),
+		stack:                make([]any, initialStackSize),
 		stackPointer:         0,
 		framePointer:         0,
 		running:              false,
@@ -166,7 +166,7 @@ func (c *Context) SetPC(pc int) *Context {
 
 // SetGlobal stores a value in a the global symbol table that is
 // at the top of the symbol table chain.
-func (c *Context) SetGlobal(name string, value interface{}) error {
+func (c *Context) SetGlobal(name string, value any) error {
 	return c.symbols.Root().Set(name, value)
 }
 
@@ -268,7 +268,7 @@ func (c *Context) GetModuleName() string {
 }
 
 // Pop removes the top-most item from the stack.
-func (c *Context) Pop() (interface{}, error) {
+func (c *Context) Pop() (any, error) {
 	if c.stackPointer <= 0 || len(c.stack) < c.stackPointer {
 		return nil, c.error(errors.ErrStackUnderflow)
 	}
@@ -316,19 +316,19 @@ func (c *Context) formatStack(syms *symbols.SymbolTable, newlines bool) string {
 
 // get is a helper function that retrieves a symbol value from the associated
 // symbol table.
-func (c *Context) get(name string) (interface{}, bool) {
+func (c *Context) get(name string) (any, bool) {
 	return c.symbols.Get(name)
 }
 
 // set is a helper function that sets a symbol value in the associated
 // symbol table.
-func (c *Context) set(name string, value interface{}) error {
+func (c *Context) set(name string, value any) error {
 	return c.symbols.Set(name, value)
 }
 
 // setAlways is a helper function that sets a symbol value in the associated
 // symbol table.
-func (c *Context) setAlways(name string, value interface{}) {
+func (c *Context) setAlways(name string, value any) {
 	c.symbols.SetAlways(name, value)
 }
 
@@ -338,9 +338,9 @@ func (c *Context) create(name string) error {
 }
 
 // push puts a new items on the stack.
-func (c *Context) push(value interface{}) error {
+func (c *Context) push(value any) error {
 	if c.stackPointer >= len(c.stack) {
-		c.stack = append(c.stack, make([]interface{}, growStackBy)...)
+		c.stack = append(c.stack, make([]any, growStackBy)...)
 	}
 
 	c.stack[c.stackPointer] = value
@@ -353,6 +353,6 @@ func (c *Context) push(value interface{}) error {
 	return nil
 }
 
-func (c *Context) Result() interface{} {
+func (c *Context) Result() any {
 	return c.result
 }

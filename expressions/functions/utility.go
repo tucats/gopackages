@@ -16,7 +16,7 @@ import (
 )
 
 // Sleep implements util.sleep().
-func Sleep(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Sleep(syms *symbols.SymbolTable, args []any) (any, error) {
 	duration, err := time.ParseDuration(util.GetString(args[0]))
 	if err == nil {
 		time.Sleep(duration)
@@ -26,14 +26,14 @@ func Sleep(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 }
 
 // ProfileGet implements the profile.get() function.
-func ProfileGet(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func ProfileGet(symbols *symbols.SymbolTable, args []any) (any, error) {
 	key := util.GetString(args[0])
 
 	return persistence.Get(key), nil
 }
 
 // ProfileSet implements the profile.set() function.
-func ProfileSet(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func ProfileSet(symbols *symbols.SymbolTable, args []any) (any, error) {
 	key := util.GetString(args[0])
 
 	// If the value is an empty string, delete the key else
@@ -49,7 +49,7 @@ func ProfileSet(symbols *symbols.SymbolTable, args []interface{}) (interface{}, 
 }
 
 // ProfileDelete implements the profile.delete() function.
-func ProfileDelete(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func ProfileDelete(symbols *symbols.SymbolTable, args []any) (any, error) {
 	key := util.GetString(args[0])
 	persistence.Delete(key)
 
@@ -57,9 +57,9 @@ func ProfileDelete(symbols *symbols.SymbolTable, args []interface{}) (interface{
 }
 
 // ProfileKeys implements the profile.keys() function.
-func ProfileKeys(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func ProfileKeys(symbols *symbols.SymbolTable, args []any) (any, error) {
 	keys := persistence.Keys()
-	result := make([]interface{}, len(keys))
+	result := make([]any, len(keys))
 
 	for i, key := range keys {
 		result[i] = key
@@ -69,14 +69,14 @@ func ProfileKeys(symbols *symbols.SymbolTable, args []interface{}) (interface{},
 }
 
 // UUID implements the uuid() function.
-func UUID(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func UUID(symbols *symbols.SymbolTable, args []any) (any, error) {
 	u := uuid.New()
 
 	return u.String(), nil
 }
 
 // Length implements the len() function.
-func Length(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Length(symbols *symbols.SymbolTable, args []any) (any, error) {
 	if args[0] == nil {
 		return 0, nil
 	}
@@ -85,7 +85,7 @@ func Length(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 	case error:
 		return len(arg.Error()), nil
 
-	case map[string]interface{}:
+	case map[string]any:
 		keys := make([]string, 0)
 
 		for k := range arg {
@@ -96,7 +96,7 @@ func Length(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 
 		return len(keys), nil
 
-	case []interface{}:
+	case []any:
 		return len(arg), nil
 
 	case nil:
@@ -116,21 +116,21 @@ func Length(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 // an empty array of the given size. IF there are two parameters,
 // the first must be an existing array which is resized to match
 // the new array.
-func Array(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	var array []interface{}
+func Array(symbols *symbols.SymbolTable, args []any) (any, error) {
+	var array []any
 
 	count := 0
 
 	if len(args) == 2 {
 		switch v := args[0].(type) {
-		case []interface{}:
+		case []any:
 			count = util.GetInt(args[1])
 			if count < len(v) {
 				array = v[:count]
 			} else if count == len(v) {
 				array = v
 			} else {
-				array = append(v, make([]interface{}, count-len(v))...)
+				array = append(v, make([]any, count-len(v))...)
 			}
 
 		default:
@@ -138,7 +138,7 @@ func Array(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error
 		}
 	} else {
 		count = util.GetInt(args[0])
-		array = make([]interface{}, count)
+		array = make([]any, count)
 	}
 
 	return array, nil
@@ -146,12 +146,12 @@ func Array(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error
 
 // GetEnv implements the util.getenv() function which reads.
 // an environment variable from the os.
-func GetEnv(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func GetEnv(symbols *symbols.SymbolTable, args []any) (any, error) {
 	return os.Getenv(util.GetString(args[0])), nil
 }
 
 // GetMode implements the util.Mode() function which reports the runtime mode.
-func GetMode(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func GetMode(symbols *symbols.SymbolTable, args []any) (any, error) {
 	m, ok := symbols.Get("__exec_mode")
 	if !ok {
 		m = "run"
@@ -161,9 +161,9 @@ func GetMode(symbols *symbols.SymbolTable, args []interface{}) (interface{}, err
 }
 
 // Members gets an array of the names of the fields in a structure.
-func Members(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Members(symbols *symbols.SymbolTable, args []any) (any, error) {
 	switch v := args[0].(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		keys := make([]string, 0)
 
 		for k := range v {
@@ -174,7 +174,7 @@ func Members(symbols *symbols.SymbolTable, args []interface{}) (interface{}, err
 
 		sort.Strings(keys)
 
-		a := make([]interface{}, len(keys))
+		a := make([]any, len(keys))
 		for n, k := range keys {
 			a[n] = k
 		}
@@ -187,13 +187,13 @@ func Members(symbols *symbols.SymbolTable, args []interface{}) (interface{}, err
 }
 
 // Sort implements the sort() function.
-func Sort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Sort(symbols *symbols.SymbolTable, args []any) (any, error) {
 	// Make a master array of the values presented
-	var array []interface{}
+	var array []any
 
 	for _, a := range args {
 		switch v := a.(type) {
-		case []interface{}:
+		case []any:
 			array = append(array, v...)
 		default:
 			array = append(array, v)
@@ -215,7 +215,7 @@ func Sort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error)
 
 		sort.Ints(intArray)
 
-		resultArray := make([]interface{}, len(array))
+		resultArray := make([]any, len(array))
 
 		for n, i := range intArray {
 			resultArray[n] = i
@@ -231,7 +231,7 @@ func Sort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error)
 
 		sort.Float64s(floatArray)
 
-		resultArray := make([]interface{}, len(array))
+		resultArray := make([]any, len(array))
 
 		for n, i := range floatArray {
 			resultArray[n] = i
@@ -247,7 +247,7 @@ func Sort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error)
 
 		sort.Strings(stringArray)
 
-		resultArray := make([]interface{}, len(array))
+		resultArray := make([]any, len(array))
 
 		for n, i := range stringArray {
 			resultArray[n] = i
@@ -261,7 +261,7 @@ func Sort(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error)
 }
 
 // Exit implements the util.exit() function.
-func Exit(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Exit(symbols *symbols.SymbolTable, args []any) (any, error) {
 	// If no arguments, just do a simple exit
 	if len(args) == 0 {
 		os.Exit(0)
@@ -282,12 +282,12 @@ func Exit(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error)
 }
 
 // FormatSymbols implements the util.symbols() function.
-func FormatSymbols(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func FormatSymbols(syms *symbols.SymbolTable, args []any) (any, error) {
 	return syms.Format(false), nil
 }
 
 // Type implements the type() function.
-func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Type(syms *symbols.SymbolTable, args []any) (any, error) {
 	switch v := args[0].(type) {
 	case nil:
 		return "nil", nil
@@ -301,7 +301,7 @@ func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		return "string", nil
 	case bool:
 		return "bool", nil
-	case []interface{}:
+	case []any:
 		return "array", nil
 
 	default:
@@ -326,11 +326,11 @@ func Type(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 // Append implements the builtin append() function, which concatenates all the items
 // together as an array. The first argument is flattened into the result, and then each
 // additional argument is added to the array as-is.
-func Append(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-	result := []interface{}{}
+func Append(s *symbols.SymbolTable, args []any) (any, error) {
+	result := []any{}
 
 	for i, j := range args {
-		if array, ok := j.([]interface{}); ok && i == 0 {
+		if array, ok := j.([]any); ok && i == 0 {
 			result = append(result, array...)
 		} else {
 			result = append(result, j)
@@ -344,8 +344,7 @@ func Append(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 // an element from an array by index number, or to delete a symbol entirely. The
 // first form requires a string name, the second form requires an integer index,
 // and the third form does not have a second parameter.
-func Delete(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
+func Delete(s *symbols.SymbolTable, args []any) (any, error) {
 	if _, ok := args[0].(string); ok && len(args) != 1 {
 		return nil, errors.ErrArgumentCount
 	} else {
@@ -358,13 +357,13 @@ func Delete(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	case string:
 		return nil, s.Delete(v, true)
 
-	case map[string]interface{}:
+	case map[string]any:
 		key := util.GetString(args[1])
 		delete(v, key)
 		
 		return v, nil
 
-	case []interface{}:
+	case []any:
 		i := util.GetInt(args[1])
 		if i < 0 || i >= len(v) {
 			return nil, errors.ErrArrayIndex
@@ -381,10 +380,10 @@ func Delete(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 // GetArgs implements util.Args() which fetches command-line arguments from
 // the Ego command invocation, if any.
-func GetArgs(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func GetArgs(s *symbols.SymbolTable, args []any) (any, error) {
 	r, found := s.Get("__cli_args")
 	if !found {
-		r = []interface{}{}
+		r = []any{}
 	}
 
 	return r, nil
@@ -392,12 +391,12 @@ func GetArgs(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 
 // Make implements the make() function. The first argument must be a model of the
 // array type (using the Go native version), and the second argument is the size.
-func Make(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Make(syms *symbols.SymbolTable, args []any) (any, error) {
 	kind := args[0]
 	size := util.GetInt(args[1])
-	array := make([]interface{}, size)
+	array := make([]any, size)
 
-	if v, ok := kind.([]interface{}); ok {
+	if v, ok := kind.([]any); ok {
 		if len(v) > 0 {
 			kind = v[0]
 		}
@@ -422,9 +421,9 @@ func Make(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		for i := range array {
 			array[i] = 0.0
 		}
-	case map[string]interface{}:
+	case map[string]any:
 		for i := range array {
-			array[i] = map[string]interface{}{}
+			array[i] = map[string]any{}
 		}
 
 	default:

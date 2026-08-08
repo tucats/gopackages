@@ -7,28 +7,28 @@ import (
 
 func TestFunctionLeft(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "simple test",
-			args: args{[]interface{}{"Abraham", 4}},
+			args: args{[]any{"Abraham", 4}},
 			want: "Abra",
 		},
 		{
 			name: "negative length test",
-			args: args{[]interface{}{"Abraham", -5}},
+			args: args{[]any{"Abraham", -5}},
 			want: "",
 		},
 		{
 			name: "length too long test",
-			args: args{[]interface{}{"Abraham", 50}},
+			args: args{[]any{"Abraham", 50}},
 			want: "Abraham",
 		},
 	}
@@ -51,33 +51,33 @@ func TestFunctionLeft(t *testing.T) {
 
 func TestFunctionRight(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "simple test",
-			args: args{[]interface{}{"Abraham", 3}},
+			args: args{[]any{"Abraham", 3}},
 			want: "ham",
 		},
 		{
 			name: "length too small test",
-			args: args{[]interface{}{"Abraham", -5}},
+			args: args{[]any{"Abraham", -5}},
 			want: "",
 		},
 		{
 			name: "length too long test",
-			args: args{[]interface{}{"Abraham", 103}},
+			args: args{[]any{"Abraham", 103}},
 			want: "Abraham",
 		},
 		{
 			name: "empty string test",
-			args: args{[]interface{}{"", 3}},
+			args: args{[]any{"", 3}},
 			want: "",
 		},
 	}
@@ -100,38 +100,38 @@ func TestFunctionRight(t *testing.T) {
 
 func TestFunctionLower(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "lower case",
-			args: args{[]interface{}{"short"}},
+			args: args{[]any{"short"}},
 			want: "short",
 		},
 		{
 			name: "upper case",
-			args: args{[]interface{}{"TALL"}},
+			args: args{[]any{"TALL"}},
 			want: "tall",
 		},
 		{
 			name: "mixed case",
-			args: args{[]interface{}{"camelCase"}},
+			args: args{[]any{"camelCase"}},
 			want: "camelcase",
 		},
 		{
 			name: "empty string",
-			args: args{[]interface{}{""}},
+			args: args{[]any{""}},
 			want: "",
 		},
 		{
 			name: "non-string",
-			args: args{[]interface{}{3.14}},
+			args: args{[]any{3.14}},
 			want: "3.14",
 		},
 	}
@@ -154,38 +154,38 @@ func TestFunctionLower(t *testing.T) {
 
 func TestFunctionUpper(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "lower case",
-			args: args{[]interface{}{"short"}},
+			args: args{[]any{"short"}},
 			want: "SHORT",
 		},
 		{
 			name: "upper case",
-			args: args{[]interface{}{"TALL"}},
+			args: args{[]any{"TALL"}},
 			want: "TALL",
 		},
 		{
 			name: "mixed case",
-			args: args{[]interface{}{"camelCase"}},
+			args: args{[]any{"camelCase"}},
 			want: "CAMELCASE",
 		},
 		{
 			name: "empty string",
-			args: args{[]interface{}{""}},
+			args: args{[]any{""}},
 			want: "",
 		},
 		{
 			name: "non-string",
-			args: args{[]interface{}{3.14}},
+			args: args{[]any{3.14}},
 			want: "3.14",
 		},
 	}
@@ -208,38 +208,38 @@ func TestFunctionUpper(t *testing.T) {
 
 func TestFunctionSubstring(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "left case",
-			args: args{[]interface{}{"simple", 1, 3}},
+			args: args{[]any{"simple", 1, 3}},
 			want: "sim",
 		},
 		{
 			name: "right case",
-			args: args{[]interface{}{"simple", 3, 4}},
+			args: args{[]any{"simple", 3, 4}},
 			want: "mple",
 		},
 		{
 			name: "middle case",
-			args: args{[]interface{}{"simple", 3, 1}},
+			args: args{[]any{"simple", 3, 1}},
 			want: "m",
 		},
 		{
 			name: "invalid start case",
-			args: args{[]interface{}{"simple", -5, 3}},
+			args: args{[]any{"simple", -5, 3}},
 			want: "sim",
 		},
 		{
 			name: "invalid len case",
-			args: args{[]interface{}{"simple", 1, 355}},
+			args: args{[]any{"simple", 1, 355}},
 			want: "simple",
 		},
 	}
@@ -262,58 +262,58 @@ func TestFunctionSubstring(t *testing.T) {
 
 func TestFunctionIndex(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 	
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "index found",
-			args: args{[]interface{}{"string of text", "of"}},
+			args: args{[]any{"string of text", "of"}},
 			want: 8,
 		},
 		{
 			name: "index not found",
-			args: args{[]interface{}{"string of text", "burp"}},
+			args: args{[]any{"string of text", "burp"}},
 			want: 0,
 		},
 		{
 			name: "empty source string",
-			args: args{[]interface{}{"", "burp"}},
+			args: args{[]any{"", "burp"}},
 			want: 0,
 		},
 		{
 			name: "empty test string",
-			args: args{[]interface{}{"string of text", ""}},
+			args: args{[]any{"string of text", ""}},
 			want: 1,
 		},
 		{
 			name: "non-string test",
-			args: args{[]interface{}{"A1B2C3D4", 3}},
+			args: args{[]any{"A1B2C3D4", 3}},
 			want: 6,
 		},
 		{
 			name: "array index",
-			args: args{[]interface{}{[]interface{}{"tom", 3.14, true}, 3.14}},
+			args: args{[]any{[]any{"tom", 3.14, true}, 3.14}},
 			want: 2,
 		},
 		{
 			name: "array not found",
-			args: args{[]interface{}{[]interface{}{"tom", 3.14, true}, false}},
+			args: args{[]any{[]any{"tom", 3.14, true}, false}},
 			want: 0,
 		},
 		{
 			name: "member found",
-			args: args{[]interface{}{map[string]interface{}{"name": "tom", "age": 55}, "age"}},
+			args: args{[]any{map[string]any{"name": "tom", "age": 55}, "age"}},
 			want: true,
 		},
 		{
 			name: "member found",
-			args: args{[]interface{}{map[string]interface{}{"name": "tom", "age": 55}, "gender"}},
+			args: args{[]any{map[string]any{"name": "tom", "age": 55}, "gender"}},
 			want: false,
 		},
 	}

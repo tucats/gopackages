@@ -7,44 +7,44 @@ import (
 
 func TestFunctionMin(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "integer list",
-			args: args{[]interface{}{5, 7, 2.0}},
+			args: args{[]any{5, 7, 2.0}},
 			want: 2,
 		},
 		{
 			name: "float list",
-			args: args{[]interface{}{5.5, 5.1, "9.0"}},
+			args: args{[]any{5.5, 5.1, "9.0"}},
 			want: 5.1,
 		},
 		{
 			name: "string list",
-			args: args{[]interface{}{"dog", "cake", "pony"}},
+			args: args{[]any{"dog", "cake", "pony"}},
 			want: "cake",
 		},
 		{
 			name: "bool list",
-			args: args{[]interface{}{true, 33, false}},
+			args: args{[]any{true, 33, false}},
 			want: false,
 		},
 		{
 			name:    "Invalid tyoe",
-			args:    args{[]interface{}{map[string]interface{}{"age": 55}, 5}},
+			args:    args{[]any{map[string]any{"age": 55}, 5}},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "Invalid int",
-			args:    args{[]interface{}{15, []interface{}{5, 5}}},
+			args:    args{[]any{15, []any{5, 5}}},
 			want:    nil,
 			wantErr: true,
 		},
@@ -68,44 +68,44 @@ func TestFunctionMin(t *testing.T) {
 
 func TestFunctionMax(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "integer list",
-			args: args{[]interface{}{5, 7, 2.0}},
+			args: args{[]any{5, 7, 2.0}},
 			want: 7,
 		},
 		{
 			name: "float list",
-			args: args{[]interface{}{5.5, 5.1, "9.0"}},
+			args: args{[]any{5.5, 5.1, "9.0"}},
 			want: 9.0,
 		},
 		{
 			name: "string list",
-			args: args{[]interface{}{"dog", "cake", "pony"}},
+			args: args{[]any{"dog", "cake", "pony"}},
 			want: "pony",
 		},
 		{
 			name: "bool list",
-			args: args{[]interface{}{true, 33, false}},
+			args: args{[]any{true, 33, false}},
 			want: true,
 		},
 		{
 			name:    "Invalid type",
-			args:    args{[]interface{}{map[string]interface{}{"age": 55}, 5}},
+			args:    args{[]any{map[string]any{"age": 55}, 5}},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "Invalid int",
-			args:    args{[]interface{}{15, []interface{}{5, 5}}},
+			args:    args{[]any{15, []any{5, 5}}},
 			want:    nil,
 			wantErr: true,
 		},
@@ -129,44 +129,44 @@ func TestFunctionMax(t *testing.T) {
 
 func TestFunctionSum(t *testing.T) {
 	type args struct {
-		args []interface{}
+		args []any
 	}
 	
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name: "integer list",
-			args: args{[]interface{}{5, 7, 2.0}},
+			args: args{[]any{5, 7, 2.0}},
 			want: 14,
 		},
 		{
 			name: "float list",
-			args: args{[]interface{}{5.5, 5.1, "9.0"}},
+			args: args{[]any{5.5, 5.1, "9.0"}},
 			want: 19.6,
 		},
 		{
 			name: "string list",
-			args: args{[]interface{}{"dog", "cake", 55}},
+			args: args{[]any{"dog", "cake", 55}},
 			want: "dogcake55",
 		},
 		{
 			name: "bool list",
-			args: args{[]interface{}{true, 33, false}},
+			args: args{[]any{true, 33, false}},
 			want: true,
 		},
 		{
 			name:    "Invalid type",
-			args:    args{[]interface{}{map[string]interface{}{"age": 55}, 5}},
+			args:    args{[]any{map[string]any{"age": 55}, 5}},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "Invalid int",
-			args:    args{[]interface{}{15, []interface{}{5, 5}}},
+			args:    args{[]any{15, []any{5, 5}}},
 			want:    nil,
 			wantErr: true,
 		},

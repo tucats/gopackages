@@ -42,7 +42,7 @@ type SymbolTable struct {
 	forPackage    string
 	parent        *SymbolTable
 	symbols       map[string]*SymbolAttribute
-	values        []*[]interface{}
+	values        []*[]any
 	id            uuid.UUID
 	size          int
 	scopeBoundary bool

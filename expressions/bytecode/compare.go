@@ -18,7 +18,7 @@ import (
 // and a type-specific test for equality is done.
 // If the values are equal, then true is pushed
 // back on the stack, else false.
-func equalByteCode(c *Context, i interface{}) error {
+func equalByteCode(c *Context, i any) error {
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
 	if err != nil {
@@ -108,7 +108,7 @@ func equalByteCode(c *Context, i interface{}) error {
 // and a type-specific test for equality is done.
 // If the values are not equal, then true is pushed
 // back on the stack, else false.
-func notEqualByteCode(c *Context, i interface{}) error {
+func notEqualByteCode(c *Context, i any) error {
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
 	if err != nil {
@@ -190,7 +190,7 @@ func notEqualByteCode(c *Context, i interface{}) error {
 // If the top value is greater than the second
 // value, then true is pushed back on the stack,
 // else false.
-func greaterThanByteCode(c *Context, i interface{}) error {
+func greaterThanByteCode(c *Context, i any) error {
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
 	if err != nil {
@@ -259,7 +259,7 @@ func greaterThanByteCode(c *Context, i interface{}) error {
 // If the top value is greater than or equal to the
 // second value, then true is pushed back on the stack,
 // else false.
-func greaterThanOrEqualByteCode(c *Context, i interface{}) error {
+func greaterThanOrEqualByteCode(c *Context, i any) error {
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
 	if err != nil {
@@ -326,7 +326,7 @@ func greaterThanOrEqualByteCode(c *Context, i interface{}) error {
 // If the top value is less than the second
 // value, then true is pushed back on the stack,
 // else false.
-func lessThanByteCode(c *Context, i interface{}) error {
+func lessThanByteCode(c *Context, i any) error {
 	// Terms pushed in reverse order
 	v2, err := c.Pop()
 	if err != nil {
@@ -396,7 +396,7 @@ func lessThanByteCode(c *Context, i interface{}) error {
 // If the top value is less than or equal to the
 // second value, then true is pushed back on the
 // stack, else false.
-func lessThanOrEqualByteCode(c *Context, i interface{}) error {
+func lessThanOrEqualByteCode(c *Context, i any) error {
 	// Terms pushed in reverse order.
 	v2, err := c.Pop()
 	if err != nil {

@@ -14,7 +14,7 @@ import (
 )
 
 // opcodeHandler defines a function that implements an opcode.
-type opcodeHandler func(b *Context, i interface{}) error
+type opcodeHandler func(b *Context, i any) error
 
 // dispatchMap is a map that is used to locate the function for an opcode.
 type dispatchMap map[Opcode]opcodeHandler
@@ -134,7 +134,7 @@ func (c *Context) RunFromAddress(addr int) error {
 
 // GoRoutine allows calling a named function as a go routine, using arguments. The invocation
 // of GoRoutine should be in a "go" statement to run the code.
-func GoRoutine(fName string, parentCtx *Context, args []interface{}) {
+func GoRoutine(fName string, parentCtx *Context, args []any) {
 	parentCtx.mux.RLock()
 	parentSymbols := parentCtx.symbols
 	parentCtx.mux.RUnlock()
@@ -172,7 +172,7 @@ func GoRoutine(fName string, parentCtx *Context, args []interface{}) {
 	}
 
 	if err != nil && !err.Is(errors.ErrStop) {
-		fmt.Printf("%s\n", i18n.E("go.error", map[string]interface{}{"name": fName, "err": err}))
+		fmt.Printf("%s\n", i18n.E("go.error", map[string]any{"name": fName, "err": err}))
 
 		ui.Log(ui.TraceLogger, "--> Go routine invocation ends with %v", err)
 		os.Exit(55)

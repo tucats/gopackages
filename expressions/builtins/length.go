@@ -8,7 +8,7 @@ import (
 )
 
 // Length implements the len() function.
-func Length(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Length(s *symbols.SymbolTable, args []any) (any, error) {
 	if args[0] == nil {
 		return 0, nil
 	}
@@ -42,7 +42,7 @@ func Length(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 }
 
 // SizeOf returns the size in bytes of an arbibrary object.
-func SizeOf(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func SizeOf(s *symbols.SymbolTable, args []any) (any, error) {
 	size := data.SizeOf(args[0])
 
 	return size, nil

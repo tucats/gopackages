@@ -13,7 +13,7 @@ import (
 //    table.
 //
 // 2. Slot numbers are used to locate the value itself. VAlues are
-//    stored in a []interface{}, which is always created using the
+//    stored in a []any, which is always created using the
 //    SymbolAllocationSize value. The address of this array is then
 //    stored in the symbol table's Values array, which is an array
 //    of pointers to the value lists.
@@ -39,15 +39,15 @@ func (s *SymbolTable) initializeValues() {
 	}
 
 	if s.values == nil {
-		bin := make([]interface{}, SymbolAllocationSize)
-		s.values = make([]*[]interface{}, 1)
+		bin := make([]any, SymbolAllocationSize)
+		s.values = make([]*[]any, 1)
 		s.values[0] = &bin
 		s.size = 0
 	}
 }
 
 // Given an index and a value, store the value in the Values list.
-func (s *SymbolTable) SetValue(index int, v interface{}) {
+func (s *SymbolTable) SetValue(index int, v any) {
 	if index == noSlot {
 		return
 	}
@@ -58,7 +58,7 @@ func (s *SymbolTable) SetValue(index int, v interface{}) {
 	// bin number.
 	bin := index / SymbolAllocationSize
 	for bin >= len(s.values) {
-		newBin := make([]interface{}, SymbolAllocationSize)
+		newBin := make([]any, SymbolAllocationSize)
 		s.values = append(s.values, &newBin)
 
 		ui.Log(ui.SymbolLogger, "%s, create new value bin", s.Name)
@@ -69,7 +69,7 @@ func (s *SymbolTable) SetValue(index int, v interface{}) {
 }
 
 // Given an index, retrieve a value from the Values list.
-func (s *SymbolTable) GetValue(index int) interface{} {
+func (s *SymbolTable) GetValue(index int) any {
 	if index == noSlot {
 		return nil
 	}
@@ -86,7 +86,7 @@ func (s *SymbolTable) GetValue(index int) interface{} {
 
 // Given an index, return the address of the value in that
 // slot.
-func (s *SymbolTable) AddressOfValue(index int) *interface{} {
+func (s *SymbolTable) AddressOfValue(index int) *any {
 	if index == noSlot {
 		return nil
 	}
@@ -103,7 +103,7 @@ func (s *SymbolTable) AddressOfValue(index int) *interface{} {
 
 // Given an index, return the address of the value in that
 // slot.
-func (s *SymbolTable) AddressOfImmuableValue(index int) *interface{} {
+func (s *SymbolTable) AddressOfImmuableValue(index int) *any {
 	if index == noSlot {
 		return nil
 	}
@@ -126,6 +126,6 @@ func (s *SymbolTable) AddressOfImmuableValue(index int) *interface{} {
 	return &oldValue
 }
 
-func makeInterface(i data.Immutable) interface{} {
+func makeInterface(i data.Immutable) any {
 	return i
 }

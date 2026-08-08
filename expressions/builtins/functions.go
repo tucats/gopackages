@@ -39,10 +39,10 @@ type FunctionDefinition struct {
 	FullScope bool
 
 	// F is the address of the function implementation
-	F interface{}
+	F any
 
 	// V is a value constant associated with this name.
-	V interface{}
+	V any
 
 	// D is a function declaration object that details the
 	// parameter and return types.
@@ -139,7 +139,7 @@ func AddBuiltins(symbolTable *symbols.SymbolTable) {
 
 // FindFunction returns the function definition associated with the
 // provided function pointer, if one is found.
-func FindFunction(f func(*symbols.SymbolTable, []interface{}) (interface{}, error)) *FunctionDefinition {
+func FindFunction(f func(*symbols.SymbolTable, []any) (any, error)) *FunctionDefinition {
 	sf1 := reflect.ValueOf(f)
 
 	for _, d := range FunctionDictionary {
@@ -155,7 +155,7 @@ func FindFunction(f func(*symbols.SymbolTable, []interface{}) (interface{}, erro
 }
 
 // FindName returns the name of a function from the dictionary if one is found.
-func FindName(f func(*symbols.SymbolTable, []interface{}) (interface{}, error)) string {
+func FindName(f func(*symbols.SymbolTable, []any) (any, error)) string {
 	sf1 := reflect.ValueOf(f)
 
 	for name, d := range FunctionDictionary {
@@ -170,7 +170,7 @@ func FindName(f func(*symbols.SymbolTable, []interface{}) (interface{}, error)) 
 	return ""
 }
 
-func CallBuiltin(s *symbols.SymbolTable, name string, args ...interface{}) (interface{}, error) {
+func CallBuiltin(s *symbols.SymbolTable, name string, args ...any) (any, error) {
 	var fdef = FunctionDefinition{}
 
 	found := false
@@ -190,10 +190,10 @@ func CallBuiltin(s *symbols.SymbolTable, name string, args ...interface{}) (inte
 		return nil, errors.ErrPanic.Context(i18n.E("arg.count"))
 	}
 
-	fn, ok := fdef.F.(func(*symbols.SymbolTable, []interface{}) (interface{}, error))
+	fn, ok := fdef.F.(func(*symbols.SymbolTable, []any) (any, error))
 	if !ok {
 		return nil, errors.ErrPanic.Context(i18n.E("function.pointer",
-			map[string]interface{}{"ptr": fdef.F}))
+			map[string]any{"ptr": fdef.F}))
 	}
 
 	return fn(s, args)

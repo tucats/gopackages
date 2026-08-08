@@ -5,7 +5,7 @@ import "testing"
 func TestFormat(t *testing.T) {
 	tests := []struct {
 		name string
-		arg  interface{}
+		arg  any
 		want string
 	}{
 		{
@@ -20,17 +20,17 @@ func TestFormat(t *testing.T) {
 		},
 		{
 			name: "Array of int",
-			arg:  []interface{}{3, 5, 55},
+			arg:  []any{3, 5, 55},
 			want: "[3, 5, 55]",
 		},
 		{
 			name: "Array with array",
-			arg:  []interface{}{3, []interface{}{"tom", true}, 55},
+			arg:  []any{3, []any{"tom", true}, 55},
 			want: "[3, [\"tom\", true], 55]",
 		},
 		{
 			name: "simple structure",
-			arg: map[string]interface{}{
+			arg: map[string]any{
 				"name": "Tom",
 				"age":  59,
 			},

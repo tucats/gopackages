@@ -7,7 +7,7 @@ import (
 
 // Make implements the make() function. The first argument must be a model of the
 // array type (using the Go native version), and the second argument is the size.
-func Make(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Make(s *symbols.SymbolTable, args []any) (any, error) {
 	kind := args[0]
 	size := data.Int(args[1])
 
@@ -16,9 +16,9 @@ func Make(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 		kind = data.InstanceOfType(v)
 	}
 
-	array := make([]interface{}, size)
+	array := make([]any, size)
 
-	if v, ok := kind.([]interface{}); ok {
+	if v, ok := kind.([]any); ok {
 		if len(v) > 0 {
 			kind = v[0]
 		}

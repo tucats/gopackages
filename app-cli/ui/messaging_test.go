@@ -11,7 +11,7 @@ func TestLogMessage(t *testing.T) {
 	type args struct {
 		class  string
 		format string
-		args   []interface{}
+		args   []any
 	}
 
 	tests := []struct {
@@ -24,7 +24,7 @@ func TestLogMessage(t *testing.T) {
 			args: args{
 				class:  "USER",
 				format: "string text",
-				args:   []interface{}{},
+				args:   []any{},
 			},
 			want: "     USER   : string text",
 		},
@@ -33,7 +33,7 @@ func TestLogMessage(t *testing.T) {
 			args: args{
 				class:  "USER",
 				format: "digits %d",
-				args:   []interface{}{42},
+				args:   []any{42},
 			},
 			want: "     USER   : digits 42",
 		},

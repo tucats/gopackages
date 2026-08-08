@@ -16,7 +16,7 @@ import (
 )
 
 // FormatUnquoted formats a value but does not put quotes on strings.
-func FormatUnquoted(arg interface{}) string {
+func FormatUnquoted(arg any) string {
 	switch v := arg.(type) {
 	case string:
 		return v
@@ -31,7 +31,7 @@ func FormatUnquoted(arg interface{}) string {
 // other types have a type enclosure, such as int(42) for the value
 // 42 expressed as an int. This is used to format data on the stack
 // during debugging and tracking, for example.
-func FormatWithType(element interface{}) string {
+func FormatWithType(element any) string {
 	switch actual := element.(type) {
 	case error:
 		return "E<" + actual.Error() + ">"
@@ -108,7 +108,7 @@ func FormatWithType(element interface{}) string {
 // Format a value as a human-readable value, such as you would see from fmt.Printf()
 // for the associated value. This includes formatting for non-concrete objects, such
 // as types, nil values, constants, etc.
-func Format(element interface{}) string {
+func Format(element any) string {
 	if IsNil(element) {
 		return "<nil>"
 	}
@@ -166,7 +166,7 @@ func Format(element interface{}) string {
 	case Declaration:
 		return v.String()
 
-	case *interface{}:
+	case *any:
 		if v != nil {
 			vv := *v
 			switch vv := vv.(type) {
@@ -183,7 +183,7 @@ func Format(element interface{}) string {
 				return fmt.Sprintf("&%s", Format(vv))
 			}
 		} else {
-			return "nil<*interface{}>"
+			return "nil<*any>"
 		}
 
 	case Function:

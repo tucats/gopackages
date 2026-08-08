@@ -12,7 +12,7 @@ import (
 )
 
 // Int implements the int() function.
-func Int(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Int(symbols *symbols.SymbolTable, args []any) (any, error) {
 	v := data.Coerce(args[0], 1)
 	if v == nil {
 		return nil, errors.ErrInvalidType.Context("int")
@@ -22,7 +22,7 @@ func Int(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 }
 
 // Float implements the float() function.
-func Float(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Float(symbols *symbols.SymbolTable, args []any) (any, error) {
 	v := util.Coerce(args[0], 1.0)
 	if v == nil {
 		return nil, errors.ErrInvalidType.Context("float")
@@ -32,10 +32,10 @@ func Float(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error
 }
 
 // String implements the string() function.
-func String(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func String(symbols *symbols.SymbolTable, args []any) (any, error) {
 	// Special case. Is the argument an array of strings? If so, restructure as a single
 	// string with line breaks.
-	if array, ok := args[0].([]interface{}); ok {
+	if array, ok := args[0].([]any); ok {
 		isString := true
 
 		for _, v := range array {
@@ -65,7 +65,7 @@ func String(symbols *symbols.SymbolTable, args []interface{}) (interface{}, erro
 }
 
 // Bool implements the bool() function.
-func Bool(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Bool(symbols *symbols.SymbolTable, args []any) (any, error) {
 	v := util.Coerce(args[0], true)
 	if v == nil {
 		return nil, errors.ErrInvalidType.Context("bool")
@@ -75,19 +75,19 @@ func Bool(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error)
 }
 
 // Coerce coerces a value to match the type of a model value.
-func Coerce(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Coerce(symbols *symbols.SymbolTable, args []any) (any, error) {
 	return util.Coerce(args[0], args[1]), nil
 }
 
 // Normalize coerces a value to match the type of a model value.
-func Normalize(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Normalize(symbols *symbols.SymbolTable, args []any) (any, error) {
 	v1, v2 := util.Normalize(args[0], args[1])
-	
-	return []interface{}{v1, v2}, nil
+
+	return []any{v1, v2}, nil
 }
 
 // New implements the new() function.
-func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func New(syms *symbols.SymbolTable, args []any) (any, error) {
 	// Is the type an integer? If so it's a type
 	if typeValue, ok := args[0].(int); ok {
 		switch reflect.Kind(typeValue) {
@@ -135,13 +135,13 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 	case symbols.SymbolTable:
 		return nil, errors.ErrInvalidValue.In("new")
 
-	case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
+	case func(*symbols.SymbolTable, []any) (any, error):
 		return nil, errors.ErrInvalidValue.In("new")
 
 	case int:
 	case string:
 	case float64:
-	case []interface{}:
+	case []any:
 
 	default:
 		return nil, errors.ErrInvalidType.In("new")
@@ -151,8 +151,7 @@ func New(syms *symbols.SymbolTable, args []interface{}) (interface{}, error) {
 }
 
 // DeepCopy makes a deep copy of an Ego data type.
-func DeepCopy(source interface{}, depth int) interface{} {
-
+func DeepCopy(source any, depth int) any {
 	if depth < 0 {
 		return nil
 	}
@@ -167,16 +166,16 @@ func DeepCopy(source interface{}, depth int) interface{} {
 	case bool:
 		return v
 
-	case []interface{}:
-		r := make([]interface{}, 0)
+	case []any:
+		r := make([]any, 0)
 		for _, d := range v {
 			r = append(r, DeepCopy(d, depth-1))
 		}
 
 		return r
 
-	case map[string]interface{}:
-		r := map[string]interface{}{}
+	case map[string]any:
+		r := map[string]any{}
 		for k, d := range v {
 			r[k] = DeepCopy(d, depth-1)
 		}

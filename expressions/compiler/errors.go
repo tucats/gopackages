@@ -6,7 +6,7 @@ import (
 )
 
 // error generates a new compiler error.
-func (c *Compiler) error(err error, args ...interface{}) *errors.Error {
+func (c *Compiler) error(err error, args ...any) *errors.Error {
 	p := c.t.TokenP
 	if p < 0 {
 		p = 0

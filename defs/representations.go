@@ -53,14 +53,14 @@ type DBColumn struct {
 
 type DBRowSet struct {
 	ServerInfo `json:"server"`
-	Rows       []map[string]interface{} `json:"rows"`
+	Rows       []map[string]any `json:"rows"`
 	Count      int                      `json:"count"`
 }
 
 type DBAbstractRowSet struct {
 	ServerInfo `json:"server"`
 	Columns    []string        `json:"columns"`
-	Rows       [][]interface{} `json:"rows"`
+	Rows       [][]any `json:"rows"`
 	Count      int             `json:"count"`
 }
 

@@ -20,7 +20,7 @@ import (
 
 // stopByteCode instruction processor causes the current execution context to
 // stop executing immediately.
-func stopByteCode(c *Context, i interface{}) error {
+func stopByteCode(c *Context, i any) error {
 	c.running = false
 
 	return errors.ErrStop
@@ -29,7 +29,7 @@ func stopByteCode(c *Context, i interface{}) error {
 // branchFalseByteCode instruction processor branches to the instruction named in
 // the operand if the top-of-stack item is a boolean FALSE value. Otherwise,
 // execution continues with the next instruction.
-func branchFalseByteCode(c *Context, i interface{}) error {
+func branchFalseByteCode(c *Context, i any) error {
 	// Get test value
 	v, err := c.Pop()
 	if err != nil {
@@ -57,7 +57,7 @@ func branchFalseByteCode(c *Context, i interface{}) error {
 
 // branchByteCode instruction processor branches to the instruction named in
 // the operand.
-func branchByteCode(c *Context, i interface{}) error {
+func branchByteCode(c *Context, i any) error {
 	// Get destination
 	if address := data.Int(i); address < 0 || address > c.bc.nextAddress {
 		return c.error(errors.ErrInvalidBytecodeAddress).Context(address)
@@ -71,7 +71,7 @@ func branchByteCode(c *Context, i interface{}) error {
 // branchTrueByteCode instruction processor branches to the instruction named in
 // the operand if the top-of-stack item is a boolean TRUE value. Otherwise,
 // execution continues with the next instruction.
-func branchTrueByteCode(c *Context, i interface{}) error {
+func branchTrueByteCode(c *Context, i any) error {
 	// Get test value
 	v, err := c.Pop()
 	if err != nil {
@@ -102,12 +102,12 @@ func branchTrueByteCode(c *Context, i interface{}) error {
 // number of arguments that are on the stack. The function value must be
 // either a pointer to a built-in function, or a pointer to a bytecode
 // function implementation.
-func callByteCode(c *Context, i interface{}) error {
+func callByteCode(c *Context, i any) error {
 	var err error
 
-	var functionPointer interface{}
+	var functionPointer any
 
-	var result interface{}
+	var result any
 
 	// Argument count is in operand. It can be offset by a
 	// value held in the context cause during argument processing.
@@ -125,7 +125,7 @@ func callByteCode(c *Context, i interface{}) error {
 	}
 
 	// Arguments are in reverse order on stack.
-	args := make([]interface{}, argc)
+	args := make([]any, argc)
 
 	for n := 0; n < argc; n = n + 1 {
 		v, err := c.Pop()
@@ -256,7 +256,7 @@ func callByteCode(c *Context, i interface{}) error {
 			err = c.error(err).In(builtins.FindName(function))
 		}
 
-	case func(*symbols.SymbolTable, []interface{}) (interface{}, error):
+	case func(*symbols.SymbolTable, []any) (any, error):
 		// First, can we check the argument count on behalf of the caller?
 		functionDefinition := builtins.FindFunction(function)
 		functionName := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()

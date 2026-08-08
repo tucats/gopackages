@@ -7,7 +7,7 @@ import (
 func TestIsStackMarker(t *testing.T) {
 	tests := []struct {
 		name  string
-		i     interface{}
+		i     any
 		types []string
 		want  bool
 	}{

@@ -8,7 +8,7 @@ import (
 // on the runtime context. The current module name and line number
 // from the context are stored in the new error object, along with
 // the message and context.
-func (c *Context) error(err error, context ...interface{}) *errors.Error {
+func (c *Context) error(err error, context ...any) *errors.Error {
 	if err == nil {
 		return nil
 	}

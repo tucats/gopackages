@@ -10,13 +10,13 @@ import (
 )
 
 // Index implements the index() function.
-func Index(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Index(symbols *symbols.SymbolTable, args []any) (any, error) {
 	if !extensions() {
 		return nil, errors.ErrExtension.Context("index")
 	}
 
 	switch arg := args[0].(type) {
-	case []interface{}:
+	case []any:
 		for n, v := range arg {
 			if reflect.DeepEqual(v, args[1]) {
 				return n, nil

@@ -25,7 +25,7 @@ const LineFormat = "at %d"
 
 // FormatUnquoted formats a value but does not
 // put quotes on strings.
-func FormatUnquoted(arg interface{}) string {
+func FormatUnquoted(arg any) string {
 	switch v := arg.(type) {
 	case string:
 		return v
@@ -38,7 +38,7 @@ func FormatUnquoted(arg interface{}) string {
 // In particular, this varies from a simple "%v" format in Go because
 // it puts commas in the array list output to match the syntax of an
 // array constant and puts quotes around string values.
-func Format(arg interface{}) string {
+func Format(arg any) string {
 	if arg == nil {
 		return "<nil>"
 	}
@@ -59,7 +59,7 @@ func Format(arg interface{}) string {
 
 	case float64:
 		return fmt.Sprintf("%v", v)
-	case map[string]interface{}:
+	case map[string]any:
 		var b strings.Builder
 		// Make a list of the keys, ignoring hidden members whose name
 		// starts with "__"
@@ -92,7 +92,7 @@ func Format(arg interface{}) string {
 		
 		return b.String()
 
-	case []interface{}:
+	case []any:
 		var b strings.Builder
 
 		b.WriteRune('[')

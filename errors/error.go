@@ -105,7 +105,7 @@ func (e *Error) HasAt() bool {
 // dependent value that further describes the error. For
 // example, in a keyword not recognized error, the context
 // is usually the offending keyword.
-func (e *Error) Context(context interface{}) *Error {
+func (e *Error) Context(context any) *Error {
 	if e == nil {
 		return nil
 	}
@@ -177,7 +177,7 @@ func Equals(e1, e2 error) bool {
 // object is not an error, then the result is always false.
 // If it is a native error or an EgoError, the error and
 // wrapped error are compared.
-func (e *Error) Equal(v interface{}) bool {
+func (e *Error) Equal(v any) bool {
 	if e == nil {
 		return v == nil
 	}
@@ -300,7 +300,7 @@ func (e *Error) Unwrap() error {
 }
 
 // GetContext retrieves the context value for the error.
-func (e *Error) GetContext() interface{} {
+func (e *Error) GetContext() any {
 	if e == nil {
 		return nil
 	}

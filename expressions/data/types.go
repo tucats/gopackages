@@ -115,7 +115,7 @@ const (
 // These constants are used to map a type name to a string. This creates a single place
 // where the "common" name for built-in types is found.
 const (
-	InterfaceTypeName = "interface{}"
+	InterfaceTypeName = "any"
 	BoolTypeName      = "bool"
 	ByteTypeName      = "byte"
 	IntTypeName       = "int"
@@ -152,7 +152,7 @@ type Function struct {
 	// The value of the function. For a compiled Ego function, this
 	// is a pointer to the assicated byte code. For a native function,
 	// this is the function value.
-	Value interface{}
+	Value any
 }
 
 // Type defines the type of an Ego object. All types have a kind which
@@ -182,7 +182,7 @@ type Field struct {
 // used to describe a list of return values to be treated as a tuple
 // when returning from a builtin or runtime function.
 type Values struct {
-	Items []interface{}
+	Items []any
 }
 
 // This map caches whether a given type implements a given interface.
@@ -195,13 +195,13 @@ var implements map[string]bool
 var validationLock sync.Mutex
 
 // List creates a new Values list object, placing the items in the list.
-func List(items ...interface{}) Values {
+func List(items ...any) Values {
 	return Values{Items: items}
 }
 
 // Get retrieves a named attribute (a field or a method)
 // from the type.
-func (t Type) Get(name string) interface{} {
+func (t Type) Get(name string) any {
 	if v, found := t.fields[name]; found {
 		return v
 	}
@@ -511,7 +511,7 @@ func (t Type) IsPointer() bool {
 }
 
 // Determine if the type is an interface. This could be
-// a simple interface object ("interface{}") or a type
+// a simple interface object ("any") or a type
 // that specifies an interface.
 func (t Type) IsInterface() bool {
 	// Is it a straightforward interface?
@@ -671,7 +671,7 @@ func (t Type) IsTypeDefinition() bool {
 
 // Define a function for a type, that can be used as a receiver
 // function.
-func (t *Type) DefineFunction(name string, declaration *Declaration, value interface{}) {
+func (t *Type) DefineFunction(name string, declaration *Declaration, value any) {
 	if t.functions == nil {
 		t.functions = map[string]Function{}
 	}
@@ -770,8 +770,8 @@ func (t Type) IsUndefined() bool {
 
 // Retrieve a receiver function from the given type. Returns
 // nil if there is no such function.
-func (t Type) Function(name string) interface{} {
-	var v interface{}
+func (t Type) Function(name string) any {
+	var v any
 
 	ok := false
 
@@ -813,9 +813,9 @@ func (t Type) Name() string {
 // Return the kind of the type passed in. All pointers are reported
 // as a pointer type, without the pointer designation.
 
-func KindOf(i interface{}) int {
+func KindOf(i any) int {
 	switch i.(type) {
-	case *interface{}, **sync.WaitGroup, **sync.Mutex, *string:
+	case *any, **sync.WaitGroup, **sync.Mutex, *string:
 		return PointerKind
 
 	case *bool, *int, *int32, *byte, *int64:
@@ -862,7 +862,7 @@ func KindOf(i interface{}) int {
 // IsNumeric determines if the value passed is an numeric type. The
 // parameter value can be an actual value (int, byte, float32, etc)
 // or a Type which represents a numeric value.
-func IsNumeric(i interface{}) bool {
+func IsNumeric(i any) bool {
 	switch actual := i.(type) {
 	case int, int32, int64, byte, float32, float64:
 		return true
@@ -884,7 +884,7 @@ func IsNumeric(i interface{}) bool {
 // TypeOf accepts an interface of arbitrary Ego or native data type,
 // and returns the associated type specification, such as data.intKind
 // or data.stringKind.
-func TypeOf(i interface{}) *Type {
+func TypeOf(i any) *Type {
 	switch v := i.(type) {
 	case Type:
 		if baseType := v.BaseType(); baseType != nil {
@@ -902,7 +902,7 @@ func TypeOf(i interface{}) *Type {
 
 		return v
 
-	case *interface{}:
+	case *any:
 		baseType := TypeOf(*v)
 
 		return PointerType(baseType)
@@ -978,7 +978,7 @@ func TypeOf(i interface{}) *Type {
 // IsType accepts an arbitrary value that is either an Ego or native data
 // value, and a type specification, and indicates if it is of the provided
 // Ego datatype indicator.
-func IsType(v interface{}, t *Type) bool {
+func IsType(v any, t *Type) bool {
 	if t.kind == InterfaceKind {
 		// If it is an empty interface (no methods) then it's always true
 		if len(t.functions) == 0 {
@@ -1008,7 +1008,7 @@ func IsType(v interface{}, t *Type) bool {
 // away any type definition layers and compares the value type to the ultimate
 // base type.  If the type passed in is already a base type, this is no different
 // than calling IsType() directly.
-func IsBaseType(v interface{}, t *Type) bool {
+func IsBaseType(v any, t *Type) bool {
 	valid := IsType(v, t)
 	if !valid && t.IsTypeDefinition() {
 		valid = IsBaseType(v, t.valueType)
@@ -1019,7 +1019,7 @@ func IsBaseType(v interface{}, t *Type) bool {
 
 // For a given interface pointer, unwrap the pointer and return the type it
 // actually points to.
-func TypeOfPointer(v interface{}) *Type {
+func TypeOfPointer(v any) *Type {
 	if p, ok := v.(Type); ok {
 		if p.kind != PointerKind || p.valueType == nil {
 			return UndefinedType
@@ -1029,7 +1029,7 @@ func TypeOfPointer(v interface{}) *Type {
 	}
 
 	// Is this a pointer to an actual native interface?
-	p, ok := v.(*interface{})
+	p, ok := v.(*any)
 	if !ok {
 		return UndefinedType
 	}
@@ -1042,7 +1042,7 @@ func TypeOfPointer(v interface{}) *Type {
 // Determine if the given value is "nil". This an be either an actual
 // nil value, or a value that represents the "nil values" for the given
 // type (which are recorded as the address of the zero value).
-func IsNil(v interface{}) bool {
+func IsNil(v any) bool {
 	// Is it outright a nil value?
 	if v == nil {
 		return true
@@ -1054,7 +1054,7 @@ func IsNil(v interface{}) bool {
 	}
 
 	// If it's not a pointer, then it can't be nil
-	addr, ok := v.(*interface{})
+	addr, ok := v.(*any)
 	if !ok {
 		return false
 	}

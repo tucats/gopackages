@@ -69,7 +69,7 @@ func dumpOption(level int, option Option, comma bool) {
 	fmt.Printf("%s  }%s\n", prefix, commaString)
 }
 
-func p(level int, label string, value interface{}) {
+func p(level int, label string, value any) {
 	prefix := strings.Repeat("  ", level)
 
 	switch v := value.(type) {

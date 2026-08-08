@@ -206,7 +206,7 @@ func IsActive(class int) bool {
 // class is not active, no action is taken.  Use WriteLog if you want
 // to write a message to a logging class regardless of whether it is
 // active or not.
-func Log(class int, format string, args ...interface{}) {
+func Log(class int, format string, args ...any) {
 	if class < 0 || class >= len(loggers) {
 		WriteLog(InternalLogger, "ERROR: Invalid Debug() class %d", class)
 
@@ -221,7 +221,7 @@ func Log(class int, format string, args ...interface{}) {
 // WriteLog displays a message to the log, regardless of whether the
 // logger is enabled. If there is an active log file, the message is
 // added to the log file, else it is written to stdout.
-func WriteLog(class int, format string, args ...interface{}) {
+func WriteLog(class int, format string, args ...any) {
 	if class < 0 || class >= len(loggers) {
 		WriteLog(InternalLogger, "ERROR: Invalid Log() class %d", class)
 
@@ -245,7 +245,7 @@ func WriteLog(class int, format string, args ...interface{}) {
 }
 
 // formatLogMessage displays a message to stdout.
-func formatLogMessage(class int, format string, args ...interface{}) string {
+func formatLogMessage(class int, format string, args ...any) string {
 	if class < 0 || class >= len(loggers) {
 		WriteLog(InternalLogger, "ERROR: Invalid LogMessage() class %d", class)
 
@@ -278,9 +278,9 @@ func formatLogMessage(class int, format string, args ...interface{}) string {
 // Note that the format string is tested to see if it is probably
 // a localization string. If so, it is localized before output.
 // If it was localized, and there is a single argument that is a
-// proper map[string]interface{} object, then that is used for the
+// proper map[string]any object, then that is used for the
 // formatting.
-func Say(format string, args ...interface{}) {
+func Say(format string, args ...any) {
 	var s string
 
 	alreadyFormatted := false
@@ -289,7 +289,7 @@ func Say(format string, args ...interface{}) {
 	// translation available, then the format is unchanged.
 	if strings.Index(format, ".") > 0 {
 		if len(args) > 0 {
-			if m, ok := args[0].(map[string]interface{}); ok {
+			if m, ok := args[0].(map[string]any); ok {
 				format = i18n.T(format, m)
 				alreadyFormatted = true
 			}

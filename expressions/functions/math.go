@@ -9,7 +9,7 @@ import (
 )
 
 // Min implements the min() function.
-func Min(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Min(symbols *symbols.SymbolTable, args []any) (any, error) {
 	if len(args) == 1 {
 		return args[0], nil
 	}
@@ -51,8 +51,7 @@ func Min(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 }
 
 // Max implements the max() function.
-func Max(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
+func Max(symbols *symbols.SymbolTable, args []any) (any, error) {
 	if len(args) == 1 {
 		return args[0], nil
 	}
@@ -95,8 +94,7 @@ func Max(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 }
 
 // Sum implements the sum() function.
-func Sum(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
-
+func Sum(symbols *symbols.SymbolTable, args []any) (any, error) {
 	base := args[0]
 	for _, addend := range args[1:] {
 		addend = util.Coerce(addend, base)
@@ -123,20 +121,20 @@ func Sum(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) 
 }
 
 // Sqrt implements the sqrt() function.
-func Sqrt(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Sqrt(symbols *symbols.SymbolTable, args []any) (any, error) {
 	f := util.GetFloat(args[0])
 
 	return math.Sqrt(f), nil
 }
 
 // Abs implements the abs() function.
-func Abs(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Abs(symbols *symbols.SymbolTable, args []any) (any, error) {
 	f := util.GetFloat(args[0])
 
 	return math.Abs(f), nil
 }
 
 // Log is the log() function.
-func Log(symbols *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Log(symbols *symbols.SymbolTable, args []any) (any, error) {
 	return math.Log(util.GetFloat(args[0])), nil
 }

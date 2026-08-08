@@ -38,7 +38,7 @@ func (e *SymbolError) Error() string {
 }
 
 // NewError creates an SymbolError object.
-func (*SymbolTable) NewError(text string, args ...interface{}) error {
+func (*SymbolTable) NewError(text string, args ...any) error {
 	e := &SymbolError{Text: text}
 
 	if len(args) > 0 {

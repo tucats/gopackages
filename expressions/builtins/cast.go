@@ -10,7 +10,7 @@ import (
 // convert numeric arrays to a different kind of array, to convert a string
 // to an array of integer (rune) values, etc.  It is called from within
 // the Call bytecode when the function is really a type.
-func Cast(s *symbols.SymbolTable, args []interface{}) (interface{}, error) {
+func Cast(s *symbols.SymbolTable, args []any) (any, error) {
 	// Target t is the last parameter
 	t := data.TypeOf(args[len(args)-1])
 	source := args[0]

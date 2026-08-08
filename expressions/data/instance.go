@@ -6,7 +6,7 @@ import (
 
 // InstanceOfType accepts a type object, and returns the zero-value
 // model of that type. This only applies to base types.
-func InstanceOfType(t *Type) interface{} {
+func InstanceOfType(t *Type) any {
 	switch t.kind {
 	case TypeKind:
 		return t.InstanceOf(nil)
@@ -45,7 +45,7 @@ func InstanceOfType(t *Type) interface{} {
 // For a given type, create a "zero-instance" of that type. For builtin scalar
 // types, it is the same as the InstanceOf() function. However, this can also
 // generate structs, maps, arrays, and user type instances as well.
-func (t Type) InstanceOf(superType *Type) interface{} {
+func (t Type) InstanceOf(superType *Type) any {
 	switch t.kind {
 	case TypeKind:
 		return t.valueType.InstanceOf(&t)

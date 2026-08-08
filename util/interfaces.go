@@ -7,8 +7,8 @@ import (
 
 // GetMap extracts a struct from an abstract interface. Returns nil
 // if the interface did not contain a struct/map.
-func GetMap(v interface{}) map[string]interface{} {
-	if m, ok := v.(map[string]interface{}); ok {
+func GetMap(v any) map[string]any {
+	if m, ok := v.(map[string]any); ok {
 		return m
 	}
 
@@ -17,8 +17,8 @@ func GetMap(v interface{}) map[string]interface{} {
 
 // GetArray extracts a struct from an abstract interface. Returns nil
 // if the interface did not contain a struct/map.
-func GetArray(v interface{}) []interface{} {
-	if m, ok := v.([]interface{}); ok {
+func GetArray(v any) []any {
+	if m, ok := v.([]any); ok {
 		return m
 	}
 
@@ -27,9 +27,9 @@ func GetArray(v interface{}) []interface{} {
 
 // GetInt64 takes a generic interface and returns the integer value, using
 // type coercion if needed.
-func GetInt64(v interface{}) int64 {
+func GetInt64(v any) int64 {
 	switch v.(type) {
-	case map[string]interface{}, []interface{}, nil:
+	case map[string]any, []any, nil:
 		return int64(0)
 	case error:
 		return 0
@@ -40,12 +40,12 @@ func GetInt64(v interface{}) int64 {
 
 // GetInt takes a generic interface and returns the integer value, using
 // type coercion if needed.
-func GetInt(v interface{}) int {
+func GetInt(v any) int {
 	switch v.(type) {
 	case error:
 		return 0
 
-	case map[string]interface{}, []interface{}, nil:
+	case map[string]any, []any, nil:
 		return 0
 	}
 
@@ -54,12 +54,12 @@ func GetInt(v interface{}) int {
 
 // GetBool takes a generic interface and returns the boolean value, using
 // type coercion if needed.
-func GetBool(v interface{}) bool {
+func GetBool(v any) bool {
 	switch v.(type) {
 	case error:
 		return false
 
-	case map[string]interface{}, []interface{}, nil:
+	case map[string]any, []any, nil:
 		return false
 	}
 
@@ -68,15 +68,15 @@ func GetBool(v interface{}) bool {
 
 // GetString takes a generic interface and returns the string value, using
 // type coercion if needed.
-func GetString(v interface{}) string {
+func GetString(v any) string {
 	switch v.(type) {
 	case error:
 		return ""
 
-	case map[string]interface{}:
+	case map[string]any:
 		return Format(v)
 
-	case []interface{}, nil:
+	case []any, nil:
 		return ""
 	}
 
@@ -85,12 +85,12 @@ func GetString(v interface{}) string {
 
 // GetFloat takes a generic interface and returns the float64 value, using
 // type coercion if needed.
-func GetFloat(v interface{}) float64 {
+func GetFloat(v any) float64 {
 	switch v.(type) {
 	case error:
 		return 0.0
 
-	case map[string]interface{}, []interface{}, nil:
+	case map[string]any, []any, nil:
 		return 0.0
 	}
 
@@ -99,7 +99,7 @@ func GetFloat(v interface{}) float64 {
 
 // Coerce returns the value after it has been converted to the type of the
 // model value.
-func Coerce(v interface{}, model interface{}) interface{} {
+func Coerce(v any, model any) any {
 	if e, ok := v.(error); ok {
 		return e
 	}
@@ -250,7 +250,7 @@ func Coerce(v interface{}, model interface{}) interface{} {
 
 // Normalize accepts two different values and promotes them to
 // the most compatable format.
-func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
+func Normalize(v1 any, v2 any) (any, any) {
 	// Same type? we're done here
 	switch v1.(type) {
 	case nil:
@@ -267,10 +267,10 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 			return float32(0), v2
 		case float64:
 			return float64(0), v2
-		case []interface{}:
-			return []interface{}{}, v2
-		case map[string]interface{}:
-			return map[string]interface{}{}, v2
+		case []any:
+			return []any{}, v2
+		case map[string]any:
+			return map[string]any{}, v2
 		}
 
 	case string:
@@ -367,7 +367,7 @@ func Normalize(v1 interface{}, v2 interface{}) (interface{}, interface{}) {
 }
 
 // CoerceType will coerce an interface to a given type by name.
-func CoerceType(v interface{}, typeName string) interface{} {
+func CoerceType(v any, typeName string) any {
 	switch typeName {
 	case "int":
 		return Coerce(v, int(0))
